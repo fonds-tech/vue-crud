@@ -1,9 +1,10 @@
-// @ts-check
-import antfu from '@antfu/eslint-config'
+import eslint from '@fonds/eslint-config'
 
-export default antfu(
+export default eslint(
   {
     type: 'lib',
+    vue: true,
+    jsx: true,
     pnpm: true,
   },
 )

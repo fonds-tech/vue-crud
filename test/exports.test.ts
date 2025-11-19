@@ -1,7 +1,7 @@
-import { x } from 'tinyexec'
-import { describe, expect, it } from 'vitest'
-import { getPackageExportsManifest } from 'vitest-package-exports'
 import yaml from 'yaml'
+import { x } from 'tinyexec'
+import { it, expect, describe } from 'vitest'
+import { getPackageExportsManifest } from 'vitest-package-exports'
 
 // TODO: remove this when you are ready for the first release
 const IS_READY = false
