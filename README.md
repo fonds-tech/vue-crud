@@ -45,15 +45,15 @@ pnpm install
 
 项目内置了一些常用的脚本，方便你进行开发、测试和构建。
 
-| 命令 | 描述 |
-| :--- | :--- |
-| `pnpm dev` | 启动开发模式，文件变更时自动重新构建。 |
-| `pnpm build` | 为生产环境构建和打包代码。 |
-| `pnpm test` | 运行所有单元测试。 |
-| `pnpm lint` | 检查代码风格问题。 |
-| `pnpm typecheck` | 对整个项目进行 TypeScript 类型检查。 |
-| `pnpm release` | 自动提升版本号并打上 Git 标签，方便发布。 |
-| `pnpm start` | 使用 `tsx` 直接运行 `src/index.ts`。 |
+| 命令             | 描述                                      |
+| :--------------- | :---------------------------------------- |
+| `pnpm dev`       | 启动开发模式，文件变更时自动重新构建。    |
+| `pnpm build`     | 为生产环境构建和打包代码。                |
+| `pnpm test`      | 运行所有单元测试。                        |
+| `pnpm lint`      | 检查代码风格问题。                        |
+| `pnpm typecheck` | 对整个项目进行 TypeScript 类型检查。      |
+| `pnpm release`   | 自动提升版本号并打上 Git 标签，方便发布。 |
+| `pnpm start`     | 使用 `tsx` 直接运行 `src/index.ts`。      |
 
 ## 🤝 贡献
 

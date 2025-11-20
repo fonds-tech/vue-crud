@@ -1,5 +1,6 @@
 import type { App } from "vue"
 import Crud from "./crud"
+import Dialog from "./dialog"
 import AddButton from "./add-button"
 import DeleteButton from "./delete-button"
 
@@ -7,6 +8,7 @@ export const components: { [key: string]: any } = {
   Crud,
   AddButton,
   DeleteButton,
+  Dialog,
 }
 
 /**

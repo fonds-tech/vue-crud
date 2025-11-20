@@ -6,10 +6,13 @@ export default eslint(
     vue: true,
     jsx: true,
     pnpm: true,
+    stylistic: true,
+    formatters: true,
   },
   {
     rules: {
       "no-console": "off",
+      "ts/ban-ts-comment": "off",
     },
   },
 )

@@ -5,6 +5,7 @@ packages:
 catalog:
   '@antfu/ni': ^27.0.1
   '@antfu/utils': ^9.3.0
+  '@element-plus/icons-vue': ^2.3.2
   '@fonds/eslint-config': ^1.0.15
   '@fonds/utils': ^1.0.6
   '@types/lodash-es': ^4.17.12
@@ -15,6 +16,7 @@ catalog:
   bumpp: ^10.3.1
   element-plus: ^2.11.8
   eslint: ^9.39.1
+  eslint-plugin-format: ^1.0.2
   happy-dom: ^20.0.10
   lint-staged: ^16.2.6
   lodash-es: ^4.17.21

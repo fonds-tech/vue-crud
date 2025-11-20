@@ -36,6 +36,7 @@
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "catalog:",
     "@fonds/utils": "catalog:",
     "element-plus": "catalog:",
     "lodash-es": "catalog:",
@@ -52,6 +53,7 @@
     "@vue/test-utils": "catalog:",
     "bumpp": "catalog:",
     "eslint": "catalog:",
+    "eslint-plugin-format": "catalog:",
     "happy-dom": "catalog:",
     "lint-staged": "catalog:",
     "sass": "catalog:",
