@@ -3,7 +3,7 @@
     <div class="title">
       CRUD DEMO
     </div>
-    <fd-crud>
+    <fd-crud ref="crud">
       <fd-add-button />
       <fd-delete-button />
     </fd-crud>
@@ -12,16 +12,13 @@
 
 <script setup lang="ts">
 import { useCrud } from "./hooks"
+import { TestService } from "./utils/test"
 
 const crud = useCrud(
-  {
-    service: "test",
-  },
-  (app) => {
-    app.refresh()
-  },
+  { service: new TestService() },
+  app => app.refresh(),
 )
-console.log("🚀 ~ crud:", crud)
+console.log("🚀 ~ crud:", crud.value)
 </script>
 
 <style scoped>

@@ -13,9 +13,8 @@ export default defineComponent({
   setup(props, { slots, expose }) {
     const ins = getCurrentInstance()
     const mitt = new Mitt(ins?.uid)
-    const config = useConfig() || ({} as CrudOptions)
     const options = reactive<CrudOptions>(inject("__crud_options__", {} as CrudOptions))
-    const crudConfig = reactive<CrudOptions>(merge(clone(config), options))
+    const { dict, permission } = useConfig()
 
     const crud = reactive<any>(
       merge(
@@ -36,13 +35,13 @@ export default defineComponent({
           // 事件
           mitt,
           // 配置
-          config: crudConfig,
+          config: options,
         },
-        clone({ dict: crudConfig.dict || {}, permission: crudConfig.permission || {} }),
+        clone({ dict, permission }),
       ),
     )
 
-    merge(crud, useHelper({ config, crud, mitt }))
+    merge(crud, useHelper({ config: options, crud, mitt }))
 
     provide("crud", crud)
     provide("mitt", mitt)

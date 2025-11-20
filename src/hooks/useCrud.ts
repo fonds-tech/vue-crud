@@ -8,11 +8,6 @@ export function useCrud(options?: Partial<CrudOptions>, callback?: (app: CrudRef
   useParent("fd-crud", crud)
 
   if (options) {
-    // 测试模式
-    if (options.service === "test") {
-      //   options.service = new TestService()
-    }
-
     provide("__crud_options__", options)
   }
 
