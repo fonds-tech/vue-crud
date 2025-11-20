@@ -34,5 +34,5 @@ export interface CrudRef {
 }
 
 export interface CrudOptions extends Config {
-  service?: CrudService
+  service?: any
 }

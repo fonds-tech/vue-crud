@@ -25,8 +25,8 @@
     "dist"
   ],
   "scripts": {
+    "dev": "vite",
     "build": "tsdown",
-    "dev": "tsdown --watch",
     "lint": "eslint",
     "prepublishOnly": "nr build",
     "release": "bumpp",
