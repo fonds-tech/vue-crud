@@ -11,15 +11,16 @@ export default defineConfig({
     vueJsx(),
     dts({
       include: ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-      outDir: "types",
+      outDir: "dist/types",
     }),
   ],
 
   build: {
     lib: {
       entry: resolve(__dirname, "src/entry.ts"),
-      name: "index",
-      fileName: format => `index.${format}.js`,
+      name: "VueCrud",
+      formats: ["es", "cjs"],
+      fileName: format => (format === "es" ? "index.mjs" : "index.cjs"),
       cssFileName: "index",
     },
     rollupOptions: {
@@ -34,7 +35,6 @@ export default defineConfig({
       },
     },
     sourcemap: true,
-    minify: "terser",
     cssCodeSplit: false,
   },
 })

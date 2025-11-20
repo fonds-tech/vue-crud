@@ -15,18 +15,26 @@
   "keywords": [],
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/index.css",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsdown",
+    "build": "pnpm run build:clean && pnpm run build:lib && pnpm run build:types",
+    "build:clean": "node ./scripts/clean.mjs",
+    "build:lib": "vite build",
+    "build:types": "vue-tsc --project tsconfig.build.json --emitDeclarationOnly",
     "lint": "eslint",
     "prepublishOnly": "nr build",
     "release": "bumpp",
