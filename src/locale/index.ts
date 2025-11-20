@@ -1,11 +1,11 @@
-import en from './en'
-import ja from './ja'
-import zhCn from './zh-cn'
-import zhTw from './zh-tw'
+import en from "./en"
+import ja from "./ja"
+import zhCn from "./zh-cn"
+import zhTw from "./zh-tw"
 
 export const locale = {
   en,
   ja,
-  'zh-cn': zhCn,
-  'zh-tw': zhTw,
+  "zh-cn": zhCn,
+  "zh-tw": zhTw,
 }

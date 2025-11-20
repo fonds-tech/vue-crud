@@ -1,5 +1,5 @@
-import type { Ref } from 'vue'
-import { getCurrentInstance } from 'vue'
+import type { Ref } from "vue"
+import { getCurrentInstance } from "vue"
 
 export function useParent(name: string, ref: Ref): void {
   const ins = getCurrentInstance()
@@ -8,7 +8,7 @@ export function useParent(name: string, ref: Ref): void {
     let parent = ins.proxy?.$.parent
 
     if (parent) {
-      while (parent && parent.type?.name !== name && parent.type?.name !== 'fd-crud') {
+      while (parent && parent.type?.name !== name && parent.type?.name !== "fd-crud") {
         parent = parent?.parent
       }
 

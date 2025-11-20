@@ -5,14 +5,17 @@ packages:
 catalog:
   '@antfu/ni': ^27.0.1
   '@antfu/utils': ^9.3.0
-  '@fonds/eslint-config': ^1.0.14
+  '@fonds/eslint-config': ^1.0.15
+  '@fonds/utils': ^1.0.3
   '@types/lodash-es': ^4.17.12
   '@types/node': ^24.10.0
   '@vitejs/plugin-vue': ^6.0.2
   '@vitejs/plugin-vue-jsx': ^5.1.2
+  '@vue/test-utils': ^2.4.6
   bumpp: ^10.3.1
   element-plus: ^2.11.8
   eslint: ^9.39.1
+  happy-dom: ^20.0.10
   lint-staged: ^16.2.6
   lodash-es: ^4.17.21
   sass: ^1.94.1

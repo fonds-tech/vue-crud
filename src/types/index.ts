@@ -1,2 +1,2 @@
-export * from './config'
-export * from './crud'
+export * from "./config"
+export * from "./crud"

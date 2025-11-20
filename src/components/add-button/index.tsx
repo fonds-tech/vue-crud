@@ -1,8 +1,8 @@
-import { defineComponent } from 'vue'
-import { useCore, useConfig } from '../../hooks'
+import { defineComponent } from "vue"
+import { useCore, useConfig } from "../../hooks"
 
 export default defineComponent({
-  name: 'fd-add-button',
+  name: "fd-add-button",
 
   setup(_, { slots }) {
     const { crud } = useCore()
@@ -10,7 +10,7 @@ export default defineComponent({
 
     return () => {
       return (
-        crud.getPermission('add') && (
+        crud.getPermission("add") && (
           <el-button type="primary" size={style.size} onClick={crud.rowAdd}>
             {slots.default?.() || crud.dict.label.add}
           </el-button>

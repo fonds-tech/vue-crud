@@ -19,7 +19,7 @@ export type WildCardHandlerList<T> = Array<WildcardHandler<T>>
 
 // 事件处理函数映射表类型，将事件名称或通配符映射到对应的处理函数列表
 export type EventHandlerMap<Events extends Record<PropertyKey, unknown>> = Map<
-  keyof Events | '*',
+  keyof Events | "*",
   HandlerList<Events[keyof Events]> | WildCardHandlerList<Events>
 >
 
@@ -47,8 +47,8 @@ export class Mitt<Events extends Record<PropertyKey, unknown> = Record<string, u
    * @memberOf Mitt
    */
   on<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void
-  on(type: '*', handler: WildcardHandler<Events>): void
-  on<Key extends keyof Events>(type: Key | '*', handler: Handler<Events[Key]> | WildcardHandler<Events>): void {
+  on(type: "*", handler: WildcardHandler<Events>): void
+  on<Key extends keyof Events>(type: Key | "*", handler: Handler<Events[Key]> | WildcardHandler<Events>): void {
     const handlers: Array<Handler<Events[Key]> | WildcardHandler<Events>> | undefined = this.events.get(type)
     if (handlers) {
       // 如果已有处理函数列表，则添加新的处理函数
@@ -69,8 +69,8 @@ export class Mitt<Events extends Record<PropertyKey, unknown> = Record<string, u
    * @memberOf Mitt
    */
   off<Key extends keyof Events>(type: Key, handler?: Handler<Events[Key]>): void
-  off(type: '*', handler?: WildcardHandler<Events>): void
-  off<Key extends keyof Events>(type: Key | '*', handler?: Handler<Events[Key]> | WildcardHandler<Events>): void {
+  off(type: "*", handler?: WildcardHandler<Events>): void
+  off<Key extends keyof Events>(type: Key | "*", handler?: Handler<Events[Key]> | WildcardHandler<Events>): void {
     const handlers: Array<Handler<Events[Key]> | WildcardHandler<Events>> | undefined = this.events.get(type)
     if (handlers) {
       if (handler) {
@@ -106,7 +106,7 @@ export class Mitt<Events extends Record<PropertyKey, unknown> = Record<string, u
     }
 
     // 调用通配符事件处理函数
-    handlers = this.events.get('*')
+    handlers = this.events.get("*")
     if (handlers) {
       (handlers as WildCardHandlerList<Events>)
         .slice() // 使用slice创建副本

@@ -1,10 +1,15 @@
-import eslint from '@fonds/eslint-config'
+import eslint from "@fonds/eslint-config"
 
 export default eslint(
   {
-    type: 'lib',
+    type: "app",
     vue: true,
     jsx: true,
     pnpm: true,
+  },
+  {
+    rules: {
+      "no-console": "off",
+    },
   },
 )

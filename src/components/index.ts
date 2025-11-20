@@ -1,24 +1,10 @@
+import type { App } from "vue"
+import Crud from "./crud"
+import AddButton from "./add-button"
+
 export const components: { [key: string]: any } = {
   Crud,
-  AddBtn,
-  AdvBtn,
-  AdvSearch,
-  Flex,
-  Form,
-  FormTabs,
-  FormCard,
-  MultiDeleteBtn,
-  Pagination,
-  RefreshBtn,
-  SearchKey,
-  Table,
-  Upsert,
-  Dialog,
-  Filter,
-  Search,
-  ErrorMessage,
-  Row,
-  ContextMenu,
+  AddButton,
 }
 
 /**
