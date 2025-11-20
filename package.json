@@ -31,10 +31,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run build:clean && pnpm run build:lib && pnpm run build:types",
+    "build": "pnpm run build:clean && pnpm run build:lib",
     "build:clean": "node ./scripts/clean.mjs",
     "build:lib": "vite build",
-    "build:types": "vue-tsc --project tsconfig.build.json --emitDeclarationOnly",
     "lint": "eslint",
     "prepublishOnly": "nr build",
     "release": "bumpp",

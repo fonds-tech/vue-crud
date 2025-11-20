@@ -1,9 +1,11 @@
+const globalStore = globalThis as typeof globalThis & Record<string, unknown>
+
 export default {
-  get(key: string) {
-    return globalThis[key]
+  get<T = unknown>(key: string): T | undefined {
+    return globalStore[key] as T | undefined
   },
 
-  set(key: string, value: any) {
-    globalThis[key] = value
+  set<T = unknown>(key: string, value: T): void {
+    globalStore[key] = value
   },
 }

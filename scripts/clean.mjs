@@ -1,6 +1,6 @@
+import process from "node:process"
 import { rmSync } from "node:fs"
 import { resolve } from "node:path"
-import { process } from "node:process"
 
 const targets = ["dist", "types"]
 

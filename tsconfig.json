@@ -4,26 +4,18 @@
     "jsx": "preserve",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
-
     "baseUrl": ".",
     "module": "ESNext",
-
     "moduleResolution": "bundler",
     "paths": {
       "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
-
-    "allowImportingTsExtensions": true,
-    "strict": false,
-
+    "types": ["vite/client", "vue/jsx"],
+    "strict": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "declaration": true,
-    "declarationDir": "types",
-    "emitDeclarationOnly": true,
     "noEmit": true,
     "isolatedModules": true,
     "skipLibCheck": true

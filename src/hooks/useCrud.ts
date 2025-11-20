@@ -3,7 +3,7 @@ import type { CrudRef, CrudOptions } from "../types"
 import { useParent } from "./useParent"
 import { ref, watch, provide } from "vue"
 
-export function useCrud(options?: Partial<CrudOptions>, callback?: (app: CrudRef) => void): Ref<CrudRef> {
+export function useCrud(options?: Partial<CrudOptions>, callback?: (app: CrudRef) => void): Ref<CrudRef | undefined> {
   const crud = ref<CrudRef>()
   useParent("fd-crud", crud)
 

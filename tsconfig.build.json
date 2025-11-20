@@ -6,7 +6,8 @@
     "declarationDir": "dist/types",
     "emitDeclarationOnly": true,
     "noEmit": false,
-    "outDir": "dist/types"
+    "outDir": "dist/types",
+    "skipLibCheck": false
   },
   "include": ["src"],
   "exclude": ["src/App.vue", "node_modules", "dist", "examples", "test"]
