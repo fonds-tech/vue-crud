@@ -1,48 +1,11 @@
-import type { FormExpose } from "../../../types"
+import type { FormRef } from "../../../types"
 import Form from "../index"
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
-import { it, vi, expect, describe } from "vitest"
-
-vi.mock("../../../hooks", async () => {
-  const actual = await vi.importActual<typeof import("../../../hooks")>("../../../hooks")
-  return {
-    ...actual,
-    useConfig: () => ({
-      dict: {
-        label: {
-          save: "保存",
-          close: "关闭",
-          seeMore: "查看更多",
-          hideContent: "收起内容",
-          nonEmpty: "{label}不能为空",
-        },
-      },
-      permission: {},
-      style: {
-        size: "default",
-        form: {
-          span: 12,
-          labelWidth: 120,
-          labelPosition: "right",
-          plugins: [],
-        },
-      },
-      events: {},
-    }),
-    useBrowser: () => ({
-      width: 1920,
-      height: 1080,
-      isMini: false,
-    }),
-  }
-})
+import { it, expect, describe } from "vitest"
 
 function mountForm() {
   return mount(Form, {
-    props: {
-      inner: true,
-    },
     global: {
       plugins: [ElementPlus],
     },
@@ -50,54 +13,46 @@ function mountForm() {
 }
 
 describe("fd-form", () => {
-  it("hydrates nested values when opening the form", () => {
+  it("hydrates default values when using schema", async () => {
     const wrapper = mountForm()
-    const instance = wrapper.vm as FormExpose
+    const instance = wrapper.vm as FormRef
 
-    instance.open({
-      title: "Nested",
+    instance.use({
       items: [
         {
-          field: "profile.name",
+          field: "name",
           label: "姓名",
+          value: "Alice",
           component: {
             is: "el-input",
           },
         },
       ],
-      form: {
-        profile: {
-          name: "Alice",
-        },
-      },
     })
 
-    expect(instance.form["profile-name"]).toBe("Alice")
+    expect(instance.getField("name")).toBe("Alice")
   })
 
-  it("bindForm accepts nested objects", () => {
+  it("bindFields replaces existing model", () => {
     const wrapper = mountForm()
-    const instance = wrapper.vm as FormExpose
+    const instance = wrapper.vm as FormRef
 
-    instance.open({
-      title: "Bind",
+    instance.use({
       items: [
         {
-          field: "profile.name",
-          label: "姓名",
+          field: "age",
+          label: "年龄",
           component: {
-            is: "el-input",
+            is: "el-input-number",
           },
         },
       ],
     })
 
-    instance.bindForm({
-      profile: {
-        name: "Bob",
-      },
+    instance.bindFields({
+      age: 30,
     })
 
-    expect(instance.form["profile-name"]).toBe("Bob")
+    expect(instance.getField("age")).toBe(30)
   })
 })

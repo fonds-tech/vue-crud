@@ -16,8 +16,8 @@ catalogs:
       specifier: ^2.3.2
       version: 2.3.2
     '@fonds/eslint-config':
-      specifier: ^1.0.15
-      version: 1.0.15
+      specifier: ^1.0.17
+      version: 1.0.17
     '@fonds/utils':
       specifier: ^1.0.6
       version: 1.0.6
@@ -125,7 +125,7 @@ importers:
         version: 9.3.0
       '@fonds/eslint-config':
         specifier: 'catalog:'
-        version: 1.0.15(@vue/compiler-sfc@3.5.24)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.12(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))
+        version: 1.0.17(@vue/compiler-sfc@3.5.24)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.12(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -818,8 +818,8 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@fonds/eslint-config@1.0.15':
-    resolution: {integrity: sha512-/huaRm5Vk4qDEgmwqO4liX7LqF6RYPCpn9xttWJ/Ytv7GGJ6+yj+XvsGo371nf+9/P1OgbmNaU1L3kyN0Yl7pQ==}
+  '@fonds/eslint-config@1.0.17':
+    resolution: {integrity: sha512-m/O9+IwPJLBTHx3mDUcPVhy8J5V9eKbKH6/RAgjk3/bJNZ3Ch7Tvb5dIKJaJL57HVE2Oun0VmGEC+cARNefdyA==}
     hasBin: true
     peerDependencies:
       '@eslint-react/eslint-plugin': ^2.0.1
@@ -4072,7 +4072,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@fonds/eslint-config@1.0.15(@vue/compiler-sfc@3.5.24)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.12(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))':
+  '@fonds/eslint-config@1.0.17(@vue/compiler-sfc@3.5.24)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.12(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 0.11.0

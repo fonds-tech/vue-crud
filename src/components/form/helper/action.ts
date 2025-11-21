@@ -1,150 +1,134 @@
 import type { Ref } from "vue"
 import type { FormInstance } from "element-plus"
-import type { FormItem, FormField, FormModel, FormConfig } from "../../../types"
-import { assign } from "lodash-es"
-import { dataset } from "../../../utils/dataset"
+import type { FormMode, FormField, FormOptions } from "../../../types"
+import { isArray, cloneDeep, set as setPath } from "lodash-es"
+import { findItem, normalizeItems, ensureComponent } from "./schema"
 
-interface ActionOptions<T extends FormModel = FormModel> {
-  config: FormConfig<T>
-  form: T
-  Form: Ref<FormInstance | undefined>
+export interface FormActionContext {
+  options: FormOptions
+  model: Record<string, unknown>
+  form: Ref<FormInstance | undefined>
 }
 
-type SetKey = "options" | "props" | "hidden" | "hidden-toggle"
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null
-}
-
-export function useAction<T extends FormModel = FormModel>({ config, form, Form }: ActionOptions<T>) {
-  function findItem(field?: FormField<T>) {
-    if (field === undefined || field === null || field === "") {
-      return undefined
-    }
-
-    let target: FormItem<T> | undefined
-
-    function deep(list: FormItem<T>[]) {
-      list.forEach((item) => {
-        if (item.field === field) {
-          target = item
-        }
-        else if (item.children) {
-          deep(item.children)
-        }
-      })
-    }
-
-    deep(config.items)
-    return target
+export function useFormActions({ options, model, form }: FormActionContext) {
+  function clearModel() {
+    Object.keys(model).forEach(key => delete model[key])
   }
 
-  function set({ field, key, path }: { field?: FormField<T>, key?: SetKey, path?: string }, data?: unknown) {
-    if (typeof path === "string") {
-      dataset(config, path, data)
-      return
+  function setMode(mode: FormMode) {
+    options.mode = mode
+  }
+
+  function getField(field?: FormField) {
+    if (field === undefined || field === null) {
+      return model
     }
+    const key = String(field)
+    return model[key]
+  }
 
-    const target = findItem(field)
+  function setField(field: FormField, value: any) {
+    model[String(field)] = value
+  }
 
+  function bindFields(data: Record<string, unknown> = {}) {
+    const values = cloneDeep(data)
+    form.value?.resetFields()
+    form.value?.clearValidate()
+    clearModel()
+    Object.assign(model, values)
+    normalizeItems(options.items, model)
+  }
+
+  function setData(path: string, value: unknown) {
+    setPath(options as Record<string, any>, path, value)
+  }
+
+  function setItem(field: FormField, data: Record<string, unknown>) {
+    const target = findItem(options.items, field)
+    if (target) {
+      Object.assign(target, data)
+    }
+  }
+
+  function setList(field: FormField, list: any[]) {
+    const target = findItem(options.items, field)
+    if (target) {
+      ensureComponent(target)
+      target.component!.options = list
+    }
+  }
+
+  function getList(field: FormField) {
+    const target = findItem(options.items, field)
     if (!target) {
-      return
+      return []
     }
+    ensureComponent(target)
+    return target.component?.options ?? []
+  }
 
-    switch (key) {
-      case "options":
-        if (target.component && Array.isArray(data)) {
-          target.component.options = data
-        }
-        break
-      case "props":
-        if (target.component && isRecord(data)) {
-          target.component.props = assign({}, target.component.props, data)
-        }
-        break
-      case "hidden":
-        if (typeof data === "boolean") {
-          target.hidden = data
-        }
-        break
-      case "hidden-toggle": {
-        const currentHidden = typeof target.hidden === "boolean" ? target.hidden : false
-        target.hidden = typeof data === "boolean" ? !data : !currentHidden
-        break
+  function setProps(field: FormField, props: Record<string, any>) {
+    const target = findItem(options.items, field)
+    if (target) {
+      ensureComponent(target)
+      if (target.component?.props) {
+        Object.assign(target.component.props, props)
       }
-      case undefined:
-        if (isRecord(data)) {
-          assign(target, data)
-        }
-        break
-      default:
-        break
     }
   }
 
-  function getForm(field?: FormField<T>) {
-    if (field === undefined || field === null || field === "") {
-      return form
+  function setStyle(field: FormField, style: Record<string, unknown>) {
+    const target = findItem(options.items, field)
+    if (target) {
+      ensureComponent(target)
+      if (target.component?.style) {
+        Object.assign(target.component.style, style)
+      }
     }
-    const record = form as Record<string, unknown>
-    return record[String(field)]
   }
 
-  function setForm(field: FormField<T>, value: unknown) {
-    const record = form as Record<string, unknown>
-    record[String(field)] = value
+  function toggleHidden(fields: FormField | FormField[], hidden: boolean) {
+    const list = isArray(fields) ? fields : [fields]
+    list.forEach((field) => {
+      const target = findItem(options.items, field)
+      if (target) {
+        target.hidden = () => hidden
+      }
+    })
   }
 
-  function setConfig(path: string, value: unknown) {
-    set({ path }, value)
-  }
-
-  function setData(field: FormField<T>, value: unknown) {
-    set({ field }, value)
-  }
-
-  function setOptions(field: FormField<T>, value: unknown[]) {
-    set({ field, key: "options" }, value)
-  }
-
-  function setProps(field: FormField<T>, value: Record<string, unknown>) {
-    set({ field, key: "props" }, value)
-  }
-
-  function toggleItem(field: FormField<T>, value?: boolean) {
-    set({ field, key: "hidden-toggle" }, value)
-  }
-
-  function hideItem(...fields: FormField<T>[]) {
-    fields.forEach(field => set({ field, key: "hidden" }, true))
-  }
-
-  function showItem(...fields: FormField<T>[]) {
-    fields.forEach(field => set({ field, key: "hidden" }, false))
-  }
-
-  function setTitle(value: string) {
-    config.title = value
-  }
-
-  function collapseItem(item: FormItem) {
-    if (typeof item.field === "string" && item.field.length > 0) {
-      Form.value?.clearValidate(item.field)
+  function collapse(flag?: boolean) {
+    if (typeof flag === "boolean") {
+      options.layout.grid.collapsed = flag
     }
-    item.collapse = !item.collapse
+    else {
+      options.layout.grid.collapsed = !options.layout.grid.collapsed
+    }
+  }
+
+  function setRequired(field: FormField, required: boolean) {
+    const target = findItem(options.items, field)
+    if (target) {
+      target.required = () => required
+    }
   }
 
   return {
-    getForm,
-    setForm,
+    setMode,
+    getField,
+    setField,
+    bindFields,
     setData,
-    setConfig,
-    setOptions,
+    setItem,
+    setOptions: setList,
+    getOptions: getList,
     setProps,
-    toggleItem,
-    hideItem,
-    showItem,
-    setTitle,
-    collapseItem,
+    setStyle,
+    hideItem: (field: FormField | FormField[]) => toggleHidden(field, true),
+    showItem: (field: FormField | FormField[]) => toggleHidden(field, false),
+    collapse,
+    setRequired,
+    clearModel,
   }
 }

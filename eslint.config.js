@@ -7,9 +7,27 @@ export default eslint(
     jsx: true,
     pnpm: true,
     stylistic: true,
-    formatters: true,
     typescript: {
       tsconfigPath: "./tsconfig.json",
+    },
+    formatters: {
+      prettierOptions: {
+        arrowParens: "always",
+        bracketSameLine: false,
+        bracketSpacing: true,
+        endOfLine: "auto",
+        printWidth: 180,
+        proseWrap: "always",
+        semi: false,
+        singleAttributePerLine: false,
+        singleQuote: false,
+        tabWidth: 2,
+        trailingComma: "all",
+        useTabs: false,
+        vueIndentScriptAndStyle: false,
+        jsxBracketSameLine: false,
+        jsxSingleQuote: false,
+      },
     },
   },
   {
