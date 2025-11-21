@@ -1,6 +1,8 @@
 import { defineComponent } from "vue"
 import { useCore, useConfig } from "../../hooks"
 
+/* eslint-disable ts/no-unsafe-argument */
+
 export default defineComponent({
   name: "fd-delete-button",
 
@@ -16,7 +18,7 @@ export default defineComponent({
             size={style.size}
             disabled={crud.selection.length === 0}
             onClick={() => {
-              crud.rowDelete(...crud.selection)
+              void crud.rowDelete(...crud.selection)
             }}
           >
             {slots.default?.() || crud.dict.label.delete}

@@ -1,5 +1,8 @@
 import { assign, orderBy } from "lodash-es"
 
+/* 测试服务用于模拟任意数据结构，允许使用动态 any 操作 */
+/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-member-access, ts/no-unsafe-argument, ts/strict-boolean-expressions */
+
 function uuid(separator = "-"): string {
   const s: any[] = []
   const hexDigits = "0123456789abcdef"

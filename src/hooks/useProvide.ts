@@ -11,7 +11,14 @@ export function useProvide(app: App, options: Options = {}): Options {
       api: { list: "list", add: "add", update: "update", delete: "delete", info: "info", page: "page" },
       pagination: { page: "page", size: "size" },
     },
-    style: {},
+    style: {
+      form: {
+        span: 12,
+        labelWidth: 120,
+        labelPosition: "right",
+        plugins: [],
+      },
+    },
     events: {},
     permission: { add: true, page: true, list: true, update: true, delete: true, detail: true, info: true },
   }, options)

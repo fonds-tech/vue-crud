@@ -8,11 +8,19 @@ export default eslint(
     pnpm: true,
     stylistic: true,
     formatters: true,
+    typescript: {
+      tsconfigPath: "./tsconfig.json",
+    },
   },
   {
     rules: {
       "no-console": "off",
       "ts/ban-ts-comment": "off",
     },
+  },
+  {
+    ignores: [
+      ".serena",
+    ],
   },
 )

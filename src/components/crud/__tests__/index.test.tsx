@@ -2,6 +2,8 @@ import Crud from "../index"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 
+/* eslint-disable ts/no-unsafe-member-access */
+
 // Mock hooks
 vi.mock("../../../hooks", () => ({
   useConfig: () => ({

@@ -3,6 +3,8 @@ import { Close, FullScreen, ScaleToOriginal } from "@element-plus/icons-vue"
 import { ElDialog, dialogEmits, dialogProps } from "element-plus"
 import { ref, watch, computed, defineComponent } from "vue"
 
+/* eslint-disable ts/no-unsafe-argument */
+
 export default defineComponent({
   name: "fd-dialog",
   inheritAttrs: false,

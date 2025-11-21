@@ -7,9 +7,9 @@ import { getPackageExportsManifest } from "vitest-package-exports"
 const IS_READY = false
 
 describe.runIf(IS_READY)("exports-snapshot", async () => {
-  const packages: { name: string, path: string, private?: boolean }[] = JSON.parse(
+  const packages = JSON.parse(
     await x("pnpm", ["ls", "--only-projects", "-r", "--json"]).then(r => r.stdout),
-  )
+  ) as Array<{ name: string, path: string, private?: boolean }>
 
   for (const pkg of packages) {
     if (pkg.private)

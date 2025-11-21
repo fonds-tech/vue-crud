@@ -3,6 +3,8 @@ import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
 import { it, expect, describe } from "vitest"
 
+/* eslint-disable ts/no-unsafe-call, ts/no-unsafe-member-access */
+
 describe("dialog", () => {
   it("renders correctly", () => {
     const wrapper = mount(Dialog, {

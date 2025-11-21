@@ -5,6 +5,9 @@ import { assign } from "lodash-es"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { merge, isArray, isFunction } from "@fonds/utils"
 
+/* CRUD 助手依赖运行期 schema/服务交互，允许必要的动态类型操作 */
+/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-argument, ts/no-unsafe-call, ts/no-unsafe-member-access, ts/no-unsafe-return, ts/strict-boolean-expressions, ts/no-floating-promises, ts/promise-function-async, ts/no-misused-promises */
+
 interface HelperOptions {
   mitt: Mitt
   crud: CrudRef
@@ -236,9 +239,12 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
       case "service":
         Object.assign(crud.service, value)
         Object.setPrototypeOf(crud.service, Object.getPrototypeOf(value))
-        if ((value as any)._permission) {
-          for (const i in (value as any)._permission) {
-            crud.permission[i] = (value as any)._permission[i]
+        if (value && typeof value === "object" && "_permission" in value) {
+          const permissions = (value as { _permission?: Record<string, any> })._permission
+          if (permissions) {
+            Object.keys(permissions).forEach((name) => {
+              crud.permission[name] = permissions[name]
+            })
           }
         }
         break

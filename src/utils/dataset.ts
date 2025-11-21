@@ -1,57 +1,104 @@
-import { flatMap, isObject } from "lodash-es"
+import { flatMap } from "lodash-es"
 
-export function dataset(obj: any, key: string, value: any): any {
-  const isGet = value === undefined
-  let d = obj
+type DatasetRecord = Record<string, unknown>
+type DatasetCursor = DatasetRecord | DatasetRecord[] | undefined
 
-  const arr = flatMap(
-    key.split(".").map((e) => {
-      if (e.includes("[")) {
-        return e.split("[").map(item => item.replace(/"/g, ""))
+function isRecord(value: unknown): value is DatasetRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function isRecordArray(value: unknown): value is DatasetRecord[] {
+  return Array.isArray(value)
+}
+
+function normalizeSegments(path: string) {
+  return flatMap(
+    path.split(".").map((segment) => {
+      if (segment.includes("[")) {
+        return segment.split("[").map(token => token.replace(/"/g, ""))
       }
-      return e
+      return segment
     }),
-  )
+  ).filter(Boolean)
+}
 
-  try {
-    for (let i = 0; i < arr.length; i++) {
-      const e: any = arr[i]
-      let n: any = null
+function resolveKey(segment: string, cursor: DatasetCursor) {
+  if (!segment.includes("]")) {
+    return segment
+  }
 
-      if (e.includes("]")) {
-        const [k, v] = e.replace("]", "").split(":")
+  const [key, value] = segment.replace("]", "").split(":")
 
-        if (v) {
-          n = d.findIndex((x: any) => x[k] === v)
-        }
-        else {
-          n = Number(k)
-        }
-      }
-      else {
-        n = e
-      }
+  if (value) {
+    if (!isRecordArray(cursor)) {
+      return undefined
+    }
+    return cursor.findIndex(item => isRecord(item) && item[key] === value)
+  }
 
-      if (i !== arr.length - 1) {
-        d = d[n]
-      }
-      else {
-        if (isGet) {
-          return d[n]
-        }
-        if (isObject(value)) {
-          Object.assign(d[n], value)
-        }
-        else {
-          d[n] = value
-        }
+  const index = Number(key)
+  return Number.isNaN(index) ? undefined : index
+}
+
+function readValue(cursor: DatasetCursor, key: string | number) {
+  if (typeof key === "number" && isRecordArray(cursor)) {
+    return cursor[key]
+  }
+  if (typeof key === "string" && isRecord(cursor)) {
+    return cursor[key]
+  }
+  return undefined
+}
+
+function writeValue(cursor: DatasetCursor, key: string | number, value: unknown) {
+  if (typeof key === "number" && isRecordArray(cursor)) {
+    cursor[key] = isRecord(value) ? value : {}
+    return true
+  }
+  if (typeof key === "string" && isRecord(cursor)) {
+    if (isRecord(value)) {
+      const current = cursor[key]
+      cursor[key] = {
+        ...(isRecord(current) ? current : {}),
+        ...value,
       }
     }
+    else {
+      cursor[key] = value
+    }
+    return true
+  }
+  return false
+}
 
+export function dataset(obj: DatasetRecord, key: string, value?: unknown): unknown {
+  const isGet = value === undefined
+  const segments = normalizeSegments(key)
+  let cursor: DatasetCursor = obj
+
+  try {
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i]
+      const resolvedKey = resolveKey(segment, cursor)
+      if (resolvedKey === undefined) {
+        return {}
+      }
+
+      const isLast = i === segments.length - 1
+      if (!isLast) {
+        cursor = readValue(cursor, resolvedKey)
+        continue
+      }
+
+      if (isGet) {
+        return readValue(cursor, resolvedKey)
+      }
+
+      writeValue(cursor, resolvedKey, value)
+    }
     return obj
   }
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  catch (e) {
+  catch {
     return {}
   }
 }

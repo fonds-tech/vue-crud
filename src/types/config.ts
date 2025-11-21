@@ -1,3 +1,5 @@
+import type { FormPlugin } from "./form"
+
 export interface Dict {
   primaryId: string
   api: {
@@ -54,6 +56,12 @@ export interface Config {
   permission: Permission
   style: {
     size: "large" | "default" | "small"
+    form?: {
+      span?: number
+      labelWidth?: number | string
+      labelPosition?: "left" | "right" | "top"
+      plugins?: FormPlugin[]
+    }
   }
   events: {
     [key: string]: (...args: any[]) => any
