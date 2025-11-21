@@ -1,15 +1,16 @@
 import type { Slot, PropType } from "vue"
-import { isEmpty } from "@/utils/check"
+import { selectProps } from "element-plus/es/components/select/src/select"
 import { ElOption, ElSelect } from "element-plus"
-import { merge, isEqual, cloneDeep } from "lodash-es"
+import { merge, isEmpty, isEqual, cloneDeep } from "lodash-es"
 import { ref, watch, computed, useAttrs, defineComponent } from "vue"
 
 type LooseRecord = Record<string, unknown>
-type SelectPrimitive = string | number | boolean | LooseRecord
-type SelectValue = SelectPrimitive | SelectPrimitive[]
-type ApiHandler = (params: LooseRecord) => Promise<unknown>
-type ParamsResolver = LooseRecord | ((payload: LooseRecord) => LooseRecord)
 type OptionItem = LooseRecord
+type SelectPrimitive = string | number | boolean | OptionItem
+type SelectValue = SelectPrimitive | SelectPrimitive[] | null | undefined
+type ApiHandler = (params: LooseRecord) => Promise<OptionItem[] | unknown>
+type ParamsResolver = LooseRecord | ((payload: LooseRecord) => LooseRecord)
+type SelectPropKey = keyof typeof selectProps
 
 interface FieldNames {
   label: string
@@ -23,51 +24,44 @@ const defaultFieldNames: FieldNames = {
   disabled: "disabled",
 }
 
-const normalizeOptions = <T = OptionItem>(source: unknown): T[] => (Array.isArray(source) ? (source as T[]) : [])
-const isParamsResolverFn = (resolver: ParamsResolver): resolver is (payload: LooseRecord) => LooseRecord => typeof resolver === "function"
+// 通用工具：安全解析 options、函数类型守卫、字段读取
+const normalizeOptions = (source: unknown): OptionItem[] => (Array.isArray(source) ? (source as OptionItem[]) : [])
+const isParamsResolver = (resolver: ParamsResolver): resolver is (payload: LooseRecord) => LooseRecord => typeof resolver === "function"
 const isApiHandler = (handler?: ApiHandler): handler is ApiHandler => typeof handler === "function"
+const resolveField = (item: OptionItem, key: string) => (Object.prototype.hasOwnProperty.call(item, key) ? item[key] : undefined)
 
-function resolveBooleanAttr(value: unknown) {
-  if (value === "" || value === "true") {
-    return true
-  }
-  if (value === "false") {
-    return false
-  }
-  return Boolean(value)
-}
-
-const resolveFieldValue = (item: OptionItem, key: string): unknown => (Object.prototype.hasOwnProperty.call(item, key) ? item[key] : undefined)
+const fdSelectProps = {
+  ...selectProps,
+  api: {
+    type: Function as PropType<ApiHandler>,
+    default: undefined,
+  },
+  params: {
+    type: [Object, Function] as PropType<ParamsResolver>,
+    default: () => ({}),
+  },
+  fieldNames: {
+    type: Object as PropType<Partial<FieldNames>>,
+    default: undefined,
+  },
+  searchField: {
+    type: String,
+    default: "name",
+  },
+  refreshOnBlur: {
+    type: Boolean,
+    default: true,
+  },
+  refreshOnFocus: {
+    type: Boolean,
+    default: true,
+  },
+} as const
 
 export default defineComponent({
-  name: "zm-select",
+  name: "el-select",
   inheritAttrs: false,
-  props: {
-    modelValue: {
-      type: [String, Number, Boolean, Object, Array] as PropType<SelectValue>,
-      default: undefined,
-    },
-    api: {
-      type: Function as PropType<ApiHandler>,
-      default: undefined,
-    },
-    params: {
-      type: [Object, Function] as PropType<ParamsResolver>,
-      default: () => ({}),
-    },
-    searchField: {
-      type: String,
-      default: "name",
-    },
-    refreshOnBlur: {
-      type: Boolean,
-      default: true,
-    },
-    refreshOnFocus: {
-      type: Boolean,
-      default: true,
-    },
-  },
+  props: fdSelectProps,
   emits: {
     "update:modelValue": (_value?: SelectValue) => true,
     "change": (_value?: SelectValue, _extra?: unknown) => true,
@@ -75,70 +69,72 @@ export default defineComponent({
     "clear": () => true,
   },
   setup(props, { emit, slots, expose }) {
+    // -----------------------------
+    // 基础状态：继承 attrs、维护当前值、loading、搜索关键字以及远程 options
+    // -----------------------------
     const attrs = useAttrs() as LooseRecord
     const selectValue = ref<SelectValue | undefined>(props.modelValue)
-    const list = ref<OptionItem[]>([])
     const loading = ref(false)
-    const searchValue = ref("")
+    const searchKeyword = ref("")
+    const remoteOptions = ref<OptionItem[]>([])
 
-    const forwardedAttrs = computed<LooseRecord>(() => {
-      const rest = { ...attrs }
-      delete rest.class
-      delete rest.options
-      delete rest.loading
-      delete rest.fieldNames
-      delete rest.remote
-      delete rest["remote-method"]
-      delete rest.remoteMethod
-      delete rest.filterable
-      return rest
+    // -----------------------------
+    // props/attrs 透传与字段映射
+    // -----------------------------
+    const elSelectProps = computed<LooseRecord>(() => {
+      const mapped: LooseRecord = {}
+      ;(Object.keys(selectProps) as SelectPropKey[]).forEach((key) => {
+        mapped[key] = props[key]
+      })
+      return mapped
     })
 
+    // 透传除 class/自定义字段外的其它 attrs，避免污染 ElSelect
+    const passthroughAttrs = computed<LooseRecord>(() => {
+      const cloned = { ...attrs }
+      delete cloned.class
+      delete cloned.fieldNames
+      return cloned
+    })
+
+    // 字段映射：支持自定义 label/value/disabled 键
     const fieldNames = computed<FieldNames>(() => {
-      const attrFieldNames = attrs.fieldNames as Partial<FieldNames> | undefined
+      const custom = props.fieldNames
       return {
-        label: attrFieldNames?.label ?? defaultFieldNames.label,
-        value: attrFieldNames?.value ?? defaultFieldNames.value,
-        disabled: attrFieldNames?.disabled ?? defaultFieldNames.disabled,
+        label: custom?.label ?? defaultFieldNames.label,
+        value: custom?.value ?? defaultFieldNames.value,
+        disabled: custom?.disabled ?? defaultFieldNames.disabled,
       }
     })
 
-    const fallbackOptions = computed<OptionItem[]>(() => normalizeOptions<OptionItem>(attrs.options))
+    // -----------------------------
+    // options 数据来源：优先远程，fallback 为 props.options
+    // -----------------------------
+    const fallbackOptions = computed<OptionItem[]>(() => normalizeOptions(props.options))
     const options = computed<OptionItem[]>(() => {
-      const remoteOptions = list.value
-      return cloneDeep(isEmpty(remoteOptions) ? fallbackOptions.value : remoteOptions)
+      const source = isEmpty(remoteOptions.value) ? fallbackOptions.value : remoteOptions.value
+      return cloneDeep(source)
     })
 
-    const valueKey = computed(() => fieldNames.value.value)
-    const labelKey = computed(() => fieldNames.value.label)
-    const disabledKey = computed(() => fieldNames.value.disabled)
+    const mergedLoading = computed(() => Boolean(props.loading) || loading.value)
+    const shouldRemote = computed(() => Boolean(props.remote) || isApiHandler(props.api))
+    const shouldFilterable = computed(() => Boolean(props.filterable) || shouldRemote.value)
 
-    const updateModelValue = (value?: SelectValue) => {
-      selectValue.value = value
-      emit("update:modelValue", value)
-    }
-
-    watch(
-      () => props.modelValue,
-      (val) => {
-        selectValue.value = val
-      },
-    )
-
-    const handleApiRequest = async (extra: LooseRecord = {}, showLoading = false) => {
-      const apiHandler = props.api
-      if (!isApiHandler(apiHandler)) {
+    // -----------------------------
+    // 数据获取与刷新：统一封装 API 调用与暴露 refresh
+    // -----------------------------
+    async function fetchOptions(extra: LooseRecord = {}, showLoading = false) {
+      if (!isApiHandler(props.api)) {
         return
       }
       const paramsSource = props.params
-      const baseParams = isParamsResolverFn(paramsSource) ? paramsSource(extra) : cloneDeep(paramsSource ?? {})
+      const baseParams = isParamsResolver(paramsSource) ? paramsSource(extra) : cloneDeep(paramsSource ?? {})
       if (showLoading) {
         loading.value = true
       }
-      const mergedParams = merge(baseParams, extra)
       try {
-        const res = await apiHandler(mergedParams)
-        list.value = normalizeOptions<OptionItem>(res)
+        const response = await props.api(merge(baseParams, extra))
+        remoteOptions.value = normalizeOptions(response)
       }
       finally {
         if (showLoading) {
@@ -147,75 +143,79 @@ export default defineComponent({
       }
     }
 
-    const refresh = (data: LooseRecord = {}) => {
-      void handleApiRequest(data, true)
+    // 对外暴露的刷新入口
+    function refresh(extra: LooseRecord = {}) {
+      void fetchOptions(extra, true)
     }
 
-    const shouldRemote = computed(() => {
-      if ("remote" in attrs) {
-        return resolveBooleanAttr(attrs.remote)
-      }
-      return isApiHandler(props.api)
-    })
-
-    const shouldFilterable = computed(() => {
-      if ("filterable" in attrs) {
-        return resolveBooleanAttr(attrs.filterable)
-      }
-      return shouldRemote.value
-    })
-
-    function onFocus() {
-      if (searchValue.value && props.refreshOnFocus) {
-        refresh()
-      }
+    // -----------------------------
+    // 事件处理：模型同步、change、远程搜索、焦点与清空
+    // -----------------------------
+    function updateModelValue(value?: SelectValue) {
+      selectValue.value = value
+      emit("update:modelValue", value)
     }
 
-    function onBlur() {
-      if (searchValue.value && props.refreshOnBlur) {
-        refresh()
-      }
-    }
-
-    function onChange(value?: SelectValue) {
-      const fieldKey = valueKey.value
-      const currentOptions = options.value
-      if (resolveBooleanAttr(attrs.multiple) && Array.isArray(value)) {
-        const items = currentOptions.filter((item) => {
-          const optionValue = resolveFieldValue(item, fieldKey) as SelectPrimitive | undefined
-          return optionValue !== undefined && value.includes(optionValue)
+    // change 事件：多选返回勾选项集合，单选返回当前行
+    function handleChange(value?: SelectValue) {
+      const valueKey = fieldNames.value.value
+      const list = options.value
+      if (props.multiple && Array.isArray(value)) {
+        const items = list.filter((item) => {
+          const itemValue = resolveField(item, valueKey) as SelectPrimitive | undefined
+          return itemValue !== undefined && value.includes(itemValue)
         })
         emit("change", value, items)
         return
       }
       const normalizedValue = Array.isArray(value) ? undefined : value
-      const matched = currentOptions.find((option) => {
-        const optionValue = resolveFieldValue(option, fieldKey) as SelectPrimitive | undefined
-        return optionValue === normalizedValue
-      })
+      const matched = list.find(item => resolveField(item, valueKey) === normalizedValue)
       emit("change", normalizedValue, matched)
     }
 
-    function onRemoteSearch(value: string) {
-      if (!value) {
+    // 远程搜索：手动触发 API，并同步关键字
+    function handleRemoteSearch(keyword: string) {
+      if (!keyword) {
         return
       }
-      searchValue.value = value
-      void handleApiRequest({ [props.searchField]: value })
-      emit("search", value)
+      searchKeyword.value = keyword
+      void fetchOptions({ [props.searchField]: keyword })
+      emit("search", keyword)
     }
 
-    function onClear() {
-      searchValue.value = ""
+    // 焦点/失焦时按照配置决定是否重刷
+    function handleFocus() {
+      if (searchKeyword.value && props.refreshOnFocus) {
+        refresh()
+      }
+    }
+
+    function handleBlur() {
+      if (searchKeyword.value && props.refreshOnBlur) {
+        refresh()
+      }
+    }
+
+    // 清空时重置关键字并刷新列表
+    function handleClear() {
+      searchKeyword.value = ""
       refresh()
       emit("clear")
     }
 
+    // -----------------------------
+    // watch & expose：响应 props 变化并暴露 refresh
+    // -----------------------------
+    watch(
+      () => props.modelValue,
+      (val) => {
+        selectValue.value = val
+      },
+    )
+
     watch(
       () => props.api,
-      () => {
-        refresh()
-      },
+      () => refresh(),
       { immediate: true },
     )
 
@@ -231,61 +231,70 @@ export default defineComponent({
 
     expose({ refresh })
 
+    // -----------------------------
+    // 插槽透传与默认 option 渲染（若用户未自定义 default slot）
+    // -----------------------------
     const slotsMap = slots as Record<string, Slot | undefined>
 
     const buildSlots = () => {
-      const forwarded: Record<string, Slot> = {}
-      Object.keys(slotsMap).forEach((name) => {
-        if (name === "default") {
+      const result: Record<string, Slot> = {}
+      Object.entries(slotsMap).forEach(([name, slotRender]) => {
+        if (name === "default" || typeof slotRender !== "function") {
           return
         }
-        const slotRender = slotsMap[name]
-        if (typeof slotRender !== "function") {
-          return
-        }
-        forwarded[name] = (scope?: Record<string, unknown>) => slotRender(scope) ?? []
+        result[name] = scope => slotRender(scope) ?? []
       })
-      return forwarded
+      return result
     }
 
+    // 默认 option 渲染：若开发者自定义 default 槽位则不干预
     const renderOptions = () => {
       if (typeof slots.default === "function") {
-        return slots.default() ?? []
+        return slots.default()
       }
-      const valueField = valueKey.value
-      const labelField = labelKey.value
-      const disabledField = disabledKey.value
+      const fieldLabel = fieldNames.value.label
+      const fieldValue = fieldNames.value.value
+      const fieldDisabled = fieldNames.value.disabled
       return options.value.map((item, index) => {
-        const rawValue = resolveFieldValue(item, valueField) as SelectPrimitive | undefined
-        const normalizedValue = rawValue ?? index
-        const rawLabel = resolveFieldValue(item, labelField)
-        const label = typeof rawLabel === "string" ? rawLabel : String(rawLabel ?? normalizedValue)
-        const disabled = Boolean(resolveFieldValue(item, disabledField))
+        const rawValue = resolveField(item, fieldValue) as SelectPrimitive | undefined
+        const value = rawValue ?? index
+        const rawLabel = resolveField(item, fieldLabel)
+        const label = typeof rawLabel === "string" ? rawLabel : String(rawLabel ?? value)
+        const disabled = Boolean(resolveField(item, fieldDisabled))
         return (
           <ElOption
-            key={String(normalizedValue)}
+            key={String(value)}
             label={label}
-            value={normalizedValue}
+            value={value}
             disabled={disabled}
           />
         )
       })
     }
 
+    // -----------------------------
+    // 渲染：优先使用用户传入的 remoteMethod，否则回退到组件内部实现
+    // -----------------------------
+    const remoteMethod = computed(() => props.remoteMethod ?? (shouldRemote.value ? handleRemoteSearch : undefined))
+
+    // -----------------------------
+    // 渲染：ElSelect 透传原生 props/attrs，并覆盖 loading、remoteMethod、事件回调
+    // -----------------------------
     return () => (
       <ElSelect
-        {...forwardedAttrs.value}
-        class={["zm-select", attrs.class]}
-        loading={Boolean(attrs.loading) || loading.value}
+        {...elSelectProps.value}
+        {...passthroughAttrs.value}
+        class={["el-select", attrs.class]}
+        loading={mergedLoading.value}
         filterable={shouldFilterable.value}
         remote={shouldRemote.value}
-        remoteMethod={onRemoteSearch}
+        remoteMethod={remoteMethod.value}
         modelValue={selectValue.value}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onChange={onChange}
-        onClear={onClear}
         onUpdate:modelValue={updateModelValue}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onClear={handleClear}
         v-slots={buildSlots()}
       >
         {renderOptions()}
