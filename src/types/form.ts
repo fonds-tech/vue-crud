@@ -1,70 +1,71 @@
 import type { VNodeChild, CSSProperties, Component as VueComponent } from "vue"
-import type { FormInstance, FormItemProp, FormItemRule, FormValidateCallback } from "element-plus"
+import type { FormProps, FormInstance, FormItemProp, FormItemRule, FormValidateCallback } from "element-plus"
 
-export type FormModel<T extends Record<string, any> = Record<string, any>> = T
-export type FormField<T extends FormModel = FormModel> = keyof T | string
+export type FormRecord = Record<string, any>
+export type FormModel = FormRecord
+export type FormField = string
 export type FormMode = "add" | "update" | "info" | (string & {})
 
-export interface FormRenderContext<T extends FormModel = FormModel> {
-  model: T
-  field?: FormField<T>
+export interface FormRenderContext {
+  model: FormRecord
+  field?: FormField
 }
 
-export type FormRenderContent<T extends FormModel = FormModel> = VNodeChild | ((ctx: FormRenderContext<T>) => VNodeChild)
+export type FormRenderContent = VNodeChild | ((ctx: FormRenderContext) => VNodeChild)
 
-export type FormComponentResolver<T extends FormModel = FormModel, R = any> = R | ((ctx: FormRenderContext<T>) => R)
+export type FormComponentResolver<R = any> = R | ((ctx: FormRenderContext) => R)
 
-export interface FormComponent<T extends FormModel = FormModel> {
-  is?: FormComponentResolver<T, string | VueComponent>
-  props?: FormComponentResolver<T, Record<string, any>>
-  style?: FormComponentResolver<T, CSSProperties>
-  on?: FormComponentResolver<T, Record<string, (...args: any[]) => void>>
-  slots?: FormComponentResolver<T, Record<string, FormRenderContent<T>>>
-  options?: FormComponentResolver<T, any[]>
+export interface FormComponent {
+  is?: FormComponentResolver<string | VueComponent>
+  props?: FormComponentResolver<Record<string, any>>
+  style?: FormComponentResolver<CSSProperties>
+  on?: FormComponentResolver<Record<string, (...args: any[]) => void>>
+  slots?: FormComponentResolver<Record<string, FormRenderContent>>
+  options?: FormComponentResolver<any[]>
   ref?: (el: any) => void
   slot?: string
 }
 
 export type FormHookKey = "number" | "string" | "split" | "join" | "boolean" | "booleanNumber" | "datetimeRange" | "splitJoin" | "json" | "empty" | (string & {})
 
-export type FormHookFn<T extends FormModel = FormModel> = (value: any, ctx: { model: T, field?: FormField<T>, method: "bind" | "submit" }) => any
+export type FormHookFn = (value: any, ctx: { model: FormModel, field?: FormField, method: "bind" | "submit" }) => any
 
-export type FormHook<T extends FormModel = FormModel>
+export type FormHook
   = | FormHookKey
-    | FormHookFn<T>
-    | Array<FormHookKey | FormHookFn<T>>
+    | FormHookFn
+    | Array<FormHookKey | FormHookFn>
     | {
-      bind?: FormHookKey | FormHookFn<T> | Array<FormHookKey | FormHookFn<T>>
-      submit?: FormHookKey | FormHookFn<T> | Array<FormHookKey | FormHookFn<T>>
+      bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
+      submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
     }
 
-export interface FormItem<T extends FormModel = FormModel> {
-  field?: FormField<T>
+export interface FormItem {
+  field?: FormField
   label?: string
   span?: number
-  extra?: FormRenderContent<T>
-  required?: FormComponentResolver<T, boolean>
-  disabled?: FormComponentResolver<T, boolean>
-  hidden?: FormComponentResolver<T, boolean>
+  extra?: FormRenderContent
+  required?: FormComponentResolver<boolean>
+  disabled?: FormComponentResolver<boolean>
+  hidden?: FormComponentResolver<boolean>
   collapse?: boolean
   value?: any
-  hook?: FormHook<T>
+  hook?: FormHook
   rules?: FormItemRule | FormItemRule[]
-  component?: FormComponent<T>
-  children?: FormItem<T>[]
+  component?: FormComponent
+  children?: FormItem[]
   group?: string
 }
 
-export interface FormGroupPane<T extends FormModel = FormModel> {
+export interface FormGroupPane {
   title: string
-  component?: FormComponent<T>
-  children?: FormComponent<T>[]
+  component?: FormComponent
+  children?: FormComponent[]
 }
 
-export interface FormGroup<T extends FormModel = FormModel> {
+export interface FormGroup {
   type?: "steps" | "tabs"
-  component?: FormComponent<T>
-  children?: FormGroupPane<T>[]
+  component?: FormComponent
+  children?: FormGroupPane[]
 }
 
 export interface FormLayout {
@@ -80,51 +81,51 @@ export interface FormLayout {
   }
 }
 
-export interface FormOptions<T extends FormModel = FormModel> {
+export interface FormOptions {
   key: number
   mode: FormMode
-  form: Record<string, any>
+  form: Partial<FormProps>
   layout: FormLayout
-  group?: FormGroup<T>
-  items: FormItem<T>[]
-  model: T
-  onNext?: (model: T, ctx: { next: () => void }) => void
-  onSubmit?: (model: T, errors?: Record<string, any>) => void
+  group?: FormGroup
+  items: FormItem[]
+  model: FormRecord
+  onNext?: (model: FormRecord, ctx: { next: () => void }) => void
+  onSubmit?: (model: FormRecord, errors?: Record<string, any>) => void
 }
 
-export type FormUseOptions<T extends FormModel = FormModel> = Partial<Omit<FormOptions<T>, "key" | "model" | "items">> & {
+export type FormUseOptions<T extends FormRecord = FormRecord> = Partial<Omit<FormOptions, "key" | "model" | "items">> & {
   model?: Partial<T>
-  items?: FormItem<T>[]
+  items?: FormItem[]
 }
 
-export interface FormSubmitResult<T extends FormModel = FormModel> {
+export interface FormSubmitResult<T extends FormRecord = FormRecord> {
   model: T
   errors?: Record<string, any>
 }
 
-export interface FormRef<T extends FormModel = FormModel> {
+export interface FormRef<T extends FormRecord = FormRecord> {
   id: string | number | undefined
   form?: FormInstance
   model: T
-  items: FormItem<T>[]
+  items: FormItem[]
   mode: FormMode
   use: (options: FormUseOptions<T>) => void
   next: () => void
   prev: () => void
   setMode: (mode: FormMode) => void
-  getField: (field?: FormField<T>) => any
-  setField: (field: FormField<T>, value: any) => void
+  getField: (field?: FormField) => any
+  setField: (field: FormField, value: any) => void
   bindFields: (data?: Record<string, any>) => void
   setData: (path: string, value: any) => void
-  setItem: (field: FormField<T>, data: Partial<FormItem<T>>) => void
-  setProps: (field: FormField<T>, props: Record<string, any>) => void
-  setStyle: (field: FormField<T>, style: CSSProperties) => void
-  setOptions: (field: FormField<T>, list: any[]) => void
-  getOptions: (field: FormField<T>) => any[]
-  hideItem: (field: FormField<T> | FormField<T>[]) => void
-  showItem: (field: FormField<T> | FormField<T>[]) => void
+  setItem: (field: FormField, data: Partial<FormItem>) => void
+  setProps: (field: FormField, props: Record<string, any>) => void
+  setStyle: (field: FormField, style: CSSProperties) => void
+  setOptions: (field: FormField, list: any[]) => void
+  getOptions: (field: FormField) => any[]
+  hideItem: (field: FormField | FormField[]) => void
+  showItem: (field: FormField | FormField[]) => void
   collapse: (flag?: boolean) => void
-  setRequired: (field: FormField<T>, required: boolean) => void
+  setRequired: (field: FormField, required: boolean) => void
   submit: (callback?: (model: T, errors?: Record<string, any>) => void) => Promise<FormSubmitResult<T>>
   validate: (callback?: FormValidateCallback) => ReturnType<FormInstance["validate"]>
   validateField: (props?: FormItemProp | FormItemProp[], callback?: FormValidateCallback) => ReturnType<FormInstance["validateField"]>

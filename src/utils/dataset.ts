@@ -40,12 +40,12 @@ function resolveKey(segment: string, cursor: DatasetCursor) {
   return Number.isNaN(index) ? undefined : index
 }
 
-function readValue(cursor: DatasetCursor, key: string | number) {
+function readValue(cursor: DatasetCursor, key: string | number): DatasetCursor {
   if (typeof key === "number" && isRecordArray(cursor)) {
-    return cursor[key]
+    return cursor[key] as DatasetCursor
   }
   if (typeof key === "string" && isRecord(cursor)) {
-    return cursor[key]
+    return cursor[key] as DatasetCursor
   }
   return undefined
 }

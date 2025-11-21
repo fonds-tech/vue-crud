@@ -15,7 +15,7 @@ function mountForm() {
 describe("fd-form", () => {
   it("hydrates default values when using schema", async () => {
     const wrapper = mountForm()
-    const instance = wrapper.vm as FormRef
+    const instance = wrapper.vm as unknown as FormRef
 
     instance.use({
       items: [
@@ -35,7 +35,7 @@ describe("fd-form", () => {
 
   it("bindFields replaces existing model", () => {
     const wrapper = mountForm()
-    const instance = wrapper.vm as FormRef
+    const instance = wrapper.vm as unknown as FormRef
 
     instance.use({
       items: [

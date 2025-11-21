@@ -1,12 +1,12 @@
-import type { FormHook, FormField, FormModel, FormHookFn } from "../types"
+import type { FormHook, FormField, FormModel, FormHookFn, FormHookKey } from "../types"
 import { isArray, isEmpty, isObject, isString, isFunction } from "lodash-es"
 
 /* 钩子执行依赖任意 schema 配置，禁用严格的 any/boolean 校验规则 */
-/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-member-access, ts/no-unsafe-return, ts/no-unsafe-argument, ts/strict-boolean-expressions */
+/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-return, ts/no-unsafe-argument, ts/strict-boolean-expressions */
 
 interface HookTree<T extends FormModel = FormModel> {
-  bind: { value: any, hook: FormHook<T>, model: T, field: FormField<T> }
-  submit: { value: any, hook: FormHook<T>, model: T, field: FormField<T> }
+  bind: { value: any, hook: FormHook, model: T, field: FormField }
+  submit: { value: any, hook: FormHook, model: T, field: FormField }
 }
 
 const formatters: Record<string, FormHookFn> = {
@@ -84,20 +84,20 @@ const formatters: Record<string, FormHookFn> = {
   },
 }
 
-function normalizeField<T extends FormModel>(model: T, field?: FormField<T>, value?: any) {
+function normalizeField<T extends FormModel>(model: T, field?: FormField, value?: any) {
   if (!field) {
     return
   }
 
   const key = String(field)
   const path = key.split(".")
+  let cursor: Record<string, any> = model as Record<string, any>
 
   if (path.length === 1) {
-    model[field] = value
+    cursor[key] = value
     return
   }
 
-  let cursor: any = model
   for (let i = 0; i < path.length - 1; i++) {
     const segment = path[i]
     cursor[segment] = cursor[segment] ?? {}
@@ -107,9 +107,9 @@ function normalizeField<T extends FormModel>(model: T, field?: FormField<T>, val
   cursor[path[path.length - 1]] = value
 }
 
-function parse<T extends FormModel>(
-  phase: keyof HookTree,
-  payload: HookTree<T>[keyof HookTree],
+function parse<T extends FormModel, K extends keyof HookTree<T>>(
+  phase: K,
+  payload: HookTree<T>[K],
 ) {
   const { value, model, field, hook } = payload
 
@@ -117,7 +117,7 @@ function parse<T extends FormModel>(
     return
   }
 
-  const stack: Array<string | FormHookFn<T>> = []
+  const stack: Array<string | FormHookFn> = []
 
   if (isString(hook)) {
     stack.push(hook)
@@ -125,20 +125,22 @@ function parse<T extends FormModel>(
   else if (isArray(hook)) {
     stack.push(...hook)
   }
-  else if (isObject(hook)) {
-    const pipes = hook[phase]
-    if (pipes) {
-      stack.push(...(isArray(pipes) ? pipes : [pipes]))
-    }
-  }
   else if (isFunction(hook)) {
     stack.push(hook)
+  }
+  else if (isObject(hook)) {
+    const config = hook as { bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>, submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn> }
+    const pipes = config[phase]
+    if (pipes) {
+      const normalized = (isArray(pipes) ? pipes : [pipes])
+      stack.push(...normalized)
+    }
   }
 
   let nextValue = value
 
   stack.forEach((pipe) => {
-    let handler: FormHookFn<T> | undefined
+    let handler: FormHookFn | undefined
 
     if (isString(pipe)) {
       handler = formatters[pipe]
@@ -148,7 +150,7 @@ function parse<T extends FormModel>(
     }
 
     if (handler) {
-      nextValue = handler(nextValue, { model, field, method: phase as "bind" | "submit" })
+      nextValue = handler(nextValue, { model: model as FormModel, field, method: phase as "bind" | "submit" })
     }
   })
 

@@ -1,11 +1,10 @@
 import type { FormInstance } from "element-plus"
 import type { Component as VueComponent } from "vue"
-import type { FormRef, FormItem, FormField, FormModel, FormOptions, FormComponent, FormUseOptions, FormRenderContent, FormRenderContext } from "../../types"
+import type { FormRef, FormItem, FormField, FormModel, FormRecord, FormOptions, FormComponent, FormUseOptions, FormRenderContent, FormRenderContext } from "../../types"
 import { useFormActions } from "./helper/action"
 import { useFormMethods } from "./helper/methods"
 import { merge, cloneDeep } from "lodash-es"
 import { normalizeItems, resolveMaybeFn } from "./helper/schema"
-import { ElCol, ElRow, ElForm, ElStep, ElTabs, ElSteps, ElDivider, ElTabPane, ElFormItem } from "element-plus"
 import { h, ref, reactive, onMounted, defineComponent, getCurrentInstance, resolveComponent as resolveVueComponent } from "vue"
 
 type LooseRecord = Record<string, any>
@@ -31,11 +30,11 @@ function createDefaultOptions(): FormOptions {
   }
 }
 
-function resolveValue<T extends FormModel = FormModel, R = unknown>(source: R | ((ctx: FormRenderContext<T>) => R), ctx: FormRenderContext<T>) {
+function resolveValue<R = unknown>(source: R | ((ctx: FormRenderContext) => R), ctx: FormRenderContext) {
   return resolveMaybeFn(source, ctx)
 }
 
-function resolveContent<T>(content: FormRenderContent<T> | undefined, ctx: FormRenderContext<T>) {
+function resolveContent(content: FormRenderContent | undefined, ctx: FormRenderContext) {
   if (content === undefined || content === null)
     return null
   return typeof content === "function" ? content(ctx) : content
@@ -45,10 +44,11 @@ export default defineComponent({
   name: "fd-form",
   setup(_, { slots, expose }) {
     const formRef = ref<FormInstance>()
-    const options = reactive<FormOptions>(createDefaultOptions())
+    const options = reactive(createDefaultOptions())
     const model = reactive<LooseRecord>({})
     const step = ref(1)
 
+    const formActions = useFormActions({ options, model, form: formRef })
     const {
       clearModel,
       setMode,
@@ -65,24 +65,25 @@ export default defineComponent({
       showItem,
       collapse,
       setRequired,
-    } = useFormActions({ options, model, form: formRef })
+    } = formActions
+    const formMethods = useFormMethods({ options, model, form: formRef })
+    const { submit, validate, validateField, resetFields, clearFields, clearValidate, scrollToField } = formMethods
 
-    const { submit, validate, validateField, resetFields, clearFields, clearValidate, scrollToField } = useFormMethods({ options, model, form: formRef })
-
-    function createContext<T extends FormModel = FormModel>(field?: FormField<T>): FormRenderContext<T> {
+    function createContext(field?: FormField): FormRenderContext {
       return {
-        model: model as T,
+        model: model as FormRecord,
         field,
       }
     }
 
-    function mergeOptions<T extends FormModel = FormModel>(useOptions: FormUseOptions<T> = {}) {
-      const merged = merge(createDefaultOptions(), useOptions)
+    function mergeOptions(useOptions: FormUseOptions = {}) {
+      const merged = merge(createDefaultOptions(), useOptions) as FormOptions
       Object.assign(options, merged)
-      options.model = model as T
+      options.model = model as FormRecord
       clearModel()
-      if (useOptions.model) {
-        Object.assign(model, cloneDeep(useOptions.model))
+      const nextModel = useOptions.model as FormRecord | undefined
+      if (nextModel !== undefined && nextModel !== null) {
+        Object.assign(model, cloneDeep(nextModel))
       }
       normalizeItems(options.items, model)
       step.value = 1
@@ -107,7 +108,7 @@ export default defineComponent({
       return target ?? null
     }
 
-    function renderComponent<T extends FormModel>(component: FormComponent<T> | undefined, ctx: FormRenderContext<T>) {
+    function renderComponent(component: FormComponent | undefined, ctx: FormRenderContext) {
       if (component === undefined) {
         return null
       }
@@ -117,7 +118,7 @@ export default defineComponent({
         return slotRender({ model, field: ctx.field })
       }
 
-      const rawTarget = component.is !== undefined ? resolveMaybeFn<FormRenderContext<T>, string | VueComponent>(component.is, ctx) : undefined
+      const rawTarget = component.is !== undefined ? resolveMaybeFn<FormRenderContext, string | VueComponent>(component.is, ctx) : undefined
       const target = resolveTarget(rawTarget)
       if (target === null) {
         return null
@@ -174,18 +175,18 @@ export default defineComponent({
       const content = hasChildren ? item.children!.map((child, childIndex) => renderItem(child, childIndex)) : renderComponent(item.component, ctx)
 
       return (
-        <ElCol span={columnSpan} key={`${item.field ?? index}`} style={{ marginBottom: `${options.layout.grid.rowGap}px` }}>
-          <ElFormItem prop={item.field as string} rules={disabled ? undefined : item.rules} required={required} extra={extra} label={label}>
+        <el-col span={columnSpan} key={`${item.field ?? index}`} style={{ marginBottom: `${options.layout.grid.rowGap}px` }}>
+          <el-form-item prop={item.field as string} rules={disabled ? undefined : item.rules} required={required} extra={extra} label={label}>
             {{
               default: () => content,
             }}
-          </ElFormItem>
+          </el-form-item>
           {item.collapse === true && (
             <div class="fd-form__collapse">
-              <ElDivider>{item.collapse ? "..." : ""}</ElDivider>
+              <el-divider>{item.collapse ? "..." : ""}</el-divider>
             </div>
           )}
-        </ElCol>
+        </el-col>
       )
     }
 
@@ -196,22 +197,22 @@ export default defineComponent({
       }
       if (group.type === "steps") {
         return (
-          <ElSteps active={step.value - 1} finish-status="success">
+          <el-steps active={step.value - 1} finish-status="success">
             {group.children.map((pane, index) => (
-              <ElStep title={pane.title} key={index} />
+              <el-step title={pane.title} key={index} />
             ))}
-          </ElSteps>
+          </el-steps>
         )
       }
       if (group.type === "tabs") {
         return (
-          <ElTabs modelValue={group.children[0]?.title}>
+          <el-tabs modelValue={group.children[0]?.title}>
             {group.children.map((pane, index) => (
-              <ElTabPane label={pane.title} name={pane.title} key={index}>
+              <el-tab-pane label={pane.title} name={pane.title} key={index}>
                 {pane.children?.map((component, idx) => renderGroupSlot(component, idx))}
-              </ElTabPane>
+              </el-tab-pane>
             ))}
-          </ElTabs>
+          </el-tabs>
         )
       }
       return null
@@ -248,7 +249,7 @@ export default defineComponent({
 
     const id = getCurrentInstance()?.uid
 
-    const context: FormRef = {
+    const context = {
       id,
       get form() {
         return formRef.value
@@ -286,7 +287,7 @@ export default defineComponent({
       clearFields,
       clearValidate,
       scrollToField,
-    }
+    } as unknown as FormRef
 
     expose(context)
 
@@ -296,22 +297,24 @@ export default defineComponent({
       }
     })
 
-    return () => (
-      <div class="fd-form">
-        {renderGroup()}
-        <ElForm
-          ref={formRef}
-          class="fd-form__body"
-          model={model}
-          {...options.form}
-          onSubmit={(event: Event) => {
-            event.preventDefault()
-            void handleSubmit()
-          }}
-        >
-          <ElRow gutter={options.layout.grid.colGap}>{options.items.map((item, index) => renderItem(item, index))}</ElRow>
-        </ElForm>
-      </div>
-    )
+    return () => {
+      const items = options.items as unknown as FormItem[]
+      return (
+        <div class="fd-form">
+          {renderGroup()}
+          <el-form
+            ref={formRef}
+            model={model}
+            {...options.form}
+            onSubmit={(event: Event) => {
+              event.preventDefault()
+              void handleSubmit()
+            }}
+          >
+            <el-row gutter={options.layout.grid.colGap}>{items.map((item, index) => renderItem(item, index))}</el-row>
+          </el-form>
+        </div>
+      )
+    }
   },
 })

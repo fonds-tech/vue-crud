@@ -1,5 +1,3 @@
-import type { FormPlugin } from "./form"
-
 export interface Dict {
   primaryId: string
   api: {
@@ -60,7 +58,7 @@ export interface Config {
       span?: number
       labelWidth?: number | string
       labelPosition?: "left" | "right" | "top"
-      plugins?: FormPlugin[]
+      plugins?: Array<Record<string, any>>
     }
   }
   events: {

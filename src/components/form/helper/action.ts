@@ -1,5 +1,5 @@
-import type { Ref } from "vue"
 import type { FormInstance } from "element-plus"
+import type { Ref, CSSProperties } from "vue"
 import type { FormMode, FormField, FormOptions } from "../../../types"
 import { isArray, cloneDeep, set as setPath } from "lodash-es"
 import { findItem, normalizeItems, ensureComponent } from "./schema"
@@ -10,7 +10,25 @@ export interface FormActionContext {
   form: Ref<FormInstance | undefined>
 }
 
-export function useFormActions({ options, model, form }: FormActionContext) {
+export interface FormActions {
+  setMode: (mode: FormMode) => void
+  getField: (field?: FormField) => unknown
+  setField: (field: FormField, value: unknown) => void
+  bindFields: (data?: Record<string, unknown>) => void
+  setData: (path: string, value: unknown) => void
+  setItem: (field: FormField, data: Record<string, unknown>) => void
+  setOptions: (field: FormField, list: any[]) => void
+  getOptions: (field: FormField) => any[]
+  setProps: (field: FormField, props: Record<string, any>) => void
+  setStyle: (field: FormField, style: CSSProperties) => void
+  hideItem: (field: FormField | FormField[]) => void
+  showItem: (field: FormField | FormField[]) => void
+  collapse: (flag?: boolean) => void
+  setRequired: (field: FormField, required: boolean) => void
+  clearModel: () => void
+}
+
+export function useFormActions({ options, model, form }: FormActionContext): FormActions {
   function clearModel() {
     Object.keys(model).forEach(key => delete model[key])
   }
@@ -59,13 +77,14 @@ export function useFormActions({ options, model, form }: FormActionContext) {
     }
   }
 
-  function getList(field: FormField) {
+  function getList(field: FormField): any[] {
     const target = findItem(options.items, field)
     if (!target) {
       return []
     }
     ensureComponent(target)
-    return target.component?.options ?? []
+    const optionsValue = target.component?.options
+    return Array.isArray(optionsValue) ? optionsValue : []
   }
 
   function setProps(field: FormField, props: Record<string, any>) {
@@ -78,7 +97,7 @@ export function useFormActions({ options, model, form }: FormActionContext) {
     }
   }
 
-  function setStyle(field: FormField, style: Record<string, unknown>) {
+  function setStyle(field: FormField, style: CSSProperties) {
     const target = findItem(options.items, field)
     if (target) {
       ensureComponent(target)

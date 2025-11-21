@@ -10,7 +10,17 @@ interface MethodsContext {
   form: Ref<FormInstance | undefined>
 }
 
-export function useFormMethods({ options, model, form }: MethodsContext) {
+export interface FormMethods {
+  submit: (callback?: (model: Record<string, any>, errors?: Record<string, any>) => void) => Promise<FormSubmitResult>
+  validate: (callback?: FormValidateCallback) => ReturnType<FormInstance["validate"]>
+  validateField: (field?: FormItemProp | FormItemProp[], callback?: FormValidateCallback) => ReturnType<FormInstance["validateField"]>
+  resetFields: (field?: FormItemProp | FormItemProp[]) => void
+  clearFields: (field?: FormItemProp | FormItemProp[]) => void
+  clearValidate: (field?: FormItemProp | FormItemProp[]) => void
+  scrollToField: (field: FormItemProp) => void
+}
+
+export function useFormMethods({ options, model, form }: MethodsContext): FormMethods {
   function runSubmitHooks(target: Record<string, unknown>) {
     options.items.forEach((item) => {
       if (item.hook !== undefined && item.field !== undefined) {
@@ -40,11 +50,20 @@ export function useFormMethods({ options, model, form }: MethodsContext) {
 
   async function submit(callback?: (model: Record<string, any>, errors?: Record<string, any>) => void): Promise<FormSubmitResult> {
     return new Promise((resolve) => {
-      void form.value?.validate((errors) => {
+      if (!form.value) {
+        const snapshot = cloneDeep<Record<string, unknown>>(model)
+        runSubmitHooks(snapshot)
+        const normalizedModel = snapshot as Record<string, any>
+        callback?.(normalizedModel, undefined)
+        options.onSubmit?.(normalizedModel, undefined)
+        resolve({ model: normalizedModel, errors: undefined })
+        return
+      }
+      void form.value.validate((valid, fields) => {
         const nextModel = cloneDeep<Record<string, unknown>>(model)
         runSubmitHooks(nextModel)
         const normalizedModel = nextModel as Record<string, any>
-        const typedErrors = errors ? (errors as Record<string, any>) : undefined
+        const typedErrors = valid ? undefined : (fields as Record<string, any> | undefined)
         callback?.(normalizedModel, typedErrors)
         options.onSubmit?.(normalizedModel, typedErrors)
         resolve({ model: normalizedModel, errors: typedErrors })
@@ -52,9 +71,9 @@ export function useFormMethods({ options, model, form }: MethodsContext) {
     })
   }
 
-  const validate = async (callback?: FormValidateCallback) => form.value?.validate(callback)
+  const validate = async (callback?: FormValidateCallback) => form.value?.validate(callback) ?? Promise.resolve(true)
 
-  const validateField = async (field?: FormItemProp | FormItemProp[], callback?: FormValidateCallback) => form.value?.validateField(field, callback)
+  const validateField = async (field?: FormItemProp | FormItemProp[], callback?: FormValidateCallback) => form.value?.validateField(field, callback) ?? Promise.resolve(true)
 
   const resetFields = (field?: FormItemProp | FormItemProp[]) => form.value?.resetFields(field)
 
