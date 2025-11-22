@@ -6,7 +6,6 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { merge, isArray, isFunction } from "@fonds/utils"
 
 /* CRUD 助手依赖运行期 schema/服务交互，允许必要的动态类型操作 */
-/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-argument, ts/no-unsafe-call, ts/no-unsafe-member-access, ts/no-unsafe-return, ts/strict-boolean-expressions, ts/no-floating-promises, ts/promise-function-async, ts/no-misused-promises */
 
 interface HelperOptions {
   mitt: Mitt

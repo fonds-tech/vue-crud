@@ -1,8 +1,6 @@
 import { defineComponent } from "vue"
 import { useCore, useConfig } from "../../hooks"
 
-/* eslint-disable ts/no-unsafe-argument */
-
 export default defineComponent({
   name: "fd-delete-button",
 

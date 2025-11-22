@@ -4,8 +4,6 @@ import { useHelper } from "./useHelper"
 import { Mitt, clone, merge } from "@fonds/utils"
 import { inject, provide, reactive, defineComponent, getCurrentInstance } from "vue"
 
-/* eslint-disable ts/no-unsafe-assignment, ts/strict-boolean-expressions */
-
 export default defineComponent({
   name: "fd-crud",
   props: {

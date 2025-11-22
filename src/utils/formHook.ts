@@ -2,7 +2,6 @@ import type { FormHook, FormField, FormModel, FormHookFn, FormHookKey } from "..
 import { isArray, isEmpty, isObject, isString, isFunction } from "lodash-es"
 
 /* 钩子执行依赖任意 schema 配置，禁用严格的 any/boolean 校验规则 */
-/* eslint-disable ts/no-unsafe-assignment, ts/no-unsafe-return, ts/no-unsafe-argument, ts/strict-boolean-expressions */
 
 interface HookTree<T extends FormModel = FormModel> {
   bind: { value: any, hook: FormHook, model: T, field: FormField }

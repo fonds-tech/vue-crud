@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
-import { merge, isEqual, cloneDeep } from "lodash-es"
+import { merge, isEqual, debounce, cloneDeep } from "lodash-es"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type OptionRecord = Record<string, any>
@@ -42,6 +42,7 @@ interface CustomProps {
   labelKey?: string
   valueKey?: string
   immediate?: boolean
+  debounce?: number
 }
 
 defineOptions({
@@ -59,6 +60,7 @@ const props = withDefaults(
     labelKey: "label",
     valueKey: "value",
     immediate: true,
+    debounce: 300,
   },
 )
 
@@ -167,11 +169,15 @@ function handleClear() {
 
 function handleFilterInput(value: string) {
   currentSearchTerm.value = value
-  if (value && typeof props.api === "function")
-    refresh({ [props.searchField]: value })
+  debouncedRefresh(value)
   if (value)
     emit("search", value)
 }
+
+const debouncedRefresh = debounce((value: string) => {
+  if (value && typeof props.api === "function")
+    refresh({ [props.searchField]: value })
+}, props.debounce)
 
 function resolveOptionField(option: OptionRecord, key: string | undefined) {
   if (!option || !key)

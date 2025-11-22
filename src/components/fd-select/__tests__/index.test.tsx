@@ -107,16 +107,25 @@ describe("fd-select", () => {
   })
 
   it("搜索输入会触发远程刷新与 search 事件", async () => {
+    vi.useFakeTimers()
     const apiMock = vi.fn().mockResolvedValue(baseOptions) // mock搜索接口
     const wrapper = mountFdSelect({ props: { api: apiMock } }) // 挂载组件
 
     await flushPromises() // 等待初次加载
 
     wrapper.vm.handleFilterInput("海") // 触发搜索
+
+    // 验证防抖：立即检查不应调用
+    expect(apiMock).not.toHaveBeenLastCalledWith(expect.objectContaining({ keyword: "海" }))
+
+    // 快进时间
+    vi.advanceTimersByTime(300)
     await flushPromises() // 等待刷新
 
     expect(apiMock).toHaveBeenLastCalledWith(expect.objectContaining({ keyword: "海" })) // 校验搜索参数
     expect(wrapper.emitted("search")?.[0]).toEqual(["海"]) // search事件携带关键字
+
+    vi.useRealTimers()
   })
 })
 
