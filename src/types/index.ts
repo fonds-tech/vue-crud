@@ -1,3 +1,4 @@
+export * from "../components/fd-detail/type"
 export * from "../components/fd-form/type"
 export * from "./config"
 export * from "./crud"

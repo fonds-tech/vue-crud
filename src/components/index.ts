@@ -1,6 +1,7 @@
 import type { App, Component } from "vue"
 import Crud from "./crud"
 import Form from "./fd-form/index.vue"
+import Detail from "./fd-detail/index.vue"
 import Dialog from "./fd-dialog/index.vue"
 import Select from "./fd-select/index.vue"
 import Cascader from "./fd-cascader/index.vue"
@@ -17,6 +18,7 @@ export const components: Record<string, Component> = {
   FdOption,
   Select,
   Cascader,
+  Detail,
 }
 
 /**
