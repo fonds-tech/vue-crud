@@ -100,120 +100,116 @@ function mountForm() {
 }
 
 describe("fd-form", () => {
-  // 测试 fd-form 组件是否暴露了各种 schema 操作，例如 setField, getField, setOptions, hideItem, showItem。
   it("fd-form 组件暴露 schema 操作", async () => {
-    const wrapper = mountForm()
-    const form = wrapper.vm as unknown as FormRef<{ name: string }>
+    const wrapper = mountForm() // 挂载 fd-form 组件
+    const form = wrapper.vm as unknown as FormRef<{ name: string }> // 获取组件实例并断言类型
 
     form.use({
-      model: { name: "Tom" },
+      model: { name: "Tom" }, // 设置初始模型数据
       items: [
         {
-          field: "name",
-          label: "名称",
-          component: { is: BasicInput },
-          required: true,
+          field: "name", // 字段名
+          label: "名称", // 标签
+          component: { is: BasicInput }, // 使用 BasicInput 组件
+          required: true, // 必填项
         },
       ],
-    })
+    }) // 初始化表单配置
 
-    await nextTick()
+    await nextTick() // 等待 DOM 更新
 
-    expect(form.model.name).toBe("Tom")
-    form.setField("name", "Jerry")
-    expect(form.getField("name")).toBe("Jerry")
+    expect(form.model.name).toBe("Tom") // 验证模型初始值
+    form.setField("name", "Jerry") // 修改字段值
+    expect(form.getField("name")).toBe("Jerry") // 验证字段值已更新
 
-    form.setOptions("name", [{ label: "A", value: "a" }])
-    expect(form.items[0]?.component?.options).toEqual([{ label: "A", value: "a" }])
+    form.setOptions("name", [{ label: "A", value: "a" }]) // 设置选项数据
+    expect(form.items[0]?.component?.options).toEqual([{ label: "A", value: "a" }]) // 验证选项数据已更新
 
-    form.hideItem("name")
-    expect(form.items[0].hidden).toBe(true)
-    form.showItem("name")
-    expect(form.items[0].hidden).toBe(false)
+    form.hideItem("name") // 隐藏表单项
+    expect(form.items[0].hidden).toBe(true) // 验证表单项已隐藏
+    form.showItem("name") // 显示表单项
+    expect(form.items[0].hidden).toBe(false) // 验证表单项已显示
 
-    const rules = form.items[0].rules as Array<{ required?: boolean }>
-    expect(rules?.[0]?.required).toBe(true)
+    const rules = form.items[0].rules as Array<{ required?: boolean }> // 获取校验规则
+    expect(rules?.[0]?.required).toBe(true) // 验证 required 规则生效
   })
 
-  // 测试表单提交功能和回调触发。
   it("提交表单并触发回调", async () => {
-    const wrapper = mountForm()
-    const form = wrapper.vm as unknown as FormRef<{ title: string }>
-    const onSubmit = vi.fn()
+    const wrapper = mountForm() // 挂载 fd-form 组件
+    const form = wrapper.vm as unknown as FormRef<{ title: string }> // 获取组件实例
+    const onSubmit = vi.fn() // 创建提交回调 mock
 
     form.use({
-      model: { title: "Hello" },
-      onSubmit,
+      model: { title: "Hello" }, // 设置初始模型
+      onSubmit, // 绑定提交回调
       items: [
         {
-          field: "title",
-          label: "标题",
-          component: { is: BasicInput },
+          field: "title", // 字段名
+          label: "标题", // 标签
+          component: { is: BasicInput }, // 使用 BasicInput 组件
         },
       ],
-    })
+    }) // 初始化表单配置
 
-    await nextTick()
+    await nextTick() // 等待更新
 
-    const result = await form.submit()
-    expect(onSubmit).toHaveBeenCalledTimes(1)
-    expect(result.values.title).toBe("Hello")
-    expect(result.errors).toBeUndefined()
+    const result = await form.submit() // 触发提交
+    expect(onSubmit).toHaveBeenCalledTimes(1) // 验证回调被调用一次
+    expect(result.values.title).toBe("Hello") // 验证提交的数据
+    expect(result.errors).toBeUndefined() // 验证没有错误
   })
 
-  // 测试对 form hooks 和 bindFields 功能的支持。
   it("支持 hooks 和 bindFields", async () => {
-    const wrapper = mountForm()
-    const form = wrapper.vm as unknown as FormRef<{ tags: string, price: number }>
+    const wrapper = mountForm() // 挂载 fd-form 组件
+    const form = wrapper.vm as unknown as FormRef<{ tags: string, price: number }> // 获取实例
 
     form.use({
-      model: { tags: "x,y", price: 5 },
+      model: { tags: "x,y", price: 5 }, // 初始数据
       items: [
         {
-          field: "tags",
+          field: "tags", // tags 字段
           label: "标签",
-          hook: "split",
-          component: { is: FlexibleInput },
+          hook: "split", // 使用 split hook，将字符串转为数组
+          component: { is: FlexibleInput }, // 使用 FlexibleInput
         },
         {
-          field: "price",
+          field: "price", // price 字段
           label: "价格",
-          component: { is: BasicInput },
+          component: { is: BasicInput }, // 使用 BasicInput
         },
       ],
-    })
+    }) // 初始化配置
 
-    await nextTick()
-    expect(form.model.tags).toEqual(["x", "y"])
+    await nextTick() // 等待更新
+    expect(form.model.tags).toEqual(["x", "y"]) // 验证 hook 将 "x,y" 转换为 ["x", "y"]
 
-    form.bindFields({ tags: "a", price: 15 })
-    await nextTick()
-    expect(form.getField("price")).toBe(15)
+    form.bindFields({ tags: "a", price: 15 }) // 批量绑定字段值
+    await nextTick() // 等待更新
+    expect(form.getField("price")).toBe(15) // 验证 price 字段更新
 
-    form.setProps("price", { placeholder: "请输入金额" })
-    const priceItem = form.items.find(item => item.field === "price")
+    form.setProps("price", { placeholder: "请输入金额" }) // 动态设置组件 props
+    const priceItem = form.items.find(item => item.field === "price") // 查找 price 表单项
     const priceProps = typeof priceItem?.component?.props === "function"
-      ? priceItem.component.props(form.model)
-      : priceItem?.component?.props
-    expect(priceProps?.placeholder).toBe("请输入金额")
+      ? priceItem.component.props(form.model) // 如果 props 是函数，则执行获取结果
+      : priceItem?.component?.props // 否则直接获取 props
+    expect(priceProps?.placeholder).toBe("请输入金额") // 验证 props 设置成功
   })
 
-  // 测试多步表单中的步骤导航流程。
   it("处理步骤导航流程", async () => {
-    const wrapper = mountForm()
-    const form = wrapper.vm as unknown as FormRef<{ foo: string }>
-    const onSubmit = vi.fn()
-    const onNext = vi.fn((_, ctx: { next: () => void }) => ctx.next())
+    const wrapper = mountForm() // 挂载 fd-form
+    const form = wrapper.vm as unknown as FormRef<{ foo: string }> // 获取实例
+    const onSubmit = vi.fn() // mock 提交回调
+    const onNext = vi.fn((_, ctx: { next: () => void }) => ctx.next()) // mock 下一步回调
 
     form.use({
-      model: { foo: "" },
-      onSubmit,
-      onNext,
+      model: { foo: "" }, // 初始模型
+      onSubmit, // 绑定提交
+      onNext, // 绑定下一步
       group: {
-        type: "steps",
+        type: "steps", // 使用步骤条模式
         children: [
-          { name: "basic", title: "基础", component: { is: BasicInput } },
-          { name: "extra", title: "扩展", component: { is: BasicInput } },
+          { name: "basic", title: "基础", component: { is: BasicInput } }, // 第一步
+          { name: "extra", title: "扩展", component: { is: BasicInput } }, // 第二步
         ],
       },
       items: [
@@ -223,20 +219,20 @@ describe("fd-form", () => {
           component: { is: BasicInput },
         },
       ],
-    })
+    }) // 初始化配置
 
-    await nextTick()
+    await nextTick() // 等待更新
 
-    form.next()
-    expect(onNext).toHaveBeenCalledTimes(1)
-    expect(onSubmit).not.toHaveBeenCalled()
+    form.next() // 触发下一步
+    expect(onNext).toHaveBeenCalledTimes(1) // 验证 onNext 被调用
+    expect(onSubmit).not.toHaveBeenCalled() // 验证 onSubmit 未被调用（因为还在步骤中）
 
-    form.next()
-    expect(onNext).toHaveBeenCalledTimes(2)
-    expect(onSubmit).toHaveBeenCalledTimes(1)
+    form.next() // 再次触发下一步（到达最后一步）
+    expect(onNext).toHaveBeenCalledTimes(2) // 验证 onNext 再次被调用
+    expect(onSubmit).toHaveBeenCalledTimes(1) // 验证 onSubmit 被调用（完成所有步骤）
 
-    form.prev()
-    form.prev()
-    expect(onNext).toHaveBeenCalledTimes(2)
+    form.prev() // 上一步
+    form.prev() // 再上一步
+    expect(onNext).toHaveBeenCalledTimes(2) // 验证 onNext 调用次数不变
   })
 })
