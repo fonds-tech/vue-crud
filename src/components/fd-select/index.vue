@@ -34,20 +34,56 @@ type ApiHandler = (params: Record<string, any>) => Promise<OptionRecord[]>
 
 // 扩展出来的增强属性，承担远程获取与交互控制职责
 interface CustomProps {
+  /**
+   * 远程数据获取函数
+   * @description 返回 Promise<OptionRecord[]>
+   */
   api?: ApiHandler
+  /**
+   * 额外的请求参数
+   * @description 可以是静态对象或动态生成函数
+   */
   params?: Record<string, any> | ((payload: Record<string, any>) => Record<string, any>)
+  /**
+   * 搜索字段名
+   * @default 'keyword'
+   */
   searchField?: string
+  /**
+   * 失去焦点时是否刷新
+   * @default true
+   */
   refreshOnBlur?: boolean
+  /**
+   * 获得焦点时是否刷新
+   * @default true
+   */
   refreshOnFocus?: boolean
+  /**
+   * 选项标签字段名
+   * @default 'label'
+   */
   labelKey?: string
+  /**
+   * 选项值字段名
+   * @default 'value'
+   */
   valueKey?: string
+  /**
+   * 是否立即获取数据
+   * @default true
+   */
   immediate?: boolean
+  /**
+   * 搜索防抖时间 (ms)
+   * @default 300
+   */
   debounce?: number
 }
 
 defineOptions({
   name: "fd-select",
-  inheritAttrs: false,
+  inheritAttrs: false, // 禁用属性自动继承，手动控制透传
 })
 
 const props = withDefaults(
@@ -70,6 +106,7 @@ const emit = defineEmits<{
   (e: "clear"): void
 }>()
 
+// 双向绑定 modelValue
 const modelValue = defineModel<ElSelectProps["modelValue"]>({
   default: undefined,
 })
@@ -85,6 +122,7 @@ const optionLoading = ref(false)
 const currentSearchTerm = ref("")
 
 // 统一对外的可用选项：远程 > props.options > attrs.options
+// 优先级逻辑：如果是远程搜索，优先使用远程返回的数据；否则回退到 props 或 attrs 传入的静态选项
 const availableOptions = computed<OptionRecord[]>(() => {
   if (remoteOptionList.value.length > 0)
     return remoteOptionList.value
@@ -98,6 +136,7 @@ const availableOptions = computed<OptionRecord[]>(() => {
 const labelKey = computed(() => props.labelKey)
 const valueKey = computed(() => props.valueKey)
 
+// 监听 api 变化，重置数据并按需刷新
 watch(
   () => props.api,
   () => {
@@ -108,6 +147,7 @@ watch(
   { immediate: true },
 )
 
+// 监听 params 变化，深度比较，发生变化时触发刷新
 watch(
   () => props.params,
   (next, prev) => {
@@ -140,16 +180,19 @@ async function refresh(extra: Record<string, any> = {}) {
   }
 }
 
+// 聚焦时刷新 (如果配置了 refreshOnFocus 且有搜索词)
 function handleFocus() {
   if (currentSearchTerm.value && props.refreshOnFocus)
     refresh({ [props.searchField]: currentSearchTerm.value })
 }
 
+// 失焦时刷新 (如果配置了 refreshOnBlur 且有搜索词)
 function handleBlur() {
   if (currentSearchTerm.value && props.refreshOnBlur)
     refresh({ [props.searchField]: currentSearchTerm.value })
 }
 
+// 处理值变更，查找并回传完整的 Option 对象
 function handleChange(value: ElSelectProps["modelValue"]) {
   const key = valueKey.value
   if (Array.isArray(value)) {
@@ -161,12 +204,14 @@ function handleChange(value: ElSelectProps["modelValue"]) {
   emit("change", value, matched)
 }
 
+// 清空搜索词并重置列表
 function handleClear() {
   currentSearchTerm.value = ""
   refresh()
   emit("clear")
 }
 
+// 处理搜索输入，触发防抖刷新
 function handleFilterInput(value: string) {
   currentSearchTerm.value = value
   debouncedRefresh(value)
@@ -174,22 +219,26 @@ function handleFilterInput(value: string) {
     emit("search", value)
 }
 
+// 防抖后的刷新函数
 const debouncedRefresh = debounce((value: string) => {
   if (value && typeof props.api === "function")
     refresh({ [props.searchField]: value })
 }, props.debounce)
 
+// 解析选项特定字段值
 function resolveOptionField(option: OptionRecord, key: string | undefined) {
   if (!option || !key)
     return undefined
   return option[key]
 }
 
+// 解析选项 Key (用于 v-for)
 function resolveOptionKey(option: OptionRecord, index: number) {
   const value = resolveOptionField(option, valueKey.value)
   return value ?? index
 }
 
+// 过滤掉自定义属性，只保留透传给 el-select 的属性
 const forwardedProps = computed(() => {
   const {
     api,
@@ -208,6 +257,7 @@ const forwardedProps = computed(() => {
 // 自动整理透传属性，必要时补全 filterable / loading 等行为
 const selectBindingProps = computed(() => {
   const payload: Record<string, unknown> = { ...forwardedProps.value, ...(attrs as Record<string, unknown>) }
+  // 如果配置了 API，自动开启远程搜索模式
   if (props.api) {
     if (payload.remote === true && payload.remoteMethod === undefined)
       payload.remoteMethod = handleFilterInput
@@ -216,6 +266,7 @@ const selectBindingProps = computed(() => {
     if (payload.filterable === undefined)
       payload.filterable = true
   }
+  // 同步 loading 状态
   if (payload.loading === undefined)
     payload.loading = optionLoading.value
   return payload

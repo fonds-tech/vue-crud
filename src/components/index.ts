@@ -3,6 +3,7 @@ import Crud from "./crud"
 import Form from "./fd-form/index.vue"
 import Dialog from "./fd-dialog/index.vue"
 import Select from "./fd-select/index.vue"
+import Cascader from "./fd-cascader/index.vue"
 import FdOption from "./fd-option/index.vue"
 import AddButton from "./add-button"
 import DeleteButton from "./delete-button"
@@ -15,6 +16,7 @@ export const components: Record<string, Component> = {
   Form,
   FdOption,
   Select,
+  Cascader,
 }
 
 /**

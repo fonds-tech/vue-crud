@@ -161,33 +161,52 @@ defineOptions({
   inheritAttrs: false,
 })
 
+// 生成唯一 ID，用于辅助标识
 const id = typeof useId === "function" ? useId() : `fd-form-${Math.random().toString(36).slice(2)}`
+
+// Element Plus Form 实例引用
 const formRef = ref<FormInstance>()
+
+// 表单核心配置状态，响应式对象
 const options = reactive<FormOptions>({
-  key: 0,
-  mode: "add",
-  model: {},
-  items: [],
-  group: {},
+  key: 0, // 强制刷新 key
+  mode: "add", // 默认为新增模式
+  model: {}, // 表单数据模型
+  items: [], // 表单项配置列表
+  group: {}, // 分组配置 (Tabs/Steps)
   form: {
-    labelWidth: "auto",
-    scrollToError: true,
+    labelWidth: "auto", // 默认标签宽度自动
+    scrollToError: true, // 校验失败自动滚动到错误项
   },
   layout: {
-    row: { gutter: 16, collapsed: false, collapsedRows: 3 },
-    column: { span: 8 },
+    row: { gutter: 16, collapsed: false, collapsedRows: 3 }, // 默认栅格行配置
+    column: { span: 8 }, // 默认栅格列配置 (3列布局)
   },
 })
 
+// 步骤条当前步骤索引 (用于 group.type === 'steps')
 const step = ref(1)
+
+// 引用 options.model 作为响应式数据源
 const model = reactive(options.model) as FormRecord
+
+// 初始化 Action Hook (提供 setField, bindFields 等操作方法)
 const action = useAction({ options, model, form: formRef })
+
+// 初始化 Methods Hook (提供 validate, submit 等表单原生方法)
 const methods = useMethods({ options, model, form: formRef })
 
+/**
+ * 类型守卫：判断配置项是否为 FormComponent 对象
+ */
 function isComponentConfig(component?: FormComponentSlot): component is FormComponent {
   return Boolean(component && typeof component === "object" && "is" in component)
 }
 
+/**
+ * 解析组件类型 (is 属性)
+ * 支持字符串组件名、Vue组件对象或动态函数返回
+ */
 function is(com?: FormComponentSlot) {
   if (!com)
     return undefined
@@ -197,14 +216,29 @@ function is(com?: FormComponentSlot) {
     return com as string | VueComponent
   return com as VueComponent
 }
+
+// 解析组件事件监听器 (on 属性)
 const on = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, (...args: any[]) => void>>(com, "on") ?? {} : {})
+
+// 解析组件默认插槽名 (slot 属性)
 const slot = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<string | undefined>(com, "slot") : undefined)
+
+// 解析组件 Props (props 属性)
 const props = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, any>>(com, "props") ?? {} : {})
+
+// 解析组件样式 (style 属性)
 const style = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<CSSProperties | undefined>(com, "style") : undefined)
+
+/**
+ * 检查是否有 slots 属性
+ */
 function hasSlotsProp(target: unknown): target is Record<string, any> {
   return Boolean(target && typeof target === "object" && "slots" in target)
 }
 
+/**
+ * 解析组件的具名插槽配置
+ */
 function slots(target?: FormItem | FormComponentSlot) {
   if (!target)
     return {}
@@ -212,12 +246,27 @@ function slots(target?: FormItem | FormComponentSlot) {
     return {}
   return resolveProp<Record<string, FormComponentSlot>>(target, "slots") ?? {}
 }
+
+// 解析组件特有的 options 属性 (如 Select 的下拉选项)
 const componentOptions = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<any[]>(com, "options") : undefined)
 
+// 计算表单项显隐状态 (默认显示，unless hidden=true)
 const show = (item: FormItem) => !resolveProp<boolean>(item, "hidden")
+
+// 计算额外提示信息 (extra 属性)
 const extra = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? "" : resolveProp<string>(item, "extra"))
+
+// 计算是否必填 (required 属性)，隐藏项自动设为非必填
 const required = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? false : Boolean(resolveProp(item, "required")))
+
+// 计算是否禁用 (disabled 属性)
 const disabled = (item: FormItem) => Boolean(resolveProp(item, "disabled"))
+
+/**
+ * 计算最终校验规则
+ * 1. 隐藏项无校验规则
+ * 2. 非必填项自动过滤掉内部生成的 required 规则 (_inner=true)
+ */
 function rules(item: FormItem) {
   if (resolveProp<boolean>(item, "hidden"))
     return []
@@ -232,16 +281,22 @@ function rules(item: FormItem) {
   return fieldRules
 }
 
+/**
+ * 格式化并增强组件 Props
+ * 为常见 Element Plus 组件自动注入 placeholder 和 options
+ */
 const formatProps = computed(() => (item: FormItem) => {
   const componentName = is(item.component)
   const baseProps = {
     ...props(item.component),
   }
 
+  // 全局禁用覆盖
   if (disabled(item)) {
     baseProps.disabled = true
   }
 
+  // 针对特定组件的默认值增强
   switch (componentName) {
     case "el-input":
     case "el-input-number":
@@ -278,6 +333,7 @@ const formatProps = computed(() => (item: FormItem) => {
       baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
       break
     default: {
+      // 其他组件尝试注入 options
       const optionValues = componentOptions(item.component)
       if (optionValues)
         baseProps.options = optionValues
@@ -288,12 +344,14 @@ const formatProps = computed(() => (item: FormItem) => {
   return baseProps
 })
 
+// 提取纯组件 Props (不包含特殊处理)
 function componentProps(component?: FormComponentSlot) {
   return {
     ...props(component),
   }
 }
 
+// 处理组件 Ref 回调
 function useRef(el: unknown, com?: FormComponentSlot) {
   if (!isComponentConfig(com))
     return
@@ -303,12 +361,17 @@ function useRef(el: unknown, com?: FormComponentSlot) {
   }
 }
 
+// 生成 Ref 绑定函数
 function bindComponentRef(com?: FormComponentSlot) {
   return (el: unknown) => {
     useRef(el, com)
   }
 }
 
+/**
+ * 核心属性解析函数
+ * 处理动态属性：如果是函数则执行并传入 model，否则直接返回
+ */
 function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined {
   if (!target || typeof target !== "object")
     return undefined
@@ -319,10 +382,12 @@ function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined 
   return value as TValue | undefined
 }
 
+// 类型守卫：判断是否为有效表单项配置
 function isFormItemConfig(value: DeepPartial<FormItem> | FormItem | undefined): value is FormItem {
   return Boolean(value && value.field && value.component)
 }
 
+// 确保组件配置对象存在默认结构
 function ensureComponentDefaults(item: FormItem) {
   if (!item.component) {
     item.component = {}
@@ -332,15 +397,23 @@ function ensureComponentDefaults(item: FormItem) {
   item.component.style = item.component.style ?? {}
 }
 
+/**
+ * 初始化表单项
+ * 1. 设置默认值
+ * 2. 执行 bind hook
+ * 3. 生成 required 校验规则
+ */
 function normalizeItems() {
   options.items.forEach((item) => {
     ensureComponentDefaults(item)
 
     const fieldKey = String(item.field)
+    // 应用默认值 (仅当 model 中无值时)
     if (isDef(item.value) && !isDef(model[fieldKey])) {
       model[fieldKey] = cloneDeep(item.value)
     }
 
+    // 执行 bind 阶段的数据转换 hook
     if (item.hook && item.field) {
       formHook.bind({
         hook: item.hook,
@@ -350,10 +423,12 @@ function normalizeItems() {
       })
     }
 
+    // 如果标记为 required，自动注入 Element Plus 校验规则
     if (required(item)) {
       const rule: InternalRule = { required: true, message: `${item.label ?? fieldKey}为必填项`, _inner: true }
       if (isNoEmpty(item.rules)) {
         const ruleList: InternalRule[] = (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as InternalRule[]
+        // 替换或添加内部规则
         const index = ruleList.findIndex(r => r._inner === true)
         if (index > -1)
           ruleList[index] = rule
@@ -368,6 +443,10 @@ function normalizeItems() {
   })
 }
 
+/**
+ * 合并用户配置到内部状态
+ * 使用 lodash merge 深度合并配置
+ */
 function mergeFormOptions(useOptions: FormUseOptions = {}) {
   if (useOptions.key !== undefined) {
     options.key = Number(useOptions.key)
@@ -388,6 +467,7 @@ function mergeFormOptions(useOptions: FormUseOptions = {}) {
     options.group = merge({}, options.group, useOptions.group)
   }
   if (useOptions.items) {
+    // 替换整个 items 数组
     const nextItems = useOptions.items.filter(isFormItemConfig)
     options.items.splice(0, options.items.length, ...nextItems)
   }
@@ -398,6 +478,7 @@ function mergeFormOptions(useOptions: FormUseOptions = {}) {
     options.onSubmit = useOptions.onSubmit
   }
   if (useOptions.model) {
+    // 重置并覆盖 model
     Object.keys(model).forEach((key) => {
       delete model[key]
     })
@@ -406,11 +487,19 @@ function mergeFormOptions(useOptions: FormUseOptions = {}) {
   step.value = 1
 }
 
+/**
+ * 初始化表单 (核心公开方法)
+ * @param useOptions 用户配置
+ */
 function use(useOptions: FormUseOptions = {}) {
   mergeFormOptions(useOptions)
   normalizeItems()
 }
 
+/**
+ * 下一步 (仅 Steps 模式有效)
+ * 触发校验，通过后执行 onNext 或自动跳转
+ */
 function next() {
   methods.validate((errors) => {
     if (isEmpty(errors)) {
@@ -419,6 +508,7 @@ function next() {
         const total = options.group?.children?.length || 0
         if (options.group?.type === "steps" && total > 0) {
           if (step.value >= total) {
+            // 最后一步，提交表单
             methods.submit()
           }
           else {
@@ -426,6 +516,7 @@ function next() {
           }
         }
         else {
+          // 非步骤条模式，直接提交
           methods.submit()
         }
       }
@@ -440,12 +531,16 @@ function next() {
   })
 }
 
+/**
+ * 上一步 (仅 Steps 模式有效)
+ */
 function prev() {
   if (step.value > 1) {
     step.value -= 1
   }
 }
 
+// 导出组件实例 API
 defineExpose({
   id,
   use,
