@@ -100,7 +100,6 @@ const demoFormOptions: FormUseOptions = {
           type: "datetimerange",
           startPlaceholder: "开始时间",
           endPlaceholder: "结束时间",
-          defaultTime: ["09:00:00", "18:00:00"],
         },
       },
     },
