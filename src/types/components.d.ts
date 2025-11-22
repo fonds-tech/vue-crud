@@ -6,7 +6,7 @@ declare module "vue" {
     "ElDialog": typeof import("element-plus")["ElDialog"]
     "el-dialog": typeof import("element-plus")["ElDialog"]
     "fd-dialog": typeof import("../components/fd-dialog")["default"]
-    "fd-form": typeof import("../components/form")["default"]
+    "fd-form": typeof import("../components/fd-form/index.vue")["default"]
   }
 }
 

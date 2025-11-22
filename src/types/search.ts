@@ -1,4 +1,4 @@
-import type { FormRef, FormRecord, FormUseOptions } from "./form"
+import type { FormRef, FormRecord, FormUseOptions } from "@/components/fd-form/type"
 import type { VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
 export type SearchMaybeFn<T> = T | ((model: FormRecord) => T)

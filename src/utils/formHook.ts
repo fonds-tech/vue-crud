@@ -1,4 +1,4 @@
-import type { FormHook, FormField, FormModel, FormHookFn, FormHookKey } from "../types"
+import type { FormHook, FormField, FormModel, FormHookFn, FormHookKey } from "@/components/fd-form/type"
 import { isArray, isEmpty, isObject, isString, isFunction } from "lodash-es"
 
 /* 钩子执行依赖任意 schema 配置，禁用严格的 any/boolean 校验规则 */
