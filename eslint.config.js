@@ -7,9 +7,7 @@ export default eslint(
     jsx: true,
     pnpm: true,
     stylistic: true,
-    typescript: {
-      tsconfigPath: "./tsconfig.json",
-    },
+    typescript: true,
     formatters: {
       prettierOptions: {
         arrowParens: "always",

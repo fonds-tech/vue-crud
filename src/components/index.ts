@@ -2,6 +2,9 @@ import type { App, Component } from "vue"
 import Crud from "./crud"
 import Form from "./form"
 import Dialog from "./dialog"
+import Search from "./search"
+import Select from "./select/index.vue"
+import FdOption from "./fd-option/index.vue"
 import AddButton from "./add-button"
 import DeleteButton from "./delete-button"
 
@@ -10,7 +13,10 @@ export const components: Record<string, Component> = {
   AddButton,
   DeleteButton,
   Dialog,
+  FdOption,
   Form,
+  Search,
+  Select,
 }
 
 /**

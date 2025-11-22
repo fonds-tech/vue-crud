@@ -1,3 +1,5 @@
+import type { FormActions } from "./helper/action"
+import type { FormMethods } from "./helper/methods"
 import type { FormInstance } from "element-plus"
 import type { Component as VueComponent } from "vue"
 import type { FormRef, FormItem, FormField, FormModel, FormRecord, FormOptions, FormComponent, FormUseOptions, FormRenderContent, FormRenderContext } from "../../types"
@@ -48,7 +50,8 @@ export default defineComponent({
     const model = reactive<LooseRecord>({})
     const step = ref(1)
 
-    const formActions = useFormActions({ options, model, form: formRef })
+    const resolveFormActions = useFormActions as unknown as (context: any) => FormActions
+    const formActions = resolveFormActions({ options, model, form: formRef })
     const {
       clearModel,
       setMode,
@@ -66,7 +69,8 @@ export default defineComponent({
       collapse,
       setRequired,
     } = formActions
-    const formMethods = useFormMethods({ options, model, form: formRef })
+    const resolveFormMethods = useFormMethods as unknown as (context: any) => FormMethods
+    const formMethods = resolveFormMethods({ options, model, form: formRef })
     const { submit, validate, validateField, resetFields, clearFields, clearValidate, scrollToField } = formMethods
 
     function createContext(field?: FormField): FormRenderContext {
@@ -85,6 +89,7 @@ export default defineComponent({
       if (nextModel !== undefined && nextModel !== null) {
         Object.assign(model, cloneDeep(nextModel))
       }
+      // @ts-expect-error Type instantiation becomes too deep for TS 5.6, runtime behavior与原实现一致
       normalizeItems(options.items, model)
       step.value = 1
     }
