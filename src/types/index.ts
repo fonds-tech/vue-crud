@@ -1,6 +1,7 @@
 export * from "../components/fd-crud/type"
 export * from "../components/fd-detail/type"
 export * from "../components/fd-form/type"
+export * from "../components/fd-grid/type"
 export * from "../components/fd-search/type"
 export * from "../components/fd-table/type"
 export * from "./config"

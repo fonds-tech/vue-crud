@@ -125,11 +125,13 @@ const searchRef = useSearch({
       // 默认超过1行会被折叠 (因为 collapsedRows: 1)
     },
   ],
-  actions: [
-    { type: "search" },
-    { type: "reset" },
-    { type: "collapse" },
-  ],
+  action: {
+    col: { span: 24 },
+    items: [
+      { type: "search", text: "搜索" },
+      { type: "reset", text: "重置" },
+    ],
+  },
   onSearch: (model, { next }) => {
     console.log("Search triggered:", model)
     next()
