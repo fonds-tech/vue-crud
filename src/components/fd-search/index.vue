@@ -6,8 +6,21 @@
       </template>
     </fd-form>
 
-    <div v-if="resolvedActions.length" class="fd-search__actions" :style="actionsStyle">
-      <template v-for="(action, actionIndex) in resolvedActions" :key="actionIndex">
+    <component
+      :is="actionWrapperTag"
+      v-if="resolvedActions.length"
+      class="fd-search__action"
+      v-bind="getActionWrapperProps()"
+      :style="actionWrapperStyle"
+    >
+      <component
+        :is="actionItemTag"
+        v-for="(action, actionIndex) in resolvedActions"
+        :key="actionIndex"
+        class="fd-search__action-item"
+        :class="{ 'fd-search__action-item--grid': useActionGrid }"
+        v-bind="getActionItemProps(action)"
+      >
         <el-button
           v-if="action.type === 'search'"
           type="primary"
@@ -64,15 +77,15 @@
             <component :is="value" />
           </template>
         </component>
-      </template>
-    </div>
+      </component>
+    </component>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CSSProperties } from "vue"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
-import type { SearchAction, SearchUseOptions } from "./type"
+import type { SearchAction, SearchOptions, SearchActionOptions } from "./type"
 import FdForm from "../fd-form/index.vue"
 import { isDef } from "@fonds/utils"
 import { useCore } from "@/hooks"
@@ -98,57 +111,64 @@ const defaultActions: SearchAction[] = [
   { type: "reset" },
 ]
 
+interface InternalActionOptions<T extends FormRecord = FormRecord> {
+  items: SearchAction<T>[]
+  row?: SearchActionOptions<T>["row"]
+  col?: SearchActionOptions<T>["col"]
+}
+
 interface InternalOptions<T extends FormRecord = FormRecord> {
   form: FormUseOptions<T>
-  actions: SearchAction<T>[]
-  layout: {
-    actions: {
-      gap: number
-      wrap: boolean
-      align: "flex-start" | "center" | "flex-end" | "space-between"
-    }
-  }
-  onSearch?: SearchUseOptions<T>["onSearch"]
-  onReset?: SearchUseOptions<T>["onReset"]
+  action: InternalActionOptions<T>
+  onSearch?: SearchOptions<T>["onSearch"]
+  onReset?: SearchOptions<T>["onReset"]
 }
 
 const options = reactive<InternalOptions>({
   form: {
     model: {},
     items: [],
-    layout: {
-      row: { gutter: 16, collapsed: false, collapsedRows: 2 },
-      column: { span: 8 },
-    },
+    row: { gutter: 16, collapsed: false, collapsedRows: 2 },
+    col: { span: 8 },
     form: {
       labelWidth: "auto",
     },
   },
-  actions: cloneDeep(defaultActions),
-  layout: {
-    actions: {
-      gap: 8,
-      wrap: true,
-      align: "flex-end",
-    },
+  action: {
+    items: cloneDeep(defaultActions),
+    row: undefined,
+    col: undefined,
   },
 })
 
 // 表单数据模型，优先读取 fd-form 实例，否则退回默认配置
 const formModel = computed<FormRecord>(() => formRef.value?.model ?? (options.form.model as FormRecord) ?? {})
 // 真实的动作列表，未配置时回退为默认搜索/重置
-const resolvedActions = computed(() => (options.actions.length ? options.actions : defaultActions))
-// 动作区域样式，保证按钮在多布局场景下可控
-const actionsStyle = computed<CSSProperties>(() => {
-  const flexWrap: "wrap" | "nowrap" = options.layout.actions.wrap ? "wrap" : "nowrap"
-  return {
-    display: "flex",
-    flexWrap,
-    justifyContent: options.layout.actions.align,
-    gap: `${options.layout.actions.gap}px`,
-  }
-})
+const resolvedActions = computed(() => (options.action.items.length ? options.action.items : defaultActions))
+// 动作为配置 row/col 之前保持 flex 布局，便于兼容旧配置
+const actionsStyle = computed<CSSProperties>(() => ({
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "flex-end",
+  gap: "8px",
+}))
+const useActionGrid = computed(() => Boolean(options.action.row) || Boolean(options.action.col))
+const actionWrapperTag = computed(() => (useActionGrid.value ? "el-row" : "div"))
+const actionItemTag = computed(() => (useActionGrid.value ? "el-col" : "div"))
+const actionWrapperStyle = computed<CSSProperties | undefined>(() => (useActionGrid.value ? undefined : actionsStyle.value))
 const collapseLabel = computed(() => (collapsed.value ? crud.dict?.label?.expand ?? "展开更多" : crud.dict?.label?.collapse ?? "收起"))
+
+function getActionWrapperProps() {
+  return useActionGrid.value ? (options.action.row ?? {}) : {}
+}
+
+function getActionItemProps(action: SearchAction) {
+  return useActionGrid.value ? resolveActionCol(action) : {}
+}
+
+function resolveActionCol(action: SearchAction) {
+  return merge({}, options.action.col ?? {}, action.col ?? {})
+}
 
 watch(
   () => formModel.value,
@@ -159,26 +179,33 @@ watch(
 )
 
 // 接收 fd-search 的业务配置，并透传给 fd-form
-function use(useOptions: SearchUseOptions = {}) {
+function use(useOptions: SearchOptions = {}) {
   if (!useOptions)
     return
 
-  if (Object.prototype.hasOwnProperty.call(useOptions, "actions")) {
-    options.actions.splice(0, options.actions.length, ...(useOptions.actions ?? []))
+  const { action, onSearch, onReset, ...formOptions } = useOptions
+
+  if (action && Object.prototype.hasOwnProperty.call(action, "items")) {
+    options.action.items.splice(0, options.action.items.length, ...(action.items ?? []))
   }
 
-  if (useOptions.layout?.actions) {
-    Object.assign(options.layout.actions, useOptions.layout.actions)
+  if (action?.row) {
+    options.action.row = options.action.row ? merge({}, options.action.row, action.row) : cloneDeep(action.row)
   }
 
-  options.onSearch = useOptions.onSearch
-  options.onReset = useOptions.onReset
-
-  if (useOptions.form) {
-    merge(options.form, useOptions.form)
+  if (action?.col) {
+    options.action.col = options.action.col ? merge({}, options.action.col, action.col) : cloneDeep(action.col)
   }
 
-  collapsed.value = Boolean(options.form?.layout?.row?.collapsed)
+  options.onSearch = onSearch
+  options.onReset = onReset
+
+  const formConfig = formOptions as FormUseOptions
+  if (Object.keys(formConfig).length) {
+    merge(options.form, formConfig)
+  }
+
+  collapsed.value = Boolean(options.form?.row?.collapsed)
 
   formRef.value?.use(cloneDeep(options.form))
 }
@@ -296,7 +323,7 @@ function reset(extra: Record<string, any> = {}) {
 }
 
 // 动作渲染辅助：优先判断 slot，再回退 component 细分能力
-const getActionSlot = (action: SearchAction) => resolveMaybe(action.slot)
+const getActionSlot = (action: SearchAction) => resolveMaybe(action.slot) ?? resolveComponent(action, "slot")
 const getComponentIs = (action: SearchAction) => resolveComponent(action, "is")
 const getComponentProps = (action: SearchAction) => resolveComponent(action, "props") ?? {}
 const getComponentEvents = (action: SearchAction) => resolveComponent(action, "on") ?? {}
@@ -367,3 +394,19 @@ defineExpose({
   collapse,
 })
 </script>
+
+<style lang="scss" scoped>
+.fd-search {
+  gap: 16px;
+  display: flex;
+
+  &__form {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__action {
+    flex: 0 0 auto;
+  }
+}
+</style>

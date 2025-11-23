@@ -109,6 +109,36 @@ const ElIconStub = defineComponent({
   },
 })
 
+const ElRowStub = defineComponent({
+  name: "ElRowStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs }) {
+    return () => {
+      const { class: className, ...rest } = attrs as Record<string, any>
+      return h(
+        "div",
+        { ...rest, class: ["el-row-stub", className].filter(Boolean).join(" ") },
+        slots.default?.(),
+      )
+    }
+  },
+})
+
+const ElColStub = defineComponent({
+  name: "ElColStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs }) {
+    return () => {
+      const { class: className, ...rest } = attrs as Record<string, any>
+      return h(
+        "div",
+        { ...rest, class: ["el-col-stub", className].filter(Boolean).join(" ") },
+        slots.default?.(),
+      )
+    }
+  },
+})
+
 function mountSearch(options: MountingOptions<any> = {}) {
   const toWithArray = (slot?: any) => {
     if (slot === undefined)
@@ -128,6 +158,8 @@ function mountSearch(options: MountingOptions<any> = {}) {
       stubs: {
         "el-button": ElButtonStub,
         "el-icon": ElIconStub,
+        "el-row": ElRowStub,
+        "el-col": ElColStub,
         ...(options.global?.stubs ?? {}),
       },
       ...(options.global ?? {}),
@@ -155,13 +187,13 @@ describe("fd-search", () => {
     search.form!.value = formExpose as unknown as FdFormInstance
     await nextTick()
     const options: Parameters<SearchExpose["use"]>[0] = {
-      form: {
-        model: { keyword: "" },
-        items: [
-          { field: "keyword", label: "关键字", component: { is: "el-input" } },
-        ],
+      model: { keyword: "" },
+      items: [
+        { field: "keyword", label: "关键字", component: { is: "el-input" } },
+      ],
+      action: {
+        items: [{ type: "search", text: "查询" }],
       },
-      actions: [{ type: "search", text: "查询" }],
     }
     search.use(options)
     expect(formExpose.use).toHaveBeenCalledTimes(1)
@@ -171,6 +203,28 @@ describe("fd-search", () => {
         expect.objectContaining({ field: "keyword" }),
       ]),
     }))
+  })
+
+  it("action 配置支持 row/col 布局", async () => {
+    const wrapper = mountSearch()
+    const search = getExpose(wrapper)
+    expect(search.form).toBeDefined()
+    search.form!.value = formExpose as unknown as FdFormInstance
+    await nextTick()
+    search.use({
+      action: {
+        row: { gutter: 32, justify: "start" },
+        col: { span: 12 },
+        items: [{ type: "search", text: "搜索" }],
+      },
+    })
+    await nextTick()
+    const row = wrapper.find(".el-row-stub")
+    expect(row.exists()).toBe(true)
+    expect(row.attributes("gutter")).toBe("32")
+    const col = row.find(".el-col-stub")
+    expect(col.exists()).toBe(true)
+    expect(col.attributes("span")).toBe("12")
   })
 
   it("search 会写入查询参数并调用 crud.refresh", async () => {

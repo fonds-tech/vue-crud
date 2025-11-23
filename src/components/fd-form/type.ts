@@ -1,6 +1,8 @@
 import type { Arrayable } from "element-plus/es/utils"
 import type { VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type {
+  ColProps,
+  RowProps,
   FormProps,
   FormInstance,
   FormItemProp,
@@ -9,6 +11,54 @@ import type {
   FormValidateCallback,
   FormValidationResult,
 } from "element-plus"
+
+/**
+ * 表单配置对象
+ */
+export interface FormOptions<T extends FormRecord = FormRecord> {
+  /**
+   * 唯一键，用于强制刷新渲染
+   */
+  key: number
+  /**
+   * Element Plus Form 原生属性
+   * @description label-width, label-position 等
+   */
+  form: Partial<Omit<FormProps, "model">>
+  /**
+   * 当前模式
+   */
+  mode: FormMode
+  /**
+   * 表单数据模型
+   */
+  model: T
+  /**
+   * 表单项列表
+   */
+  items: Array<FormItem<T>>
+  /**
+   * 分组配置
+   */
+  group: FormGroup<T>
+  /**
+   * 行配置 (el-row)
+   */
+  row?: FormRow
+  /**
+   * 列配置 (el-col)
+   */
+  col?: Partial<ColProps>
+  /**
+   * 下一步回调
+   * @description 仅在 steps 布局下有效
+   */
+  onNext?: (model: T, ctx: { next: () => void }) => void
+  /**
+   * 提交回调
+   */
+  onSubmit?: (model: T, errors: Record<string, any> | undefined) => void
+}
 
 /**
  * 表单数据记录类型
@@ -180,6 +230,11 @@ export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormIt
    */
   offset?: number
   /**
+   * 列配置 (el-col 属性)
+   * @description 优先级高于 options.col
+   */
+  col?: Partial<ColProps>
+  /**
    * 帮助文本
    * @description 显示在 Label 旁边的提示信息
    */
@@ -278,94 +333,9 @@ export interface FormGroup<T extends FormRecord = FormRecord> {
   children?: FormGroupChild<T>[]
 }
 
-/**
- * 表单布局配置
- * @description 全局控制表单的栅格布局
- */
-export interface FormLayout {
-  /**
-   * 行配置 (el-row)
-   */
-  row: {
-    /**
-     * 栅格间隔
-     */
-    gutter?: number
-    /**
-     * 水平排列方式
-     */
-    justify?: "start" | "center" | "end" | "space-around" | "space-between"
-    /**
-     * 垂直排列方式
-     */
-    align?: "top" | "middle" | "bottom"
-    /**
-     * 是否折叠
-     * @description 仅在搜索表单场景下常用
-     */
-    collapsed?: boolean
-    /**
-     * 折叠后保留的行数
-     */
-    collapsedRows?: number
-  }
-  /**
-   * 列配置 (el-col)
-   * @description 默认应用于所有表单项的列配置
-   */
-  column: {
-    span?: number
-    offset?: number
-    xs?: number
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-  }
-}
-
-/**
- * 表单完整配置对象
- */
-export interface FormOptions<T extends FormRecord = FormRecord> {
-  /**
-   * 唯一键，用于强制刷新渲染
-   */
-  key: number
-  /**
-   * Element Plus Form 原生属性
-   * @description label-width, label-position 等
-   */
-  form: Partial<Omit<FormProps, "model">>
-  /**
-   * 当前模式
-   */
-  mode: FormMode
-  /**
-   * 表单数据模型
-   */
-  model: T
-  /**
-   * 表单项列表
-   */
-  items: Array<FormItem<T>>
-  /**
-   * 分组配置
-   */
-  group: FormGroup<T>
-  /**
-   * 布局配置
-   */
-  layout: FormLayout
-  /**
-   * 下一步回调
-   * @description 仅在 steps 布局下有效
-   */
-  onNext?: (model: T, ctx: { next: () => void }) => void
-  /**
-   * 提交回调
-   */
-  onSubmit?: (model: T, errors: Record<string, any> | undefined) => void
+export interface FormRow extends Partial<RowProps> {
+  collapsed?: boolean
+  collapsedRows?: number
 }
 
 /**

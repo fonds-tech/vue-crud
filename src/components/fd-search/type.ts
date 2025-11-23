@@ -1,5 +1,25 @@
+import type { ColProps, RowProps } from "element-plus"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
 import type { Ref, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
+
+/**
+ * fd-search use 方法的配置项
+ */
+export interface SearchOptions<T extends FormRecord = FormRecord> extends FormUseOptions<T> {
+  /**
+   * 搜索区域动作配置
+   * @description 支持通过 row/col 自定义按钮布局
+   */
+  action?: SearchActionOptions<T>
+  /**
+   * 重置钩子，允许重置后执行业务逻辑
+   */
+  onReset?: SearchHook<T>
+  /**
+   * 搜索钩子，常用于补充额外参数或自定义请求
+   */
+  onSearch?: SearchHook<T>
+}
 
 /**
  * 搜索模型类型，直接复用 fd-form 的 FormRecord，便于与表单模型保持一致
@@ -50,6 +70,24 @@ export interface SearchActionComponent<T extends FormRecord = FormRecord> {
 }
 
 /**
+ * 搜索动作区域的布局与按钮配置
+ */
+export interface SearchActionOptions<T extends FormRecord = FormRecord> {
+  /**
+   * 行配置 (el-row)，用于控制整体按钮容器的布局
+   */
+  row?: Partial<RowProps>
+  /**
+   * 列配置 (el-col)，可指定默认 span/offset 等属性
+   */
+  col?: Partial<ColProps>
+  /**
+   * 自定义动作按钮列表
+   */
+  items?: SearchAction<T>[]
+}
+
+/**
  * 搜索区域动作配置
  */
 export interface SearchAction<T extends FormRecord = FormRecord> {
@@ -62,6 +100,10 @@ export interface SearchAction<T extends FormRecord = FormRecord> {
    */
   text?: string
   /**
+   * 列配置 (el-col)，优先级高于 action.col
+   */
+  col?: Partial<ColProps>
+  /**
    * 自定义插槽名称，优先于 component 渲染
    */
   slot?: SearchMaybeFn<string | undefined, T>
@@ -72,59 +114,10 @@ export interface SearchAction<T extends FormRecord = FormRecord> {
 }
 
 /**
- * 搜索布局配置，目前仅控制动作区域
- */
-export interface SearchLayout {
-  actions?: {
-    /**
-     * 动作按钮之间的间距，默认 8px
-     */
-    gap?: number
-    /**
-     * 是否允许换行，移动端可以开启 wrap
-     */
-    wrap?: boolean
-    /**
-     * flex 主轴对齐方式
-     */
-    align?: "flex-start" | "center" | "flex-end" | "space-between"
-  }
-}
-
-/**
  * 搜索/重置钩子
  * @description 除了拿到模型数据，还会透出 next(params) 帮助业务接管异步流程
  */
-export type SearchHook<T extends FormRecord = FormRecord> = (
-  model: T,
-  ctx: { next: (params?: Record<string, any>) => Promise<any> },
-) => void | Promise<void>
-
-/**
- * fd-search use 方法的配置项
- */
-export interface SearchUseOptions<T extends FormRecord = FormRecord> {
-  /**
-   * 完整透传给 fd-form 的配置，可覆盖 items/model/layout 等
-   */
-  form?: FormUseOptions<T>
-  /**
-   * 动作按钮配置，默认提供搜索/重置
-   */
-  actions?: SearchAction<T>[]
-  /**
-   * 布局控制，目前仅包含 actions，但方便后续扩展
-   */
-  layout?: SearchLayout
-  /**
-   * 搜索钩子，常用于补充额外参数或自定义请求
-   */
-  onSearch?: SearchHook<T>
-  /**
-   * 重置钩子，允许重置后执行业务逻辑
-   */
-  onReset?: SearchHook<T>
-}
+export type SearchHook<T extends FormRecord = FormRecord> = (model: T, ctx: { next: (params?: Record<string, any>) => Promise<any> }) => void | Promise<void>
 
 /**
  * 组件实例通过 defineExpose 暴露的能力
@@ -141,7 +134,7 @@ export interface SearchExpose<T extends FormRecord = FormRecord> {
   /**
    * 初始化方法，外部调用时可覆盖默认配置
    */
-  use: (options?: SearchUseOptions<T>) => void
+  use: (options?: SearchOptions<T>) => void
   /**
    * 手动触发搜索，允许附加额外参数
    */

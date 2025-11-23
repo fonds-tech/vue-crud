@@ -51,7 +51,8 @@
     "@fonds/utils": "catalog:",
     "element-plus": "catalog:",
     "lodash-es": "catalog:",
-    "vue": "catalog:"
+    "vue": "catalog:",
+    "vue-router": "catalog:"
   },
   "devDependencies": {
     "@antfu/ni": "catalog:",
