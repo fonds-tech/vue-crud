@@ -1,5 +1,5 @@
-import type Mitt from "../utils/mitt"
-import type { Dict, Config, Permission } from "./config"
+import type Mitt from "../../utils/mitt"
+import type { Dict, Config, Permission } from "../../types/config"
 
 export type CrudParams = Record<string, any>
 
@@ -30,7 +30,6 @@ export interface CrudRef {
   getParams: () => CrudParams
   setParams: (data: CrudParams) => void
   [key: string]: any
-
 }
 
 export interface CrudOptions extends Config {
