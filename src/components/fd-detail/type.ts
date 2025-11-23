@@ -121,15 +121,10 @@ export interface DetailOptions<D extends DetailData = DetailData> {
   onDetail?: (row: D, ctx: { done: (data: D) => void, next: (params: Record<string, any>) => Promise<any>, close: () => void }) => void
 }
 
-/** 深度 Partial，允许配置嵌套字段 */
-export type DeepPartial<T> = {
-  [K in keyof T]?: T[K] extends Record<string, any> ? DeepPartial<T[K]> : T[K]
-}
-
 /**
  * use 方法支持的参数
  */
-export type DetailUseOptions<D extends DetailData = DetailData> = DeepPartial<DetailOptions<D>> & Record<string, any>
+export type DetailUseOptions<D extends DetailData = DetailData> = import("../fd-form/type").DeepPartial<DetailOptions<D>> & Record<string, any>
 
 /**
  * 组件暴露的实例方法

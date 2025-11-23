@@ -4,6 +4,7 @@ import Form from "./fd-form/index.vue"
 import Table from "./fd-table/index.vue"
 import Detail from "./fd-detail/index.vue"
 import Dialog from "./fd-dialog/index.vue"
+import Search from "./fd-search/index.vue"
 import Select from "./fd-select/index.vue"
 import Cascader from "./fd-cascader/index.vue"
 import FdOption from "./fd-option/index.vue"
@@ -16,6 +17,7 @@ export const components: Record<string, Component> = {
   DeleteButton,
   Dialog,
   Form,
+  Search,
   FdOption,
   Select,
   Cascader,

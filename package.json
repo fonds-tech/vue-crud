@@ -43,6 +43,7 @@
     "start": "tsx src/index.ts",
     "test": "vitest",
     "typecheck": "tsc",
+    "typecheck:test": "tsc -p tsconfig.test.json",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
