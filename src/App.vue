@@ -1,134 +1,197 @@
 <template>
-  <div>
-    <div class="title">
+  <div class="demo-page">
+    <h1 class="demo-title">
       CRUD DEMO
-    </div>
+    </h1>
+
     <fd-crud ref="crud">
-      <fd-add-button />
-      <fd-delete-button />
+      <template #default>
+        <fd-search ref="search" />
+
+        <fd-table ref="table">
+          <template #toolbar>
+            <fd-add-button />
+            <fd-delete-button />
+            <div class="demo-toolbar__spacer"></div>
+            <el-button type="primary" @click="handleExport">
+              <el-icon><download /></el-icon>
+              导出
+            </el-button>
+          </template>
+        </fd-table>
+
+        <fd-detail ref="detail" />
+      </template>
     </fd-crud>
-    <fd-form ref="form" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { FormUseOptions } from "./types"
+import type { TableUseOptions } from "./components/fd-table/type"
+import type { DetailUseOptions } from "./components/fd-detail/type"
+import type { SearchUseOptions } from "./components/fd-search/type"
+import { h } from "vue"
+import { Download } from "@element-plus/icons-vue"
 import { TestService } from "./utils/test"
-import { h, onMounted } from "vue"
-import { useCrud, useForm } from "./hooks"
+import { useCrud, useTable, useDetail, useSearch } from "./hooks"
 
 const crud = useCrud(
-  { service: new TestService() },
-  app => app.refresh(),
+  {
+    service: new TestService(),
+    permission: { add: true, delete: true, update: true, detail: true },
+  },
+  instance => instance.refresh(),
 )
-const form = useForm()
 
-const regionOptions = [
-  { label: "上海", value: "shanghai" },
-  { label: "北京", value: "beijing" },
-  { label: "深圳", value: "shenzhen" },
-]
-
-const demoFormOptions: FormUseOptions = {
+const searchOptions: SearchUseOptions = {
   form: {
-    labelWidth: 120,
-  },
-  model: {
-    name: "",
-    age: 18,
-    region: "",
-    status: true,
-    joinedAt: [],
-    description: "",
-  },
-  items: [
-    {
-      field: "name",
-      label: "姓名",
-      required: true,
-      component: {
-        is: "el-input",
-        props: {
-          placeholder: "请输入姓名",
-          clearable: true,
+    model: {
+      keyword: "",
+      status: "",
+      occupation: "",
+    },
+    layout: {
+      row: { gutter: 16, collapsedRows: 2 },
+      column: { span: 8 },
+    },
+    items: [
+      {
+        field: "keyword",
+        label: "关键词",
+        component: {
+          is: "el-input",
+          props: { placeholder: "输入姓名或手机号", clearable: true },
         },
       },
-    },
-    {
-      field: "age",
-      label: "年龄",
-      component: {
-        is: "el-input-number",
-        props: {
-          min: 0,
-          max: 120,
-          placeholder: "请输入年龄",
+      {
+        field: "status",
+        label: "状态",
+        component: {
+          is: "el-select",
+          props: { placeholder: "全部状态", clearable: true },
+          slots: {
+            default: () => [
+              h("el-option", { label: "启用", value: 1 }),
+              h("el-option", { label: "禁用", value: 0 }),
+            ],
+          },
         },
       },
-    },
-    {
-      field: "region",
-      label: "地区",
-      component: {
-        is: "el-select",
-        props: {
-          placeholder: "请选择地区",
-          clearable: true,
+      {
+        field: "occupation",
+        label: "岗位",
+        component: {
+          is: "el-select",
+          props: { placeholder: "选择岗位", clearable: true },
+          slots: {
+            default: () => [
+              h("el-option", { label: "研发", value: 1 }),
+              h("el-option", { label: "产品", value: 2 }),
+              h("el-option", { label: "运营", value: 3 }),
+            ],
+          },
         },
+      },
+    ],
+  },
+  actions: [
+    { type: "search", text: "搜索" },
+    { type: "reset", text: "重置" },
+    {
+      component: {
+        is: "el-button",
+        props: { text: true, type: "primary" },
         slots: {
-          default: () => regionOptions.map(option => h("el-option", option)),
+          default: () => "清空条件",
         },
-      },
-    },
-    {
-      field: "status",
-      label: "状态",
-      component: {
-        is: "el-switch",
-        props: {
-          activeText: "启用",
-          inactiveText: "停用",
-        },
-      },
-    },
-    {
-      field: "joinedAt",
-      label: "入职时间",
-      component: {
-        is: "el-date-picker",
-        props: {
-          type: "datetimerange",
-          startPlaceholder: "开始时间",
-          endPlaceholder: "结束时间",
-        },
-      },
-    },
-    {
-      field: "description",
-      label: "备注",
-      component: {
-        is: "el-input",
-        props: {
-          type: "textarea",
-          rows: 3,
-          maxlength: 200,
-          showWordLimit: true,
+        on: {
+          click: () => crud.value?.setParams({}),
         },
       },
     },
   ],
 }
 
-onMounted(() => {
-  form.value?.use(demoFormOptions)
-})
+const tableOptions: TableUseOptions = {
+  table: {
+    border: true,
+    stripe: true,
+  },
+  columns: [
+    { prop: "name", label: "姓名", minWidth: 140 },
+    { prop: "account", label: "账号", minWidth: 140 },
+    { prop: "createTime", label: "创建日期", minWidth: 160 },
+    {
+      prop: "status",
+      label: "状态",
+      dict: [
+        { label: "启用", value: 1, type: "success" },
+        { label: "禁用", value: 0, type: "danger" },
+      ],
+    },
+    { prop: "wages", label: "薪资", minWidth: 120 },
+    { prop: "phone", label: "手机号", minWidth: 160 },
+    {
+      type: "action",
+      actions: () => [
+        { text: "详情", type: "detail" },
+        { text: "编辑", type: "update" },
+        { text: "删除", type: "delete" },
+      ],
+    },
+  ],
+}
+
+const detailOptions: DetailUseOptions = {
+  items: [
+    { label: "姓名", field: "name", span: 2 },
+    { label: "账号", field: "account", span: 2 },
+    { label: "薪资", field: "wages", span: 2 },
+    { label: "手机号", field: "phone", span: 2 },
+    { label: "入职时间", field: "createTime", span: 2 },
+    {
+      label: "状态",
+      field: "status",
+      component: {
+        is: () => "el-tag",
+        props: (data: any) => ({ type: data.status ? "success" : "danger" }),
+        slots: {
+          default: (data: any) => () => (data.status ? "启用" : "禁用"),
+        },
+      },
+    },
+  ],
+  groups: [
+    { name: 1, title: "基础信息" },
+  ],
+}
+
+const search = useSearch(searchOptions)
+const table = useTable(tableOptions)
+const detail = useDetail(detailOptions)
+
+function handleExport() {
+  console.log("导出当前筛选结果:", search.value?.model)
+  console.log("当前表格选中:", table.value?.selection)
+}
 </script>
 
 <style scoped>
-.title {
-  font-size: 24px;
+.demo-page {
+  gap: 16px;
+  display: flex;
+  padding: 24px;
+  flex-direction: column;
+}
+
+.demo-title {
+  margin: 0;
+  font-size: 28px;
   text-align: center;
-  font-weight: bold;
-  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.demo-toolbar__spacer {
+  flex: 1;
 }
 </style>

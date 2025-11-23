@@ -37,4 +37,9 @@ export default defineConfig({
     sourcemap: true,
     cssCodeSplit: false,
   },
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "src"),
+    },
+  },
 })

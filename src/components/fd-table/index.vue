@@ -12,11 +12,13 @@
         </el-tooltip>
 
         <el-dropdown trigger="click" @command="onSizeChange">
-          <el-tooltip content="尺寸">
-            <el-button circle size="small">
-              <el-icon><operation /></el-icon>
-            </el-button>
-          </el-tooltip>
+          <span class="fd-table__tool-trigger">
+            <el-tooltip content="尺寸">
+              <el-button circle size="small">
+                <el-icon><operation /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item
@@ -33,11 +35,13 @@
 
         <el-popover width="220" placement="bottom" trigger="click">
           <template #reference>
-            <el-tooltip content="列设置">
-              <el-button circle size="small">
-                <el-icon><setting /></el-icon>
-              </el-button>
-            </el-tooltip>
+            <span class="fd-table__tool-trigger">
+              <el-tooltip content="列设置">
+                <el-button circle size="small">
+                  <el-icon><setting /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </span>
           </template>
           <div class="fd-table__columns">
             <el-checkbox
@@ -787,6 +791,10 @@ defineExpose({
     gap: 8px;
     display: flex;
     margin-left: auto;
+  }
+
+  &__tool-trigger {
+    display: inline-flex;
   }
 
   &__body {

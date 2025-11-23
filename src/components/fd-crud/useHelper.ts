@@ -78,6 +78,13 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
         done()
         success(res)
         mitt.emit("crud.refresh", res)
+        const pageInfo = res?.pagination ?? {}
+        mitt.emit("table.refresh", {
+          list: Array.isArray(res?.list) ? res.list : [],
+          page: pageInfo.page ?? pageInfo.currentPage,
+          count: pageInfo.total ?? res?.count ?? (Array.isArray(res?.list) ? res.list.length : 0),
+          pageSize: pageInfo.size ?? pageInfo.pageSize,
+        })
       }
 
       // 下一步

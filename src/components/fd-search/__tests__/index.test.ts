@@ -123,7 +123,6 @@ function mountSearch(options: MountingOptions<any> = {}) {
   })
 
   return mount(Search, {
-    // @ts-expect-error
     slots: mergedSlots as MountingOptions<any>["slots"],
     global: {
       stubs: {

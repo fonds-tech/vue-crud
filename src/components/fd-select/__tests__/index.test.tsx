@@ -2,7 +2,7 @@ import type { VueWrapper } from "@vue/test-utils"
 import Select from "../index.vue"
 import FdOption from "../../fd-option/index.vue"
 import ElementPlus from "element-plus"
-import { h } from "vue"
+import { h, defineComponent } from "vue"
 import { mount, flushPromises } from "@vue/test-utils"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
@@ -15,6 +15,27 @@ const baseOptions = [
   { label: "北京", value: "bj" }, // 基础数据：北京
 ]
 
+const ElOptionStub = defineComponent({
+  name: "ElOptionStub",
+  props: ["label", "value"],
+  setup(_, { slots }) {
+    return () => h("div", { class: "el-option-stub" }, slots.default?.())
+  },
+})
+
+const ElSelectStub = defineComponent({
+  name: "ElSelectStub",
+  props: {
+    loading: { type: Boolean, default: false },
+  },
+  setup(_, { slots }) {
+    return () => h("div", { class: "el-select-stub" }, [
+      slots.prefix?.({ loading: false, options: baseOptions }),
+      slots.default?.({ loading: false, options: baseOptions, refresh: () => {} }),
+    ])
+  },
+})
+
 function mountFdSelect(options: { props?: Partial<SelectProps>, slots?: SlotMap } = {}) {
   return mount(Select, {
     props: {
@@ -24,22 +45,27 @@ function mountFdSelect(options: { props?: Partial<SelectProps>, slots?: SlotMap 
     slots: options.slots, // 透传slot定义
     global: {
       plugins: [ElementPlus], // 注册Element Plus依赖
+      stubs: {
+        "el-select": ElSelectStub,
+        "el-option": ElOptionStub,
+      },
     },
   }) as VueWrapper<any>
 }
 
 function mountFdOption(options: { props?: Partial<OptionProps>, slots?: SlotMap } = {}) {
+  const optionRecord = options.props?.option ?? baseOptions[0]
   return mount(FdOption, {
     props: {
-      option: baseOptions[0], // 默认选用第一项数据
+      option: optionRecord,
+      value: optionRecord.value,
+      label: optionRecord.label,
       ...(options.props ?? {}), // 允许自定义label/value
     } as OptionProps,
     slots: options.slots, // 传入slot
     global: {
       stubs: {
-        "el-option": {
-          template: "<div class=\"el-option-stub\"><slot /></div>", // stub避免真实el-select依赖
-        },
+        "el-option": ElOptionStub,
       },
     },
   }) as VueWrapper<any>
