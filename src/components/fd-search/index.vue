@@ -45,7 +45,6 @@
 
         <el-button
           v-else-if="action.type === 'collapse'"
-          text
           @click="collapse()"
         >
           <el-icon class="fd-search__icon">
@@ -167,7 +166,7 @@ const actionGridProps = computed(() => {
     collapsedRows,
   }
 })
-const collapseLabel = computed(() => (collapsed.value ? crud.dict?.label?.expand ?? "展开更多" : crud.dict?.label?.collapse ?? "收起"))
+const collapseLabel = computed(() => (collapsed.value ? crud.dict?.label?.expand ?? "展开" : crud.dict?.label?.collapse ?? "折叠"))
 
 function getActionItemProps(action: SearchAction) {
   const col = resolveActionCol(action)

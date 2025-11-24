@@ -2,7 +2,13 @@
   <div class="app-layout">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand__logo">FD</span>
+        <div class="brand__logo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
         <h1 class="brand__title">
           CRUD Pro
         </h1>
@@ -24,13 +30,25 @@
 
       <div class="sidebar-footer">
         <button class="theme-toggle" :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" @click="toggleTheme">
-          <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-          <span>{{ isDark ? 'Light' : 'Dark' }}</span>
+          <div class="toggle-icon">
+            <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+          </div>
+          <span>{{ isDark ? 'Dark Mode' : 'Light Mode' }}</span>
         </button>
-        <p class="version">
-          v1.0.0
-        </p>
+        <div class="user-profile">
+          <div class="avatar">
+            F
+          </div>
+          <div class="user-info">
+            <p class="username">
+              Fonds Tech
+            </p>
+            <p class="role">
+              Admin
+            </p>
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -86,42 +104,58 @@ onMounted(() => {
 <style scoped>
 /* Global CSS Variables */
 :global(:root) {
-  --app-bg: #f9fafb;
+  --app-bg: #ffffff; /* Cleaner white bg for app, content will have contrast */
+  --sidebar-bg: #f8fafc; /* Very subtle gray for sidebar */
+  --sidebar-border: #f1f5f9; /* Subtle border */
+
+  --hover-bg: #e2e8f0;
+  --text-sub: #64748b;
+  --active-bg: #ffffff; /* White active item on gray sidebar */
+
   --card-bg: #ffffff;
-  --hover-bg: #f2f4f7;
-  --text-sub: #667085;
-  --active-bg: #eff8ff;
-  --shadow-md: 0 4px 6px -2px rgba(16, 24, 40, 0.03), 0 12px 16px -4px rgba(16, 24, 40, 0.08);
-  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
-  --text-main: #344054;
-  --sidebar-bg: #ffffff;
-  --text-title: #101828;
-  --active-text: #175cd3;
-  --card-border: #eaecf0;
-  --divider-color: #eaecf0;
-  --sidebar-border: #eaecf0;
+
+  --text-main: #334155;
+  --text-title: #0f172a;
+  --active-text: #0f172a;
+  --card-border: #e2e8f0;
+  --divider-color: #f1f5f9;
+
+  /* Refined Shadows */
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
   /* Radius */
   --radius-lg: 12px;
   --radius-md: 8px;
   --radius-sm: 6px;
+  --radius-xl: 16px;
+
+  /* Pattern */
+  --dot-color: #e5e7eb;
 }
 
 :global(html.dark) {
-  --app-bg: #0b0c0f;
-  --card-bg: #15171e;
-  --hover-bg: #1f242f;
-  --text-sub: #94969c;
-  --active-bg: #1a2645;
-  --shadow-md: 0 4px 6px -2px rgba(0, 0, 0, 0.4), 0 12px 16px -4px rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --text-main: #cecfd2;
-  --sidebar-bg: #111318;
-  --text-title: #f5f6f7;
-  --active-text: #528bff;
-  --card-border: #222630;
-  --divider-color: #222630;
-  --sidebar-border: #2a2f3a;
+  --app-bg: #020617; /* Deep dark */
+  --sidebar-bg: #0f172a; /* Slightly lighter dark */
+  --card-bg: #0f172a;
+
+  --hover-bg: #1e293b;
+  --text-sub: #64748b;
+  --active-bg: #1e293b;
+
+  --dot-color: #1e293b;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+
+  --text-main: #94a3b8;
+  --text-title: #f8fafc;
+  --active-text: #f8fafc;
+  --card-border: #1e293b;
+  --divider-color: #1e293b;
+  --sidebar-border: #1e293b;
 }
 
 :global(body) {
@@ -132,13 +166,17 @@ onMounted(() => {
     color 0.3s ease;
   font-family:
     "Inter",
-    "PingFang SC",
+    system-ui,
     -apple-system,
-    BlinkMacSystemFont,
     sans-serif;
   background-color: var(--app-bg);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Dot Pattern */
+:global(.dot-pattern) {
+  background-size: 20px 20px;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
 }
 
 .app-layout {
@@ -150,67 +188,65 @@ onMounted(() => {
 .sidebar {
   top: 0;
   left: 0;
-  width: 240px;
+  width: 260px; /* Slightly wider for better proportions */
   bottom: 0;
   display: flex;
-  z-index: 20;
+  padding: 0 16px;
+  z-index: 50;
   position: fixed;
   background: var(--sidebar-bg);
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
   border-right: 1px solid var(--sidebar-border);
   flex-direction: column;
 }
 
 .brand {
-  gap: 10px;
-  height: 64px;
+  gap: 12px;
+  height: 72px;
   display: flex;
-  padding: 0 20px;
+  padding: 0 12px;
   align-items: center;
-  border-bottom: 1px solid var(--divider-color);
 }
 
 .brand__logo {
-  color: white;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  background: #0f172a; /* Dark logo bg */
   display: flex;
-  font-size: 13px;
-  background: linear-gradient(135deg, #0052d9, #2563eb);
-  box-shadow: var(--shadow-sm);
   align-items: center;
-  font-weight: 700;
-  border-radius: 6px;
+  border-radius: 8px;
   justify-content: center;
+}
+
+:global(html.dark) .brand__logo {
+  background: #3b82f6;
 }
 
 .brand__title {
   color: var(--text-title);
   margin: 0;
   font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .nav-menu {
   gap: 4px;
   flex: 1;
   display: flex;
-  padding: 20px 12px;
+  padding-top: 24px;
   flex-direction: column;
 }
 
 .nav-item {
+  gap: 12px;
   color: var(--text-sub);
   display: flex;
   padding: 8px 12px;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   align-items: center;
   font-weight: 500;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   text-decoration: none;
 }
 
@@ -221,67 +257,99 @@ onMounted(() => {
 
 .router-link-active.nav-item {
   color: var(--active-text);
+  box-shadow: var(--shadow-xs); /* Subtle lift for active item */
   background-color: var(--active-bg);
 }
 
-.nav-item__icon {
-  width: 18px;
-  height: 18px;
-  opacity: 0.6;
-  margin-right: 10px;
-  /* border-radius and background-color removed to show SVG icon */
+/* In dark mode, active item needs different style */
+:global(html.dark) .router-link-active.nav-item {
+  box-shadow: none;
+  background-color: var(--active-bg);
 }
 
 .sidebar-footer {
+  gap: 16px;
   display: flex;
-  padding: 16px 20px;
-  border-top: 1px solid var(--divider-color);
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--sidebar-bg);
+  padding: 24px 0;
+  border-top: 1px solid var(--sidebar-border);
+  flex-direction: column;
 }
 
 .theme-toggle {
-  gap: 8px;
   color: var(--text-sub);
-  border: 1px solid var(--divider-color);
+  border: 1px solid var(--sidebar-border);
   cursor: pointer;
   display: flex;
-  padding: 6px 10px;
-  font-size: 12px;
-  transition: all 0.2s ease;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: transparent;
+  transition: all 0.2s;
   align-items: center;
   font-weight: 500;
-  border-radius: var(--radius-sm);
-  background-color: transparent;
+  border-radius: var(--radius-md);
+  justify-content: space-between;
 }
 
 .theme-toggle:hover {
   color: var(--text-title);
-  border-color: var(--sidebar-border);
-  background-color: var(--hover-bg);
+  border-color: var(--text-sub);
 }
 
-.version {
+.toggle-icon {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile {
+  gap: 12px;
+  display: flex;
+  padding: 4px 8px;
+  align-items: center;
+}
+
+.avatar {
+  color: white;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  font-size: 14px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  align-items: center;
+  font-weight: 600;
+  border-radius: 50%;
+  justify-content: center;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  color: var(--text-title);
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.role {
   color: var(--text-sub);
   margin: 0;
-  opacity: 0.6;
   font-size: 12px;
-  font-family: monospace;
 }
 
-/* Main Content Styles */
+/* Main Content */
 .main-content {
   flex: 1;
-  padding: 24px 32px;
-  max-width: 1600px;
-  margin-left: 240px;
+  padding: 32px 40px;
+  max-width: 1440px; /* Constrain max width for better readability */
+  margin-left: 260px;
 }
 
 /* Transition */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-from,

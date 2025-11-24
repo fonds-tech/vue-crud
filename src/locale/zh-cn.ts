@@ -28,5 +28,5 @@ export default {
   hideContent: "隐藏内容",
   nonEmpty: "{label}不能为空",
   collapse: "收起",
-  expand: "展开更多",
+  expand: "展开",
 }
