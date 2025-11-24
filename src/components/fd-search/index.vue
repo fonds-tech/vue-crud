@@ -141,7 +141,11 @@ const options = reactive<InternalOptions>({
   },
   action: {
     items: cloneDeep(defaultActions),
-    grid: undefined,
+    grid: {
+      cols: 2,
+      colGap: 12,
+      rowGap: 12,
+    },
   },
 })
 

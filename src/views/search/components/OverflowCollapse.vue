@@ -37,6 +37,10 @@ const options: SearchOptions = {
     level: "",
     createTime: [],
     remark: "",
+    executor: "",
+    priority: "",
+    city: "",
+    source: "",
   },
   grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: true, collapsedRows: 2 },
   items: [
@@ -46,6 +50,10 @@ const options: SearchOptions = {
     { field: "department", label: "部门", component: { is: "el-select", props: { placeholder: "选择部门", clearable: true }, options: [{ label: "技术部", value: "tech" }, { label: "产品部", value: "product" }, { label: "运营部", value: "ops" }] } },
     { field: "tags", label: "标签", component: { is: "el-select", props: { multiple: true, collapseTags: true, placeholder: "选择标签" }, options: [{ label: "重点", value: "important" }, { label: "体验", value: "ux" }, { label: "优化", value: "opt" }] } },
     { field: "level", label: "级别", component: { is: "el-select", props: { placeholder: "全部级别", clearable: true }, options: [{ label: "L1", value: "L1" }, { label: "L2", value: "L2" }, { label: "L3", value: "L3" }] } },
+    { field: "executor", label: "执行人", component: { is: "el-input", props: { placeholder: "执行负责人", clearable: true } } },
+    { field: "priority", label: "优先级", component: { is: "el-select", props: { placeholder: "优先级", clearable: true }, options: [{ label: "高", value: "high" }, { label: "中", value: "medium" }, { label: "低", value: "low" }] } },
+    { field: "city", label: "城市", component: { is: "el-select", props: { placeholder: "选择城市", clearable: true }, options: [{ label: "上海", value: "sh" }, { label: "北京", value: "bj" }, { label: "深圳", value: "sz" }] } },
+    { field: "source", label: "来源", component: { is: "el-select", props: { placeholder: "线索来源", clearable: true }, options: [{ label: "广告", value: "ad" }, { label: "官网", value: "site" }, { label: "转介绍", value: "ref" }] } },
     {
       field: "createTime",
       label: "创建日期",
@@ -73,7 +81,7 @@ const options: SearchOptions = {
     },
   ],
   action: {
-    grid: { cols: 1, colGap: 0, rowGap: 8 },
+    grid: { cols: 1, colGap: 0, rowGap: 12 },
     items: [
       { type: "search", text: "搜索" },
       { type: "reset", text: "重置" },
