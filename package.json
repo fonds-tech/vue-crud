@@ -51,6 +51,7 @@
     "@fonds/utils": "catalog:",
     "element-plus": "catalog:",
     "lodash-es": "catalog:",
+    "uuid": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:"
   },

@@ -87,10 +87,12 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 .header-content h2 {
   margin: 0 0 6px 0;
-  font-size: 24px;
-  font-weight: 700; /* Bolder title */
-  color: var(--text-title);
-  letter-spacing: -0.02em;
+  font-size: 28px;
+  background: var(--primary-gradient);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header-content p {
@@ -137,9 +139,16 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
   display: flex;
   overflow: hidden;
   background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   border-radius: var(--radius-xl);
   flex-direction: column;
+}
+
+.preview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .preview-info {
@@ -165,10 +174,10 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 }
 
 .meta-tag {
-  color: var(--text-sub);
-  background: var(--divider-color);
-  font-weight: 500;
-  border-color: transparent;
+  color: var(--primary-color);
+  border: none;
+  background: rgba(59, 130, 246, 0.1);
+  font-weight: 600;
 }
 
 .preview-body {

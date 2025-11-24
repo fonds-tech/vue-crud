@@ -25,6 +25,7 @@ catalog:
   tinyexec: ^1.0.2
   tsx: ^4.20.6
   typescript: ^5.9.3
+  uuid: ^13.0.0
   vite: ^7.2.1
   vite-plugin-dts: ^4.5.4
   vitepress: ^1.6.4
