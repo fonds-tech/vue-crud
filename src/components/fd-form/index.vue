@@ -613,6 +613,6 @@ defineExpose({
 
 <style scoped>
 .fd-form {
-  width: 100%;
+  flex: 1;
 }
 </style>

@@ -1,4 +1,4 @@
-import type { ColProps, RowProps } from "element-plus"
+import type { GridProps, GridItemProps } from "../fd-grid/type"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
 import type { Ref, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
@@ -8,7 +8,7 @@ import type { Ref, VNodeChild, CSSProperties, Component as VueComponent } from "
 export interface SearchOptions<T extends FormRecord = FormRecord> extends FormUseOptions<T> {
   /**
    * 搜索区域动作配置
-   * @description 支持通过 row/col 自定义按钮布局
+   * @description 直接透传 fd-grid 的 props，自定义动作区域栅格
    */
   action?: SearchActionOptions<T>
   /**
@@ -74,13 +74,9 @@ export interface SearchActionComponent<T extends FormRecord = FormRecord> {
  */
 export interface SearchActionOptions<T extends FormRecord = FormRecord> {
   /**
-   * 行配置 (el-row)，用于控制整体按钮容器的布局
+   * 栅格配置（映射至 fd-grid 的全部 props）
    */
-  row?: Partial<RowProps>
-  /**
-   * 列配置 (el-col)，可指定默认 span/offset 等属性
-   */
-  col?: Partial<ColProps>
+  grid?: GridProps
   /**
    * 自定义动作按钮列表
    */
@@ -100,9 +96,9 @@ export interface SearchAction<T extends FormRecord = FormRecord> {
    */
   text?: string
   /**
-   * 列配置 (el-col)，优先级高于 action.col
+   * 列配置（映射至 fd-grid-item 的 span/offset）
    */
-  col?: Partial<ColProps>
+  col?: Pick<GridItemProps, "span" | "offset">
   /**
    * 自定义插槽名称，优先于 component 渲染
    */

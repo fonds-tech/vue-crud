@@ -77,8 +77,11 @@ const visibilityMap = computed(() => {
 })
 
 const gridStyle = computed<CSSProperties>(() => ({
+  display: "grid",
+  gridTemplateColumns: `repeat(${resolvedCols.value}, minmax(0, 1fr))`,
   columnGap: `${resolvedColGap.value}px`,
   rowGap: `${resolvedRowGap.value}px`,
+  gap: `${resolvedRowGap.value}px ${resolvedColGap.value}px`,
 }))
 
 const registerItem: GridContext["registerItem"] = (state) => {
@@ -106,3 +109,9 @@ const context: GridContext = {
 
 provide(gridInjectionKey, context)
 </script>
+
+<style scoped>
+.fd-grid {
+  display: grid;
+}
+</style>

@@ -33,9 +33,6 @@ const viewportWidth = computed(() => grid?.width.value ?? (typeof window !== "un
 const resolvedSpan = computed(() => clampValue(resolveResponsiveValue(props.span, viewportWidth.value, 1), 1, cols.value))
 const resolvedOffset = computed(() => clampValue(resolveResponsiveValue(props.offset, viewportWidth.value, 0), 0, Math.max(cols.value - 1, 0)))
 
-const widthPercent = computed(() => (resolvedSpan.value / cols.value) * 100)
-const offsetPercent = computed(() => (resolvedOffset.value / cols.value) * 100)
-
 const id = Symbol("fd-grid-item")
 const state: GridItemState = {
   id,
@@ -56,15 +53,11 @@ const isVisible = computed(() => grid?.isItemVisible(id) ?? true)
 
 const itemStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    flex: `0 0 ${widthPercent.value}%`,
-    maxWidth: `${widthPercent.value}%`,
+    gridColumn: `span ${resolvedOffset.value + 1} / span ${resolvedSpan.value}`,
   }
 
   if (props.suffix) {
-    style.marginLeft = "auto"
-  }
-  else if (resolvedOffset.value > 0) {
-    style.marginLeft = `${offsetPercent.value}%`
+    style.justifySelf = "end"
   }
 
   return style
@@ -74,3 +67,14 @@ const itemClass = computed(() => ({
   "fd-grid__item--suffix": props.suffix,
 }))
 </script>
+
+<style scoped>
+.fd-grid__item {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.fd-grid__item--suffix {
+  justify-self: end;
+}
+</style>

@@ -139,6 +139,36 @@ const ElColStub = defineComponent({
   },
 })
 
+const FdGridStub = defineComponent({
+  name: "FdGridStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs }) {
+    return () => {
+      const { class: className, ...rest } = attrs as Record<string, any>
+      return h(
+        "div",
+        { ...rest, class: ["fd-grid-stub", className].filter(Boolean).join(" ") },
+        slots.default?.(),
+      )
+    }
+  },
+})
+
+const FdGridItemStub = defineComponent({
+  name: "FdGridItemStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs }) {
+    return () => {
+      const { class: className, ...rest } = attrs as Record<string, any>
+      return h(
+        "div",
+        { ...rest, class: ["fd-grid-item-stub", className].filter(Boolean).join(" ") },
+        slots.default?.(),
+      )
+    }
+  },
+})
+
 function mountSearch(options: MountingOptions<any> = {}) {
   const toWithArray = (slot?: any) => {
     if (slot === undefined)
@@ -160,6 +190,8 @@ function mountSearch(options: MountingOptions<any> = {}) {
         "el-icon": ElIconStub,
         "el-row": ElRowStub,
         "el-col": ElColStub,
+        "fd-grid": FdGridStub,
+        "fd-grid-item": FdGridItemStub,
         ...(options.global?.stubs ?? {}),
       },
       ...(options.global ?? {}),
@@ -205,7 +237,7 @@ describe("fd-search", () => {
     }))
   })
 
-  it("action 配置支持 row/col 布局", async () => {
+  it("action 配置支持 grid 布局", async () => {
     const wrapper = mountSearch()
     const search = getExpose(wrapper)
     expect(search.form).toBeDefined()
@@ -213,18 +245,19 @@ describe("fd-search", () => {
     await nextTick()
     search.use({
       action: {
-        row: { gutter: 32, justify: "start" },
-        col: { span: 12 },
-        items: [{ type: "search", text: "搜索" }],
+        grid: { cols: 12, colGap: 32, rowGap: 16 },
+        items: [{ type: "search", text: "搜索", col: { span: 6 } }],
       },
     })
     await nextTick()
-    const row = wrapper.find(".el-row-stub")
-    expect(row.exists()).toBe(true)
-    expect(row.attributes("gutter")).toBe("32")
-    const col = row.find(".el-col-stub")
-    expect(col.exists()).toBe(true)
-    expect(col.attributes("span")).toBe("12")
+    const grid = wrapper.find(".fd-grid-stub")
+    expect(grid.exists()).toBe(true)
+    expect(grid.attributes("cols")).toBe("12")
+    expect(grid.attributes("colgap")).toBe("32")
+    expect(grid.attributes("rowgap")).toBe("16")
+    const item = grid.find(".fd-grid-item-stub")
+    expect(item.exists()).toBe(true)
+    expect(item.attributes("span")).toBe("6")
   })
 
   it("search 会写入查询参数并调用 crud.refresh", async () => {

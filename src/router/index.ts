@@ -1,23 +1,27 @@
-import CrudDemo from "../views/CrudDemo.vue"
-import FormDebug from "../views/FormDebug.vue"
-import SearchDebug from "../views/SearchDebug.vue"
+import Crud from "../views/crud.vue"
+import Form from "../views/form.vue"
+import Search from "../views/search.vue"
 import { createRouter, createWebHistory } from "vue-router"
 
 const routes = [
   {
     path: "/",
-    name: "CrudDemo",
-    component: CrudDemo,
+    redirect: "/crud",
   },
   {
-    path: "/form-debug",
-    name: "FormDebug",
-    component: FormDebug,
+    path: "/crud",
+    name: "crud",
+    component: Crud,
   },
   {
-    path: "/search-debug",
-    name: "SearchDebug",
-    component: SearchDebug,
+    path: "/form",
+    name: "Form",
+    component: Form,
+  },
+  {
+    path: "/search",
+    name: "Search",
+    component: Search,
   },
 ]
 

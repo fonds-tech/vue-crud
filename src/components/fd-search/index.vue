@@ -6,29 +6,29 @@
       </template>
     </fd-form>
 
-    <component
-      :is="actionWrapperTag"
+    <fd-grid
       v-if="resolvedActions.length"
       class="fd-search__action"
-      v-bind="getActionWrapperProps()"
-      :style="actionWrapperStyle"
+      v-bind="actionGridProps"
     >
-      <component
-        :is="actionItemTag"
+      <fd-grid-item
         v-for="(action, actionIndex) in resolvedActions"
         :key="actionIndex"
         class="fd-search__action-item"
-        :class="{ 'fd-search__action-item--grid': useActionGrid }"
         v-bind="getActionItemProps(action)"
       >
         <el-button
           v-if="action.type === 'search'"
           type="primary"
-          :loading="loading"
+          :disabled="loading"
           @click="search()"
         >
-          <el-icon class="fd-search__icon">
-            <icon-search />
+          <el-icon
+            class="fd-search__icon"
+            :class="{ 'is-loading': loading }"
+          >
+            <icon-loading v-if="loading" />
+            <icon-search v-else />
           </el-icon>
           <span>{{ action.text || crud.dict?.label?.search || "搜索" }}</span>
         </el-button>
@@ -77,22 +77,23 @@
             <component :is="value" />
           </template>
         </component>
-      </component>
-    </component>
+      </fd-grid-item>
+    </fd-grid>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { CSSProperties } from "vue"
+import type { GridProps } from "../fd-grid/type"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
-import type { SearchAction, SearchOptions, SearchActionOptions } from "./type"
+import type { SearchAction, SearchOptions } from "./type"
 import FdForm from "../fd-form/index.vue"
 import { isDef } from "@fonds/utils"
 import { useCore } from "@/hooks"
 import { merge, cloneDeep } from "lodash-es"
 import { isEmpty, isFunction } from "@/utils/check"
+import { resolveResponsiveValue } from "../fd-grid/utils"
 import { ref, watch, computed, reactive, useSlots, onMounted, onBeforeUnmount } from "vue"
-import { Search as IconSearch, ArrowUp as IconArrowUp, Refresh as IconRefresh, ArrowDown as IconArrowDown } from "@element-plus/icons-vue"
+import { Search as IconSearch, ArrowUp as IconArrowUp, Loading as IconLoading, Refresh as IconRefresh, ArrowDown as IconArrowDown } from "@element-plus/icons-vue"
 
 defineOptions({
   name: "fd-search",
@@ -105,6 +106,13 @@ const { crud, mitt } = useCore()
 const formRef = ref<InstanceType<typeof FdForm>>()
 const loading = ref(false)
 const collapsed = ref(false)
+const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1920)
+
+function handleResize() {
+  if (typeof window === "undefined")
+    return
+  viewportWidth.value = window.innerWidth
+}
 
 const defaultActions: SearchAction[] = [
   { type: "search" },
@@ -113,8 +121,7 @@ const defaultActions: SearchAction[] = [
 
 interface InternalActionOptions<T extends FormRecord = FormRecord> {
   items: SearchAction<T>[]
-  row?: SearchActionOptions<T>["row"]
-  col?: SearchActionOptions<T>["col"]
+  grid?: GridProps
 }
 
 interface InternalOptions<T extends FormRecord = FormRecord> {
@@ -136,8 +143,7 @@ const options = reactive<InternalOptions>({
   },
   action: {
     items: cloneDeep(defaultActions),
-    row: undefined,
-    col: undefined,
+    grid: undefined,
   },
 })
 
@@ -145,29 +151,39 @@ const options = reactive<InternalOptions>({
 const formModel = computed<FormRecord>(() => formRef.value?.model ?? (options.form.model as FormRecord) ?? {})
 // 真实的动作列表，未配置时回退为默认搜索/重置
 const resolvedActions = computed(() => (options.action.items.length ? options.action.items : defaultActions))
-// 动作为配置 row/col 之前保持 flex 布局，便于兼容旧配置
-const actionsStyle = computed<CSSProperties>(() => ({
-  display: "flex",
-  flexWrap: "wrap",
-  justifyContent: "flex-end",
-  gap: "8px",
-}))
-const useActionGrid = computed(() => Boolean(options.action.row) || Boolean(options.action.col))
-const actionWrapperTag = computed(() => (useActionGrid.value ? "el-row" : "div"))
-const actionItemTag = computed(() => (useActionGrid.value ? "el-col" : "div"))
-const actionWrapperStyle = computed<CSSProperties | undefined>(() => (useActionGrid.value ? undefined : actionsStyle.value))
+// 动作区域使用 fd-grid 布局，gutter 兼容 el-row 写法
+const defaultActionGap = 12
+const actionGridProps = computed(() => {
+  const grid = options.action.grid ?? {}
+  const colGap = Math.max(0, resolveResponsiveValue(grid.colGap ?? defaultActionGap, viewportWidth.value, defaultActionGap))
+  const rowGap = Math.max(0, resolveResponsiveValue(grid.rowGap ?? defaultActionGap, viewportWidth.value, defaultActionGap))
+  const cols = Math.max(1, resolveResponsiveValue(grid.cols ?? 24, viewportWidth.value, 24))
+  const collapsed = grid.collapsed ?? false
+  const collapsedRows = Math.max(1, grid.collapsedRows ?? 1)
+  return {
+    cols,
+    colGap,
+    rowGap,
+    collapsed,
+    collapsedRows,
+  }
+})
 const collapseLabel = computed(() => (collapsed.value ? crud.dict?.label?.expand ?? "展开更多" : crud.dict?.label?.collapse ?? "收起"))
 
-function getActionWrapperProps() {
-  return useActionGrid.value ? (options.action.row ?? {}) : {}
-}
-
 function getActionItemProps(action: SearchAction) {
-  return useActionGrid.value ? resolveActionCol(action) : {}
+  const col = resolveActionCol(action)
+  return {
+    span: col.span,
+    offset: col.offset,
+  }
 }
 
 function resolveActionCol(action: SearchAction) {
-  return merge({}, options.action.col ?? {}, action.col ?? {})
+  const merged = action.col ?? {}
+  return {
+    span: resolveResponsiveValue(merged.span ?? 12, viewportWidth.value, 12),
+    offset: resolveResponsiveValue(merged.offset ?? 0, viewportWidth.value, 0),
+  }
 }
 
 watch(
@@ -189,12 +205,8 @@ function use(useOptions: SearchOptions = {}) {
     options.action.items.splice(0, options.action.items.length, ...(action.items ?? []))
   }
 
-  if (action?.row) {
-    options.action.row = options.action.row ? merge({}, options.action.row, action.row) : cloneDeep(action.row)
-  }
-
-  if (action?.col) {
-    options.action.col = options.action.col ? merge({}, options.action.col, action.col) : cloneDeep(action.col)
+  if (action?.grid) {
+    options.action.grid = options.action.grid ? merge({}, options.action.grid, action.grid) : cloneDeep(action.grid)
   }
 
   options.onSearch = onSearch
@@ -377,10 +389,16 @@ function unregisterEvents() {
 
 onMounted(() => {
   registerEvents()
+  if (typeof window !== "undefined") {
+    window.addEventListener("resize", handleResize)
+  }
 })
 
 onBeforeUnmount(() => {
   unregisterEvents()
+  if (typeof window !== "undefined") {
+    window.removeEventListener("resize", handleResize)
+  }
 })
 
 defineExpose({
@@ -395,18 +413,22 @@ defineExpose({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .fd-search {
-  gap: 16px;
+  gap: 12px;
   display: flex;
+  justify-content: space-between;
 
   &__form {
     flex: 1;
-    min-width: 0;
   }
 
-  &__action {
-    flex: 0 0 auto;
+  &__icon {
+    width: 1em;
+    display: inline-flex;
+    min-width: 1em;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
