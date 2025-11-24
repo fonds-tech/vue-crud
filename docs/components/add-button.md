@@ -10,17 +10,10 @@
 
 ```vue
 <template>
-  <fd-crud ref="crud">
+  <fd-crud>
     <fd-add-button>新建用户</fd-add-button>
   </fd-crud>
 </template>
-
-<script setup lang="ts">
-import type { CrudRef } from "vue-crud"
-import { ref } from "vue"
-
-const crud = ref<CrudRef>()
-</script>
 ```
 
 如果不传插槽文本，会默认显示 `crud.dict.label.add`。
@@ -28,7 +21,6 @@ const crud = ref<CrudRef>()
 ## 与 useCrud 搭配
 
 ```ts
-import { ref } from "vue"
 import { useCrud } from "vue-crud"
 
 const crud = useCrud(

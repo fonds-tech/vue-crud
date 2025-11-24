@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 import { Search, Document, DataAnalysis } from "@element-plus/icons-vue"
 
 const navItems = [
@@ -76,8 +76,19 @@ function toggleTheme() {
 }
 
 onMounted(() => {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  handleThemeChange(mediaQuery)
+  mediaQuery.addEventListener("change", handleThemeChange)
+})
+
+onUnmounted(() => {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  mediaQuery.removeEventListener("change", handleThemeChange)
+})
+
+function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
   const savedTheme = localStorage.getItem("theme")
-  const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+  const systemDark = e.matches
 
   if (savedTheme === "dark" || (!savedTheme && systemDark)) {
     isDark.value = true
@@ -87,7 +98,7 @@ onMounted(() => {
     isDark.value = false
     document.documentElement.classList.remove("dark")
   }
-})
+}
 </script>
 
 <style scoped>
