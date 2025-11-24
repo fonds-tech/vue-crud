@@ -572,6 +572,9 @@ defineExpose({
 <style lang="scss">
 .fd-form {
   flex: 1;
+  .el-space {
+    width: 100%;
+  }
   .el-form-item {
     margin-bottom: 0;
   }

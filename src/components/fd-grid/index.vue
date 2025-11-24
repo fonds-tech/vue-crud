@@ -52,29 +52,66 @@ const resolvedColGap = computed(() => Math.max(0, resolveResponsiveValue(props.c
 const resolvedCollapsed = computed(() => props.collapsed)
 const resolvedCollapsedRows = computed(() => Math.max(1, props.collapsedRows))
 
-const visibilityMap = computed(() => {
+const visibilityState = computed(() => {
   const map = new Map<symbol, boolean>()
-  let currentRow = 1
-  let spaceLeft = resolvedCols.value
+  const displayIds = new Set<symbol>()
+  const colsValue = resolvedCols.value
+  const collapsed = resolvedCollapsed.value
+  const collapsedRowsValue = resolvedCollapsedRows.value
 
-  items.value.forEach((item) => {
-    const span = clampValue(item.span.value, 1, resolvedCols.value)
-    const offset = clampValue(item.offset.value, 0, Math.max(resolvedCols.value - 1, 0))
-    const required = Math.min(span + offset, resolvedCols.value)
-
-    if (required > spaceLeft) {
-      currentRow += 1
-      spaceLeft = resolvedCols.value
+  const effectiveItems = items.value.map((item) => {
+    const span = clampValue(item.span.value, 1, colsValue)
+    const offset = clampValue(item.offset.value, 0, Math.max(colsValue - 1, 0))
+    const effectiveSpan = Math.min(offset > 0 ? span + offset : span, colsValue)
+    return {
+      id: item.id,
+      suffix: item.suffix.value,
+      span: effectiveSpan,
     }
-
-    const hidden = !item.suffix.value && resolvedCollapsed.value && currentRow > resolvedCollapsedRows.value
-    map.set(item.id, !hidden)
-
-    spaceLeft = Math.max(spaceLeft - required, 0)
   })
 
-  return map
+  if (!collapsed) {
+    effectiveItems.forEach((entry) => {
+      map.set(entry.id, true)
+    })
+    return { map, overflow: false }
+  }
+
+  const exceedsRows = (spanSum: number) => Math.ceil(spanSum / colsValue) > collapsedRowsValue
+  let spanSum = 0
+
+  effectiveItems.forEach((entry) => {
+    if (entry.suffix) {
+      spanSum += entry.span
+      displayIds.add(entry.id)
+    }
+  })
+
+  if (!exceedsRows(spanSum)) {
+    for (const entry of effectiveItems) {
+      if (entry.suffix) {
+        continue
+      }
+      const nextSpan = spanSum + entry.span
+      if (exceedsRows(nextSpan)) {
+        break
+      }
+      displayIds.add(entry.id)
+      spanSum = nextSpan
+    }
+  }
+
+  const overflow = effectiveItems.some(entry => !entry.suffix && !displayIds.has(entry.id))
+
+  effectiveItems.forEach((entry) => {
+    map.set(entry.id, displayIds.has(entry.id))
+  })
+
+  return { map, overflow }
 })
+
+const visibilityMap = computed(() => visibilityState.value.map)
+const overflow = computed(() => visibilityState.value.overflow)
 
 const gridStyle = computed<CSSProperties>(() => ({
   display: "grid",
@@ -100,6 +137,8 @@ const context: GridContext = {
   collapsed: resolvedCollapsed,
   collapsedRows: resolvedCollapsedRows,
   width: computed(() => viewportWidth.value),
+  overflow,
+  visibilityMap,
   registerItem,
   unregisterItem,
   isItemVisible(id) {

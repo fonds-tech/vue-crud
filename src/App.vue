@@ -10,7 +10,7 @@
           </svg>
         </div>
         <h1 class="brand__title">
-          CRUD
+          CRUD Pro
         </h1>
       </div>
 
@@ -96,14 +96,11 @@ onMounted(() => {
   --app-bg: #ffffff; /* Cleaner white bg for app, content will have contrast */
   --sidebar-bg: #f8fafc; /* Very subtle gray for sidebar */
   --sidebar-border: #f1f5f9; /* Subtle border */
-
   --header-bg: #ffffff; /* New variable for header background */
   --header-border: #f1f5f9; /* New variable for header border */
-
   --hover-bg: #f8fafc;
   --text-sub: #64748b;
   --active-bg: #f1f5f9; /* Slightly darker for active top nav */
-
   --card-bg: #ffffff;
 
   --text-main: #334155;
@@ -111,11 +108,17 @@ onMounted(() => {
   --active-text: #0f172a;
   --card-border: #e2e8f0;
   --divider-color: #f1f5f9;
+  --app-bg-gradient: radial-gradient(circle at 50% 0%, rgba(120, 119, 198, 0.08), rgba(255, 255, 255, 0) 70%);
+
+  /* Accents */
+  --nav-active-color: #2563eb;
+  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
 
   /* Refined Shadows */
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
 
   /* Radius */
   --radius-lg: 12px;
@@ -147,9 +150,12 @@ onMounted(() => {
   --text-title: #f8fafc;
   --active-text: #f8fafc;
   --card-border: #1e293b;
+  --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.1);
   --divider-color: #1e293b;
   --header-border: #1e293b;
   --sidebar-border: #1e293b;
+  --app-bg-gradient: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), rgba(2, 6, 23, 0) 70%);
+  --nav-active-color: #60a5fa;
 }
 
 :global(body) {
@@ -164,6 +170,8 @@ onMounted(() => {
     -apple-system,
     sans-serif;
   background-color: var(--app-bg);
+  background-image: var(--app-bg-gradient);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -210,14 +218,11 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   display: flex;
-  background: #0f172a;
+  background: var(--primary-gradient);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   align-items: center;
   border-radius: 8px;
   justify-content: center;
-}
-
-:global(html.dark) .brand__logo {
-  background: #3b82f6;
 }
 
 .brand__title {
@@ -254,7 +259,7 @@ onMounted(() => {
 }
 
 .router-link-active.nav-item {
-  color: var(--active-text);
+  color: var(--nav-active-color);
   box-shadow: none;
   background-color: var(--active-bg);
 }
@@ -313,6 +318,7 @@ onMounted(() => {
 .main-content {
   flex: 1;
   width: 100%;
+  padding: 32px 40px;
   max-width: 1440px;
   box-sizing: border-box;
   margin-top: 64px;

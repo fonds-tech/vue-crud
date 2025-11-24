@@ -1,6 +1,6 @@
 <template>
-  <div v-show="isVisible" class="fd-grid__item" :class="itemClass" :style="itemStyle">
-    <slot />
+  <div class="fd-grid__item" :class="itemClass" :style="itemStyle">
+    <slot :overflow="overflow" />
   </div>
 </template>
 
@@ -49,11 +49,13 @@ onBeforeUnmount(() => {
   grid?.unregisterItem(id)
 })
 
-const isVisible = computed(() => grid?.isItemVisible(id) ?? true)
+const isVisible = computed(() => grid?.visibilityMap.value.get(id) ?? true)
+const overflow = computed(() => grid?.overflow.value ?? false)
 
 const itemStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     gridColumn: `span ${resolvedOffset.value + 1} / span ${resolvedSpan.value}`,
+    display: isVisible.value ? "block" : "none",
   }
 
   if (props.suffix) {
@@ -71,11 +73,10 @@ const itemClass = computed(() => ({
 <style lang="scss">
 .fd-grid__item {
   height: fit-content;
-  min-width: 0;
-  box-sizing: border-box;
-}
+  display: none;
 
-.fd-grid__item--suffix {
-  justify-self: end;
+  &--suffix {
+    justify-self: end;
+  }
 }
 </style>

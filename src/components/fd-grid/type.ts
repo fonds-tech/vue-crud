@@ -33,6 +33,8 @@ export interface GridContext {
   collapsed: ComputedRef<boolean>
   collapsedRows: ComputedRef<number>
   width: ComputedRef<number>
+  overflow: ComputedRef<boolean>
+  visibilityMap: ComputedRef<Map<symbol, boolean>>
   registerItem: (state: GridItemState) => void
   unregisterItem: (id: symbol) => void
   isItemVisible: (id: symbol) => boolean
