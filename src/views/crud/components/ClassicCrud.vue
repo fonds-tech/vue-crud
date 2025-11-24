@@ -44,7 +44,7 @@ const searchOptions: SearchOptions = {
     status: "",
     occupation: "",
   },
-  grid: { cols: 4, colGap: 16, rowGap: 16, collapsedRows: 2 },
+  grid: { cols: 4, colGap: 12, rowGap: 12, collapsedRows: 2 },
   items: [
     {
       field: "keyword",

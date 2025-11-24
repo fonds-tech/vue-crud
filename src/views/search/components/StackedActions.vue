@@ -84,14 +84,14 @@ onMounted(() => {
 
 .variant-card {
   border: none;
-  box-shadow: var(--shadow-md);
-  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
 }
 
 .crud-shell {
   padding: 16px;
   background: var(--app-bg);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
 }
 
 .panel-title {
@@ -110,6 +110,6 @@ pre {
   background: #111827;
   max-height: 300px;
   font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
 }
 </style>

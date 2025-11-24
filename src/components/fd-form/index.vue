@@ -179,8 +179,8 @@ const options = reactive<FormOptions>({
   },
   grid: {
     cols: 4,
-    colGap: 16,
-    rowGap: 16,
+    colGap: 12,
+    rowGap: 12,
     collapsed: false,
     collapsedRows: 1,
   },
@@ -569,8 +569,11 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style lang="scss">
 .fd-form {
   flex: 1;
+  .el-form-item {
+    margin-bottom: 0;
+  }
 }
 </style>

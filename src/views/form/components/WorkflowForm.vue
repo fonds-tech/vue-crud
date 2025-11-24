@@ -41,7 +41,7 @@ const options: FormUseOptions = {
     risk: 2,
     comment: "",
   },
-  grid: { cols: 4, colGap: 16, rowGap: 16 },
+  grid: { cols: 4, colGap: 12, rowGap: 12 },
   form: {
     labelWidth: "90px",
   },

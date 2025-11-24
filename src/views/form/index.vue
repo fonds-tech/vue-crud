@@ -77,19 +77,20 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 }
 
 .page-header {
-  gap: 20px;
+  gap: 16px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   justify-content: space-between;
 }
 
 .header-content h2 {
   color: var(--text-title);
   margin: 0 0 4px 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .header-content p {
@@ -100,34 +101,35 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 /* Modern Tabs */
 .tabs-group {
-  gap: 4px;
+  gap: 2px;
+  border: 1px solid var(--divider-color);
   display: flex;
-  padding: 4px;
+  padding: 3px;
   background: var(--hover-bg);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .tab-item {
   color: var(--text-sub);
   border: none;
   cursor: pointer;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 6px 12px;
+  font-size: 13px;
   background: transparent;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   font-weight: 500;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .tab-item:hover {
   color: var(--text-main);
-  background: rgba(128, 128, 128, 0.1);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .tab-item.active {
-  color: var(--active-text);
+  color: var(--text-title);
   background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   font-weight: 600;
 }
 
@@ -136,13 +138,13 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
   border: 1px solid var(--card-border);
   overflow: hidden;
   background: var(--card-bg);
-  box-shadow: var(--shadow-md);
-  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
 }
 
 .preview-info {
   display: flex;
-  padding: 20px 24px;
+  padding: 16px 24px;
   background: var(--card-bg);
   align-items: center;
   border-bottom: 1px solid var(--divider-color);
@@ -151,8 +153,8 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 .info-text h3 {
   color: var(--text-title);
-  margin: 0 0 4px 0;
-  font-size: 16px;
+  margin: 0 0 2px 0;
+  font-size: 15px;
   font-weight: 600;
 }
 

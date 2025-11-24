@@ -135,7 +135,7 @@ const options = reactive<InternalOptions>({
   form: {
     model: {},
     items: [],
-    grid: { cols: 4, colGap: 16, rowGap: 16, collapsed: false, collapsedRows: 2 },
+    grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 2 },
     form: {
       labelWidth: "auto",
     },
