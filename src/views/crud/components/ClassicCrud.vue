@@ -44,8 +44,7 @@ const searchOptions: SearchOptions = {
     status: "",
     occupation: "",
   },
-  row: { gutter: 16, collapsedRows: 2 },
-  col: { span: 8 },
+  grid: { cols: 4, colGap: 16, rowGap: 16, collapsedRows: 2 },
   items: [
     {
       field: "keyword",
@@ -86,8 +85,7 @@ const searchOptions: SearchOptions = {
     },
   ],
   action: {
-    row: { gutter: 12, justify: "end" },
-    col: { span: 6 },
+    grid: { cols: 24, colGap: 12, rowGap: 12 },
     items: [
       { type: "search", text: "搜索" },
       { type: "reset", text: "重置" },

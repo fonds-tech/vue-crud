@@ -135,8 +135,7 @@ const options = reactive<InternalOptions>({
   form: {
     model: {},
     items: [],
-    row: { gutter: 16, collapsed: false, collapsedRows: 2 },
-    col: { span: 8 },
+    grid: { cols: 4, colGap: 16, rowGap: 16, collapsed: false, collapsedRows: 2 },
     form: {
       labelWidth: "auto",
     },
@@ -217,7 +216,7 @@ function use(useOptions: SearchOptions = {}) {
     merge(options.form, formConfig)
   }
 
-  collapsed.value = Boolean(options.form?.row?.collapsed)
+  collapsed.value = Boolean(options.form?.grid?.collapsed)
 
   formRef.value?.use(cloneDeep(options.form))
 }

@@ -33,8 +33,7 @@ const options: SearchOptions = {
     owner: "",
     status: "",
   },
-  row: { gutter: 12, collapsed: false },
-  col: { span: 8 },
+  grid: { cols: 4, colGap: 12, rowGap: 12 },
   items: [
     {
       field: "keyword",
@@ -67,8 +66,7 @@ const options: SearchOptions = {
     },
   ],
   action: {
-    row: { gutter: 8, justify: "end" },
-    col: { span: 6 },
+    grid: { cols: 24, colGap: 8, rowGap: 8 },
     items: [
       { type: "search", text: "查询" },
       { type: "reset", text: "清空" },

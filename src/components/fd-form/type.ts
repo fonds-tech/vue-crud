@@ -1,8 +1,7 @@
 import type { Arrayable } from "element-plus/es/utils"
+import type { GridProps, GridItemProps } from "../fd-grid/type"
 import type { VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type {
-  ColProps,
-  RowProps,
   FormProps,
   FormInstance,
   FormItemProp,
@@ -42,13 +41,9 @@ export interface FormOptions<T extends FormRecord = FormRecord> {
    */
   group: FormGroup<T>
   /**
-   * 行配置 (el-row)
+   * 栅格配置 (fd-grid)
    */
-  row?: FormRow
-  /**
-   * 列配置 (el-col)
-   */
-  col?: Partial<ColProps>
+  grid?: GridProps
   /**
    * 下一步回调
    * @description 仅在 steps 布局下有效
@@ -224,16 +219,11 @@ export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormIt
    * 栅格占据的列数 (共24格)
    * @default 24
    */
-  span?: number
+  span?: GridItemProps["span"]
   /**
    * 栅格左侧的间隔格数
    */
-  offset?: number
-  /**
-   * 列配置 (el-col 属性)
-   * @description 优先级高于 options.col
-   */
-  col?: Partial<ColProps>
+  offset?: GridItemProps["offset"]
   /**
    * 帮助文本
    * @description 显示在 Label 旁边的提示信息
@@ -331,11 +321,6 @@ export interface FormGroup<T extends FormRecord = FormRecord> {
    * 分组列表定义
    */
   children?: FormGroupChild<T>[]
-}
-
-export interface FormRow extends Partial<RowProps> {
-  collapsed?: boolean
-  collapsedRows?: number
 }
 
 /**

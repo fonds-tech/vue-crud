@@ -193,14 +193,14 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
 
   // 切换折叠状态
   function collapse(state?: boolean) {
-    if (!options.row) {
-      options.row = {}
+    if (!options.grid) {
+      options.grid = {}
     }
     if (typeof state === "boolean") {
-      options.row.collapsed = state
+      options.grid.collapsed = state
       return
     }
-    options.row.collapsed = !options.row.collapsed
+    options.grid.collapsed = !options.grid.collapsed
   }
 
   /**

@@ -37,8 +37,7 @@ const searchOptions: SearchOptions = {
     keyword: "",
     status: "",
   },
-  row: { gutter: 12, collapsedRows: 1 },
-  col: { span: 12 },
+  grid: { cols: 4, colGap: 12, rowGap: 12, collapsedRows: 1 },
   items: [
     {
       field: "keyword",
@@ -59,8 +58,7 @@ const searchOptions: SearchOptions = {
     },
   ],
   action: {
-    row: { gutter: 8, justify: "end" },
-    col: { span: 6 },
+    grid: { cols: 24, colGap: 8, rowGap: 8 },
     items: [
       { type: "search", text: "查询" },
       { type: "reset", text: "清空" },

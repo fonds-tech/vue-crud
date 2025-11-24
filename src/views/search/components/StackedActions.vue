@@ -33,8 +33,7 @@ const stackedOptions: SearchOptions = {
     status: "",
     owner: "",
   },
-  row: { gutter: 12, collapsedRows: 1 },
-  col: { span: 8 },
+  grid: { cols: 4, colGap: 12, rowGap: 12, collapsedRows: 1 },
   items: [
     {
       field: "keyword",

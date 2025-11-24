@@ -74,11 +74,12 @@
         </el-tab-pane>
       </el-tabs>
 
-      <el-row v-bind="options.row">
+      <fd-grid v-bind="options.grid">
         <template v-for="(item, _index) in options.items" :key="`${item.field ?? _index}`">
-          <el-col
-            v-show="show(item, _index)"
-            v-bind="resolveCol(item)"
+          <fd-grid-item
+            v-show="show(item)"
+            :span="resolveSpan(item)"
+            :offset="resolveOffset(item)"
           >
             <el-form-item
               v-bind="item"
@@ -126,9 +127,9 @@
                 </template>
               </component>
             </el-form-item>
-          </el-col>
+          </fd-grid-item>
         </template>
-      </el-row>
+      </fd-grid>
     </el-space>
   </el-form>
 </template>
@@ -176,9 +177,16 @@ const options = reactive<FormOptions>({
     labelWidth: "auto", // 默认标签宽度自动
     scrollToError: true, // 校验失败自动滚动到错误项
   },
-  row: { gutter: 16, collapsed: false, collapsedRows: 1 }, // 默认栅格行配置
-  col: { span: 8 }, // 默认栅格列配置 (3列布局)
+  grid: {
+    cols: 4,
+    colGap: 16,
+    rowGap: 16,
+    collapsed: false,
+    collapsedRows: 1,
+  },
 })
+
+const defaultItemSpan = 1
 
 // 步骤条当前步骤索引 (用于 group.type === 'steps')
 const step = ref(1)
@@ -225,23 +233,12 @@ const props = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp
 // 解析组件样式 (style 属性)
 const style = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<CSSProperties | undefined>(com, "style") : undefined)
 
-/**
- * 解析 ElCol 属性
- * 优先级: item.col > item.span/offset > options.col
- */
-function resolveCol(item: FormItem) {
-  const base = { ...options.col }
-  // 兼容旧的 span / offset 属性
-  if (item.span !== undefined)
-    base.span = item.span
-  if (item.offset !== undefined)
-    base.offset = item.offset
+function resolveSpan(item: FormItem) {
+  return item.span ?? defaultItemSpan
+}
 
-  // 合并 item.col
-  if (item.col) {
-    return merge(base, item.col)
-  }
-  return base
+function resolveOffset(item: FormItem) {
+  return item.offset ?? 0
 }
 
 /**
@@ -265,47 +262,11 @@ function slots(target?: FormItem | FormComponentSlot) {
 // 解析组件特有的 options 属性 (如 Select 的下拉选项)
 const componentOptions = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<any[]>(com, "options") : undefined)
 
-// 计算需要显示的 item 索引集合 (处理 collapsed)
-const visibleIndices = computed(() => {
-  const indices = new Set<number>()
-  const totalSpan = 24
-  let currentSpan = 0
-  let currentRow = 0
-  const collapsed = options.row?.collapsed
-  const collapsedRows = options.row?.collapsedRows ?? 1
-
-  options.items.forEach((item, index) => {
-    if (resolveProp<boolean>(item, "hidden"))
-      return
-
-    const colProps = resolveCol(item)
-    const span = colProps.span ?? 24
-
-    // 如果是折叠状态，且当前行数已经超过限制，则不再显示
-    if (collapsed && currentRow >= collapsedRows) {
-      return
-    }
-
-    indices.add(index)
-
-    currentSpan += span
-    if (currentSpan >= totalSpan) {
-      currentRow++
-      currentSpan = 0
-    }
-  })
-  return indices
-})
-
 // 计算表单项显隐状态
-function show(item: FormItem, index: number) {
+function show(item: FormItem) {
   // 1. 基础 hidden 属性检查
   if (resolveProp<boolean>(item, "hidden"))
     return false
-  // 2. 折叠逻辑检查
-  if (options.row?.collapsed) {
-    return visibleIndices.value.has(index)
-  }
   return true
 }
 
@@ -513,11 +474,8 @@ function mergeFormOptions(useOptions: FormUseOptions = {}) {
   if (useOptions.form) {
     options.form = merge({}, options.form, useOptions.form)
   }
-  if (useOptions.row) {
-    options.row = merge({}, options.row, useOptions.row)
-  }
-  if (useOptions.col) {
-    options.col = merge({}, options.col, useOptions.col)
+  if (useOptions.grid) {
+    options.grid = merge({}, options.grid, useOptions.grid)
   }
   if (useOptions.group) {
     options.group = merge({}, options.group, useOptions.group)

@@ -37,11 +37,10 @@ const options: FormUseOptions = {
     email: "",
     desc: "",
   },
-  row: {
-    gutter: 12,
-  },
-  col: {
-    span: 6,
+  grid: {
+    cols: 4,
+    colGap: 12,
+    rowGap: 12,
   },
   form: {
     labelWidth: "80px",
@@ -66,7 +65,7 @@ const options: FormUseOptions = {
       field: "desc",
       label: "备注",
       component: { is: "el-input", props: { type: "textarea", rows: 2 } },
-      col: { span: 12 },
+      span: 2,
     },
   ],
 }

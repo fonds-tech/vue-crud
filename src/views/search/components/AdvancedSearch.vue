@@ -40,8 +40,7 @@ const advancedOptions: SearchOptions = {
     priority: 3,
     remarks: "",
   },
-  row: { gutter: 20, collapsed: false, collapsedRows: 1 },
-  col: { span: 12 },
+  grid: { cols: 4, colGap: 20, rowGap: 20, collapsed: false, collapsedRows: 1 },
   items: [
     {
       field: "keyword",
@@ -120,7 +119,7 @@ const advancedOptions: SearchOptions = {
           valueFormat: "YYYY-MM-DD",
         },
       },
-      col: { span: 24 },
+      span: 4,
     },
     {
       field: "notify",
@@ -137,7 +136,7 @@ const advancedOptions: SearchOptions = {
         is: "el-slider",
         props: { range: true, step: 1, min: 0, max: 50, showStops: true },
       },
-      col: { span: 24 },
+      span: 4,
     },
     {
       field: "approval",
@@ -168,7 +167,7 @@ const advancedOptions: SearchOptions = {
         is: "el-input",
         props: { type: "textarea", rows: 2, maxlength: 100, showWordLimit: true },
       },
-      col: { span: 24 },
+      span: 4,
     },
   ],
   action: {

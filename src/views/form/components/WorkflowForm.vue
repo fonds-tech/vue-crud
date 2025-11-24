@@ -41,8 +41,7 @@ const options: FormUseOptions = {
     risk: 2,
     comment: "",
   },
-  row: { gutter: 16 },
-  col: { span: 8 },
+  grid: { cols: 4, colGap: 16, rowGap: 16 },
   form: {
     labelWidth: "90px",
   },
@@ -79,7 +78,7 @@ const options: FormUseOptions = {
           { label: "体验优化", value: "ux" },
         ],
       },
-      col: { span: 12 },
+      span: 2,
     },
     {
       field: "notify",
@@ -90,13 +89,13 @@ const options: FormUseOptions = {
       field: "risk",
       label: "风险级别",
       component: { is: "el-slider", props: { min: 1, max: 5, showStops: true } },
-      col: { span: 12 },
+      span: 2,
     },
     {
       field: "comment",
       label: "补充说明",
       component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 120, showWordLimit: true } },
-      col: { span: 24 },
+      span: 4,
     },
   ],
 }
