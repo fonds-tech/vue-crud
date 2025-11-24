@@ -274,7 +274,12 @@ function show(item: FormItem) {
 const extra = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? "" : resolveProp<string>(item, "extra"))
 
 // 计算是否必填 (required 属性)，隐藏项自动设为非必填
-const required = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? false : Boolean(resolveProp(item, "required")))
+function required(item: FormItem) {
+  if (resolveProp<boolean>(item, "hidden"))
+    return false
+  const flag = resolveProp<boolean | undefined>(item, "required")
+  return typeof flag === "boolean" ? flag : undefined
+}
 
 // 计算是否禁用 (disabled 属性)
 const disabled = (item: FormItem) => Boolean(resolveProp(item, "disabled"))
@@ -574,9 +579,6 @@ defineExpose({
   flex: 1;
   .el-space {
     width: 100%;
-  }
-  .el-form-item {
-    margin-bottom: 0;
   }
 }
 </style>

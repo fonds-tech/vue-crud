@@ -38,9 +38,9 @@ const options: FormUseOptions = {
     desc: "",
   },
   grid: {
-    cols: 4,
+    cols: 1,
     colGap: 12,
-    rowGap: 12,
+    rowGap: 0,
   },
   form: {
     labelWidth: "80px",
@@ -50,22 +50,31 @@ const options: FormUseOptions = {
       field: "name",
       label: "姓名",
       component: { is: "el-input", props: { placeholder: "请输入姓名" } },
+      rules: [{ required: true, message: "请输入姓名", trigger: "blur" }],
     },
     {
       field: "age",
       label: "年龄",
       component: { is: "el-input-number", props: { min: 0 } },
+      rules: [
+        { required: true, message: "请输入年龄", trigger: "blur" },
+        { type: "number", min: 0, max: 120, message: "年龄需在 0-120 岁之间", trigger: "blur" },
+      ],
     },
     {
       field: "email",
       label: "邮箱",
       component: { is: "el-input", props: { placeholder: "name@example.com" } },
+      rules: [
+        { required: true, message: "请输入邮箱地址", trigger: "blur" },
+        { type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"] },
+      ],
     },
     {
       field: "desc",
       label: "备注",
       component: { is: "el-input", props: { type: "textarea", rows: 2 } },
-      span: 2,
+      rules: [{ max: 200, message: "备注不超过 200 字", trigger: "blur" }],
     },
   ],
 }

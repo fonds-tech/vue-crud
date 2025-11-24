@@ -107,28 +107,31 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
           // 克隆数据，避免 hook 修改影响原始 model
           const values = cloneDeep(model) as T
 
-          // 遍历所有表单项，执行 submit 阶段的 hook
-          options.items.forEach((item) => {
-            const fieldName = String(item.field)
-            if (item.hook && item.field && isDef(values[fieldName as keyof T])) {
-              formHook.submit({
-                hook: item.hook,
-                model: values,
-                field: fieldName,
-                value: values[fieldName as keyof T],
-              })
-            }
-          })
-
           const normalizedErrors = invalidFields as Record<string, any> | undefined
+          const hasErrors = Boolean(normalizedErrors && Object.keys(normalizedErrors).length > 0)
+
+          if (!hasErrors) {
+            // 遍历所有表单项，执行 submit 阶段的 hook
+            options.items.forEach((item) => {
+              const fieldName = String(item.field)
+              if (item.hook && item.field && isDef(values[fieldName as keyof T])) {
+                formHook.submit({
+                  hook: item.hook,
+                  model: values,
+                  field: fieldName,
+                  value: values[fieldName as keyof T],
+                })
+              }
+            })
+          }
 
           if (isFunction(callback)) {
             callback(values, normalizedErrors)
           }
 
-          // 触发全局 onSubmit 回调
-          if (isFunction(options.onSubmit)) {
-            options.onSubmit(values, normalizedErrors)
+          // 触发全局 onSubmit 回调（仅在校验通过后）
+          if (!hasErrors && isFunction(options.onSubmit)) {
+            options.onSubmit(values, undefined)
           }
 
           resolve({ values, errors: normalizedErrors })
