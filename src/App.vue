@@ -1,17 +1,8 @@
 <template>
   <div class="app">
-    <header class="hero">
-      <span class="hero__badge">
-        FD CRUD
-      </span>
-      <h1 class="hero__title">
-        组件演示控制台
-      </h1>
-      <p class="hero__desc">
-        集成 CRUD、表单与搜索示例，方便在同一页面对比交互与主题效果。
-      </p>
-
-      <nav class="hero__nav">
+    <nav class="top-nav">
+      <span class="logo">FD CRUD</span>
+      <div class="nav-links">
         <router-link
           v-for="playground in playgrounds"
           :key="playground.path"
@@ -20,8 +11,8 @@
         >
           {{ playground.label }}
         </router-link>
-      </nav>
-    </header>
+      </div>
+    </nav>
 
     <main class="content-card">
       <router-view />
@@ -52,47 +43,35 @@ const playgrounds = [
 }
 
 .app {
-  padding: 48px 24px 64px;
+  padding: 24px;
   box-sizing: border-box;
   min-height: 100vh;
 }
 
-.hero {
-  text-align: center;
-  margin-bottom: 32px;
+.top-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  justify-content: space-between;
 }
 
-.hero__badge {
-  color: #1f6ff2;
+.logo {
+  color: #1f2d3d;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nav-links {
+  gap: 8px;
   display: inline-flex;
-  padding: 6px 14px;
-  font-size: 13px;
-  border-radius: 999px;
-  letter-spacing: 0.08em;
-  background-color: rgba(64, 158, 255, 0.14);
-}
-
-.hero__desc {
-  color: #606266;
-  margin: 0 auto;
-  max-width: 560px;
-  line-height: 1.6;
-}
-
-.hero__nav {
-  gap: 12px;
-  display: inline-flex;
-  flex-wrap: wrap;
-  margin-top: 24px;
-  justify-content: center;
 }
 
 .nav-link {
   color: #1f2d3d;
   border: 1px solid transparent;
-  padding: 10px 18px;
-  min-width: 120px;
-  box-shadow: 0 8px 20px rgba(31, 109, 255, 0.08);
+  padding: 6px 14px;
+  min-width: 0;
+  box-shadow: none;
   transition: all 0.2s;
   font-weight: 600;
   border-radius: 999px;
@@ -114,25 +93,26 @@ const playgrounds = [
 
 .content-card {
   margin: 0 auto;
-  padding: 32px;
-  max-width: 1200px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
-  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+  border-radius: 18px;
   background-color: #fff;
 }
 
 @media (max-width: 768px) {
   .app {
-    padding: 32px 16px 48px;
+    padding: 16px;
   }
 
-  .hero__title {
-    font-size: 26px;
+  .top-nav {
+    gap: 12px;
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .content-card {
-    padding: 20px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 14px;
   }
 }
 </style>
