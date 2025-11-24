@@ -6,6 +6,7 @@ import { Crud } from "./entry"
 import { createApp } from "vue"
 
 import "element-plus/dist/index.css"
+import "element-plus/theme-chalk/dark/css-vars.css"
 
 const app = createApp(App)
 

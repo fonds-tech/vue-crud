@@ -204,18 +204,18 @@ onMounted(() => {
 
 .variant-card {
   border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-md);
   border-radius: 20px;
 }
 
 .crud-shell {
   padding: 16px;
-  background: #f8fafc;
+  background: var(--app-bg);
   border-radius: 16px;
 }
 
 .panel-title {
-  color: #909399;
+  color: var(--text-sub);
   display: flex;
   align-items: center;
   margin-bottom: 12px;

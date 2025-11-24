@@ -1,34 +1,39 @@
 <template>
-  <div class="view-shell">
-    <aside class="component-panel">
-      <h3>Components</h3>
-      <p>切换不同的 fd-search 调试场景，保持代码结构清晰。</p>
-      <button
-        v-for="component in componentCatalog"
-        :key="component.key"
-        type="button"
-        class="component-link"
-        :class="{ active: component.key === activeComponentKey }"
-        @click="activeComponentKey = component.key"
-      >
-        <strong>{{ component.title }}</strong>
-        <span>{{ component.description }}</span>
-      </button>
-    </aside>
+  <div class="page-container">
+    <header class="page-header">
+      <div class="header-content">
+        <h2>搜索演示</h2>
+        <p>fd-search 调试场景与布局</p>
+      </div>
 
-    <section class="preview">
-      <header class="preview-header">
-        <div>
-          <h2>{{ activeComponent.title }}</h2>
+      <div class="tabs-group">
+        <button
+          v-for="component in componentCatalog"
+          :key="component.key"
+          class="tab-item"
+          :class="{ active: component.key === activeComponentKey }"
+          @click="activeComponentKey = component.key"
+        >
+          {{ component.title }}
+        </button>
+      </div>
+    </header>
+
+    <div class="preview-card">
+      <div class="preview-info">
+        <div class="info-text">
+          <h3>{{ activeComponent.title }}</h3>
           <p>{{ activeComponent.description }}</p>
         </div>
-        <el-tag effect="dark" type="warning">
+        <el-tag effect="light" type="warning" round>
           {{ activeComponent.badge }}
         </el-tag>
-      </header>
+      </div>
 
-      <component :is="activeComponent.component" />
-    </section>
+      <div class="preview-body">
+        <component :is="activeComponent.component" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,99 +80,99 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 </script>
 
 <style scoped>
-.view-shell {
-  gap: 24px;
-  display: flex;
-  align-items: flex-start;
+.page-container {
+  max-width: 100%;
 }
 
-.component-panel {
-  width: 260px;
-  padding: 20px;
-  background: #ffffff;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-}
-
-.component-panel h3 {
-  margin: 0 0 8px;
-}
-
-.component-panel p {
-  color: #909399;
-  margin: 0 0 16px;
-  line-height: 1.5;
-}
-
-.component-link {
-  color: #1f2d3d;
-  width: 100%;
-  border: 1px solid transparent;
-  cursor: pointer;
-  padding: 12px 14px;
-  background: #f5f7ff;
-  text-align: left;
-  transition: all 0.2s;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-.component-link:last-of-type {
-  margin-bottom: 0;
-}
-
-.component-link strong {
-  display: block;
-  font-size: 15px;
-}
-
-.component-link span {
-  color: #636e88;
-  display: block;
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-.component-link.active {
-  background: #fff;
-  box-shadow: 0 10px 24px rgba(64, 158, 255, 0.15);
-  border-color: rgba(64, 158, 255, 0.6);
-}
-
-.preview {
+.page-header {
   gap: 20px;
-  flex: 1;
   display: flex;
-  flex-direction: column;
-}
-
-.preview-header {
-  gap: 16px;
-  display: flex;
-  padding: 24px;
-  background: #fff;
-  box-shadow: 0 15px 38px rgba(15, 23, 42, 0.08);
+  flex-wrap: wrap;
   align-items: center;
-  border-radius: 18px;
+  margin-bottom: 24px;
   justify-content: space-between;
 }
 
-.preview-header h2 {
+.header-content h2 {
+  color: var(--text-title);
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.header-content p {
+  color: var(--text-sub);
   margin: 0;
+  font-size: 14px;
 }
 
-.preview-header p {
-  color: #606266;
-  margin: 6px 0 0;
+/* Modern Tabs */
+.tabs-group {
+  gap: 4px;
+  display: flex;
+  padding: 4px;
+  background: var(--hover-bg);
+  border-radius: 10px;
 }
 
-@media (max-width: 960px) {
-  .view-shell {
-    flex-direction: column;
-  }
+.tab-item {
+  color: var(--text-sub);
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 14px;
+  background: transparent;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border-radius: 8px;
+}
 
-  .component-panel {
-    width: 100%;
-  }
+.tab-item:hover {
+  color: var(--text-main);
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.tab-item.active {
+  color: var(--active-text);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+/* Preview Card */
+.preview-card {
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-md);
+  border-radius: 16px;
+}
+
+.preview-info {
+  display: flex;
+  padding: 20px 24px;
+  background: var(--card-bg);
+  align-items: center;
+  border-bottom: 1px solid var(--divider-color);
+  justify-content: space-between;
+}
+
+.info-text h3 {
+  color: var(--text-title);
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info-text p {
+  color: var(--text-sub);
+  margin: 0;
+  font-size: 13px;
+}
+
+.preview-body {
+  padding: 24px;
+  background: var(--card-bg);
+  min-height: 400px;
 }
 </style>
