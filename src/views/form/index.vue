@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import BasicForm from "./components/BasicForm.vue"
+import StepsForm from "./components/StepsForm.vue"
 import WorkflowForm from "./components/WorkflowForm.vue"
 import { ref, computed } from "vue"
 
@@ -64,6 +65,13 @@ const componentCatalog: ComponentMeta[] = [
     badge: "工作流",
     description: "包含日期、标签、开关和滑块，模拟审批信息收集。",
     component: WorkflowForm,
+  },
+  {
+    key: "steps",
+    title: "多步骤审批",
+    badge: "Steps",
+    description: "分步填写并联动步骤条，适合长流程审批。",
+    component: StepsForm,
   },
 ]
 

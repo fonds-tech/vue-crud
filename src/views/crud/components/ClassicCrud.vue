@@ -163,9 +163,9 @@ function handleExport() {
 
 <style scoped>
 .crud-card {
-  border: none;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-  border-radius: 20px;
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
 }
 
 .toolbar-spacer {

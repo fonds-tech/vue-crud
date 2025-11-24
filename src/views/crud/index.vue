@@ -135,20 +135,20 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 /* Preview Card */
 .preview-card {
-  border: 1px solid var(--card-border);
+  border: 1px solid var(--color-border-subtle);
   display: flex;
   overflow: hidden;
   background: var(--card-bg);
-  box-shadow: var(--shadow-md);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm); /* Softer shadow */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-lg); /* Reduced from xl to lg */
   flex-direction: column;
 }
 
 .preview-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md), var(--shadow-glow);
-  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px); /* Reduced movement */
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
 }
 
 .preview-info {
