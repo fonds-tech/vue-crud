@@ -112,6 +112,7 @@ provide(gridInjectionKey, context)
 
 <style scoped>
 .fd-grid {
+  height: fit-content;
   display: grid;
 }
 </style>

@@ -68,8 +68,9 @@ const itemClass = computed(() => ({
 }))
 </script>
 
-<style scoped>
+<style lang="scss">
 .fd-grid__item {
+  height: fit-content;
   min-width: 0;
   box-sizing: border-box;
 }

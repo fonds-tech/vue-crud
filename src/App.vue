@@ -1,6 +1,6 @@
 <template>
   <div class="app-layout">
-    <aside class="sidebar">
+    <header class="app-header">
       <div class="brand">
         <div class="brand__logo">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -10,7 +10,7 @@
           </svg>
         </div>
         <h1 class="brand__title">
-          CRUD Pro
+          CRUD
         </h1>
       </div>
 
@@ -28,29 +28,18 @@
         </router-link>
       </nav>
 
-      <div class="sidebar-footer">
+      <div class="header-right">
         <button class="theme-toggle" :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" @click="toggleTheme">
-          <div class="toggle-icon">
-            <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-          </div>
-          <span>{{ isDark ? 'Dark Mode' : 'Light Mode' }}</span>
+          <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
         </button>
         <div class="user-profile">
           <div class="avatar">
             F
           </div>
-          <div class="user-info">
-            <p class="username">
-              Fonds Tech
-            </p>
-            <p class="role">
-              Admin
-            </p>
-          </div>
         </div>
       </div>
-    </aside>
+    </header>
 
     <main class="main-content">
       <router-view v-slot="{ Component }">
@@ -108,9 +97,12 @@ onMounted(() => {
   --sidebar-bg: #f8fafc; /* Very subtle gray for sidebar */
   --sidebar-border: #f1f5f9; /* Subtle border */
 
-  --hover-bg: #e2e8f0;
+  --header-bg: #ffffff; /* New variable for header background */
+  --header-border: #f1f5f9; /* New variable for header border */
+
+  --hover-bg: #f8fafc;
   --text-sub: #64748b;
-  --active-bg: #ffffff; /* White active item on gray sidebar */
+  --active-bg: #f1f5f9; /* Slightly darker for active top nav */
 
   --card-bg: #ffffff;
 
@@ -145,6 +137,7 @@ onMounted(() => {
   --active-bg: #1e293b;
 
   --dot-color: #1e293b;
+  --header-bg: #0f172a;
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
 
@@ -155,6 +148,7 @@ onMounted(() => {
   --active-text: #f8fafc;
   --card-border: #1e293b;
   --divider-color: #1e293b;
+  --header-border: #1e293b;
   --sidebar-border: #1e293b;
 }
 
@@ -182,36 +176,41 @@ onMounted(() => {
 .app-layout {
   display: flex;
   min-height: 100vh;
+  flex-direction: column;
 }
 
-/* Sidebar Styles */
-.sidebar {
+/* Header Styles */
+.app-header {
   top: 0;
   left: 0;
-  width: 260px; /* Slightly wider for better proportions */
-  bottom: 0;
+  right: 0;
+  height: 64px;
   display: flex;
-  padding: 0 16px;
+  padding: 0 24px;
   z-index: 50;
   position: fixed;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  flex-direction: column;
+  background: var(--header-bg);
+  align-items: center;
+  border-bottom: 1px solid var(--header-border);
+  backdrop-filter: blur(8px);
+}
+
+:global(html.dark) .app-header {
+  background: rgba(15, 23, 42, 0.8);
 }
 
 .brand {
   gap: 12px;
-  height: 72px;
   display: flex;
-  padding: 0 12px;
   align-items: center;
+  margin-right: 48px;
 }
 
 .brand__logo {
   width: 32px;
   height: 32px;
-  background: #0f172a; /* Dark logo bg */
   display: flex;
+  background: #0f172a;
   align-items: center;
   border-radius: 8px;
   justify-content: center;
@@ -224,29 +223,28 @@ onMounted(() => {
 .brand__title {
   color: var(--text-title);
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .nav-menu {
-  gap: 4px;
+  gap: 8px;
   flex: 1;
   display: flex;
-  padding-top: 24px;
-  flex-direction: column;
+  align-items: center;
 }
 
 .nav-item {
-  gap: 12px;
+  gap: 8px;
   color: var(--text-sub);
   display: flex;
-  padding: 8px 12px;
+  padding: 8px 16px;
   font-size: 14px;
   transition: all 0.2s ease;
   align-items: center;
   font-weight: 500;
-  border-radius: var(--radius-md);
+  border-radius: 999px;
   text-decoration: none;
 }
 
@@ -257,93 +255,69 @@ onMounted(() => {
 
 .router-link-active.nav-item {
   color: var(--active-text);
-  box-shadow: var(--shadow-xs); /* Subtle lift for active item */
-  background-color: var(--active-bg);
-}
-
-/* In dark mode, active item needs different style */
-:global(html.dark) .router-link-active.nav-item {
   box-shadow: none;
   background-color: var(--active-bg);
 }
 
-.sidebar-footer {
+.nav-item__icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.header-right {
   gap: 16px;
   display: flex;
-  padding: 24px 0;
-  border-top: 1px solid var(--sidebar-border);
-  flex-direction: column;
+  align-items: center;
 }
 
 .theme-toggle {
   color: var(--text-sub);
-  border: 1px solid var(--sidebar-border);
+  border: none;
   cursor: pointer;
   display: flex;
-  padding: 8px 12px;
-  font-size: 13px;
+  padding: 8px;
   background: transparent;
   transition: all 0.2s;
   align-items: center;
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  justify-content: space-between;
+  border-radius: 50%;
+  justify-content: center;
 }
 
 .theme-toggle:hover {
   color: var(--text-title);
-  border-color: var(--text-sub);
-}
-
-.toggle-icon {
-  display: flex;
-  align-items: center;
+  background-color: var(--hover-bg);
 }
 
 .user-profile {
-  gap: 12px;
   display: flex;
-  padding: 4px 8px;
   align-items: center;
 }
 
 .avatar {
   color: white;
   width: 32px;
+  cursor: pointer;
   height: 32px;
   display: flex;
   font-size: 14px;
   background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 0 0 2px var(--app-bg);
   align-items: center;
   font-weight: 600;
   border-radius: 50%;
   justify-content: center;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.username {
-  color: var(--text-title);
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.role {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 12px;
-}
-
 /* Main Content */
 .main-content {
   flex: 1;
-  padding: 32px 40px;
-  max-width: 1440px; /* Constrain max width for better readability */
-  margin-left: 260px;
+  width: 100%;
+  max-width: 1440px;
+  box-sizing: border-box;
+  margin-top: 64px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Transition */

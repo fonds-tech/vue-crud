@@ -419,6 +419,7 @@ defineExpose({
 .fd-search {
   gap: 12px;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
 
   &__form {
