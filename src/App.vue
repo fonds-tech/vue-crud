@@ -318,11 +318,11 @@ onMounted(() => {
 .main-content {
   flex: 1;
   width: 100%;
-  padding: 32px 40px;
-  max-width: 1440px;
+  padding: 24px;
   box-sizing: border-box;
   margin-top: 64px;
   margin-left: auto;
+  padding-top: 0;
   margin-right: auto;
 }
 
