@@ -1,21 +1,15 @@
 <template>
-  <div class="search-page">
-    <div class="search-layout">
-      <el-card class="search-panel">
-        <div class="panel-title">
-          <h2>搜索表单</h2>
-          <span>fd-search / fd-crud</span>
-        </div>
-        <fd-crud ref="crudRef" class="crud-shell">
-          <fd-search ref="searchRef" />
-        </fd-crud>
-      </el-card>
-    </div>
+  <div class="search-variant">
+    <el-card class="variant-card">
+      <fd-crud ref="crudRef" class="crud-shell">
+        <fd-search ref="searchRef" />
+      </fd-crud>
+    </el-card>
 
-    <el-card class="params-panel">
+    <el-card class="variant-card">
       <div class="panel-title">
-        <h2>参数快照</h2>
-        <span>实时 JSON</span>
+        <h3>参数快照</h3>
+        <span>实时同步</span>
       </div>
       <pre>{{ crudParams }}</pre>
     </el-card>
@@ -23,70 +17,17 @@
 </template>
 
 <script setup lang="ts">
+import type { SearchOptions } from "@/components/fd-search/type"
+import { SearchMockService } from "../mockService"
 import { useCrud, useSearch } from "@/hooks"
 import { h, computed, onMounted } from "vue"
 
-// 模拟数据
-const MOCK_DATA = Array.from({ length: 20 }).map((_, i) => ({
-  id: i + 1,
-  name: `User ${i + 1}`,
-  status: i % 2, // 0 or 1
-  createTime: `2023-01-${String(i + 1).padStart(2, "0")}`,
-  type: i % 3,
-}))
-
-// 模拟 Service
-class MockService {
-  page(params: any) {
-    console.log("MockService.page called with:", params)
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let list = [...MOCK_DATA]
-
-        // 模拟后端搜索过滤
-        if (params.keyword) {
-          list = list.filter(item => item.name.includes(params.keyword))
-        }
-        if (params.status !== undefined && params.status !== "") {
-          list = list.filter(item => item.status === Number(params.status))
-        }
-        if (params.createTime && params.createTime.length === 2) {
-          // Simple date range check mock
-          const start = params.createTime[0]
-          const end = params.createTime[1]
-          list = list.filter(item => item.createTime >= start && item.createTime <= end)
-        }
-
-        resolve({
-          list,
-          total: list.length,
-          pagination: {
-            page: params.page || 1,
-            size: params.size || 20,
-            total: list.length,
-          },
-        })
-      }, 500)
-    })
-  }
-
-  add() { return Promise.resolve() }
-  update() { return Promise.resolve() }
-  delete() { return Promise.resolve() }
-  info() { return Promise.resolve() }
-}
-
-// 初始化 CRUD
 const crudRef = useCrud({
-  service: new MockService(),
-  permission: { add: true, delete: true, update: true, page: true }, // Enable all
+  service: new SearchMockService(),
+  permission: { add: true, delete: true, update: true, page: true },
 })
 
-// 暴露给模板显示当前参数
-const crudParams = computed(() => crudRef.value?.params)
-
-// 初始化搜索
-const searchRef = useSearch({
+const advancedOptions: SearchOptions = {
   model: {
     keyword: "",
     status: "",
@@ -107,7 +48,7 @@ const searchRef = useSearch({
       label: "关键词",
       component: {
         is: "el-input",
-        props: { placeholder: "搜索姓名或邮箱", clearable: true, prefixIcon: "el-icon-search" },
+        props: { placeholder: "搜索姓名或邮箱", clearable: true },
       },
     },
     {
@@ -156,7 +97,7 @@ const searchRef = useSearch({
       label: "用户标签",
       component: {
         is: "el-select",
-        props: { multiple: true, collapseTags: true, filterable: true, placeholder: "选择多个标签" },
+        props: { multiple: true, collapseTags: true, filterable: true },
         options: [
           { label: "高价值", value: "vip" },
           { label: "需跟进", value: "follow" },
@@ -245,65 +186,27 @@ const searchRef = useSearch({
     console.log("Reset triggered")
     next()
   },
-})
+}
 
-// 自动刷新
+const searchRef = useSearch(advancedOptions)
+const crudParams = computed(() => crudRef.value?.params)
+
 onMounted(() => {
   crudRef.value?.refresh()
 })
 </script>
 
 <style scoped>
-.search-page {
-  gap: 24px;
+.search-variant {
+  gap: 16px;
   display: flex;
   flex-direction: column;
 }
 
-.page-header {
-  gap: 12px;
-  display: flex;
-  padding: 18px 24px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-  align-items: center;
-  border-radius: 16px;
-  justify-content: space-between;
-}
-
-.page-header h1 {
-  margin: 0;
-}
-
-.page-header p {
-  color: #606266;
-  margin: 4px 0 0;
-}
-
-.search-layout {
-  display: flex;
-  flex-direction: column;
-}
-
-.search-panel,
-.params-panel {
+.variant-card {
   border: none;
-  box-shadow: 0 15px 38px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
   border-radius: 20px;
-}
-
-.panel-title {
-  color: #909399;
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  justify-content: space-between;
-}
-
-.panel-title h2 {
-  color: #1f2d3d;
-  margin: 0;
-  font-size: 20px;
 }
 
 .crud-shell {
@@ -312,21 +215,22 @@ onMounted(() => {
   border-radius: 16px;
 }
 
-.params-panel pre {
+.panel-title {
+  color: #909399;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  justify-content: space-between;
+}
+
+pre {
   color: #e5e7eb;
   margin: 0;
   padding: 16px;
   overflow: auto;
   background: #111827;
-  max-height: 320px;
+  max-height: 300px;
   font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
   border-radius: 14px;
-}
-
-@media (max-width: 960px) {
-  .page-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
 </style>

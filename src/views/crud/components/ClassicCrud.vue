@@ -1,9 +1,5 @@
 <template>
-  <div class="demo-page">
-    <h1 class="demo-title">
-      CRUD DEMO
-    </h1>
-
+  <el-card class="crud-card">
     <fd-crud ref="crud">
       <template #default>
         <fd-search ref="search" />
@@ -12,7 +8,7 @@
           <template #toolbar>
             <fd-add-button />
             <fd-delete-button />
-            <div class="demo-toolbar__spacer"></div>
+            <div class="toolbar-spacer"></div>
             <el-button type="primary" @click="handleExport">
               <el-icon><download /></el-icon>
               导出
@@ -23,16 +19,16 @@
         <fd-detail ref="detail" />
       </template>
     </fd-crud>
-  </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
 import type { SearchOptions } from "@/components/fd-search/type"
 import type { TableUseOptions } from "@/components/fd-table/type"
 import type { DetailUseOptions } from "@/components/fd-detail/type"
-import { h } from "vue"
 import { Download } from "@element-plus/icons-vue"
 import { TestService } from "@/utils/test"
+import { h, onMounted } from "vue"
 import { useCrud, useTable, useDetail, useSearch } from "@/hooks"
 
 const crud = useCrud(
@@ -40,7 +36,6 @@ const crud = useCrud(
     service: new TestService(),
     permission: { add: true, delete: true, update: true, detail: true },
   },
-  instance => instance.refresh(),
 )
 
 const searchOptions: SearchOptions = {
@@ -96,18 +91,6 @@ const searchOptions: SearchOptions = {
     items: [
       { type: "search", text: "搜索" },
       { type: "reset", text: "重置" },
-      {
-        component: {
-          is: "el-button",
-          props: { text: true, type: "primary" },
-          slots: {
-            default: () => "清空条件",
-          },
-          on: {
-            click: () => crud.value?.setParams({}),
-          },
-        },
-      },
     ],
   },
 }
@@ -170,6 +153,10 @@ const search = useSearch(searchOptions)
 const table = useTable(tableOptions)
 const detail = useDetail(detailOptions)
 
+onMounted(() => {
+  crud.value?.refresh()
+})
+
 function handleExport() {
   console.log("导出当前筛选结果:", search.value?.model)
   console.log("当前表格选中:", table.value?.selection)
@@ -177,21 +164,13 @@ function handleExport() {
 </script>
 
 <style scoped>
-.demo-page {
-  gap: 16px;
-  display: flex;
-  padding: 24px;
-  flex-direction: column;
+.crud-card {
+  border: none;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
 }
 
-.demo-title {
-  margin: 0;
-  font-size: 28px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.demo-toolbar__spacer {
+.toolbar-spacer {
   flex: 1;
 }
 </style>

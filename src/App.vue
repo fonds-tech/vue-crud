@@ -1,19 +1,24 @@
 <template>
   <div class="app">
     <header class="hero">
+      <span class="hero__badge">
+        FD CRUD
+      </span>
+      <h1 class="hero__title">
+        组件演示控制台
+      </h1>
       <p class="hero__desc">
         集成 CRUD、表单与搜索示例，方便在同一页面对比交互与主题效果。
       </p>
 
       <nav class="hero__nav">
-        <router-link to="/crud" class="nav-link">
-          CRUD 页面
-        </router-link>
-        <router-link to="/form" class="nav-link">
-          表单演示
-        </router-link>
-        <router-link to="/search" class="nav-link">
-          搜索演示
+        <router-link
+          v-for="playground in playgrounds"
+          :key="playground.path"
+          :to="playground.path"
+          class="nav-link"
+        >
+          {{ playground.label }}
         </router-link>
       </nav>
     </header>
@@ -23,6 +28,14 @@
     </main>
   </div>
 </template>
+
+<script setup lang="ts">
+const playgrounds = [
+  { path: "/crud", label: "CRUD 调试" },
+  { path: "/form", label: "表单调试" },
+  { path: "/search", label: "搜索调试" },
+]
+</script>
 
 <style scoped>
 :global(body) {
