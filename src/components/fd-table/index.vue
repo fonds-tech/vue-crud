@@ -7,7 +7,9 @@
       <div v-if="tableOptions.table.tools" class="fd-table__tools">
         <el-tooltip content="刷新">
           <el-button circle size="small" @click="refresh()">
-            <el-icon><refresh /></el-icon>
+            <el-icon>
+              <refresh />
+            </el-icon>
           </el-button>
         </el-tooltip>
 
@@ -15,16 +17,16 @@
           <span class="fd-table__tool-trigger">
             <el-tooltip content="尺寸">
               <el-button circle size="small">
-                <el-icon><operation /></el-icon>
+                <el-icon>
+                  <operation />
+                </el-icon>
               </el-button>
             </el-tooltip>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item
-                v-for="size in tableSizeOptions"
-                :key="size.value"
-                :command="size.value"
+                v-for="size in tableSizeOptions" :key="size.value" :command="size.value"
                 :class="{ 'is-active': size.value === tableOptions.table.size }"
               >
                 {{ size.label }}
@@ -38,16 +40,16 @@
             <span class="fd-table__tool-trigger">
               <el-tooltip content="列设置">
                 <el-button circle size="small">
-                  <el-icon><setting /></el-icon>
+                  <el-icon>
+                    <setting />
+                  </el-icon>
                 </el-button>
               </el-tooltip>
             </span>
           </template>
           <div class="fd-table__columns">
             <el-checkbox
-              v-for="column in columnVisibilityOptions"
-              :key="column.id"
-              v-model="column.show"
+              v-for="column in columnVisibilityOptions" :key="column.id" v-model="column.show"
               :label="column.label"
             />
           </div>
@@ -70,13 +72,8 @@
 
     <div class="fd-table__body">
       <el-table
-        ref="tableRef"
-        :data="tableRows"
-        :loading="isLoading"
-        :row-key="rowKeyProp"
-        v-bind="elTableProps"
-        @selection-change="onSelectionChange"
-        @row-contextmenu="onCellContextmenu"
+        ref="tableRef" :data="tableRows" :loading="isLoading" :row-key="rowKeyProp" v-bind="elTableProps"
+        @selection-change="onSelectionChange" @row-contextmenu="onCellContextmenu"
       >
         <!-- 透传除默认/工具栏/页眉外的所有具名插槽 -->
         <template v-for="slotName in namedExtraSlots" #[slotName]="scope" :key="slotName">
@@ -84,49 +81,30 @@
         </template>
 
         <template v-for="column in visibleColumns" :key="column.__id">
-          <el-table-column
-            v-if="column.type === 'selection'"
-            type="selection"
-            v-bind="column"
-          />
-          <el-table-column
-            v-else-if="column.type === 'index'"
-            type="index"
-            v-bind="column"
-          />
-          <el-table-column
-            v-else-if="column.type === 'expand'"
-            type="expand"
-            v-bind="column"
-          >
+          <el-table-column v-if="column.type === 'selection'" type="selection" v-bind="column" />
+          <el-table-column v-else-if="column.type === 'index'" type="index" v-bind="column" />
+          <el-table-column v-else-if="column.type === 'expand'" type="expand" v-bind="column">
             <template #default="scope">
               <slot name="expand" v-bind="scope" />
             </template>
           </el-table-column>
           <el-table-column
-            v-else-if="column.type === 'action'"
-            :align="column.align || 'center'"
-            :fixed="column.fixed || 'right'"
-            :width="column.width || 200"
-            v-bind="column"
+            v-else-if="column.type === 'action'" :align="column.align || 'center'"
+            :fixed="column.fixed || 'right'" :width="column.width || 200" v-bind="column"
           >
             <template #default="scope">
               <div class="fd-table__actions">
                 <template v-for="(action, actionIndex) in resolveActions(scope, column.actions)" :key="actionIndex">
                   <template v-if="!isHidden(action, scope)">
                     <el-link
-                      v-if="isBuiltinAction(action)"
-                      :type="getActionType(action)"
+                      v-if="isBuiltinAction(action)" :type="getActionType(action)"
                       @click="handleBuiltinAction(action, scope)"
                     >
-                      {{ action.text ?? crud.dict?.label?.[action.type!] ?? "操作" }}
+                      {{ action.text ?? crud.dict?.label?.[action.type!] ?? '操作' }}
                     </el-link>
                     <slot
-                      v-else-if="getSlotName(action.component, scope)"
-                      :name="getSlotName(action.component, scope)!"
-                      :row="scope.row"
-                      :column="scope.column"
-                      :row-index="scope.$index"
+                      v-else-if="getSlotName(action.component, scope)" :name="getSlotName(action.component, scope)!"
+                      :row="scope.row" :column="scope.column" :row-index="scope.$index"
                     />
                     <component
                       :is="getComponentIs(action.component, scope)"
@@ -136,8 +114,7 @@
                       v-on="getComponentEvents(action.component, scope)"
                     >
                       <template
-                        v-for="(value, slotName) in getComponentSlots(action.component, scope)"
-                        :key="slotName"
+                        v-for="(value, slotName) in getComponentSlots(action.component, scope)" :key="slotName"
                         #[slotName]
                       >
                         <component :is="value" />
@@ -149,11 +126,8 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-else
-            :prop="column.prop"
-            :align="column.align || 'center'"
-            :min-width="column.minWidth || 120"
-            v-bind="column"
+            v-else :prop="column.prop" :align="column.align || 'center'"
+            :min-width="column.minWidth || 120" v-bind="column"
           >
             <template #header>
               <el-space :size="4" align="center">
@@ -168,30 +142,22 @@
 
             <template #default="scope">
               <el-tag
-                v-if="hasDict(column, scope)"
-                size="small"
-                :type="getDictType(column, scope)"
+                v-if="hasDict(column, scope)" size="small" :type="getDictType(column, scope)"
                 :color="getDictColor(column, scope)"
               >
                 {{ getDictLabel(column, scope) }}
               </el-tag>
               <slot
-                v-else-if="getSlotName(column.component, scope)"
-                :name="getSlotName(column.component, scope)!"
-                :row="scope.row"
-                :column="scope.column"
-                :row-index="scope.$index"
+                v-else-if="getSlotName(column.component, scope)" :name="getSlotName(column.component, scope)!"
+                :row="scope.row" :column="scope.column" :row-index="scope.$index"
               />
               <component
                 :is="getComponentIs(column.component, scope)"
-                v-else-if="getComponentIs(column.component, scope)"
-                v-bind="getComponentProps(column.component, scope)"
-                :style="getComponentStyle(column.component, scope)"
-                v-on="getComponentEvents(column.component, scope)"
+                v-else-if="getComponentIs(column.component, scope)" v-bind="getComponentProps(column.component, scope)"
+                :style="getComponentStyle(column.component, scope)" v-on="getComponentEvents(column.component, scope)"
               >
                 <template
-                  v-for="(value, slotName) in getComponentSlots(column.component, scope)"
-                  :key="slotName"
+                  v-for="(value, slotName) in getComponentSlots(column.component, scope)" :key="slotName"
                   #[slotName]
                 >
                   <component :is="value" />
@@ -211,13 +177,9 @@
         <span>第 {{ paginationStart }}-{{ paginationEnd }} 条</span>
       </div>
       <el-pagination
-        layout="total, sizes, prev, pager, next, jumper"
-        :current-page="paginationState.currentPage"
-        :page-size="paginationState.pageSize"
-        :total="paginationState.total"
-        :page-sizes="paginationState.pageSizes"
-        @current-change="onPageChange"
-        @size-change="onPageSizeChange"
+        layout="total, sizes, prev, pager, next, jumper" :current-page="paginationState.currentPage"
+        :page-size="paginationState.pageSize" :total="paginationState.total" :page-sizes="paginationState.pageSizes"
+        @current-change="onPageChange" @size-change="onPageSizeChange"
       />
     </div>
   </div>
@@ -225,15 +187,11 @@
   <!-- 右键菜单挂载到 body，避免被表格裁剪 -->
   <teleport to="body">
     <div
-      v-if="contextMenuState.visible"
-      class="fd-table__context-menu"
+      v-if="contextMenuState.visible" class="fd-table__context-menu"
       :style="{ top: `${contextMenuState.y}px`, left: `${contextMenuState.x}px` }"
     >
       <el-button
-        v-for="(item, index) in contextMenuState.items"
-        :key="index"
-        text
-        size="small"
+        v-for="(item, index) in contextMenuState.items" :key="index" text size="small"
         @click="handleContextAction(item)"
       >
         {{ item.label }}
@@ -766,7 +724,7 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .fd-table {
   gap: 12px;
   height: 100%;
@@ -785,6 +743,10 @@ defineExpose({
     gap: 12px;
     display: flex;
     align-items: center;
+
+    .el-button + .el-button {
+      margin-left: 0;
+    }
   }
 
   &__tools {

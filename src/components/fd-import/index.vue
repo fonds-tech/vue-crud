@@ -100,7 +100,7 @@ defineOptions({
 const props = defineProps({
   title: {
     type: String,
-    default: "批量导入",
+    default: "导入",
   },
   api: {
     type: String,
