@@ -38,6 +38,148 @@ function handleSubmit() {
 </script>
 ```
 
+## 典型场景
+
+### 表单弹窗（搭配 fd-form）
+
+```vue
+<fd-dialog v-model="visible" title="新建内部用户" width="720" height="60vh" destroy-on-close>
+  <fd-form ref="formRef" />
+
+  <template #footer>
+    <el-button @click="visible = false" :disabled="saving">
+      取消
+    </el-button>
+    <el-button type="primary" :loading="saving" @click="handleSubmit">
+      提交
+    </el-button>
+  </template>
+</fd-dialog>
+
+<script setup lang="ts">
+import type { FormRef, FormUseOptions } from "vue-crud"
+import { ref, onMounted } from "vue"
+
+const visible = ref(false)
+const saving = ref(false)
+const formRef = ref<FormRef>()
+
+const options: FormUseOptions = {
+  form: { labelWidth: "96px" },
+  grid: { cols: 2, colGap: 16, rowGap: 16 },
+  model: { name: "", account: "", status: 1 },
+  items: [
+    { field: "name", label: "姓名", component: { is: "el-input" }, required: true },
+    { field: "account", label: "账号", component: { is: "el-input" }, required: true },
+    { field: "status", label: "启用状态", component: { is: "el-switch" } },
+  ],
+}
+
+onMounted(() => formRef.value?.use(options))
+
+async function handleSubmit() {
+  if (!formRef.value)
+    return
+  saving.value = true
+  const payload = await formRef.value.submit()
+  console.log("mock save", payload)
+  visible.value = false
+  saving.value = false
+}
+</script>
+```
+
+### API 调用控制（open / close / fullscreen）
+
+```vue
+<template>
+  <div>
+    <el-space>
+      <el-button type="primary" @click="openDialog">
+        手动打开
+      </el-button>
+      <el-button @click="toggleFullscreen">
+        切换全屏
+      </el-button>
+      <el-button @click="closeDialog">
+        关闭
+      </el-button>
+      <el-button text type="primary" @click="defaultFullscreen = !defaultFullscreen">
+        {{ defaultFullscreen ? "取消默认全屏" : "默认全屏" }}
+      </el-button>
+    </el-space>
+
+    <fd-dialog
+      ref="dialogRef"
+      title="巡检详情"
+      :fullscreen="defaultFullscreen"
+      @close="defaultFullscreen = false"
+    >
+      <el-descriptions :column="2">
+        <el-descriptions-item label="状态">
+          运行中
+        </el-descriptions-item>
+        <el-descriptions-item label="负责人">
+          Ops 团队
+        </el-descriptions-item>
+      </el-descriptions>
+    </fd-dialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { DialogExpose } from "vue-crud"
+import { ref } from "vue"
+
+const dialogRef = ref<DialogExpose>()
+const defaultFullscreen = ref(false)
+
+function openDialog() {
+  dialogRef.value?.open()
+}
+
+function closeDialog() {
+  dialogRef.value?.close()
+}
+
+function toggleFullscreen() {
+  dialogRef.value?.fullscreen()
+}
+```
+
+### 长内容滚动（height + top）
+
+```vue
+<fd-dialog v-model="visible" title="版本更新说明" width="640" height="48vh" top="12vh" center>
+  <el-timeline>
+    <el-timeline-item v-for="item in logs" :key="item.id" :timestamp="item.time" :type="item.type">
+      <strong>{{ item.title }}</strong>
+      <p>{{ item.desc }}</p>
+    </el-timeline-item>
+  </el-timeline>
+</fd-dialog>
+
+<script setup lang="ts">
+import type { TimelineItemProps } from "element-plus"
+import { ref } from "vue"
+
+interface TimelineLog extends Required<Pick<TimelineItemProps, "type">> {
+  id: number
+  time: string
+  title: string
+  desc: string
+}
+
+const visible = ref(false)
+const logs = ref<TimelineLog[]>([
+  { id: 1, time: "2024-07-12 10:00", title: "版本发布", desc: "推送 v1.5.2 到生产", type: "primary" },
+  { id: 2, time: "2024-07-10 16:30", title: "安全修复", desc: "修补依赖漏洞", type: "warning" },
+])
+</script>
+```
+
+更多现场效果可以在示例站点 `/dialog` 页面查看，那里整合了上述 3 种模式并给出了交互提示。
+
 ## API
 
 ### Props
