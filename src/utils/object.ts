@@ -1,6 +1,7 @@
 import type { Ref } from "vue"
+import { mergeWith } from "lodash-es"
+import { isFunction } from "@fonds/utils"
 import { isRef, toValue } from "vue"
-import { mergeWith, isFunction } from "lodash-es"
 
 function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value)

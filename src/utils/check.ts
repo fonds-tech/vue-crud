@@ -1,1 +1,1 @@
-export { isEmpty, isFunction } from "lodash-es"
+export { isEmpty, isFunction } from "@fonds/utils"

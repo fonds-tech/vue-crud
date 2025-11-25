@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { cloneDeep } from "lodash-es"
+import { clone } from "@fonds/utils"
 import { ref, computed, onMounted } from "vue"
 
 const initialPayload = {
@@ -68,7 +68,7 @@ const options: FormUseOptions = {
     labelWidth: "110px",
   },
   onSubmit(model) {
-    submitPayload.value = cloneDeep(model)
+    submitPayload.value = clone(model)
   },
   items: [
     {
@@ -149,12 +149,12 @@ const options: FormUseOptions = {
 }
 
 onMounted(() => {
-  formRef.value?.use(cloneDeep(options))
+  formRef.value?.use(clone(options))
 })
 
 function handleSubmit() {
   formRef.value?.submit().then(({ values }) => {
-    submitPayload.value = cloneDeep(values)
+    submitPayload.value = clone(values)
     console.log("HookForm Submit:", values)
   }).catch((err) => {
     console.error("HookForm Submit Error:", err)
@@ -166,7 +166,7 @@ function handleReset() {
 }
 
 function handleRebind() {
-  formRef.value?.bindFields(cloneDeep(initialPayload))
+  formRef.value?.bindFields(clone(initialPayload))
 }
 </script>
 

@@ -1,6 +1,6 @@
 import type { App } from "vue"
 import type { Options } from "../types/config"
-import { merge } from "lodash-es"
+import { merge } from "@fonds/utils"
 import { locale } from "../locale"
 
 export function useProvide(app: App, options: Options = {}): Options {

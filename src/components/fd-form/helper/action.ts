@@ -10,8 +10,7 @@ import type {
   FormItemRuleWithMeta,
 } from "../type"
 import { dataset } from "../../../utils/dataset"
-import { cloneDeep } from "lodash-es"
-import { isDef, isNoEmpty, isFunction } from "@fonds/utils"
+import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 
 interface ActionContext<T extends FormRecord = FormRecord> {
   options: FormOptions<T>
@@ -129,7 +128,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * 4. 将传入数据覆盖到模型
    */
   function bindFields(data: Partial<T> = {}) {
-    const values = cloneDeep(data)
+    const values = clone(data)
     const normalizedValues = values as Record<string, any>
     form.value?.resetFields()
     form.value?.clearValidate()
@@ -143,7 +142,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     options.items.forEach((item) => {
       if (item.field && isDef(item.value)) {
         const key = String(item.field)
-        normalizedValues[key] = isDef(normalizedValues[key]) ? normalizedValues[key] : cloneDeep(item.value)
+        normalizedValues[key] = isDef(normalizedValues[key]) ? normalizedValues[key] : clone(item.value)
       }
     })
 

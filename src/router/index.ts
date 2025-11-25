@@ -1,5 +1,6 @@
 import Crud from "../views/crud/index.vue"
 import Form from "../views/form/index.vue"
+import Dialog from "../views/dialog/index.vue"
 import Search from "../views/search/index.vue"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -22,6 +23,11 @@ const routes = [
     path: "/search",
     name: "Search",
     component: Search,
+  },
+  {
+    path: "/dialog",
+    name: "Dialog",
+    component: Dialog,
   },
 ]
 

@@ -78,7 +78,7 @@ import type { UploadInstance, UploadProgressEvent, UploadRequestOptions } from "
 import FdDialog from "../fd-dialog/index.vue"
 import { ElMessage } from "element-plus"
 import { useCore, useConfig } from "@/hooks"
-import { isString, isFunction } from "lodash-es"
+import { isString, isFunction } from "@fonds/utils"
 import { Download, UploadFilled } from "@element-plus/icons-vue"
 import { ref, watch, computed, nextTick, useAttrs, shallowRef, defineOptions } from "vue"
 

@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { cloneDeep } from "lodash-es"
+import { clone } from "@fonds/utils"
 import { ref, computed, onMounted } from "vue"
 
 const STEP_SEQUENCE = ["profile", "project", "confirm"] as const
@@ -212,7 +212,7 @@ const options: FormUseOptions = {
 }
 
 onMounted(() => {
-  formRef.value?.use(cloneDeep(options))
+  formRef.value?.use(clone(options))
 })
 
 function handleNext() {

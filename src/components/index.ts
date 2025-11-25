@@ -7,6 +7,7 @@ import Detail from "./fd-detail/index.vue"
 import Dialog from "./fd-dialog/index.vue"
 import Search from "./fd-search/index.vue"
 import Select from "./fd-select/index.vue"
+import Upsert from "./fd-upsert/index.vue"
 import Cascader from "./fd-cascader/index.vue"
 import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
@@ -29,6 +30,7 @@ export const components: Record<string, Component> = {
   Detail,
   Table,
   ImportButton,
+  Upsert,
 }
 
 /**

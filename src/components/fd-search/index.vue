@@ -86,10 +86,9 @@ import type { GridProps } from "../fd-grid/type"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
 import type { SearchAction, SearchOptions } from "./type"
 import FdForm from "../fd-form/index.vue"
-import { isDef } from "@fonds/utils"
 import { useCore } from "@/hooks"
-import { merge, cloneDeep } from "lodash-es"
 import { isEmpty, isFunction } from "@/utils/check"
+import { clone, isDef, merge } from "@fonds/utils"
 import { resolveResponsiveValue } from "../fd-grid/utils"
 import { ref, watch, computed, reactive, useSlots, onMounted, onBeforeUnmount } from "vue"
 import { Search as IconSearch, ArrowUp as IconArrowUp, Loading as IconLoading, Refresh as IconRefresh, ArrowDown as IconArrowDown } from "@element-plus/icons-vue"
@@ -140,7 +139,7 @@ const options = reactive<InternalOptions>({
     },
   },
   action: {
-    items: cloneDeep(defaultActions),
+    items: clone(defaultActions),
     grid: {
       cols: 2,
       colGap: 12,
@@ -208,7 +207,7 @@ function use(useOptions: SearchOptions = {}) {
   }
 
   if (action?.grid) {
-    options.action.grid = options.action.grid ? merge({}, options.action.grid, action.grid) : cloneDeep(action.grid)
+    options.action.grid = options.action.grid ? merge({}, options.action.grid, action.grid) : clone(action.grid)
   }
 
   options.onSearch = onSearch
@@ -221,7 +220,7 @@ function use(useOptions: SearchOptions = {}) {
 
   collapsed.value = Boolean(options.form?.grid?.collapsed)
 
-  formRef.value?.use(cloneDeep(options.form))
+  formRef.value?.use(clone(options.form))
 }
 
 // 折叠/展开搜索区域（交给 fd-form 内部实现栅格收起）
@@ -238,7 +237,7 @@ function collapse(state?: boolean) {
 
 // 过滤空字符串/undefined，保持请求参数干净
 function formatQuery(data: Record<string, any> = {}) {
-  const values = cloneDeep(data)
+  const values = clone(data)
   Object.keys(values).forEach((key) => {
     const value = values[key]
     if (!isDef(value) || (typeof value === "string" && value.trim() === "")) {

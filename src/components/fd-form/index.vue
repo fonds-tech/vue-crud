@@ -189,9 +189,8 @@ import type {
 import formHook from "./helper/hooks"
 import { useAction } from "./helper/action"
 import { useMethods } from "./helper/methods"
-import { merge, cloneDeep } from "lodash-es"
-import { isDef, isNoEmpty, isFunction } from "@fonds/utils"
 import { ref, useId, watch, computed, reactive } from "vue"
+import { clone, isDef, merge, isNoEmpty, isFunction } from "@fonds/utils"
 
 defineOptions({
   name: "fd-form",
@@ -508,7 +507,7 @@ function normalizeItems() {
     const fieldKey = String(item.field)
     // 应用默认值 (仅当 model 中无值时)
     if (isDef(item.value) && !isDef(model[fieldKey])) {
-      model[fieldKey] = cloneDeep(item.value)
+      model[fieldKey] = clone(item.value)
     }
 
     // 执行 bind 阶段的数据转换 hook
@@ -605,7 +604,7 @@ function next() {
   methods.validate((isValid) => {
     if (!isValid)
       return
-    const values = cloneDeep(model)
+    const values = clone(model)
     const proceed = () => {
       const total = options.group?.children?.length || 0
       if (options.group?.type === "steps" && total > 0) {

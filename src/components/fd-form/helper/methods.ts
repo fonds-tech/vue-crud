@@ -3,8 +3,7 @@ import type { Arrayable } from "element-plus/es/utils"
 import type { FormRecord, FormMethods, FormOptions } from "../type"
 import type { FormInstance, FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
 import formHook from "./hooks"
-import { cloneDeep } from "lodash-es"
-import { isDef, isFunction } from "@fonds/utils"
+import { clone, isDef, isFunction } from "@fonds/utils"
 
 interface MethodsContext<T extends FormRecord = FormRecord> {
   options: FormOptions<T>
@@ -105,7 +104,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
       return new Promise<{ values: T, errors: Record<string, any> | undefined }>((resolve) => {
         methods.validate((_, invalidFields) => {
           // 克隆数据，避免 hook 修改影响原始 model
-          const values = cloneDeep(model) as T
+          const values = clone(model) as T
 
           const normalizedErrors = invalidFields as Record<string, any> | undefined
           const hasErrors = Boolean(normalizedErrors && Object.keys(normalizedErrors).length > 0)

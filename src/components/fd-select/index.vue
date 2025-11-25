@@ -26,7 +26,8 @@
 
 <script setup lang="ts">
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
-import { merge, isEqual, debounce, cloneDeep } from "lodash-es"
+import { isEqual } from "lodash-es"
+import { clone, merge, debounce } from "@fonds/utils"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type OptionRecord = Record<string, any>
@@ -160,7 +161,7 @@ watch(
 // 合并基础参数与额外条件，最终输入远程服务
 function resolveParams(extra: Record<string, any> = {}) {
   const base = typeof props.params === "function" ? props.params(extra) : props.params ?? {}
-  return merge({}, cloneDeep(base), extra)
+  return merge({}, clone(base), extra)
 }
 
 // 远程刷新选项，同时处理加载状态与异常兜底

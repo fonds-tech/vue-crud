@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { cloneDeep } from "lodash-es"
+import { clone } from "@fonds/utils"
 import { ref, computed, onMounted } from "vue"
 
 interface ProjectPayload {
@@ -171,7 +171,7 @@ const options: FormUseOptions<ProjectPayload> = {
 }
 
 onMounted(() => {
-  formRef.value?.use(cloneDeep(options))
+  formRef.value?.use(clone(options))
   syncMode("add")
 })
 
@@ -209,14 +209,14 @@ function loadAddMode() {
   if (!formRef.value)
     return
   syncMode("add")
-  formRef.value.bindFields(cloneDeep(draftRecord))
+  formRef.value.bindFields(clone(draftRecord))
 }
 
 function loadUpdateMode() {
   if (!formRef.value)
     return
   syncMode("update")
-  formRef.value.bindFields(cloneDeep(reviewRecord))
+  formRef.value.bindFields(clone(reviewRecord))
 }
 </script>
 

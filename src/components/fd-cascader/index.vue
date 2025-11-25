@@ -15,8 +15,8 @@
 
 <script setup lang="ts">
 import type { CascaderValue } from "element-plus"
-import { isFunction } from "@fonds/utils"
-import { merge, isEqual, cloneDeep } from "lodash-es"
+import { isEqual } from "lodash-es"
+import { clone, merge, isFunction } from "@fonds/utils"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type CascaderOption = Record<string, any>
@@ -102,7 +102,7 @@ watch(
 // 合并请求参数
 function resolveParams(extra: Record<string, any> = {}) {
   const base = isFunction(props.params) ? props.params(extra) : props.params ?? {}
-  return merge({}, cloneDeep(base), extra)
+  return merge({}, clone(base), extra)
 }
 
 // 处理清空事件

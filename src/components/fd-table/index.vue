@@ -205,7 +205,7 @@ import type { TableDict, TableScope, TableAction, TableColumn, TableOptions, Tab
 import { useCore } from "@/hooks"
 import { ElTable } from "element-plus"
 import { isFunction } from "@/utils/check"
-import { merge, cloneDeep } from "lodash-es"
+import { clone, merge } from "@fonds/utils"
 import { Setting, Operation, FullScreen } from "@element-plus/icons-vue"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onMounted, onBeforeUnmount } from "vue"
 
@@ -550,7 +550,7 @@ function getSlotName(component: TableComponent | undefined, scope: any) {
  * 直接替换表格数据，模板内部始终使用深拷贝副本
  */
 function setData(rows: Record<string, any>[]) {
-  tableRows.value = cloneDeep(rows)
+  tableRows.value = clone(rows)
 }
 
 /**

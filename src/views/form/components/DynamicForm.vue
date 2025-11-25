@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { cloneDeep } from "lodash-es"
+import { clone } from "@fonds/utils"
 import { ref, watch, computed, onMounted } from "vue"
 
 const formRef = ref<FormRef>()
@@ -220,7 +220,7 @@ const options: FormUseOptions = {
 }
 
 onMounted(() => {
-  formRef.value?.use(cloneDeep(options))
+  formRef.value?.use(clone(options))
 })
 
 watch(() => formModel.value.region, (region) => {
@@ -273,11 +273,11 @@ function handleReset() {
 }
 
 function loadEnterprise() {
-  formRef.value?.bindFields(cloneDeep(enterpriseTemplate))
+  formRef.value?.bindFields(clone(enterpriseTemplate))
 }
 
 function loadPersonal() {
-  formRef.value?.bindFields(cloneDeep(personalTemplate))
+  formRef.value?.bindFields(clone(personalTemplate))
 }
 </script>
 

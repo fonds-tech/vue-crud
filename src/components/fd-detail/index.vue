@@ -185,9 +185,10 @@
 <script setup lang="ts">
 import type { DetailItem, DetailGroup, DetailAction, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
 import FdDialog from "../fd-dialog/index.vue"
+import { pick } from "lodash-es"
 import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
-import { pick, merge, cloneDeep } from "lodash-es"
+import { clone, merge } from "@fonds/utils"
 import { ElSpace, ElButton, ElMessage, ElSkeleton, ElDescriptions, ElDescriptionsItem } from "element-plus"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 
@@ -446,7 +447,7 @@ function requestDetail(query: Record<string, any>, done: (value: Record<string, 
     loading.value = false
     return Promise.reject(error)
   }
-  paramsCache.value = cloneDeep(query)
+  paramsCache.value = clone(query)
   return service(query)
     .then((res: Record<string, any>) => {
       done(res ?? {})
@@ -497,7 +498,7 @@ function refresh(params: Record<string, any> = {}) {
   if (isFunction(options.onDetail)) {
     return options.onDetail(params, { next, done, close })
   }
-  const query = merge(cloneDeep(paramsCache.value), params)
+  const query = merge(clone(paramsCache.value), params)
   if (!Object.keys(query).length) {
     return
   }
@@ -508,11 +509,11 @@ function refresh(params: Record<string, any> = {}) {
  * 手动设置详情数据
  */
 function setData(value: Record<string, any>) {
-  data.value = cloneDeep(value ?? {})
+  data.value = clone(value ?? {})
 }
 
 function getData() {
-  return cloneDeep(data.value)
+  return clone(data.value)
 }
 
 /**

@@ -18,6 +18,7 @@
         </fd-table>
 
         <fd-detail ref="detail" />
+        <fd-upsert ref="upsert" />
       </template>
     </fd-crud>
   </el-card>
@@ -27,9 +28,10 @@
 import type { SearchOptions } from "@/components/fd-search/type"
 import type { TableUseOptions } from "@/components/fd-table/type"
 import type { DetailUseOptions } from "@/components/fd-detail/type"
+import type { UpsertRef, UpsertUseOptions } from "@/components/fd-upsert/type"
 import { Download } from "@element-plus/icons-vue"
 import { TestService } from "@/utils/test"
-import { h, onMounted } from "vue"
+import { h, ref, onMounted } from "vue"
 import { useCrud, useTable, useDetail, useSearch } from "@/hooks"
 
 const crud = useCrud(
@@ -148,11 +150,104 @@ const detailOptions: DetailUseOptions = {
   ],
 }
 
+const occupationSelectOptions = [
+  { label: "研发", value: 1 },
+  { label: "产品", value: 2 },
+  { label: "运营", value: 3 },
+  { label: "销售", value: 4 },
+  { label: "客服", value: 5 },
+]
+
+const upsertOptions: UpsertUseOptions = {
+  form: { labelWidth: "96px" },
+  grid: { cols: 2, colGap: 16, rowGap: 16 },
+  model: {
+    status: 1,
+  },
+  items: [
+    {
+      field: "name",
+      label: "姓名",
+      required: true,
+      component: {
+        is: "el-input",
+        props: { placeholder: "请输入姓名" },
+      },
+    },
+    {
+      field: "account",
+      label: "账号",
+      required: true,
+      component: {
+        is: "el-input",
+        props: { placeholder: "请输入账号" },
+      },
+    },
+    {
+      field: "occupation",
+      label: "岗位",
+      required: true,
+      component: {
+        is: "el-select",
+        props: { placeholder: "请选择岗位", clearable: true },
+        slots: {
+          default: () => occupationSelectOptions.map(option => h("el-option", { label: option.label, value: option.value })),
+        },
+      },
+    },
+    {
+      field: "status",
+      label: "启用状态",
+      required: true,
+      hook: "booleanNumber",
+      component: {
+        is: "el-switch",
+        props: { activeValue: 1, inactiveValue: 0 },
+      },
+    },
+    {
+      field: "phone",
+      label: "手机号",
+      component: {
+        is: "el-input",
+        props: { placeholder: "请输入手机号" },
+      },
+    },
+    {
+      field: "createTime",
+      label: "入职日期",
+      component: {
+        is: "el-date-picker",
+        props: { type: "date", placeholder: "请选择日期", valueFormat: "YYYY-MM-DD" },
+      },
+    },
+    {
+      field: "wages",
+      label: "薪资",
+      component: {
+        is: "el-input-number",
+        props: { min: 0, max: 999999, controlsPosition: "right" },
+      },
+    },
+    {
+      field: "remark",
+      label: "备注",
+      span: 2,
+      component: {
+        is: "el-input",
+        props: { type: "textarea", rows: 3, placeholder: "可填写额外说明" },
+      },
+    },
+  ],
+}
+
 const search = useSearch(searchOptions)
 const table = useTable(tableOptions)
 const detail = useDetail(detailOptions)
+const upsert = ref<UpsertRef>()
 
 onMounted(() => {
+  upsert.value?.use(upsertOptions)
   crud.value?.refresh()
 })
 

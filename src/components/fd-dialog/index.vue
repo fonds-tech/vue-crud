@@ -33,7 +33,7 @@
           </el-button>
           <el-button v-if="shouldRenderCloseAction" class="fd-dialog__action" text circle @click="handleCloseClick">
             <el-icon>
-              <close />
+              <component :is="closeIcon" />
             </el-icon>
           </el-button>
         </div>
@@ -53,8 +53,8 @@
 <script setup lang="ts">
 import type { DialogEmits } from "element-plus/es/components/dialog/src/dialog"
 import { dialogEmits, dialogProps } from "element-plus"
-import { FullScreen, ScaleToOriginal } from "@element-plus/icons-vue"
 import { ref, watch, computed, useAttrs } from "vue"
+import { Close, FullScreen, ScaleToOriginal } from "@element-plus/icons-vue"
 
 defineOptions({
   name: "fd-dialog",
@@ -73,6 +73,8 @@ const props = defineProps({
 type EmitFn = <T extends keyof DialogEmits>(name: T, ...args: Parameters<DialogEmits[T]>) => void
 const emit = defineEmits(dialogEmits) as EmitFn
 const emitEvent: EmitFn = (name, ...args) => emit(name, ...args)
+
+const closeIcon = Close
 
 const attrs = useAttrs()
 const attrsRecord = attrs as Record<string, unknown> & { class?: unknown }
