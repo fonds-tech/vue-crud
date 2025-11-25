@@ -10,8 +10,8 @@ import Select from "./fd-select/index.vue"
 import Cascader from "./fd-cascader/index.vue"
 import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
-import AddButton from "./fd-add-button"
-import DeleteButton from "./fd-delete-button"
+import AddButton from "./fd-add-button/index.vue"
+import DeleteButton from "./fd-delete-button/index.vue"
 import ImportButton from "./fd-import/index.vue"
 
 export const components: Record<string, Component> = {

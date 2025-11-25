@@ -8,7 +8,7 @@
           <template #toolbar>
             <fd-add-button />
             <fd-delete-button />
-            <fd-import> </fd-import>
+            <fd-import />
             <div class="toolbar-spacer"></div>
             <el-button type="primary" @click="handleExport">
               <el-icon><download /></el-icon>
