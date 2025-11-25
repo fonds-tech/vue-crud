@@ -152,8 +152,8 @@ import formHook from "../../utils/formHook"
 import { useAction } from "./helper/action"
 import { useMethods } from "./helper/methods"
 import { merge, cloneDeep } from "lodash-es"
+import { isDef, isNoEmpty, isFunction } from "@fonds/utils"
 import { ref, useId, computed, reactive } from "vue"
-import { isDef, isEmpty, isNoEmpty, isFunction } from "@fonds/utils"
 
 defineOptions({
   name: "fd-form",
@@ -520,32 +520,32 @@ function use(useOptions: FormUseOptions = {}) {
  * 触发校验，通过后执行 onNext 或自动跳转
  */
 function next() {
-  methods.validate((errors) => {
-    if (isEmpty(errors)) {
-      const values = cloneDeep(model)
-      const proceed = () => {
-        const total = options.group?.children?.length || 0
-        if (options.group?.type === "steps" && total > 0) {
-          if (step.value >= total) {
-            // 最后一步，提交表单
-            methods.submit()
-          }
-          else {
-            step.value += 1
-          }
-        }
-        else {
-          // 非步骤条模式，直接提交
+  methods.validate((isValid) => {
+    if (!isValid)
+      return
+    const values = cloneDeep(model)
+    const proceed = () => {
+      const total = options.group?.children?.length || 0
+      if (options.group?.type === "steps" && total > 0) {
+        if (step.value >= total) {
+          // 最后一步，提交表单
           methods.submit()
         }
-      }
-
-      if (isFunction(options.onNext)) {
-        options.onNext(values, { next: proceed })
+        else {
+          step.value += 1
+        }
       }
       else {
-        proceed()
+        // 非步骤条模式，直接提交
+        methods.submit()
       }
+    }
+
+    if (isFunction(options.onNext)) {
+      options.onNext(values, { next: proceed })
+    }
+    else {
+      proceed()
     }
   })
 }

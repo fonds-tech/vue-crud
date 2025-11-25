@@ -13,8 +13,11 @@
         <el-button v-else type="success" @click="handleSubmit">
           完成提交
         </el-button>
+        <el-button type="warning" plain @click="handleStepReset">
+          重置当前
+        </el-button>
         <el-button @click="handleReset">
-          重置
+          重置全部
         </el-button>
       </div>
     </el-card>
@@ -40,6 +43,13 @@ import { cloneDeep } from "lodash-es"
 import { ref, computed, onMounted } from "vue"
 
 const STEP_SEQUENCE = ["profile", "project", "confirm"] as const
+type StepKey = typeof STEP_SEQUENCE[number]
+
+const STEP_FIELDS: Record<StepKey, string[]> = {
+  profile: ["applicant", "department", "email"],
+  project: ["timeline", "budget", "reviewer"],
+  confirm: ["remark", "agree"],
+}
 
 const stepMeta = [
   { key: "profile", title: "申请人信息", description: "基础信息确认", badge: "Step 1/3" },
@@ -225,8 +235,14 @@ function handleSubmit() {
 }
 
 function handleReset() {
+  formRef.value?.resetFields()
   syncStep(0)
-  formRef.value?.use(cloneDeep(options))
+}
+
+function handleStepReset() {
+  const step = STEP_SEQUENCE[activeStepIndex.value]
+  const targets = STEP_FIELDS[step]
+  formRef.value?.resetFields(targets)
 }
 </script>
 
