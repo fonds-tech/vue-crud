@@ -38,8 +38,12 @@
 </template>
 
 <script setup lang="ts">
+import HookForm from "./components/HookForm.vue"
+import ModeForm from "./components/ModeForm.vue"
+import TabsForm from "./components/TabsForm.vue"
 import BasicForm from "./components/BasicForm.vue"
 import StepsForm from "./components/StepsForm.vue"
+import DynamicForm from "./components/DynamicForm.vue"
 import WorkflowForm from "./components/WorkflowForm.vue"
 import { ref, computed } from "vue"
 
@@ -56,8 +60,15 @@ const componentCatalog: ComponentMeta[] = [
     key: "basic",
     title: "基础信息表单",
     badge: "标准布局",
-    description: "4 列布局，适合通用信息采集。",
+    description: "1 列控件展示基础校验，适合入门场景。",
     component: BasicForm,
+  },
+  {
+    key: "tabs",
+    title: "Tabs 分段信息",
+    badge: "Tabs + 折叠",
+    description: "三大分组 + 折叠行演示，展示 help/extra/tooltip。",
+    component: TabsForm,
   },
   {
     key: "workflow",
@@ -67,11 +78,32 @@ const componentCatalog: ComponentMeta[] = [
     component: WorkflowForm,
   },
   {
+    key: "dynamic",
+    title: "动态联动表单",
+    badge: "Action API",
+    description: "使用 setOptions/hideItem/setRequired 实现客户类型联动。",
+    component: DynamicForm,
+  },
+  {
     key: "steps",
     title: "多步骤审批",
     badge: "Steps",
     description: "分步填写并联动步骤条，适合长流程审批。",
     component: StepsForm,
+  },
+  {
+    key: "hook",
+    title: "数据钩子转换",
+    badge: "Hook",
+    description: "演示 number/json/datetimeRange 等 hook 对齐后端结构。",
+    component: HookForm,
+  },
+  {
+    key: "mode",
+    title: "模式切换场景",
+    badge: "Mode",
+    description: "setMode + bindFields 复用表单，支持新增/编辑态切换。",
+    component: ModeForm,
   },
 ]
 

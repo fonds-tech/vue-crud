@@ -42,6 +42,7 @@
 
       <el-tabs
         v-else-if="options.group?.type === 'tabs' && options.group.children?.length"
+        v-model="activeGroupName"
         v-bind="props(options.group.component)"
         :style="style(options.group.component)"
         v-on="on(options.group.component)"
@@ -190,6 +191,14 @@ const defaultItemSpan = 1
 
 // 步骤条当前步骤索引 (用于 group.type === 'steps')
 const step = ref(1)
+// Tabs 当前激活分组
+const activeGroupName = ref<string | number | undefined>(undefined)
+const resolvedActiveGroup = computed(() => {
+  if (options.group?.type !== "tabs" || !options.group.children?.length) {
+    return undefined
+  }
+  return activeGroupName.value ?? options.group.children[0]?.name
+})
 
 // 引用 options.model 作为响应式数据源
 const model = reactive(options.model) as FormRecord
@@ -267,6 +276,12 @@ function show(item: FormItem) {
   // 1. 基础 hidden 属性检查
   if (resolveProp<boolean>(item, "hidden"))
     return false
+  // 2. Tabs 分组时，仅展示当前面板下的字段
+  if (options.group?.type === "tabs" && options.group.children?.length) {
+    const currentName = resolvedActiveGroup.value
+    if (item.group && currentName && item.group !== currentName)
+      return false
+  }
   return true
 }
 
@@ -513,6 +528,12 @@ function mergeFormOptions(useOptions: FormUseOptions = {}) {
 function use(useOptions: FormUseOptions = {}) {
   mergeFormOptions(useOptions)
   normalizeItems()
+  if (options.group?.type === "tabs") {
+    activeGroupName.value = options.group.children?.[0]?.name
+  }
+  else {
+    activeGroupName.value = undefined
+  }
 }
 
 /**
