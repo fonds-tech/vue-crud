@@ -28,11 +28,11 @@
 import type { SearchOptions } from "@/components/fd-search/type"
 import type { TableUseOptions } from "@/components/fd-table/type"
 import type { DetailUseOptions } from "@/components/fd-detail/type"
-import type { UpsertRef, UpsertUseOptions } from "@/components/fd-upsert/type"
+import type { UpsertUseOptions } from "@/components/fd-upsert/type"
 import { Download } from "@element-plus/icons-vue"
 import { TestService } from "@/utils/test"
-import { h, ref, onMounted } from "vue"
-import { useCrud, useTable, useDetail, useSearch } from "@/hooks"
+import { h, onMounted } from "vue"
+import { useCrud, useTable, useDetail, useSearch, useUpsert } from "@/hooks"
 
 const crud = useCrud(
   {
@@ -244,10 +244,9 @@ const upsertOptions: UpsertUseOptions = {
 const search = useSearch(searchOptions)
 const table = useTable(tableOptions)
 const detail = useDetail(detailOptions)
-const upsert = ref<UpsertRef>()
+const upsert = useUpsert(upsertOptions)
 
 onMounted(() => {
-  upsert.value?.use(upsertOptions)
   crud.value?.refresh()
 })
 

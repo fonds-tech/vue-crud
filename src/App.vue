@@ -59,13 +59,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue"
-import { Search, Document, ChatDotRound, DataAnalysis } from "@element-plus/icons-vue"
+import { Search, Pointer, Document, ChatDotRound, DataAnalysis } from "@element-plus/icons-vue"
 
 const navItems = [
   { path: "/crud", label: "CRUD 演示", icon: DataAnalysis },
   { path: "/form", label: "表单演示", icon: Document },
   { path: "/search", label: "搜索演示", icon: Search },
   { path: "/dialog", label: "弹窗演示", icon: ChatDotRound },
+  { path: "/context-menu", label: "菜单演示", icon: Pointer },
 ]
 
 const isDark = ref(false)

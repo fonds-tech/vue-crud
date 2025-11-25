@@ -1,5 +1,5 @@
 import type { App, Component } from "vue"
-import Crud from "./fd-crud"
+import Crud from "./fd-crud/index.vue"
 import Form from "./fd-form/index.vue"
 import Grid from "./fd-grid/index.vue"
 import Table from "./fd-table/index.vue"
@@ -14,6 +14,7 @@ import FdOption from "./fd-option/index.vue"
 import AddButton from "./fd-add-button/index.vue"
 import DeleteButton from "./fd-delete-button/index.vue"
 import ImportButton from "./fd-import/index.vue"
+import FdContextMenu from "./fd-context-menu"
 
 export const components: Record<string, Component> = {
   Crud,
@@ -31,6 +32,7 @@ export const components: Record<string, Component> = {
   Table,
   ImportButton,
   Upsert,
+  FdContextMenu,
 }
 
 /**

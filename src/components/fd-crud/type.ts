@@ -29,6 +29,7 @@ export interface CrudRef {
   paramsReplace: (params: CrudParams) => CrudParams
   getParams: () => CrudParams
   setParams: (data: CrudParams) => void
+  use?: (options: Partial<CrudOptions>) => void
   [key: string]: any
 }
 

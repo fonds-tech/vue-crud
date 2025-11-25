@@ -1,3 +1,4 @@
+export * from "../components/fd-context-menu/type"
 export * from "../components/fd-crud/type"
 export * from "../components/fd-detail/type"
 export * from "../components/fd-form/type"

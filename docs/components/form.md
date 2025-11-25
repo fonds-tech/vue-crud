@@ -18,36 +18,30 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef } from "vue-crud"
-import { ref } from "vue"
 import { useForm } from "vue-crud"
 
-const formRef = ref<FormRef<{ name: string, status: number }>>()
-
-useForm((form) => {
-  form.use({
-    model: { name: "", status: 1 },
-    items: [
-      {
-        field: "name",
-        label: "名称",
-        required: true,
-        rules: [{ message: "请输入名称", trigger: "blur" }],
-        component: { is: "el-input", props: { placeholder: "请输入" } },
+const formRef = useForm<{ name: string, status: number }>({
+  model: { name: "", status: 1 },
+  items: [
+    {
+      field: "name",
+      label: "名称",
+      required: true,
+      rules: [{ message: "请输入名称", trigger: "blur" }],
+      component: { is: "el-input", props: { placeholder: "请输入" } },
+    },
+    {
+      field: "status",
+      label: "状态",
+      component: {
+        is: "el-select",
+        options: [
+          { label: "启用", value: 1 },
+          { label: "禁用", value: 0 },
+        ],
       },
-      {
-        field: "status",
-        label: "状态",
-        component: {
-          is: "el-select",
-          options: [
-            { label: "启用", value: 1 },
-            { label: "禁用", value: 0 },
-          ],
-        },
-      },
-    ],
-  })
+    },
+  ],
 })
 
 async function submit() {
