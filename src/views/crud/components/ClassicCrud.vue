@@ -8,6 +8,26 @@
           <template #toolbar>
             <fd-add-button />
             <fd-delete-button />
+            <fd-import
+              class="toolbar-import"
+              title="批量导入"
+              :upload="handleMockUpload"
+              :confirm="handleImportConfirm"
+              :template="createImportTemplate"
+              tip="支持 Excel/CSV 文件，一次上传 1 个文件。"
+            >
+              <template #result="{ data }">
+                <el-alert
+                  class="import-alert"
+                  type="success"
+                  :title="`解析成功 ${data.success ?? 0} 条，失败 ${data.fail ?? 0} 条`"
+                  :closable="false"
+                >
+                  <p>文件编号：{{ data.fileKey }}</p>
+                  <p>可点击“确认导入”写入数据并自动刷新列表。</p>
+                </el-alert>
+              </template>
+            </fd-import>
             <div class="toolbar-spacer"></div>
             <el-button type="primary" @click="handleExport">
               <el-icon><download /></el-icon>
@@ -85,7 +105,7 @@ const searchOptions: SearchOptions = {
     },
   ],
   action: {
-    grid: { cols: 24, colGap: 12, rowGap: 12 },
+    grid: { cols: 2, colGap: 12, rowGap: 12 },
     items: [
       { type: "search", text: "搜索" },
       { type: "reset", text: "重置" },
@@ -159,6 +179,37 @@ function handleExport() {
   console.log("导出当前筛选结果:", search.value?.model)
   console.log("当前表格选中:", table.value?.selection)
 }
+
+async function handleMockUpload() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          fileKey: `mock-${Date.now()}`,
+          success: 8,
+          fail: 2,
+          message: "解析完成，请确认导入。",
+        },
+      })
+    }, 1000)
+  })
+}
+
+async function handleImportConfirm(payload: Record<string, any> | null) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("确认导入数据:", payload)
+      resolve(payload)
+    }, 800)
+  })
+}
+
+async function createImportTemplate() {
+  const csv = "name,phone,status\n张三,13800000000,启用\n李四,13900000000,禁用"
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }))
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  return { url }
+}
 </script>
 
 <style scoped>
@@ -170,5 +221,13 @@ function handleExport() {
 
 .toolbar-spacer {
   flex: 1;
+}
+
+.toolbar-import {
+  margin-left: 12px;
+}
+
+.import-alert {
+  margin-top: 12px;
 }
 </style>

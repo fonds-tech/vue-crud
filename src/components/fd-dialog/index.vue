@@ -170,3 +170,71 @@ defineExpose({
   fullscreenActive,
 })
 </script>
+
+<style scoped lang="scss">
+.fd-dialog {
+  display: flex;
+  flex-direction: column;
+
+  :deep(.el-dialog__header) {
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 16px 24px;
+    border-top: 1px solid var(--el-border-color-lighter, #ebeef5);
+  }
+
+  &__header {
+    gap: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__title {
+    flex: 1;
+    color: var(--el-text-color-primary, #303133);
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    gap: 4px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__action {
+    color: var(--el-text-color-secondary, #606266);
+    width: 32px;
+    height: 32px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      color: var(--el-color-primary, #409eff);
+      background-color: var(--el-color-primary-light-9, #ecf5ff);
+    }
+  }
+
+  &__scrollbar {
+    flex: 1;
+    padding: 16px 24px;
+
+    :deep(.el-scrollbar__wrap) {
+      box-sizing: border-box;
+      padding-right: 8px;
+    }
+  }
+}
+</style>

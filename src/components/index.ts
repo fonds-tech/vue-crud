@@ -12,6 +12,7 @@ import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
 import AddButton from "./fd-add-button"
 import DeleteButton from "./fd-delete-button"
+import ImportButton from "./fd-import/index.vue"
 
 export const components: Record<string, Component> = {
   Crud,
@@ -27,6 +28,7 @@ export const components: Record<string, Component> = {
   Cascader,
   Detail,
   Table,
+  ImportButton,
 }
 
 /**
