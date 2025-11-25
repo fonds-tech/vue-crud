@@ -258,7 +258,7 @@ export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormIt
    * 分组名称
    * @description 用于 Tabs 或 Steps 布局时指定所属分组
    */
-  group?: string
+  group?: string | number
   /**
    * 是否隐藏
    * @description 动态控制表单项的显示/隐藏
@@ -289,7 +289,7 @@ export interface FormGroupChild<T extends FormRecord = FormRecord> {
   /**
    * 分组唯一标识
    */
-  name: string
+  name: string | number
   /**
    * 分组标题
    */
@@ -298,7 +298,7 @@ export interface FormGroupChild<T extends FormRecord = FormRecord> {
    * 分组内容的包装组件
    * @description 可以为分组内容自定义渲染组件
    */
-  component: FormComponent<T>
+  component?: FormComponent<T>
 }
 
 /**

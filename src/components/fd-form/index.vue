@@ -54,6 +54,7 @@
           v-for="(child, index) in options.group.children"
           :key="child.name ?? index"
           :label="child.title"
+          :name="child.name ?? index"
           v-bind="props(child.component)"
         >
           <template v-for="(com, slotName) in slots(child.component)" :key="slotName" #[slotName]="scope">
