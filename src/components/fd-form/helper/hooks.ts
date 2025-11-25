@@ -57,11 +57,15 @@ const formatters: Record<string, FormHookFn> = {
 
     // bind 阶段：从 model 中读取 start/end 字段组合成数组
     if (method === "bind") {
-      return [model[start], model[end]]
+      const rangeValue = [model[start], model[end]]
+      return rangeValue.every(entry => entry === undefined) ? [] : rangeValue
     }
 
     // submit 阶段：将数组拆分回 model 的 start/end 字段
-    const [startTime, endTime] = value || []
+    if (!isArray(value) || value.length < 2) {
+      return undefined
+    }
+    const [startTime, endTime] = value
     model[start] = startTime
     model[end] = endTime
     return undefined
@@ -125,6 +129,32 @@ function normalizeField<T extends FormModel>(model: T, field?: FormField, value?
   cursor[path[path.length - 1]] = value
 }
 
+function deleteField<T extends FormModel>(model: T, field?: FormField) {
+  if (!field) {
+    return
+  }
+
+  const key = String(field)
+  const path = key.split(".")
+  let cursor: Record<string, any> = model as Record<string, any>
+
+  if (path.length === 1) {
+    delete cursor[key]
+    return
+  }
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const segment = path[i]
+    const next = cursor[segment]
+    if (!next || typeof next !== "object") {
+      return
+    }
+    cursor = next
+  }
+
+  delete cursor[path[path.length - 1]]
+}
+
 /**
  * 解析并执行钩子函数
  * @param phase 当前阶段 ('bind' 或 'submit')
@@ -180,11 +210,16 @@ function parse<T extends FormModel, K extends keyof HookTree<T>>(
     }
   })
 
-  // 只有在 field 存在时才写回 model
-  // 部分 hook (如 datetimeRange) 可能会直接修改 model 且返回 undefined，此时 nextValue 可能无意义
-  if (field !== undefined) {
-    normalizeField(model, field, nextValue)
+  if (field === undefined) {
+    return
   }
+
+  if (phase === "submit" && nextValue === undefined) {
+    deleteField(model, field)
+    return
+  }
+
+  normalizeField(model, field, nextValue)
 }
 
 const formHook = {

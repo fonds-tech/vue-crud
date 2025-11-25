@@ -134,7 +134,7 @@ const options: FormUseOptions = {
         bind: (_value, { model }) => model.activeFlag === 1,
         submit: (value, { model }) => {
           model.activeFlag = value ? 1 : 0
-          return value
+          return undefined
         },
       },
       component: { is: "el-switch", props: { activeText: "上线", inactiveText: "下线" } },

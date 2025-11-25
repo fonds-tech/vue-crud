@@ -2,7 +2,7 @@ import type { Ref } from "vue"
 import type { Arrayable } from "element-plus/es/utils"
 import type { FormRecord, FormMethods, FormOptions } from "../type"
 import type { FormInstance, FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
-import formHook from "../../../utils/formHook"
+import formHook from "./hooks"
 import { cloneDeep } from "lodash-es"
 import { isDef, isFunction } from "@fonds/utils"
 

@@ -196,11 +196,11 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     if (!options.grid) {
       options.grid = {}
     }
-    if (typeof state === "boolean") {
-      options.grid.collapsed = state
-      return
+    const nextState = typeof state === "boolean" ? state : !options.grid.collapsed
+    options.grid = {
+      ...options.grid,
+      collapsed: nextState,
     }
-    options.grid.collapsed = !options.grid.collapsed
   }
 
   /**

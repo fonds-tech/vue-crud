@@ -37,6 +37,24 @@
               v-on="on(com)"
             />
           </template>
+          <slot
+            v-if="slot(child.component)"
+            :name="slot(child.component)"
+            :model="model"
+            :step="index"
+          />
+          <component
+            :is="is(child.component)"
+            v-else-if="is(child.component)"
+            v-bind="componentProps(child.component)"
+            :ref="bindComponentRef(child.component)"
+            :style="style(child.component)"
+            v-on="on(child.component)"
+          >
+            <template v-for="(value, childSlot) in slots(child.component)" :key="childSlot" #[childSlot]>
+              <component :is="value" />
+            </template>
+          </component>
         </el-step>
       </el-steps>
 
@@ -73,6 +91,24 @@
               v-on="on(com)"
             />
           </template>
+          <slot
+            v-if="slot(child.component)"
+            :name="slot(child.component)"
+            :model="model"
+            :scope="{ name: child.name }"
+          />
+          <component
+            :is="is(child.component)"
+            v-else-if="is(child.component)"
+            v-bind="componentProps(child.component)"
+            :ref="bindComponentRef(child.component)"
+            :style="style(child.component)"
+            v-on="on(child.component)"
+          >
+            <template v-for="(value, childSlot) in slots(child.component)" :key="childSlot" #[childSlot]>
+              <component :is="value" />
+            </template>
+          </component>
         </el-tab-pane>
       </el-tabs>
 
@@ -150,12 +186,12 @@ import type {
   FormComponentSlot,
   FormItemRuleWithMeta,
 } from "./type"
-import formHook from "../../utils/formHook"
+import formHook from "./helper/hooks"
 import { useAction } from "./helper/action"
 import { useMethods } from "./helper/methods"
 import { merge, cloneDeep } from "lodash-es"
 import { isDef, isNoEmpty, isFunction } from "@fonds/utils"
-import { ref, useId, computed, reactive } from "vue"
+import { ref, useId, watch, computed, reactive } from "vue"
 
 defineOptions({
   name: "fd-form",
@@ -200,6 +236,29 @@ const resolvedActiveGroup = computed(() => {
   }
   return activeGroupName.value ?? options.group.children[0]?.name
 })
+
+watch(
+  () => ({
+    type: options.group?.type,
+    names: options.group?.children?.map(child => child?.name).filter(name => name !== undefined),
+  }),
+  (current) => {
+    if (current.type !== "tabs") {
+      activeGroupName.value = undefined
+      return
+    }
+    const candidates = current.names ?? []
+    if (!candidates.length) {
+      activeGroupName.value = undefined
+      return
+    }
+    const currentActive = activeGroupName.value
+    if (currentActive === undefined || !candidates.includes(currentActive)) {
+      activeGroupName.value = candidates[0]
+    }
+  },
+  { deep: true, immediate: true },
+)
 
 // 引用 options.model 作为响应式数据源
 const model = reactive(options.model) as FormRecord
@@ -280,7 +339,8 @@ function show(item: FormItem) {
   // 2. Tabs 分组时，仅展示当前面板下的字段
   if (options.group?.type === "tabs" && options.group.children?.length) {
     const currentName = resolvedActiveGroup.value
-    if (item.group && currentName && item.group !== currentName)
+    const itemGroupName = item.group ?? options.group.children[0]?.name
+    if (itemGroupName && currentName && itemGroupName !== currentName)
       return false
   }
   return true

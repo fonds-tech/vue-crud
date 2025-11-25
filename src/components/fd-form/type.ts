@@ -335,7 +335,7 @@ export type DeepPartial<T> = {
  * useForm 钩子的配置选项
  * @description 允许传递部分 FormOptions 来初始化表单
  */
-export type FormUseOptions<T extends FormRecord = FormRecord> = DeepPartial<FormOptions<T>> & Record<string, any>
+export type FormUseOptions<T extends FormRecord = FormRecord> = DeepPartial<FormOptions<T>>
 
 /**
  * 表单操作动作接口
