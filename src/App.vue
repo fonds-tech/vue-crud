@@ -15,6 +15,27 @@
           </h1>
         </div>
 
+        <div class="header-actions">
+          <!-- Nav moved to sidebar -->
+          <div class="header-right">
+            <button class="theme-toggle" :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" @click="toggleTheme">
+              <transition name="rotate" mode="out-in">
+                <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+              </transition>
+            </button>
+            <div class="user-profile">
+              <div class="avatar">
+                <span>F</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout-body">
+      <aside class="app-sidebar">
         <nav class="nav-menu">
           <router-link
             v-for="item in navItems"
@@ -22,53 +43,44 @@
             :to="item.path"
             class="nav-item"
           >
-            <el-icon class="nav-item__icon">
-              <component :is="item.icon" />
-            </el-icon>
             <span class="nav-item__label">{{ item.label }}</span>
           </router-link>
         </nav>
+      </aside>
 
-        <div class="header-right">
-          <button class="theme-toggle" :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" @click="toggleTheme">
-            <transition name="rotate" mode="out-in">
-              <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+      <main class="main-content">
+        <div class="content-wrapper">
+          <router-view v-slot="{ Component }">
+            <transition name="fade-slide" mode="out-in">
+              <component :is="Component" />
             </transition>
-          </button>
-          <div class="user-profile">
-            <div class="avatar">
-              <span>F</span>
-            </div>
-          </div>
+          </router-view>
         </div>
-      </div>
-    </header>
-
-    <main class="main-content">
-      <div class="content-wrapper">
-        <router-view v-slot="{ Component }">
-          <transition name="fade-slide" mode="out-in">
-            <component :is="Component" />
-          </transition>
-        </router-view>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue"
-import { Search, Pointer, Document, ChatDotRound, DataAnalysis } from "@element-plus/icons-vue"
 
 const navItems = [
-  { path: "/crud", label: "CRUD 演示", icon: DataAnalysis },
-  { path: "/form", label: "表单演示", icon: Document },
-  { path: "/search", label: "搜索演示", icon: Search },
-  { path: "/dialog", label: "弹窗演示", icon: ChatDotRound },
-  { path: "/context-menu", label: "菜单演示", icon: Pointer },
+  { path: "/fd-form", label: "form" },
+  { path: "/fd-search", label: "search" },
+  { path: "/fd-table", label: "table" },
+  { path: "/fd-detail", label: "detail" },
+  { path: "/fd-dialog", label: "dialog" },
+  { path: "/fd-grid", label: "grid" },
+  { path: "/fd-select", label: "select" },
+  { path: "/fd-cascader", label: "cascader" },
+  { path: "/fd-context-menu", label: "context-menu" },
+  { path: "/fd-option", label: "option" },
+  { path: "/fd-add-button", label: "add-button" },
+  { path: "/fd-delete-button", label: "delete-button" },
+  { path: "/fd-import", label: "import" },
+  { path: "/fd-upsert", label: "upsert" },
+  { path: "/fd-crud", label: "crud" },
 ]
-
 const isDark = ref(false)
 
 function toggleTheme() {
@@ -144,6 +156,8 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
   --header-border: #0891b2;
 
   --header-height: 60px;
+  --sidebar-width: 220px;
+
   --color-border-subtle: #e2e8f0;
   --color-primary-hover: #0e7490;
   --color-primary-light: #cffafe;
@@ -202,6 +216,7 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
   margin: 0;
   /* Tech Font Stack: Clean Sans + Monospace for details */
   color: var(--color-text-primary);
+  overflow: hidden; /* Prevent global scroll, use inner scroll */
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
@@ -217,10 +232,11 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 
 /* Scanline Overlay */
 .app-layout {
+  width: 100vw;
+  height: 100vh;
   display: flex;
+  overflow: hidden;
   position: relative;
-  min-height: 100vh;
-  overflow-x: hidden;
   flex-direction: column;
   background-size: 30px 30px;
   background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
@@ -253,6 +269,7 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 
 /* Header Styles - Glass Tech */
 .app-header {
+  position: relative; /* Changed from fixed for flex layout ease, OR keep fixed if desired. Let's use absolute/fixed to overlay z-index */
   top: 0;
   left: 0;
   right: 0;
@@ -267,11 +284,12 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 }
 
 .header-inner {
+  width: 100%;
   height: 100%;
   margin: 0 auto;
   display: flex;
   padding: 0 24px;
-  max-width: 1600px;
+  box-sizing: border-box;
   align-items: center;
   justify-content: space-between;
 }
@@ -279,6 +297,7 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 .brand {
   gap: 12px;
   display: flex;
+  min-width: var(--sidebar-width); /* Align logo with sidebar */
   align-items: center;
   user-select: none;
   text-decoration: none;
@@ -311,33 +330,82 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
   text-transform: uppercase;
 }
 
-/* Navigation - Data Tabs */
+.header-actions {
+  gap: 12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+/* Layout Body (Sidebar + Main) */
+.layout-body {
+  flex: 1;
+  height: calc(100vh - var(--header-height));
+  display: flex;
+  overflow: hidden;
+  margin-top: var(--header-height);
+}
+
+/* Sidebar Styles */
+.app-sidebar {
+  width: var(--sidebar-width);
+  display: flex;
+  padding: 16px 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  flex-shrink: 0;
+  border-right: 1px solid var(--header-border);
+  flex-direction: column;
+  backdrop-filter: blur(16px);
+  background-color: var(--header-bg);
+  /* Scrollbar styling */
+  scrollbar-color: var(--color-primary) transparent;
+  scrollbar-width: thin;
+}
+
+.app-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.app-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.app-sidebar::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: var(--color-primary);
+}
+
+/* Navigation - Vertical */
 .nav-menu {
   gap: 4px;
   display: flex;
-  padding: 0;
-  align-items: center;
+  padding: 0 12px;
+  flex-direction: column;
 }
 
 .nav-item {
-  gap: 8px;
+  gap: 12px;
   color: var(--color-text-secondary);
-  display: flex;
-  padding: 6px 16px;
-  font-size: 0.85rem;
-  align-items: center;
-  font-family: "JetBrains Mono", monospace; /* Tech Font */
+  width: 100%;
   border: 1px solid transparent;
+  display: flex;
+  padding: 10px 12px;
   position: relative;
+  font-size: 0.85rem;
+  box-sizing: border-box;
   transition: all 0.2s ease;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
   font-weight: 500;
-  border-radius: 2px;
+  border-radius: 4px;
   letter-spacing: 0.05em;
   text-decoration: none;
 }
 
 .nav-item:hover {
   color: var(--color-primary);
+  transform: translateX(4px);
   background: rgba(0, 240, 255, 0.05);
   border-color: rgba(0, 240, 255, 0.2);
 }
@@ -349,19 +417,17 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
   border-color: var(--color-primary);
 }
 
+/* Vertical active indicator */
 .nav-item.router-link-active::before {
   top: 50%;
-  left: -1px;
-  width: 2px;
+  left: 0;
+  width: 3px;
   height: 60%;
   content: "";
   position: absolute;
   transform: translateY(-50%);
   background: var(--color-primary);
-}
-
-.nav-item__icon {
-  font-size: 1.1em;
+  border-radius: 0 2px 2px 0;
 }
 
 /* Right Actions */
@@ -419,16 +485,16 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 .main-content {
   flex: 1;
   width: 100%;
-  z-index: 1;
+  padding: 24px;
   position: relative;
   box-sizing: border-box;
-  padding-top: var(--header-height);
+  overflow-y: auto;
 }
 
 .content-wrapper {
   margin: 0 auto;
-  padding: 24px;
   max-width: 1600px;
+  padding-bottom: 40px;
 }
 
 /* Transitions - Smooth Data Flow */
