@@ -89,7 +89,9 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 <style scoped>
 .page-container {
+  display: flex;
   max-width: 100%;
+  flex-direction: column;
 }
 
 .page-header {
@@ -151,6 +153,7 @@ const activeComponent = computed(() => componentCatalog.find(item => item.key ==
 
 /* Preview Card */
 .preview-card {
+  flex: 1;
   border: 1px solid var(--card-border);
   display: flex;
   overflow: hidden;

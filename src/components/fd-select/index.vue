@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
-import { isEqual } from "lodash-es"
-import { clone, merge, debounce } from "@fonds/utils"
+import { merge, isEqual } from "lodash-es"
+import { clone, debounce } from "@fonds/utils"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type OptionRecord = Record<string, any>

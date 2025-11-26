@@ -185,10 +185,10 @@
 <script setup lang="ts">
 import type { DetailItem, DetailGroup, DetailAction, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
 import FdDialog from "../fd-dialog/index.vue"
-import { pick } from "lodash-es"
+import { clone } from "@fonds/utils"
 import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
-import { clone, merge } from "@fonds/utils"
+import { pick, merge } from "lodash-es"
 import { ElSpace, ElButton, ElMessage, ElSkeleton, ElDescriptions, ElDescriptionsItem } from "element-plus"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 

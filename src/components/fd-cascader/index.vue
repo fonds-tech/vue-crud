@@ -15,8 +15,8 @@
 
 <script setup lang="ts">
 import type { CascaderValue } from "element-plus"
-import { isEqual } from "lodash-es"
-import { clone, merge, isFunction } from "@fonds/utils"
+import { merge, isEqual } from "lodash-es"
+import { clone, isFunction } from "@fonds/utils"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type CascaderOption = Record<string, any>

@@ -6,10 +6,11 @@
 
 <script setup lang="ts">
 import type { CrudOptions } from "../../types"
+import { merge } from "lodash-es"
 import { useConfig } from "../../hooks"
 import { useHelper } from "./useHelper"
-import { Mitt, clone, merge } from "@fonds/utils"
-import { inject, provide, reactive, defineExpose, getCurrentInstance } from "vue"
+import { Mitt, clone } from "@fonds/utils"
+import { inject, provide, reactive, getCurrentInstance } from "vue"
 
 defineOptions({
   name: "fd-crud",
@@ -41,11 +42,11 @@ const crud = reactive<any>(
   ),
 )
 
-function useCrudOptions(useOptions: Partial<CrudOptions> = {}) {
-  merge(options, useOptions)
-}
-
 merge(crud, useHelper({ config: options, crud, mitt }))
+
+function useCrudOptions(useOptions: Partial<CrudOptions> = {}) {
+  merge(crud, useOptions)
+}
 
 crud.use = useCrudOptions
 

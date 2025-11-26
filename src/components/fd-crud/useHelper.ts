@@ -1,9 +1,9 @@
 import type { Mitt } from "@fonds/utils"
 import type { CrudRef, CrudOptions } from "../../types"
 import { ref } from "vue"
-import { assign } from "lodash-es"
+import { merge, assign } from "lodash-es"
+import { isArray, isFunction } from "@fonds/utils"
 import { ElMessage, ElMessageBox } from "element-plus"
-import { merge, isArray, isFunction } from "@fonds/utils"
 
 /* CRUD 助手依赖运行期 schema/服务交互，允许必要的动态类型操作 */
 
@@ -90,7 +90,7 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
       // 下一步
       function next(params: Record<string, any>): Promise<any> {
         return new Promise((resolve, reject) => {
-          service[dict.api.page](params)
+          service[dict.api.page]?.(params)
             .then((res: any) => {
               if (rd !== refreshRd.value) {
                 return

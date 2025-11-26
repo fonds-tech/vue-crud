@@ -202,10 +202,11 @@
 
 <script setup lang="ts">
 import type { TableDict, TableScope, TableAction, TableColumn, TableOptions, TableComponent, TableUseOptions } from "./type"
+import { clone } from "@fonds/utils"
+import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { ElTable } from "element-plus"
 import { isFunction } from "@/utils/check"
-import { clone, merge } from "@fonds/utils"
 import { Setting, Operation, FullScreen } from "@element-plus/icons-vue"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onMounted, onBeforeUnmount } from "vue"
 

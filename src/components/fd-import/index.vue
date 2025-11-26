@@ -80,7 +80,7 @@ import { ElMessage } from "element-plus"
 import { useCore, useConfig } from "@/hooks"
 import { isString, isFunction } from "@fonds/utils"
 import { Download, UploadFilled } from "@element-plus/icons-vue"
-import { ref, watch, computed, nextTick, useAttrs, shallowRef, defineOptions } from "vue"
+import { ref, watch, computed, nextTick, useAttrs, shallowRef } from "vue"
 
 type UploadExecutor = (payload: FormData) => Promise<any>
 type ConfirmExecutor = (payload: Record<string, any> | null) => Promise<any>

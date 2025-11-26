@@ -187,10 +187,11 @@ import type {
   FormItemRuleWithMeta,
 } from "./type"
 import formHook from "./helper/hooks"
+import { merge } from "lodash-es"
 import { useAction } from "./helper/action"
 import { useMethods } from "./helper/methods"
+import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 import { ref, useId, watch, computed, reactive } from "vue"
-import { clone, isDef, merge, isNoEmpty, isFunction } from "@fonds/utils"
 
 defineOptions({
   name: "fd-form",

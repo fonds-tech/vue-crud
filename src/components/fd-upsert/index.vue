@@ -56,12 +56,13 @@ import type { FormRef, FormRecord, FormUseOptions } from "../fd-form/type"
 import type { UpsertMode, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "./type"
 import FdForm from "../fd-form/index.vue"
 import FdDialog from "../fd-dialog/index.vue"
+import { merge } from "lodash-es"
 import { useUpsertActions } from "./helper/actions"
+import { clone, isFunction } from "@fonds/utils"
 import { useCore, useConfig } from "../../hooks"
 import { useComponentHelper } from "./helper/component"
-import { clone, merge, isFunction } from "@fonds/utils"
 import { ElButton, ElMessage, ElSkeleton } from "element-plus"
-import { ref, watch, computed, nextTick, reactive, useAttrs, useSlots, defineEmits, defineOptions, onBeforeUnmount } from "vue"
+import { ref, watch, computed, nextTick, reactive, useAttrs, useSlots, onBeforeUnmount } from "vue"
 
 defineOptions({
   name: "fd-upsert",

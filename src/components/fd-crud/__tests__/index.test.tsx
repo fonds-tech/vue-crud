@@ -1,4 +1,4 @@
-import Crud from "../index"
+import Crud from "../index.vue"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 
@@ -39,5 +39,16 @@ describe("crud", () => {
     // but we can check if the component instance has the exposed properties
     expect(wrapper.vm).toBeDefined()
     expect((wrapper.vm as any).id).toBe("test-crud")
+  })
+
+  it("merges options via exposed use method", () => {
+    const wrapper = mount(Crud)
+    const service = { page: () => {} }
+
+    const exposedUse = (wrapper.vm as any).use
+    expect(typeof exposedUse).toBe("function")
+    exposedUse({ service })
+
+    expect((wrapper.vm as any).service).toEqual(service)
   })
 })
