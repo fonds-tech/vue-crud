@@ -72,7 +72,11 @@
 
     <div class="fd-table__body">
       <el-table
-        ref="tableRef" :data="tableRows" :loading="isLoading" :row-key="rowKeyProp" v-bind="elTableProps"
+        ref="tableRef"
+        v-loading="isLoading"
+        :data="tableRows"
+        :row-key="rowKeyProp"
+        v-bind="elTableProps"
         @selection-change="onSelectionChange" @row-contextmenu="onCellContextmenu"
       >
         <!-- 透传除默认/工具栏/页眉外的所有具名插槽 -->

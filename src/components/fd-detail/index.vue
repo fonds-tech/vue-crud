@@ -7,20 +7,10 @@
     @close="handleClose"
   >
     <slot :data="data" :loading="loading" :visible="visible" :refresh="refresh" :set-data="setData">
-      <el-skeleton
-        v-if="loading"
-        :loading="loading"
-        animated
-        :rows="4"
-        class="fd-detail__skeleton"
-      >
-        <template #template>
-          <div class="fd-detail__skeleton-row"></div>
-        </template>
-      </el-skeleton>
       <el-space
-        v-else
         :key="cache"
+        v-loading="loading"
+        :element-loading-text="options.dialog.loadingText"
         direction="vertical"
         fill
         :size="16"
@@ -189,7 +179,7 @@ import { clone } from "@fonds/utils"
 import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
 import { pick, merge } from "lodash-es"
-import { ElSpace, ElButton, ElMessage, ElSkeleton, ElDescriptions, ElDescriptionsItem } from "element-plus"
+import { ElSpace, ElButton, ElMessage, ElDescriptions, ElDescriptionsItem } from "element-plus"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 
 defineOptions({
@@ -218,7 +208,7 @@ const options = reactive<DetailOptions>({
     title: crud.dict?.label?.detail ?? crud.dict?.label?.info ?? "详情",
     showClose: true,
     destroyOnClose: true,
-    loadingText: "查询中，请稍等...",
+    loadingText: "正在加载中...",
   },
   items: [],
   groups: [],
@@ -471,6 +461,7 @@ function requestDetail(query: Record<string, any>, done: (value: Record<string, 
  * 打开详情弹窗，默认按主键自动查询
  */
 function detail(row: Record<string, any>) {
+  setData(row)
   visible.value = true
   loading.value = true
   const done = (value: Record<string, any> = {}) => {
@@ -621,17 +612,6 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: flex-end;
-  }
-
-  &__skeleton {
-    width: 100%;
-
-    &-row {
-      height: 16px;
-      border-radius: 4px;
-      margin-bottom: 12px;
-      background-color: var(--el-color-info-light-9, #f4f4f5);
-    }
   }
 }
 </style>
