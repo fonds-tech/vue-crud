@@ -1,7 +1,7 @@
 <template>
   <div class="form-variant">
     <el-card class="variant-card">
-      <fd-form ref="formRef" />
+      <fd-form ref="form" />
       <div class="action-row">
         <el-button text type="primary" @click="handleToggleCollapse">
           {{ collapsed ? "展开更多字段" : "收起额外字段" }}
@@ -31,15 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { clone } from "@fonds/utils"
-import { ref, computed, onMounted } from "vue"
+import { useForm } from "@/hooks"
+import { ref, computed } from "vue"
 
-const formRef = ref<FormRef>()
-const formModel = computed(() => formRef.value?.model ?? {})
 const collapsed = ref(true)
-
-const options: FormUseOptions = {
+const form = useForm({
   model: {
     company: "",
     industry: "",
@@ -238,14 +234,11 @@ const options: FormUseOptions = {
       component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 200, showWordLimit: true } },
     },
   ],
-}
-
-onMounted(() => {
-  formRef.value?.use(clone(options))
 })
+const formModel = computed(() => form.value?.model ?? {})
 
 function handleSubmit() {
-  formRef.value?.submit().then((res) => {
+  form.value?.submit().then((res) => {
     console.log("TabsForm Submit:", res)
   }).catch((err) => {
     console.error("TabsForm Submit Error:", err)
@@ -253,16 +246,16 @@ function handleSubmit() {
 }
 
 function handleReset() {
-  formRef.value?.resetFields()
+  form.value?.resetFields()
   if (collapsed.value !== true) {
     collapsed.value = true
-    formRef.value?.collapse(true)
+    form.value?.collapse(true)
   }
 }
 
 function handleToggleCollapse() {
   collapsed.value = !collapsed.value
-  formRef.value?.collapse(collapsed.value)
+  form.value?.collapse(collapsed.value)
 }
 </script>
 

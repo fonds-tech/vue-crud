@@ -19,26 +19,25 @@
 </template>
 
 <script setup lang="ts">
-import type { CrudRef } from "@/types"
-import { ref, onMounted } from "vue"
+import { useCrud } from "@/hooks"
 
 defineOptions({
   name: "basic-import-demo",
 })
 
-const crudRef = ref<CrudRef>()
-
-onMounted(() => {
-  crudRef.value?.use?.({
-    permission: { add: true },
-    dict: {
-      label: {
-        confirm: "确定",
-        close: "关闭",
-      },
-    } as any,
-    service: {} as any,
-  })
+const crudRef = useCrud({
+  permission: { add: true },
+  dict: {
+    label: {
+      confirm: "确定",
+      close: "关闭",
+    },
+  } as any,
+  service: {
+    async page() {
+      return { list: [], pagination: { total: 0, page: 1, size: 20 } }
+    },
+  } as any,
 })
 
 function mockTemplate() {

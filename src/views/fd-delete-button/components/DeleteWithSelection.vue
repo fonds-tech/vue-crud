@@ -19,25 +19,23 @@
 </template>
 
 <script setup lang="ts">
-import type { CrudRef } from "@/types"
-import { ref, onMounted } from "vue"
+import { useCrud } from "@/hooks"
 
 defineOptions({
   name: "delete-with-selection-demo",
 })
 
-const crudRef = ref<CrudRef>()
 const mockRow = { id: 1, name: "待删除项" }
-
-onMounted(() => {
-  crudRef.value?.use?.({
-    permission: { delete: true },
-    dict: { label: { delete: "删除", deleteConfirm: "确认删除？", confirm: "确认", close: "取消", tips: "提示", deleteSuccess: "删除成功" } } as any,
-    service: {
-      delete: async () => Promise.resolve(true),
-      _permission: { delete: true },
-    } as any,
-  })
+const crudRef = useCrud({
+  permission: { delete: true },
+  dict: { label: { delete: "删除", deleteConfirm: "确认删除？", confirm: "确认", close: "取消", tips: "提示", deleteSuccess: "删除成功" } } as any,
+  service: {
+    async page() {
+      return { list: [mockRow], pagination: { total: 1, page: 1, size: 20 } }
+    },
+    delete: async () => Promise.resolve(true),
+    _permission: { delete: true },
+  } as any,
 })
 
 function toggleSelect() {

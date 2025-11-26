@@ -7,34 +7,52 @@
       演示操作列、具名插槽渲染和自定义事件处理。
     </p>
 
-    <fd-table ref="tableRef">
-      <template #status="{ row }">
-        <el-tag :type="row.status ? 'success' : 'danger'" size="small">
-          {{ row.status ? "启用" : "禁用" }}
-        </el-tag>
-      </template>
-      <template #actionSlots="{ row }">
-        <el-link type="primary" @click="handleView(row)">
-          查看
-        </el-link>
-        <el-link type="warning" @click="handleEdit(row)">
-          编辑
-        </el-link>
-      </template>
-    </fd-table>
+    <fd-crud ref="crudRef">
+      <fd-table ref="tableRef">
+        <template #status="{ row }">
+          <el-tag :type="row.status ? 'success' : 'danger'" size="small">
+            {{ row.status ? "启用" : "禁用" }}
+          </el-tag>
+        </template>
+        <template #actionSlots="{ row }">
+          <el-link type="primary" @click="handleView(row)">
+            查看
+          </el-link>
+          <el-link type="warning" @click="handleEdit(row)">
+            编辑
+          </el-link>
+        </template>
+      </fd-table>
+    </fd-crud>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { TableAction, TableColumn, TableExpose } from "@/components/fd-table/type"
+import type { TableAction, TableColumn } from "@/components/fd-table/type"
 import { ElMessage } from "element-plus"
-import { ref, onMounted } from "vue"
+import { useCrud, useTable } from "@/hooks"
 
 defineOptions({
   name: "action-table-demo",
 })
 
-const tableRef = ref<TableExpose>()
+const crudRef = useCrud({
+  service: {
+    async page() {
+      return { list: rows, pagination: { total: rows.length, page: 1, size: rows.length } }
+    },
+  },
+})
+
+const tableRef = useTable(
+  {
+    table: { border: true, size: "small", rowKey: "id" },
+    columns,
+  },
+  (table) => {
+    table.setData(rows)
+  },
+)
 
 const actionColumn: TableColumn = {
   type: "action",
@@ -67,14 +85,6 @@ function handleView(row: any) {
 function handleEdit(row: any) {
   ElMessage.success(`编辑：${row.account}`)
 }
-
-onMounted(() => {
-  tableRef.value?.use({
-    table: { border: true, size: "small", rowKey: "id" },
-    columns,
-  })
-  tableRef.value?.setData(rows)
-})
 </script>
 
 <style scoped lang="scss">

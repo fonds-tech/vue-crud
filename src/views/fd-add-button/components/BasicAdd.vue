@@ -14,22 +14,21 @@
 </template>
 
 <script setup lang="ts">
-import type { CrudRef } from "@/types"
-import { ref, onMounted } from "vue"
+import { useCrud } from "@/hooks"
 
 defineOptions({
   name: "basic-add-button-demo",
 })
 
-const crudRef = ref<CrudRef>()
-
-onMounted(() => {
-  crudRef.value?.use?.({
-    permission: { add: true },
-    dict: { label: { add: "新增" } } as any,
-    // 模拟 service，避免真实请求
-    service: {},
-  })
+const crudRef = useCrud({
+  permission: { add: true },
+  dict: { label: { add: "新增" } } as any,
+  // 模拟 service，避免真实请求
+  service: {
+    async page() {
+      return { list: [], pagination: { total: 0, page: 1, size: 20 } }
+    },
+  },
 })
 </script>
 

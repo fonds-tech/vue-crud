@@ -1,7 +1,7 @@
 <template>
   <div class="form-variant">
     <el-card class="variant-card">
-      <fd-form ref="formRef" />
+      <fd-form ref="form" />
 
       <div class="action-row">
         <el-button :disabled="isFirstStep" @click="handlePrev">
@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
-import { clone } from "@fonds/utils"
-import { ref, computed, onMounted } from "vue"
+import { useForm } from "@/hooks"
+import { ref, computed } from "vue"
 
 const STEP_SEQUENCE = ["profile", "project", "confirm"] as const
 type StepKey = typeof STEP_SEQUENCE[number]
@@ -57,177 +57,176 @@ const stepMeta = [
   { key: "confirm", title: "提交确认", description: "确认审批信息", badge: "Step 3/3" },
 ] as const
 
-const formRef = ref<FormRef>()
-const formModel = computed(() => formRef.value?.model ?? {})
 const activeStepIndex = ref(0)
 
+const form = useForm<FormUseOptions>(
+  {
+    model: {
+      applicant: "",
+      department: "",
+      email: "",
+      budget: 5000,
+      timeline: [],
+      reviewer: "",
+      remark: "",
+      agree: false,
+      __step: STEP_SEQUENCE[0],
+    },
+    grid: {
+      cols: 2,
+      colGap: 16,
+      rowGap: 12,
+    },
+    form: {
+      labelWidth: "96px",
+      scrollToError: true,
+    },
+    group: {
+      type: "steps",
+      component: {
+        props: {
+          finishStatus: "success",
+        },
+      },
+      children: stepMeta.map(step => ({
+        name: step.key,
+        title: step.title,
+        component: {
+          props: {
+            description: step.description,
+          },
+        },
+      })),
+    },
+    onNext: (_values, ctx) => {
+      if (activeStepIndex.value < STEP_SEQUENCE.length - 1) {
+        syncStep(activeStepIndex.value + 1)
+      }
+      ctx.next()
+    },
+    items: [
+      {
+        field: "applicant",
+        label: "申请人",
+        component: { is: "el-input", props: { placeholder: "请输入申请人姓名" } },
+        rules: [{ required: true, message: "请填写申请人姓名", trigger: "blur" }],
+        hidden: model => model.__step !== "profile",
+      },
+      {
+        field: "department",
+        label: "所属部门",
+        component: {
+          is: "el-select",
+          props: { placeholder: "请选择部门", clearable: true },
+          options: [
+            { label: "产品研发", value: "rd" },
+            { label: "市场运营", value: "marketing" },
+            { label: "客户成功", value: "success" },
+          ],
+        },
+        rules: [{ required: true, message: "请选择一个部门", trigger: "change" }],
+        hidden: model => model.__step !== "profile",
+      },
+      {
+        field: "email",
+        label: "联系邮箱",
+        component: { is: "el-input", props: { placeholder: "name@example.com" } },
+        rules: [
+          { required: true, message: "请输入邮箱地址", trigger: "blur" },
+          { type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"] },
+        ],
+        hidden: model => model.__step !== "profile",
+      },
+      {
+        field: "timeline",
+        label: "排期范围",
+        component: {
+          is: "el-date-picker",
+          props: { type: "daterange", unlinkPanels: true, valueFormat: "YYYY-MM-DD" },
+        },
+        rules: [{ required: true, message: "请选择项目排期", trigger: "change" }],
+        hidden: model => model.__step !== "project",
+      },
+      {
+        field: "budget",
+        label: "预算(万元)",
+        component: { is: "el-input-number", props: { min: 0, max: 500, step: 5 } },
+        rules: [
+          { required: true, message: "请输入预算", trigger: "change" },
+          { type: "number", min: 1, message: "预算必须大于 0", trigger: "change" },
+        ],
+        hidden: model => model.__step !== "project",
+      },
+      {
+        field: "reviewer",
+        label: "审批人",
+        component: {
+          is: "el-select",
+          props: { placeholder: "请选择审批责任人" },
+          options: [
+            { label: "王拓展", value: "wang" },
+            { label: "张维度", value: "zhang" },
+            { label: "李验证", value: "li" },
+          ],
+        },
+        rules: [{ required: true, message: "请选择审批人", trigger: "change" }],
+        hidden: model => model.__step !== "project",
+      },
+      {
+        field: "remark",
+        label: "补充说明",
+        span: 2,
+        component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 150, showWordLimit: true } },
+        hidden: model => model.__step !== "confirm",
+      },
+      {
+        field: "agree",
+        label: "协议确认",
+        component: {
+          is: "el-switch",
+          props: { activeText: "已阅读并同意", inactiveText: "待确认" },
+        },
+        rules: [
+          {
+            validator: (_rule, value, callback) => (value ? callback() : callback(new Error("请先同意审批协议"))),
+            trigger: "change",
+          },
+        ],
+        hidden: model => model.__step !== "confirm",
+      },
+    ],
+  },
+  (formInstance) => {
+    syncStep(0, formInstance)
+  },
+)
+
+const formModel = computed(() => form.value?.model ?? {})
 const currentStep = computed(() => stepMeta[activeStepIndex.value] ?? stepMeta[0])
 const isFirstStep = computed(() => activeStepIndex.value === 0)
 const isLastStep = computed(() => activeStepIndex.value === STEP_SEQUENCE.length - 1)
 
-function syncStep(index: number) {
+function syncStep(index: number, formInstance?: FormRef) {
   const targetIndex = Math.min(Math.max(index, 0), STEP_SEQUENCE.length - 1)
   activeStepIndex.value = targetIndex
   const step = STEP_SEQUENCE[targetIndex]
-  if (formRef.value) {
-    formRef.value.setField("__step", step)
-  }
+  const instance = formInstance ?? form.value
+  instance?.setField("__step", step)
 }
-
-const options: FormUseOptions = {
-  model: {
-    applicant: "",
-    department: "",
-    email: "",
-    budget: 5000,
-    timeline: [],
-    reviewer: "",
-    remark: "",
-    agree: false,
-    __step: STEP_SEQUENCE[0],
-  },
-  grid: {
-    cols: 2,
-    colGap: 16,
-    rowGap: 12,
-  },
-  form: {
-    labelWidth: "96px",
-    scrollToError: true,
-  },
-  group: {
-    type: "steps",
-    component: {
-      props: {
-        finishStatus: "success",
-      },
-    },
-    children: stepMeta.map(step => ({
-      name: step.key,
-      title: step.title,
-      component: {
-        props: {
-          description: step.description,
-        },
-      },
-    })),
-  },
-  onNext: (_values, ctx) => {
-    if (activeStepIndex.value < STEP_SEQUENCE.length - 1) {
-      syncStep(activeStepIndex.value + 1)
-    }
-    ctx.next()
-  },
-  items: [
-    {
-      field: "applicant",
-      label: "申请人",
-      component: { is: "el-input", props: { placeholder: "请输入申请人姓名" } },
-      rules: [{ required: true, message: "请填写申请人姓名", trigger: "blur" }],
-      hidden: model => model.__step !== "profile",
-    },
-    {
-      field: "department",
-      label: "所属部门",
-      component: {
-        is: "el-select",
-        props: { placeholder: "请选择部门", clearable: true },
-        options: [
-          { label: "产品研发", value: "rd" },
-          { label: "市场运营", value: "marketing" },
-          { label: "客户成功", value: "success" },
-        ],
-      },
-      rules: [{ required: true, message: "请选择一个部门", trigger: "change" }],
-      hidden: model => model.__step !== "profile",
-    },
-    {
-      field: "email",
-      label: "联系邮箱",
-      component: { is: "el-input", props: { placeholder: "name@example.com" } },
-      rules: [
-        { required: true, message: "请输入邮箱地址", trigger: "blur" },
-        { type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"] },
-      ],
-      hidden: model => model.__step !== "profile",
-    },
-    {
-      field: "timeline",
-      label: "排期范围",
-      component: {
-        is: "el-date-picker",
-        props: { type: "daterange", unlinkPanels: true, valueFormat: "YYYY-MM-DD" },
-      },
-      rules: [{ required: true, message: "请选择项目排期", trigger: "change" }],
-      hidden: model => model.__step !== "project",
-    },
-    {
-      field: "budget",
-      label: "预算(万元)",
-      component: { is: "el-input-number", props: { min: 0, max: 500, step: 5 } },
-      rules: [
-        { required: true, message: "请输入预算", trigger: "change" },
-        { type: "number", min: 1, message: "预算必须大于 0", trigger: "change" },
-      ],
-      hidden: model => model.__step !== "project",
-    },
-    {
-      field: "reviewer",
-      label: "审批人",
-      component: {
-        is: "el-select",
-        props: { placeholder: "请选择审批责任人" },
-        options: [
-          { label: "王拓展", value: "wang" },
-          { label: "张维度", value: "zhang" },
-          { label: "李验证", value: "li" },
-        ],
-      },
-      rules: [{ required: true, message: "请选择审批人", trigger: "change" }],
-      hidden: model => model.__step !== "project",
-    },
-    {
-      field: "remark",
-      label: "补充说明",
-      span: 2,
-      component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 150, showWordLimit: true } },
-      hidden: model => model.__step !== "confirm",
-    },
-    {
-      field: "agree",
-      label: "协议确认",
-      component: {
-        is: "el-switch",
-        props: { activeText: "已阅读并同意", inactiveText: "待确认" },
-      },
-      rules: [
-        {
-          validator: (_rule, value, callback) => (value ? callback() : callback(new Error("请先同意审批协议"))),
-          trigger: "change",
-        },
-      ],
-      hidden: model => model.__step !== "confirm",
-    },
-  ],
-}
-
-onMounted(() => {
-  formRef.value?.use(clone(options))
-})
 
 function handleNext() {
-  formRef.value?.next()
+  form.value?.next()
 }
 
 function handlePrev() {
   if (isFirstStep.value)
     return
   syncStep(activeStepIndex.value - 1)
-  formRef.value?.prev()
+  form.value?.prev()
 }
 
 function handleSubmit() {
-  formRef.value?.submit().then((res) => {
+  form.value?.submit().then((res) => {
     console.log("Steps Submit:", res)
   }).catch((err) => {
     console.error("Steps Submit Error:", err)
@@ -235,14 +234,14 @@ function handleSubmit() {
 }
 
 function handleReset() {
-  formRef.value?.resetFields()
+  form.value?.resetFields()
   syncStep(0)
 }
 
 function handleStepReset() {
   const step = STEP_SEQUENCE[activeStepIndex.value]
   const targets = STEP_FIELDS[step]
-  formRef.value?.resetFields(targets)
+  form.value?.resetFields(targets)
 }
 </script>
 

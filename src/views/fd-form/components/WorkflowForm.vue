@@ -23,11 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
+import type { FormUseOptions } from "@/components/fd-form/type"
 import { clone } from "@fonds/utils"
-import { ref, computed, onMounted } from "vue"
+import { useForm } from "@/hooks"
+import { computed } from "vue"
 
-const formRef = ref<FormRef>()
+const formRef = useForm(clone(options))
 const formModel = computed(() => formRef.value?.model ?? {})
 
 const options: FormUseOptions = {
@@ -99,10 +100,6 @@ const options: FormUseOptions = {
     },
   ],
 }
-
-onMounted(() => {
-  formRef.value?.use(clone(options))
-})
 
 function handleSubmit() {
   formRef.value?.submit().then((res) => {

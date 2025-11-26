@@ -16,8 +16,8 @@ catalogs:
       specifier: ^2.3.2
       version: 2.3.2
     '@fonds/eslint-config':
-      specifier: ^1.0.17
-      version: 1.0.18
+      specifier: ^1.0.19
+      version: 1.0.19
     '@fonds/utils':
       specifier: ^1.0.6
       version: 1.0.6
@@ -137,7 +137,7 @@ importers:
         version: 9.3.0
       '@fonds/eslint-config':
         specifier: 'catalog:'
-        version: 1.0.18(@vue/compiler-sfc@3.5.25)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.13(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))
+        version: 1.0.19(@vue/compiler-sfc@3.5.25)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.13(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -830,8 +830,8 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@fonds/eslint-config@1.0.18':
-    resolution: {integrity: sha512-OTy+Wlg5GWgPW6ZnhKMQwjx3S5/IJ5uPq9BOaU2h7yO+XybvkVSD8yEySXNWfpqsJt8WP2kBdPCBCtQsUO1ckA==}
+  '@fonds/eslint-config@1.0.19':
+    resolution: {integrity: sha512-l8LO95QT7GEkeHj66c3BJtuENhwkrCTH5LHMH1gYRRfNKzN0v6W6kxBzS3AYXbvqFKJD/WcTxfABL0tu7YhTAA==}
     hasBin: true
     peerDependencies:
       '@eslint-react/eslint-plugin': ^2.0.1
@@ -2027,8 +2027,8 @@ packages:
     peerDependencies:
       eslint: '>=8'
 
-  eslint-plugin-fonds@1.0.11:
-    resolution: {integrity: sha512-FFFwvEmkMuLp2vp7LONZkU5qKQPWasvgl9onGw7qBnSx16XtrBfB+5wgWAUyCUQEKLf8WaxfyF11F9XNjG8DiA==}
+  eslint-plugin-fonds@1.0.12:
+    resolution: {integrity: sha512-hQDCukxr48w49dALrEXhzeMmw4b+o6WtsIei9pIV9vdpdYIyXFXX2gyUNNxNhQ6aaxsrWSoVTEJp1b0H3uZDnQ==}
     peerDependencies:
       eslint: '*'
 
@@ -4096,7 +4096,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@fonds/eslint-config@1.0.18(@vue/compiler-sfc@3.5.25)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.13(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))':
+  '@fonds/eslint-config@1.0.19(@vue/compiler-sfc@3.5.25)(eslint-plugin-format@1.0.2(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.13(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(sass@1.94.2)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 0.11.0
@@ -4113,7 +4113,7 @@ snapshots:
       eslint-flat-config-utils: 2.1.4
       eslint-merge-processors: 2.0.0(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-command: 3.3.1(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-fonds: 1.0.11(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-fonds: 1.0.12(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-import-lite: 0.3.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-jsdoc: 61.4.1(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-jsonc: 2.21.0(eslint@9.39.1(jiti@2.6.1))
@@ -5357,7 +5357,7 @@ snapshots:
       eslint: 9.39.1(jiti@2.6.1)
       eslint-compat-utils: 0.5.1(eslint@9.39.1(jiti@2.6.1))
 
-  eslint-plugin-fonds@1.0.11(eslint@9.39.1(jiti@2.6.1)):
+  eslint-plugin-fonds@1.0.12(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
       postcss: 8.5.6

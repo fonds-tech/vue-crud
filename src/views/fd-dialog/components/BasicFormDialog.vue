@@ -48,15 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef, FormUseOptions } from "@/components/fd-form/type"
+import type { FormUseOptions } from "@/components/fd-form/type"
+import { ref } from "vue"
 import { Plus } from "@element-plus/icons-vue"
 import { clone } from "@fonds/utils"
+import { useForm } from "@/hooks"
 import { ElMessage } from "element-plus"
-import { ref, onMounted } from "vue"
-
-const dialogVisible = ref(false)
-const saving = ref(false)
-const formRef = ref<FormRef>()
 
 const formOptions: FormUseOptions = {
   form: { labelWidth: "96px" },
@@ -110,9 +107,9 @@ const formOptions: FormUseOptions = {
   ],
 }
 
-onMounted(() => {
-  formRef.value?.use(clone(formOptions))
-})
+const dialogVisible = ref(false)
+const saving = ref(false)
+const formRef = useForm(clone(formOptions))
 
 function openDialog() {
   dialogVisible.value = true

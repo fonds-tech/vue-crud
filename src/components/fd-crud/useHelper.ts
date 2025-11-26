@@ -56,6 +56,7 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
   // 刷新请求
   function refresh(params: Record<string, any> = {}) {
     const { service, dict } = crud
+    const pageService = service?.[dict.api.page]
 
     return new Promise((success, error) => {
       // 合并请求参数
@@ -87,10 +88,17 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
         })
       }
 
-      // 下一步
+      // 下一步：支持缺省分页服务的兜底，避免 Loading 卡死
       function next(params: Record<string, any>): Promise<any> {
         return new Promise((resolve, reject) => {
-          service[dict.api.page]?.(params)
+          if (!pageService) {
+            ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
+            done()
+            resolve({})
+            return
+          }
+
+          pageService(params)
             .then((res: any) => {
               if (rd !== refreshRd.value) {
                 return

@@ -4,10 +4,10 @@
       基础栅格
     </h4>
     <p class="demo-card__desc">
-      演示 cols 与 gap，内容自适应等宽。
+      演示 cols 与行/列间距，内容自适应等宽。
     </p>
 
-    <fd-grid :cols="3" :gap="12">
+    <fd-grid :cols="3" :row-gap="12" :col-gap="12">
       <fd-grid-item v-for="i in 6" :key="i">
         <div class="grid-box">
           单元 {{ i }}

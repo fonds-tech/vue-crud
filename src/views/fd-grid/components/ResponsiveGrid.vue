@@ -4,10 +4,10 @@
       响应式与折叠
     </h4>
     <p class="demo-card__desc">
-      使用 collapse 控制最大行数，cols 配合断点变化。
+      使用 collapsedRows 控制最大行数，cols 配合断点变化。
     </p>
 
-    <fd-grid :cols="{ xs: 1, sm: 2, md: 3 }" :gap="12" :collapse="2">
+    <fd-grid :cols="{ xs: 1, sm: 2, md: 3 }" :row-gap="12" :col-gap="12" :collapsed="true" :collapsed-rows="2">
       <fd-grid-item v-for="i in 8" :key="i">
         <div class="grid-box">
           内容 {{ i }}

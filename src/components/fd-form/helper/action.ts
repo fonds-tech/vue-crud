@@ -211,24 +211,29 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     if (!item)
       return
 
+    item.required = required
     const label = item.label || String(field)
     const rule: FormItemRuleWithMeta = { required, message: `${label}为必填项`, _inner: true }
 
-    if (isNoEmpty(item.rules)) {
-      const ruleList: FormItemRuleWithMeta[] = (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as FormItemRuleWithMeta[]
-      // 查找并替换内部自动生成的 required 规则
-      const index = ruleList.findIndex(r => r._inner === true)
-      if (index > -1) {
-        ruleList[index] = rule
-      }
-      else {
+    const ruleList: FormItemRuleWithMeta[] = isNoEmpty(item.rules)
+      ? (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as FormItemRuleWithMeta[]
+      : []
+
+    const innerIndex = ruleList.findIndex(r => r._inner === true)
+
+    if (required) {
+      if (innerIndex > -1)
+        ruleList[innerIndex] = rule
+      else
         ruleList.unshift(rule)
-      }
-      item.rules = ruleList
     }
-    else {
-      item.rules = [rule]
+    else if (innerIndex > -1) {
+      ruleList.splice(innerIndex, 1)
     }
+
+    item.rules = ruleList
+    // 重新应用校验规则后清理当前字段的校验状态，避免旧错误残留
+    form.value?.clearValidate?.([String(field)])
   }
 
   const actions: FormActions<T> = {

@@ -256,10 +256,12 @@ const tableSizeOptions = [
   { label: "偏大", value: "large" },
 ]
 
+const initialCrudParams = crud?.getParams?.() ?? crud?.params ?? {}
 const paginationState = reactive({
   total: 0,
-  pageSize: crud.getParams().size ?? 20,
-  currentPage: crud.getParams().page ?? 1,
+  // 兜底 crud 未注入或 getParams 未定义场景，避免初始化时报错
+  pageSize: initialCrudParams.size ?? 20,
+  currentPage: initialCrudParams.page ?? 1,
   pageSizes: [10, 20, 50, 100],
 })
 

@@ -11,19 +11,34 @@
       查看详情
     </el-button>
 
-    <fd-detail ref="detailRef" />
+    <fd-crud ref="crudRef">
+      <fd-detail ref="detailRef" />
+    </fd-crud>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { DetailRef } from "@/components/fd-detail/type"
-import { ref, onMounted } from "vue"
+import type { DetailUseOptions } from "@/components/fd-detail/type"
+import { useCrud, useDetail } from "@/hooks"
 
 defineOptions({
   name: "basic-detail-demo",
 })
 
-const detailRef = ref<DetailRef>()
+const detailOptions: DetailUseOptions = {
+  items,
+  dialog: { width: "720px" },
+  descriptions: { column: 2 },
+}
+
+const crudRef = useCrud({
+  service: {
+    async page() {
+      return { list: [mockData], pagination: { total: 1, page: 1, size: 20 } }
+    },
+  },
+})
+const detailRef = useDetail(detailOptions)
 
 const items = [
   { field: "name", label: "姓名" },
@@ -40,14 +55,6 @@ const mockData = {
   createTime: "2021-01-01",
   remark: "这是一个基础详情示例，展示默认两列布局。",
 }
-
-onMounted(() => {
-  detailRef.value?.use({
-    items,
-    dialog: { width: "720px" },
-    descriptions: { column: 2 },
-  })
-})
 
 function openDetail() {
   detailRef.value?.setData(mockData)

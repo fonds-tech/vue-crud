@@ -19,22 +19,16 @@
 </template>
 
 <script setup lang="ts">
-import type { CrudRef } from "@/types"
 import type { SearchOptions } from "@/components/fd-search/type"
 import type { TableUseOptions } from "@/components/fd-table/type"
 import type { DetailUseOptions } from "@/components/fd-detail/type"
 import type { UpsertUseOptions } from "@/components/fd-upsert/type"
-import { h, ref, onMounted } from "vue"
+import { h, onMounted } from "vue"
+import { useCrud, useTable, useDetail, useSearch, useUpsert } from "@/hooks"
 
 defineOptions({
   name: "basic-crud-demo",
 })
-
-const crudRef = ref<CrudRef>()
-const searchRef = ref()
-const tableRef = ref()
-const detailRef = ref()
-const upsertRef = ref()
 
 const mockService = {
   async page() {
@@ -112,16 +106,17 @@ const upsertOptions: UpsertUseOptions = {
   ],
 }
 
+const crudRef = useCrud({
+  dict,
+  service: mockService as any,
+  permission: { add: true, update: true, delete: true },
+})
+const searchRef = useSearch(searchOptions)
+const tableRef = useTable(tableOptions)
+const detailRef = useDetail(detailOptions)
+const upsertRef = useUpsert(upsertOptions)
+
 onMounted(() => {
-  crudRef.value?.use?.({
-    dict,
-    service: mockService as any,
-    permission: { add: true, update: true, delete: true },
-  })
-  searchRef.value?.use?.(searchOptions)
-  tableRef.value?.use?.(tableOptions)
-  detailRef.value?.use?.(detailOptions)
-  upsertRef.value?.use?.(upsertOptions)
   crudRef.value?.refresh()
 })
 </script>

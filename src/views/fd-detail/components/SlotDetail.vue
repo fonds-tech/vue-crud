@@ -11,40 +11,49 @@
       查看高级详情
     </el-button>
 
-    <fd-detail ref="detailRef">
-      <template #status="{ value }">
-        <el-tag :type="value ? 'success' : 'danger'">
-          {{ value ? "启用" : "禁用" }}
-        </el-tag>
-      </template>
-      <template #group-extra="{ group }">
-        <el-tag effect="plain" size="small">
-          {{ group.title }}
-        </el-tag>
-      </template>
-      <template #footer>
-        <div class="slot-footer">
-          <el-button @click="close">
-            取消
-          </el-button>
-          <el-button type="primary" @click="close">
-            知道了
-          </el-button>
-        </div>
-      </template>
-    </fd-detail>
+    <fd-crud ref="crudRef">
+      <fd-detail ref="detailRef">
+        <template #status="{ value }">
+          <el-tag :type="value ? 'success' : 'danger'">
+            {{ value ? "启用" : "禁用" }}
+          </el-tag>
+        </template>
+        <template #group-extra="{ group }">
+          <el-tag effect="plain" size="small">
+            {{ group.title }}
+          </el-tag>
+        </template>
+        <template #footer>
+          <div class="slot-footer">
+            <el-button @click="close">
+              取消
+            </el-button>
+            <el-button type="primary" @click="close">
+              知道了
+            </el-button>
+          </div>
+        </template>
+      </fd-detail>
+    </fd-crud>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { DetailRef, DetailUseOptions } from "@/components/fd-detail/type"
-import { ref, onMounted } from "vue"
+import type { DetailUseOptions } from "@/components/fd-detail/type"
+import { useCrud, useDetail } from "@/hooks"
 
 defineOptions({
   name: "slot-detail-demo",
 })
 
-const detailRef = ref<DetailRef>()
+const crudRef = useCrud({
+  service: {
+    async page() {
+      return { list: [mockData], pagination: { total: 1, page: 1, size: 20 } }
+    },
+  },
+})
+const detailRef = useDetail(options)
 
 const options: DetailUseOptions = {
   dialog: { width: "780px", title: "设备详情" },
@@ -75,10 +84,6 @@ const mockData = {
   remark: "具名插槽演示：状态标签 + 自定义 footer。",
   tags: ["生产", "核心"],
 }
-
-onMounted(() => {
-  detailRef.value?.use(options)
-})
 
 function openDetail() {
   detailRef.value?.setData(mockData)

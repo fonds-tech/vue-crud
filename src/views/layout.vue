@@ -166,6 +166,7 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
     background: var(--card-bg);
     align-items: center;
     border-bottom: 1px solid var(--divider-color);
+    padding-bottom: 10px;
     justify-content: space-between;
   }
 

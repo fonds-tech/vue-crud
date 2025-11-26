@@ -216,9 +216,9 @@ const options = reactive<FormOptions>({
     scrollToError: true, // 校验失败自动滚动到错误项
   },
   grid: {
-    cols: 4,
-    colGap: 12,
-    rowGap: 12,
+    cols: 1,
+    colGap: 0,
+    rowGap: 0,
     collapsed: false,
     collapsedRows: 1,
   },

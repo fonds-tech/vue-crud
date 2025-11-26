@@ -7,24 +7,37 @@
       展示边框、斑马纹与分页区间信息，使用本地数据。
     </p>
 
-    <fd-table ref="tableRef" />
+    <fd-crud ref="crudRef">
+      <fd-table ref="tableRef" />
+    </fd-crud>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { TableExpose } from "@/components/fd-table/type"
-import { ref, onMounted } from "vue"
+import type { TableDict, TableColumn } from "@/components/fd-table/type"
+import { useCrud, useTable } from "@/hooks"
 
 defineOptions({
   name: "basic-table-demo",
 })
 
-const tableRef = ref<TableExpose>()
+const crudRef = useCrud({
+  service: {
+    async page() {
+      return { list: rows, pagination: { total: rows.length, page: 1, size: rows.length } }
+    },
+  },
+})
 
-const columns = [
+const statusDict: TableDict[] = [
+  { label: "启用", value: 1, type: "success" },
+  { label: "禁用", value: 0, type: "danger" },
+]
+
+const columns: TableColumn[] = [
   { prop: "name", label: "姓名", minWidth: 120 },
   { prop: "account", label: "账号", minWidth: 140 },
-  { prop: "status", label: "状态", dict: [{ label: "启用", value: 1, type: "success" }, { label: "禁用", value: 0, type: "danger" }] },
+  { prop: "status", label: "状态", dict: statusDict },
   { prop: "createTime", label: "创建时间", minWidth: 160 },
 ]
 
@@ -35,13 +48,15 @@ const rows = [
   { id: 4, name: "白小纯", account: "baixiaochun", status: 1, createTime: "2021-04-10" },
 ]
 
-onMounted(() => {
-  tableRef.value?.use({
+const tableRef = useTable(
+  {
     table: { border: true, stripe: true, rowKey: "id" },
     columns,
-  })
-  tableRef.value?.setData(rows)
-})
+  },
+  (table) => {
+    table.setData(rows)
+  },
+)
 </script>
 
 <style scoped lang="scss">
