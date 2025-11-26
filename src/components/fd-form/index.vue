@@ -4,7 +4,7 @@
     :key="options.key"
     class="fd-form"
     :model="model"
-    v-bind="options.form"
+    v-bind="{ ...options.form, ...$attrs }"
   >
     <el-space direction="vertical" fill :size="24">
       <el-steps

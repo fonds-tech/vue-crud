@@ -1,16 +1,6 @@
 <template>
   <fd-dialog v-bind="dialogBindings" v-model="visible" :class="dialogClass" @open="handleOpen" @close="handleClose">
-    <el-skeleton v-if="loading" :loading="loading" animated :rows="4" class="fd-upsert__skeleton">
-      <template #template>
-        <div class="fd-upsert__skeleton-row"></div>
-      </template>
-      <template #default>
-        <p class="fd-upsert__loading-text">
-          {{ options.dialog.loadingText }}
-        </p>
-      </template>
-    </el-skeleton>
-    <fd-form v-else ref="formRef">
+    <fd-form ref="formRef" v-loading="loading" :element-loading-text="options.dialog.loadingText">
       <template v-for="(_, name) in userSlots" :key="name" #[name]="slotScope">
         <slot :name="name" v-bind="createSlotProps(slotScope)" />
       </template>
@@ -61,7 +51,7 @@ import { useUpsertActions } from "./helper/actions"
 import { clone, isFunction } from "@fonds/utils"
 import { useCore, useConfig } from "../../hooks"
 import { useComponentHelper } from "./helper/component"
-import { ElButton, ElMessage, ElSkeleton } from "element-plus"
+import { ElButton, ElMessage } from "element-plus"
 import { ref, watch, computed, nextTick, reactive, useAttrs, useSlots, onBeforeUnmount } from "vue"
 
 defineOptions({
@@ -101,7 +91,7 @@ const options = reactive<UpsertOptions>({
     width: "60%",
     showClose: true,
     destroyOnClose: false,
-    loadingText: "加载中，请稍等...",
+    loadingText: "正在加载中...",
   },
 })
 
@@ -257,7 +247,7 @@ function requestDetail(query: Record<string, any>, done: (value: Record<string, 
 async function update(row: Record<string, any> = {}) {
   mode.value = "update"
   loading.value = true
-  await open()
+  await open(row)
   const done = async (value: Record<string, any> = {}) => {
     loading.value = false
     await applyForm(value)

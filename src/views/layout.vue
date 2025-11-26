@@ -91,6 +91,7 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
       background: var(--primary-gradient);
       font-weight: 800;
       letter-spacing: -0.03em;
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }

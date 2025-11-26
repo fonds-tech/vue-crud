@@ -30,13 +30,235 @@ import type { TableUseOptions } from "@/components/fd-table/type"
 import type { DetailUseOptions } from "@/components/fd-detail/type"
 import type { UpsertUseOptions } from "@/components/fd-upsert/type"
 import { Download } from "@element-plus/icons-vue"
-import { TestService } from "@/utils/test"
 import { h, onMounted } from "vue"
+import { assign, orderBy } from "lodash-es"
 import { useCrud, useTable, useDetail, useSearch, useUpsert } from "@/hooks"
+
+const userList = [
+  {
+    id: 1,
+    name: "楚行云",
+    createTime: "1996-09-14",
+    wages: 73026,
+    status: 1,
+    account: "chuxingyun",
+    occupation: 4,
+    phone: 13797353874,
+  },
+  {
+    id: 2,
+    name: "秦尘",
+    createTime: "1977-11-09",
+    wages: 74520,
+    status: 0,
+    account: "qincheng",
+    occupation: 3,
+    phone: 18593911044,
+  },
+  {
+    id: 3,
+    name: "叶凡",
+    createTime: "1982-11-28",
+    wages: 81420,
+    status: 0,
+    account: "yefan",
+    occupation: 1,
+    phone: 16234136338,
+  },
+  {
+    id: 4,
+    name: "白小纯",
+    createTime: "2012-12-17",
+    wages: 65197,
+    status: 1,
+    account: "baixiaochun",
+    occupation: 2,
+    phone: 16325661110,
+  },
+  {
+    id: 5,
+    name: "韩立",
+    createTime: "1982-07-10",
+    wages: 99107,
+    status: 1,
+    account: "hanli",
+    occupation: 2,
+    phone: 18486594866,
+  },
+  {
+    id: 6,
+    name: "唐三",
+    createTime: "2019-07-31",
+    wages: 80658,
+    status: 1,
+    account: "tangsan",
+    occupation: 5,
+    phone: 15565014642,
+  },
+  {
+    id: 7,
+    name: "王林",
+    createTime: "2009-07-26",
+    wages: 57408,
+    status: 1,
+    account: "wanglin",
+    occupation: 1,
+    phone: 13852767084,
+  },
+  {
+    id: 8,
+    name: "李强",
+    createTime: "2016-04-26",
+    wages: 71782,
+    status: 1,
+    account: "liqiang",
+    occupation: 3,
+    phone: 18365332834,
+  },
+  {
+    id: 9,
+    name: "秦羽",
+    createTime: "1984-01-18",
+    wages: 87860,
+    status: 1,
+    account: "qinyu",
+    occupation: 0,
+    phone: 18149247129,
+  },
+]
+
+function uuid(separator = "-"): string {
+  const s: any[] = []
+  const hexDigits = "0123456789abcdef"
+  for (let i = 0; i < 36; i++) {
+    s[i] = hexDigits[Math.floor(Math.random() * 0x10)]
+  }
+  s[14] = "4"
+  s[19] = hexDigits[(s[19] & 0x3) | 0x8]
+  s[8] = s[13] = s[18] = s[23] = separator
+
+  return s.join("")
+}
+
+// 模拟 API 服务
+const mockService = {
+  // 分页列表
+  async page(params: any) {
+    const { keyWord, page, size, sort, order } = params || {}
+
+    // 关键字查询
+    const keyWordLikeFields = ["phone", "name"]
+
+    // 等值查询
+    const fieldEq = ["createTime", "occupation", "status"]
+
+    // 模糊查询
+    const likeFields = ["phone", "name"]
+
+    // 过滤后的列表
+    const list = orderBy(userList, order, sort).filter((e: any) => {
+      let f = true
+
+      if (keyWord !== undefined) {
+        f = !!keyWordLikeFields.find(k => String(e[k]).includes(String(params.keyWord)))
+      }
+
+      fieldEq.forEach((k) => {
+        if (f) {
+          if (params[k] !== undefined) {
+            f = e[k] === params[k]
+          }
+        }
+      })
+
+      likeFields.forEach((k) => {
+        if (f) {
+          if (params[k] !== undefined) {
+            f = String(e[k]).includes(String(params[k]))
+          }
+        }
+      })
+
+      return f
+    })
+
+    return new Promise((resolve) => {
+      // 模拟延迟
+      setTimeout(() => {
+        resolve({
+          list: list.slice((page - 1) * size, page * size),
+          pagination: {
+            total: list.length,
+            page,
+            size,
+          },
+          subData: {
+            wages: list.reduce((a, b) => {
+              return a + b.wages
+            }, 0),
+          },
+        })
+      }, Math.random() * 3000)
+    })
+  },
+
+  // 更新
+  async update(params: { id: any, [key: string]: any }) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const item = userList.find(e => e.id === params.id)
+        if (item) {
+          assign(item, params)
+        }
+        resolve(null)
+      }, Math.random() * 3000)
+    })
+  },
+
+  // 新增
+  async add(params: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const id = uuid()
+        userList.push({
+          id,
+          ...params,
+        })
+        resolve(id)
+      }, Math.random() * 3000)
+    })
+  },
+
+  // 详情
+  async info(params: { id: any }) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const { id } = params || {}
+        resolve(userList.find(e => e.id === id))
+      }, Math.random() * 3000)
+    })
+  },
+
+  // 删除
+  async delete(params: { ids: any[] }) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const { ids = [] } = params || {}
+        ids.forEach((id) => {
+          const index = userList.findIndex(e => e.id === id)
+          if (index > -1) {
+            userList.splice(index, 1)
+          }
+        })
+        resolve(null)
+      }, Math.random() * 3000)
+    })
+  },
+}
 
 const crud = useCrud(
   {
-    service: new TestService(),
+    service: mockService,
     permission: { add: true, delete: true, update: true, detail: true },
   },
 )
@@ -128,11 +350,11 @@ const tableOptions: TableUseOptions = {
 
 const detailOptions: DetailUseOptions = {
   items: [
-    { label: "姓名", field: "name", span: 2 },
-    { label: "账号", field: "account", span: 2 },
-    { label: "薪资", field: "wages", span: 2 },
-    { label: "手机号", field: "phone", span: 2 },
-    { label: "入职时间", field: "createTime", span: 2 },
+    { label: "姓名", field: "name" },
+    { label: "账号", field: "account" },
+    { label: "薪资", field: "wages" },
+    { label: "手机号", field: "phone" },
+    { label: "入职时间", field: "createTime" },
     {
       label: "状态",
       field: "status",
@@ -144,9 +366,8 @@ const detailOptions: DetailUseOptions = {
         },
       },
     },
-  ],
-  groups: [
-    { name: 1, title: "基础信息" },
+    // 备注信息较长，保持占满两列
+    { label: "备注", field: "remark", span: 2 },
   ],
 }
 

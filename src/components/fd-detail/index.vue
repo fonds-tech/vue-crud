@@ -282,11 +282,16 @@ const groups = computed(() => {
     .map(([name, items]) => {
       const meta = options.groups.find(group => group.name === name)
       const descriptions = merge({}, options.descriptions, meta?.descriptions) as DetailDescriptions
+      const normalizedDescriptions = {
+        ...descriptions,
+        // 默认使用两列布局，除非外部显式传入其他列数
+        column: descriptions.column ?? 2,
+      }
       return {
         name,
         items,
         title: meta ? resolveMaybe(meta.title) : descriptions.title,
-        descriptions,
+        descriptions: normalizedDescriptions,
       } as DetailGroup & { items: DetailItem[], descriptions: DetailDescriptions }
     })
     .filter(group => group.items.length > 0)
@@ -605,8 +610,12 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss">
 .fd-detail {
+  .el-space {
+    width: 100%;
+  }
+
   &__footer {
     gap: 12px;
     display: flex;
@@ -623,10 +632,6 @@ defineExpose({
       margin-bottom: 12px;
       background-color: var(--el-color-info-light-9, #f4f4f5);
     }
-  }
-
-  :deep(.el-descriptions__label:empty) {
-    display: none;
   }
 }
 </style>
