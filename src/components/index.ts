@@ -13,6 +13,7 @@ import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
 import AddButton from "./fd-add-button/index.vue"
 import DeleteButton from "./fd-delete-button/index.vue"
+import ExportButton from "./fd-export/index.vue"
 import ImportButton from "./fd-import/index.vue"
 import FdContextMenu from "./fd-context-menu"
 
@@ -31,6 +32,7 @@ export const components: Record<string, Component> = {
   Detail,
   Table,
   ImportButton,
+  ExportButton,
   Upsert,
   FdContextMenu,
 }

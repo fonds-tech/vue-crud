@@ -1,7 +1,7 @@
 <template>
   <layout
-    title="搜索演示"
-    description="fd-search 调试场景与布局"
+    title="fd-search 搜索示例"
+    description="展示 fd-search 不同布局与动作区域"
     :components="componentCatalog"
   />
 </template>

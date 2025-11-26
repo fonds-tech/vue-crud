@@ -1,7 +1,7 @@
 <template>
   <layout
-    title="Context Menu 演示"
-    description="展示 fd-context-menu 在右键触发、组件模式下的典型用法。"
+    title="fd-context-menu 右键菜单示例"
+    description="展示基础右键菜单与多级自定义项"
     :components="componentCatalog"
   />
 </template>
@@ -15,19 +15,19 @@ import AdvancedContextMenu from "./components/AdvancedContextMenu.vue"
 const componentCatalog: ComponentMeta[] = [
   {
     key: "basic",
-    title: "右键菜单",
-    badge: "API",
-    description: "在任意元素上右键弹出菜单，展示多级项、禁用项和 hover 高亮。",
+    title: "基础右键菜单",
+    badge: "基础",
+    description: "右键触发 + 关闭行为演示。",
     component: BasicContextMenu,
-    tagType: "info",
+    tagType: "success",
   },
   {
     key: "advanced",
-    title: "自定义内容",
-    badge: "组件",
-    description: "通过模板方式完全掌控菜单内容，可切换 slot 版本或列表版本。",
+    title: "多级自定义项",
+    badge: "进阶",
+    description: "多级菜单、禁用、回调关闭控制。",
     component: AdvancedContextMenu,
-    tagType: "info",
+    tagType: "warning",
   },
 ]
 </script>

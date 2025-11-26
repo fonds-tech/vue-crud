@@ -1,7 +1,7 @@
 <template>
   <layout
-    title="表单演示"
-    description="不同的 fd-form 配置与布局演示"
+    title="fd-form 表单示例"
+    description="展示 fd-form 的多种布局与模式"
     :components="componentCatalog"
   />
 </template>

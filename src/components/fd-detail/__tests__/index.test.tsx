@@ -64,17 +64,6 @@ const ElDescriptionsItemStub = defineComponent({
   },
 })
 
-const ElSkeletonStub = defineComponent({
-  name: "ElSkeletonStub",
-  inheritAttrs: false,
-  props: {
-    loading: { type: Boolean, default: false },
-  },
-  setup(props, { slots, attrs }) {
-    return () => (props.loading ? h("div", { ...attrs, class: ["el-skeleton-stub", attrs.class] }) : slots.default?.())
-  },
-})
-
 const ElSpaceStub = defineComponent({
   name: "ElSpaceStub",
   inheritAttrs: false,
@@ -184,11 +173,13 @@ function mountDetail(options: { crudOverrides?: Partial<CrudStub>, mounting?: Mo
       ...(options.mounting?.slots ?? {}),
     },
     global: {
+      directives: {
+        loading: () => {},
+      },
       stubs: {
         "fd-dialog": FdDialogStub,
         "el-descriptions": ElDescriptionsStub,
         "el-descriptions-item": ElDescriptionsItemStub,
-        "el-skeleton": ElSkeletonStub,
         "el-space": ElSpaceStub,
         "el-button": ElButtonStub,
         ...(options.mounting?.global?.stubs ?? {}),
