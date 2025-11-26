@@ -160,7 +160,7 @@ const occupationSelectOptions = [
 
 const upsertOptions: UpsertUseOptions = {
   form: { labelWidth: "96px" },
-  grid: { cols: 2, colGap: 16, rowGap: 16 },
+  grid: { cols: 1 },
   model: {
     status: 1,
   },

@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef, FormRecord, FormUseOptions } from "../fd-form/type"
-import type { UpsertMode, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "./type"
+import type { FormRef, FormItem, FormRecord, FormUseOptions } from "../fd-form/type"
+import type { UpsertMode, UpsertAction, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "./type"
 import FdForm from "../fd-form/index.vue"
 import FdDialog from "../fd-dialog/index.vue"
 import { merge } from "lodash-es"
@@ -92,9 +92,9 @@ const options = reactive<UpsertOptions>({
   items: [],
   group: {},
   grid: {
-    cols: 24,
-    rowGap: 16,
-    colGap: 16,
+    cols: 1,
+    rowGap: 0,
+    colGap: 12,
   },
   actions: [],
   dialog: {
@@ -166,11 +166,11 @@ function useUpsert(useOptions: UpsertUseOptions = {}) {
   merge(options, rest)
 
   if (Array.isArray(actions)) {
-    options.actions.splice(0, options.actions.length, ...actions)
+    options.actions.splice(0, options.actions.length, ...(actions.filter(Boolean) as UpsertAction<FormRecord>[]))
   }
 
   if (Array.isArray(items)) {
-    options.items.splice(0, options.items.length, ...items.filter(Boolean))
+    options.items.splice(0, options.items.length, ...(items.filter(Boolean) as FormItem<FormRecord>[]))
   }
 
   if (modelOverrides) {
