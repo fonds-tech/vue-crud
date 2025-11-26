@@ -1,6 +1,6 @@
 import type { Arrayable } from "element-plus/es/utils"
 import type { GridProps, GridItemProps } from "../fd-grid/type"
-import type { VNodeChild, CSSProperties, Component as VueComponent } from "vue"
+import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormProps,
   FormInstance,
@@ -143,9 +143,14 @@ export type FormMaybeFn<T, M extends FormRecord = FormRecord> = T | ((model: M) 
 
 /**
  * 表单组件插槽内容类型
- * @description 支持字符串、Vue组件、表单组件配置对象或渲染函数
+ * @description 支持字符串、Vue组件、表单组件配置对象、VNode 或渲染函数
  */
-export type FormComponentSlot<T extends FormRecord = FormRecord> = string | VueComponent | FormComponent<T> | (() => VNodeChild)
+export type FormComponentSlot<T extends FormRecord = FormRecord>
+  = | string
+    | VueComponent
+    | VNode
+    | FormComponent<T>
+    | (() => VNodeChild)
 
 /**
  * 表单内部组件配置接口
@@ -156,7 +161,7 @@ export interface FormComponent<T extends FormRecord = FormRecord> {
    * 组件类型或组件名
    * @example 'el-input', import('vue').Component
    */
-  is?: FormMaybeFn<string | VueComponent, T>
+  is?: FormMaybeFn<string | VueComponent | VNode | (() => VNodeChild), T>
   /**
    * 组件事件监听器
    * @example { change: (val) => console.log(val) }

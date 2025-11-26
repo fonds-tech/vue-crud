@@ -91,8 +91,12 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
       // 下一步：支持缺省分页服务的兜底，避免 Loading 卡死
       function next(params: Record<string, any>): Promise<any> {
         return new Promise((resolve, reject) => {
+          const hasService = Boolean(service)
+          const shouldWarn = hasService && (crud.permission?.page ?? true)
+
           if (!pageService) {
-            ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
+            if (shouldWarn)
+              ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
             done()
             resolve({})
             return

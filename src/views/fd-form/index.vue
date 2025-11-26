@@ -16,6 +16,7 @@ import BasicForm from "./components/BasicForm.vue"
 import StepsForm from "./components/StepsForm.vue"
 import DynamicForm from "./components/DynamicForm.vue"
 import WorkflowForm from "./components/WorkflowForm.vue"
+import ComponentPlayground from "./components/ComponentPlayground.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -73,6 +74,14 @@ const componentCatalog: ComponentMeta[] = [
     description: "setMode + bindFields 复用表单，支持新增/编辑态切换。",
     component: ModeForm,
     tagType: "success",
+  },
+  {
+    key: "component",
+    title: "组件配置全景",
+    badge: "Component",
+    description: "演示 component 对象 props/options/slots/on/style 的完整用法。",
+    component: ComponentPlayground,
+    tagType: "warning",
   },
 ]
 </script>

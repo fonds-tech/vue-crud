@@ -174,7 +174,7 @@
 
 <script setup lang="ts">
 import type { FormInstance } from "element-plus"
-import type { CSSProperties, Component as VueComponent } from "vue"
+import type { VNode, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormItem,
   FormRecord,
@@ -191,7 +191,7 @@ import { merge } from "lodash-es"
 import { useAction } from "./helper/action"
 import { useMethods } from "./helper/methods"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
-import { ref, useId, watch, computed, reactive } from "vue"
+import { ref, useId, watch, isVNode, markRaw, computed, reactive, defineComponent } from "vue"
 
 defineOptions({
   name: "fd-form",
@@ -276,6 +276,10 @@ function isComponentConfig(component?: FormComponentSlot): component is FormComp
   return Boolean(component && typeof component === "object" && "is" in component)
 }
 
+function wrapVNode(node: VNode) {
+  return markRaw(defineComponent({ name: "fd-form-vnode-wrapper", setup: () => () => node }))
+}
+
 /**
  * 解析组件类型 (is 属性)
  * 支持字符串组件名、Vue组件对象或动态函数返回
@@ -283,11 +287,18 @@ function isComponentConfig(component?: FormComponentSlot): component is FormComp
 function is(com?: FormComponentSlot) {
   if (!com)
     return undefined
-  if (isComponentConfig(com))
-    return resolveProp<string | VueComponent>(com, "is")
-  if (typeof com === "string" || typeof com === "function")
-    return com as string | VueComponent
-  return com as VueComponent
+
+  const resolved = isComponentConfig(com) ? resolveProp<string | VueComponent | (() => any)>(com, "is") : com
+  if (!resolved)
+    return undefined
+
+  if (isVNode(resolved))
+    return wrapVNode(resolved)
+
+  if (typeof resolved === "function" || (typeof resolved === "object" && resolved))
+    return markRaw(resolved as VueComponent)
+
+  return resolved as string | VueComponent
 }
 
 // 解析组件事件监听器 (on 属性)

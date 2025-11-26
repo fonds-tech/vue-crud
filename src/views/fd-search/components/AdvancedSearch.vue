@@ -18,14 +18,19 @@
 
 <script setup lang="ts">
 import type { SearchOptions } from "@/components/fd-search/type"
+import { h, computed } from "vue"
 import { SearchMockService } from "../mockService"
 import { useCrud, useSearch } from "@/hooks"
-import { h, computed, onMounted } from "vue"
 
-const crudRef = useCrud({
-  service: new SearchMockService(),
-  permission: { add: true, delete: true, update: true, page: true },
-})
+const crudRef = useCrud(
+  {
+    service: new SearchMockService(),
+    permission: { add: true, delete: true, update: true, page: true },
+  },
+  (crud) => {
+    crud.refresh()
+  },
+)
 
 const advancedOptions: SearchOptions = {
   model: {
@@ -189,10 +194,6 @@ const advancedOptions: SearchOptions = {
 
 const searchRef = useSearch(advancedOptions)
 const crudParams = computed(() => crudRef.value?.params)
-
-onMounted(() => {
-  crudRef.value?.refresh()
-})
 </script>
 
 <style scoped>
