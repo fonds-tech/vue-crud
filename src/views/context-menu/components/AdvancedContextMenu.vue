@@ -34,12 +34,12 @@
     >
       <div class="custom-menu">
         <h4>快速动作</h4>
-        <el-button text type="primary" @click="copyLink">
+        <div class="menu-item primary" @click="copyLink">
           复制链接
-        </el-button>
-        <el-button text type="danger" @click="removeItem">
+        </div>
+        <div class="menu-item danger" @click="removeItem">
           删除
-        </el-button>
+        </div>
         <el-divider />
         <p class="custom-menu__tip">
           你可以在这里渲染任何内容，例如表单或统计信息。
@@ -152,5 +152,25 @@ watch(
   color: var(--text-sub);
   margin: 0;
   font-size: 12px;
+}
+.menu-item {
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.2s;
+  user-select: none;
+  border-radius: 6px;
+}
+
+.menu-item:hover {
+  background-color: var(--el-fill-color-light);
+}
+
+.menu-item.primary {
+  color: var(--el-color-primary);
+}
+
+.menu-item.danger {
+  color: var(--el-color-danger);
 }
 </style>

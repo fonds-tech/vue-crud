@@ -1,17 +1,21 @@
 <template>
-  <div class="page-container">
-    <header class="page-header">
-      <div class="header-content">
-        <h2>{{ title }}</h2>
-        <p>{{ description }}</p>
+  <div class="layout">
+    <header class="layout__header">
+      <div class="layout__header-content">
+        <h2 class="layout__title">
+          {{ title }}
+        </h2>
+        <p class="layout__description">
+          {{ description }}
+        </p>
       </div>
 
-      <div class="tabs-group">
+      <div class="layout__tabs">
         <button
           v-for="component in components"
           :key="component.key"
-          class="tab-item"
-          :class="{ active: component.key === activeComponentKey }"
+          class="layout__tab"
+          :class="{ 'layout__tab--active': component.key === activeComponentKey }"
           @click="activeComponentKey = component.key"
         >
           {{ component.title }}
@@ -19,18 +23,22 @@
       </div>
     </header>
 
-    <div class="preview-card">
-      <div class="preview-info">
-        <div class="info-text">
-          <h3>{{ activeComponent.title }}</h3>
-          <p>{{ activeComponent.description }}</p>
+    <div class="layout__preview">
+      <div class="layout__preview-info">
+        <div class="layout__info-text">
+          <h3 class="layout__preview-title">
+            {{ activeComponent.title }}
+          </h3>
+          <p class="layout__preview-description">
+            {{ activeComponent.description }}
+          </p>
         </div>
-        <el-tag effect="plain" :type="activeComponent.tagType || 'primary'" round class="meta-tag">
+        <el-tag effect="plain" :type="activeComponent.tagType || 'primary'" round class="layout__meta-tag">
           {{ activeComponent.badge }}
         </el-tag>
       </div>
 
-      <div class="preview-body dot-pattern">
+      <div class="layout__preview-body dot-pattern">
         <component :is="activeComponent.component" />
       </div>
     </div>
@@ -60,132 +68,152 @@ const activeComponentKey = ref(props.components[0]?.key)
 const activeComponent = computed(() => props.components.find(item => item.key === activeComponentKey.value) ?? props.components[0])
 </script>
 
-<style scoped>
-.page-container {
+<style scoped lang="scss">
+.layout {
   display: flex;
   max-width: 100%;
+  min-height: 100%;
   flex-direction: column;
-}
 
-.page-header {
-  gap: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  margin-bottom: 24px;
-  justify-content: space-between;
-}
+  &__header {
+    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    justify-content: space-between;
+  }
 
-.header-content h2 {
-  margin: 0 0 6px 0;
-  font-size: 28px;
-  background: var(--primary-gradient);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  &__header-content {
+    h2 {
+      margin: 0 0 6px 0;
+      font-size: 28px;
+      background: var(--primary-gradient);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-.header-content p {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 14px;
-}
+    p {
+      color: var(--text-sub);
+      margin: 0;
+      font-size: 14px;
+    }
+  }
 
-.tabs-group {
-  gap: 2px;
-  display: flex;
-  padding: 4px;
-  background: var(--divider-color);
-  border-radius: var(--radius-md);
-}
+  &__title {
+    font: inherit;
+  }
 
-.tab-item {
-  color: var(--text-sub);
-  border: none;
-  cursor: pointer;
-  padding: 6px 16px;
-  font-size: 13px;
-  background: transparent;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  border-radius: 6px;
-}
+  &__description {
+    font: inherit;
+  }
 
-.tab-item:hover {
-  color: var(--text-title);
-}
+  &__tabs {
+    gap: 2px;
+    display: flex;
+    padding: 4px;
+    background: var(--divider-color);
+    border-radius: var(--radius-md);
+  }
 
-.tab-item.active {
-  color: var(--text-title);
-  background: var(--card-bg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  font-weight: 600;
-}
+  &__tab {
+    color: var(--text-sub);
+    border: none;
+    cursor: pointer;
+    padding: 6px 16px;
+    font-size: 13px;
+    background: transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    border-radius: 6px;
 
-.preview-card {
-  flex: 1;
-  border: 1px solid var(--card-border);
-  display: flex;
-  overflow: hidden;
-  background: var(--card-bg);
-  box-shadow: var(--shadow-md);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-radius: var(--radius-xl);
-  flex-direction: column;
-}
+    &:hover {
+      color: var(--text-title);
+    }
 
-.preview-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md), var(--shadow-glow);
-  border-color: rgba(59, 130, 246, 0.3);
-}
+    &--active {
+      color: var(--text-title);
+      background: var(--card-bg);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+    }
+  }
 
-.preview-info {
-  display: flex;
-  padding: 20px 32px;
-  background: var(--card-bg);
-  align-items: center;
-  border-bottom: 1px solid var(--divider-color);
-  justify-content: space-between;
-}
+  &__preview {
+    gap: 20px;
+    flex: 1;
+    border: 1px solid var(--card-border);
+    display: flex;
+    padding: 20px;
+    overflow: hidden;
+    background: var(--card-bg);
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: var(--radius-xl);
+    flex-direction: column;
 
-.info-text h3 {
-  color: var(--text-title);
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 600;
-}
+    &:hover {
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+  }
 
-.info-text p {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 13px;
-}
+  &__preview-info {
+    display: flex;
+    background: var(--card-bg);
+    align-items: center;
+    border-bottom: 1px solid var(--divider-color);
+    justify-content: space-between;
+  }
 
-.meta-tag {
-  border: none;
-  font-weight: 600;
-}
+  &__info-text {
+    h3 {
+      color: var(--text-title);
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
 
-.meta-tag.el-tag--primary,
-.meta-tag.el-tag--info {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
-}
+    p {
+      color: var(--text-sub);
+      margin: 0;
+      font-size: 13px;
+    }
+  }
 
-.meta-tag.el-tag--success {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
+  &__preview-title {
+    font: inherit;
+  }
 
-.meta-tag.el-tag--warning {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-}
+  &__preview-description {
+    font: inherit;
+  }
 
-.preview-body {
-  padding: 32px;
-  min-height: 520px;
+  &__meta-tag {
+    border: none;
+    font-weight: 600;
+
+    &.el-tag--primary,
+    &.el-tag--info {
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    &.el-tag--success {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    &.el-tag--warning {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+  }
+
+  &__preview-body {
+    min-height: 520px;
+  }
 }
 </style>

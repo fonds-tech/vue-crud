@@ -1,17 +1,13 @@
 import { reactive } from "vue"
 
-interface RefsMap {
-  [key: string]: any
-}
-
 /**
  * 统一管理模板引用，便于在 JSX 中动态绑定。
  */
 export function useRefs<T = any>() {
-  const refs = reactive<RefsMap>({})
+  const refs = reactive<Record<string, T | null>>({})
 
   function setRefs(name: string) {
-    return (el: T) => {
+    return (el: any) => {
       refs[name] = el
     }
   }

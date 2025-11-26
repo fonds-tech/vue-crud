@@ -190,12 +190,13 @@
       v-if="contextMenuState.visible" class="fd-table__context-menu"
       :style="{ top: `${contextMenuState.y}px`, left: `${contextMenuState.x}px` }"
     >
-      <el-button
-        v-for="(item, index) in contextMenuState.items" :key="index" text size="small"
+      <div
+        v-for="(item, index) in contextMenuState.items" :key="index"
+        class="fd-table__context-menu-item"
         @click="handleContextAction(item)"
       >
         {{ item.label }}
-      </el-button>
+      </div>
     </div>
   </teleport>
 </template>
@@ -807,6 +808,22 @@ defineExpose({
     box-shadow: var(--el-box-shadow-light);
     border-radius: 6px;
     flex-direction: column;
+  }
+
+  &__context-menu-item {
+    color: var(--el-text-color-regular);
+    cursor: pointer;
+    padding: 5px 12px;
+    font-size: 13px;
+    transition: all 0.2s;
+    line-height: 20px;
+    user-select: none;
+    border-radius: 4px;
+
+    &:hover {
+      color: var(--el-color-primary);
+      background-color: var(--el-fill-color-light);
+    }
   }
 }
 </style>

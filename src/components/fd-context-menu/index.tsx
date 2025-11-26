@@ -56,7 +56,7 @@ export const FdContextMenu = defineComponent({
     function registerOutsideClose(doc: Document) {
       cleanup()
       const handler = (event: MouseEvent) => {
-        const root = refs[COMPONENT_NAME] as HTMLElement | undefined
+        const root = refs[COMPONENT_NAME]
         const target = event.target as Node | null
         if (!root || root === target || root.contains(target))
           return
@@ -90,17 +90,17 @@ export const FdContextMenu = defineComponent({
 
     async function positionMenu(event: MouseEvent) {
       await nextTick()
-      const menu = refs[COMPONENT_NAME] as HTMLElement | undefined
+      const menu = refs[COMPONENT_NAME]
       if (!menu)
         return
 
       const doc = (event.target as HTMLElement | null)?.ownerDocument ?? document
-      const body = doc.body
-      const maxHeight = body.clientHeight
-      const maxWidth = body.clientWidth
+      const html = doc.documentElement
+      const maxHeight = html.clientHeight
+      const maxWidth = html.clientWidth
 
-      let left = event.pageX ?? event.clientX
-      let top = event.pageY ?? event.clientY
+      let left = event.clientX
+      let top = event.clientY
 
       const { clientHeight, clientWidth } = menu
 
@@ -288,8 +288,10 @@ export const ContextMenu = {
       const originalClose = exposed.close
       exposed.close = () => {
         originalClose()
-        render(null, host)
-        host.remove()
+        setTimeout(() => {
+          render(null, host)
+          host.remove()
+        }, 200)
       }
     }
 
