@@ -258,12 +258,9 @@ async function update(row: Record<string, any> = {}) {
   mode.value = "update"
   loading.value = true
   await open()
-  const done = (value: Record<string, any> = {}) => {
-    nextTick(() => {
-      formRef.value?.setMode?.("update")
-      formRef.value?.bindFields(value)
-      loading.value = false
-    })
+  const done = async (value: Record<string, any> = {}) => {
+    loading.value = false
+    await applyForm(value)
   }
   const next = (query: Record<string, any>) => requestDetail(query, done)
   if (isFunction(options.onDetail)) {
