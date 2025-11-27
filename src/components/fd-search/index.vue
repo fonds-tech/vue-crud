@@ -6,47 +6,24 @@
       </template>
     </fd-form>
 
-    <fd-grid
-      v-if="resolvedActions.length"
-      class="fd-search__action"
-      v-bind="actionGridProps"
-    >
-      <fd-grid-item
-        v-for="(action, actionIndex) in resolvedActions"
-        :key="actionIndex"
-        class="fd-search__action-item"
-        v-bind="getActionItemProps(action)"
-      >
-        <el-button
-          v-if="action.type === 'search'"
-          type="primary"
-          :disabled="loading"
-          @click="search()"
-        >
-          <el-icon
-            class="fd-search__icon"
-            :class="{ 'is-loading': loading }"
-          >
+    <fd-grid v-if="resolvedActions.length" class="fd-search__action" v-bind="actionGridProps">
+      <fd-grid-item v-for="(action, actionIndex) in resolvedActions" :key="actionIndex" class="fd-search__action-item" v-bind="getActionItemProps(action)">
+        <el-button v-if="action.type === 'search'" type="primary" :disabled="loading" @click="search()">
+          <el-icon class="fd-search__icon" :class="{ 'is-loading': loading }">
             <icon-loading v-if="loading" />
             <icon-search v-else />
           </el-icon>
-          <span>{{ action.text || crud.dict?.label?.search || "搜索" }}</span>
+          <span>{{ action.text || crud.dict?.label?.search || '搜索' }}</span>
         </el-button>
 
-        <el-button
-          v-else-if="action.type === 'reset'"
-          @click="reset()"
-        >
+        <el-button v-else-if="action.type === 'reset'" @click="reset()">
           <el-icon class="fd-search__icon">
             <icon-refresh />
           </el-icon>
-          <span>{{ action.text || crud.dict?.label?.reset || "重置" }}</span>
+          <span>{{ action.text || crud.dict?.label?.reset || '重置' }}</span>
         </el-button>
 
-        <el-button
-          v-else-if="action.type === 'collapse'"
-          @click="collapse()"
-        >
+        <el-button v-else-if="action.type === 'collapse'" @click="collapse()">
           <el-icon class="fd-search__icon">
             <icon-arrow-up v-if="!collapsed" />
             <icon-arrow-down v-else />
@@ -54,25 +31,10 @@
           <span>{{ collapseLabel }}</span>
         </el-button>
 
-        <slot
-          v-else-if="getActionSlot(action)"
-          :name="getActionSlot(action)!"
-          :model="formModel"
-          :action="action"
-        />
+        <slot v-else-if="getActionSlot(action)" :name="getActionSlot(action)!" :model="formModel" :action="action" />
 
-        <component
-          :is="getComponentIs(action)"
-          v-else-if="getComponentIs(action)"
-          :style="getComponentStyle(action)"
-          v-bind="getComponentProps(action)"
-          v-on="getComponentEvents(action)"
-        >
-          <template
-            v-for="(value, name) in getComponentSlots(action)"
-            :key="name"
-            #[name]
-          >
+        <component :is="getComponentIs(action)" v-else-if="getComponentIs(action)" :style="getComponentStyle(action)" v-bind="getComponentProps(action)" v-on="getComponentEvents(action)">
+          <template v-for="(value, name) in getComponentSlots(action)" :key="name" #[name]>
             <component :is="value" />
           </template>
         </component>
@@ -108,15 +70,11 @@ const collapsed = ref(false)
 const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1920)
 
 function handleResize() {
-  if (typeof window === "undefined")
-    return
+  if (typeof window === "undefined") return
   viewportWidth.value = window.innerWidth
 }
 
-const defaultActions: SearchAction[] = [
-  { type: "search" },
-  { type: "reset" },
-]
+const defaultActions: SearchAction[] = [{ type: "search" }, { type: "reset" }]
 
 interface InternalActionOptions<T extends FormRecord = FormRecord> {
   items: SearchAction<T>[]
@@ -131,22 +89,8 @@ interface InternalOptions<T extends FormRecord = FormRecord> {
 }
 
 const options = reactive<InternalOptions>({
-  form: {
-    model: {},
-    items: [],
-    grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 2 },
-    form: {
-      labelWidth: "auto",
-    },
-  },
-  action: {
-    items: clone(defaultActions),
-    grid: {
-      cols: 2,
-      colGap: 12,
-      rowGap: 12,
-    },
-  },
+  form: { model: {}, items: [], grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 2 }, form: { labelWidth: "auto" } },
+  action: { items: clone(defaultActions), grid: { cols: 2, colGap: 12, rowGap: 12 } },
 })
 
 // 表单数据模型，优先读取 fd-form 实例，否则退回默认配置
@@ -198,8 +142,7 @@ watch(
 
 // 接收 fd-search 的业务配置，并透传给 fd-form
 function use(useOptions: SearchOptions = {}) {
-  if (!useOptions)
-    return
+  if (!useOptions) return
 
   const { action, onSearch, onReset, ...formOptions } = useOptions
 
@@ -347,8 +290,7 @@ const getComponentSlots = (action: SearchAction) => resolveComponent(action, "sl
 // 通用解析函数：根据 key 读取 component 对象，并自动触发函数求值
 function resolveComponent(action: SearchAction, key: keyof NonNullable<SearchAction["component"]>) {
   const component = action.component
-  if (!component)
-    return undefined
+  if (!component) return undefined
   const value = component[key]
   return resolveMaybe(value)
 }

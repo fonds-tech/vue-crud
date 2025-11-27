@@ -26,6 +26,9 @@ const crudRef = useCrud(
   {
     service: new SearchMockService(),
     permission: { add: true, delete: true, update: true, page: true },
+    onRefresh: (params) => {
+      console.log("🚀 ~ params:", params)
+    },
   },
   (crud) => {
     crud.refresh()
@@ -33,19 +36,7 @@ const crudRef = useCrud(
 )
 
 const advancedOptions: SearchOptions = {
-  model: {
-    keyword: "",
-    status: "",
-    createTime: [],
-    department: [],
-    tags: [],
-    notify: false,
-    salaryRange: [5, 20],
-    approval: "all",
-    priority: 3,
-    remarks: "",
-  },
-  grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 1 },
+  grid: { cols: 3 },
   items: [
     {
       field: "keyword",
@@ -176,7 +167,7 @@ const advancedOptions: SearchOptions = {
     },
   ],
   action: {
-    grid: { cols: 2 },
+    grid: { cols: 1 },
     items: [
       { type: "search", text: "搜索" },
       { type: "reset", text: "重置" },
@@ -186,7 +177,7 @@ const advancedOptions: SearchOptions = {
     console.log("Search triggered:", model)
     next()
   },
-  onReset: (model, { next }) => {
+  onReset: (_model, { next }) => {
     console.log("Reset triggered")
     next()
   },

@@ -95,8 +95,7 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
           const shouldWarn = hasService && (crud.permission?.page ?? true)
 
           if (!pageService) {
-            if (shouldWarn)
-              ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
+            if (shouldWarn) ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
             done()
             resolve({})
             return

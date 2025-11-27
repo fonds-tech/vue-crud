@@ -32,6 +32,7 @@ export default eslint(
     rules: {
       "no-console": "off",
       "ts/ban-ts-comment": "off",
+      "fonds/if-newline": "off",
     },
   },
   {

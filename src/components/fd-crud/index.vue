@@ -45,6 +45,7 @@ const crud = reactive<any>(
 merge(crud, useHelper({ config: options, crud, mitt }))
 
 function useCrudOptions(useOptions: Partial<CrudOptions> = {}) {
+  merge(options, useOptions)
   merge(crud, useOptions)
 }
 
