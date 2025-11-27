@@ -9,12 +9,21 @@
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
 import Layout from "../layout.vue"
+import BasicSearch from "./components/BasicSearch.vue"
 import CompactSearch from "./components/CompactSearch.vue"
 import AdvancedSearch from "./components/AdvancedSearch.vue"
 import StackedActions from "./components/StackedActions.vue"
 import OverflowCollapse from "./components/OverflowCollapse.vue"
 
 const componentCatalog: ComponentMeta[] = [
+  {
+    key: "basic",
+    title: "基础搜索",
+    badge: "入门",
+    description: "输入/选择/日期的基础示例，涵盖关键词、状态、类型、日期、通知、优先级等常见字段。",
+    component: BasicSearch,
+    tagType: "success",
+  },
   {
     key: "advanced",
     title: "多字段高级搜索",

@@ -89,7 +89,7 @@ interface InternalOptions<T extends FormRecord = FormRecord> {
 }
 
 const options = reactive<InternalOptions>({
-  form: { model: {}, items: [], grid: { cols: 4, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 2 }, form: { labelWidth: "auto" } },
+  form: { model: {}, items: [], grid: { cols: 3, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 2 }, form: { labelWidth: "auto" } },
   action: { items: clone(defaultActions), grid: { cols: 2, colGap: 12, rowGap: 12 } },
 })
 
