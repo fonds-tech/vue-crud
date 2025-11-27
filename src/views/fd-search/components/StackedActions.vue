@@ -1,13 +1,13 @@
 <template>
   <div class="search-variant">
-    <el-card class="variant-card">
-      <fd-crud ref="crudRef" class="crud-shell">
+    <el-card>
+      <fd-crud ref="crudRef">
         <fd-search ref="searchRef" />
       </fd-crud>
     </el-card>
 
-    <el-card class="variant-card">
-      <pre>{{ crudParams }}</pre>
+    <el-card>
+      <pre class="variant-snapshot">{{ crudParams }}</pre>
     </el-card>
   </div>
 </template>
@@ -72,57 +72,21 @@ const searchRef = useSearch(stackedOptions)
 const crudParams = computed(() => crudRef.value?.params)
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .search-variant {
   gap: 16px;
   display: flex;
   flex-direction: column;
-}
 
-.variant-card {
-  border: none;
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius-lg);
-}
-
-.crud-shell {
-  padding: 16px;
-  background: var(--app-bg);
-  border-radius: var(--radius-md);
-}
-
-.variant-meta {
-  margin-bottom: 12px;
-
-  &__scene {
-    color: var(--text-main);
+  .variant-snapshot {
+    color: #e5e7eb;
     margin: 0;
-    font-weight: 600;
+    padding: 16px;
+    overflow: auto;
+    background: #111827;
+    max-height: 300px;
+    font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    border-radius: var(--radius-md);
   }
-
-  &__tips {
-    color: var(--text-sub);
-    margin: 4px 0 0;
-    font-size: 12px;
-  }
-}
-
-.panel-title {
-  color: var(--text-sub);
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  justify-content: space-between;
-}
-
-pre {
-  color: #e5e7eb;
-  margin: 0;
-  padding: 16px;
-  overflow: auto;
-  background: #111827;
-  max-height: 300px;
-  font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  border-radius: var(--radius-md);
 }
 </style>

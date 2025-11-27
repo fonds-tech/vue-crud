@@ -28,6 +28,9 @@
         <div class="layout__info-text">
           <h3 class="layout__preview-title">
             {{ activeComponent.title }}
+            <span v-if="activeComponent.componentName" class="layout__component-name">
+              - {{ activeComponent.componentName }}
+            </span>
           </h3>
           <p class="layout__preview-description">
             {{ activeComponent.description }}
@@ -55,6 +58,7 @@ export interface ComponentMeta {
   badge: string
   description: string
   component: Component
+  componentName?: string
   tagType?: "primary" | "success" | "info" | "warning" | "danger"
 }
 
@@ -191,6 +195,12 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
   &__preview-description {
     font: inherit;
+  }
+
+  &__component-name {
+    color: var(--text-sub);
+    font-size: 0.9em;
+    font-weight: bold;
   }
 
   &__meta-tag {

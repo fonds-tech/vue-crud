@@ -22,6 +22,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "入门",
     description: "通用列表场景：输入/选择/日期组合，涵盖关键词、状态、类型、日期、通知、优先级等常见字段。",
     component: BasicSearch,
+    componentName: "BasicSearch",
     tagType: "success",
   },
   {
@@ -30,6 +31,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "运营场景",
     description: "复杂筛选：级联、标签、多选、开关、滑块、评分等复合控件，演示 onSearch/onReset 钩子。",
     component: AdvancedSearch,
+    componentName: "AdvancedSearch",
     tagType: "warning",
   },
   {
@@ -38,6 +40,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "轻量页面",
     description: "工具栏式：字段精简、按钮靠右，适合列表页顶部轻量搜索。",
     component: CompactSearch,
+    componentName: "CompactSearch",
     tagType: "warning",
   },
   {
@@ -46,6 +49,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "上下排列",
     description: "按钮纵向排列：动作独立一列，适合窄屏或需要突出搜索/重置的场景。",
     component: StackedActions,
+    componentName: "StackedActions",
     tagType: "warning",
   },
   {
@@ -54,6 +58,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "折叠演示",
     description: "折叠/展开：字段超出行数自动折叠，演示 collapsed/collapsedRows 配置。",
     component: OverflowCollapse,
+    componentName: "OverflowCollapse",
     tagType: "warning",
   },
 ]
