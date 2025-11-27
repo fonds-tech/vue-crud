@@ -34,7 +34,7 @@ const options: SearchOptions = {
     owner: "",
     status: "",
   },
-  grid: { cols: 4, colGap: 12, rowGap: 12 },
+  grid: { cols: 4 },
   items: [
     {
       field: "keyword",
@@ -67,7 +67,7 @@ const options: SearchOptions = {
     },
   ],
   action: {
-    grid: { cols: 24, colGap: 8, rowGap: 8 },
+    grid: { cols: 1 },
     items: [
       { type: "search", text: "查询" },
       { type: "reset", text: "清空" },

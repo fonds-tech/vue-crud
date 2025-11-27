@@ -170,12 +170,21 @@ const advancedOptions: SearchOptions = {
     ],
   },
   onSearch: (model, { next }) => {
-    console.log("Search triggered:", model)
-    next()
+    // 模拟：将数组格式的日期范围拆分为后端需要的 start/end 字段
+    const params = { ...model }
+    if (Array.isArray(params.createTime)) {
+      const [start, end] = params.createTime
+      params.startTime = start
+      params.endTime = end
+      delete params.createTime
+    }
+    console.log("Advanced Search Params:", params)
+    next(params)
   },
   onReset: (_model, { next }) => {
-    console.log("Reset triggered")
-    next()
+    console.log("Advanced Search Reset")
+    // 重置时可以强制带上默认的排序或状态
+    next({ sort: "desc" })
   },
 }
 

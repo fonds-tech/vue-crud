@@ -16,50 +16,54 @@ import StackedActions from "./components/StackedActions.vue"
 import OverflowCollapse from "./components/OverflowCollapse.vue"
 
 const componentCatalog: ComponentMeta[] = [
+  // 1. 基础演示
   {
     key: "basic",
-    title: "基础搜索",
-    badge: "入门",
-    description: "通用列表场景：输入/选择/日期组合，涵盖关键词、状态、类型、日期、通知、优先级等常见字段。",
+    title: "基础用法",
+    badge: "Basic",
+    description: "最常用的标准布局：表单项自动网格排列，操作按钮位于右侧。涵盖输入框、下拉框、日期范围等基础控件。",
     component: BasicSearch,
     componentName: "BasicSearch",
     tagType: "success",
   },
-  {
-    key: "advanced",
-    title: "多字段高级搜索",
-    badge: "运营场景",
-    description: "复杂筛选：级联、标签、多选、开关、滑块、评分等复合控件，演示 onSearch/onReset 钩子。",
-    component: AdvancedSearch,
-    componentName: "AdvancedSearch",
-    tagType: "warning",
-  },
+  // 2. 布局变体
   {
     key: "compact",
-    title: "紧凑搜索栏",
-    badge: "轻量页面",
-    description: "工具栏式：字段精简、按钮靠右，适合列表页顶部轻量搜索。",
+    title: "紧凑布局",
+    badge: "Layout",
+    description: "适用于顶部工具栏或低高度场景。通过调整 Grid 间距和列数，使界面更紧凑，操作区可自定义添加额外按钮。",
     component: CompactSearch,
     componentName: "CompactSearch",
-    tagType: "warning",
+    tagType: "info",
   },
   {
     key: "stacked-actions",
-    title: "纵向动作区域",
-    badge: "上下排列",
-    description: "按钮纵向排列：动作独立一列，适合窄屏或需要突出搜索/重置的场景。",
+    title: "纵向动作栏",
+    badge: "Layout",
+    description: "将操作按钮区独立为一整行或纵向排列。适用于移动端适配、侧边栏搜索或需要强调操作按钮的场景。",
     component: StackedActions,
     componentName: "StackedActions",
-    tagType: "warning",
+    tagType: "info",
   },
+  // 3. 交互特性
   {
     key: "overflow",
-    title: "超行折叠示例",
-    badge: "折叠演示",
-    description: "折叠/展开：字段超出行数自动折叠，演示 collapsed/collapsedRows 配置。",
+    title: "折叠展开",
+    badge: "Feature",
+    description: "当筛选条件过多时自动折叠，保持界面整洁。支持自定义默认展示行数（collapsedRows）和展开/折叠状态。",
     component: OverflowCollapse,
     componentName: "OverflowCollapse",
     tagType: "warning",
+  },
+  // 4. 高级应用
+  {
+    key: "advanced",
+    title: "复杂组件与钩子",
+    badge: "Advanced",
+    description: "集成级联选择、滑块、评分等复杂组件。演示 onSearch/onReset 生命周期钩子，用于处理异步逻辑或参数转换。",
+    component: AdvancedSearch,
+    componentName: "AdvancedSearch",
+    tagType: "danger",
   },
 ]
 </script>

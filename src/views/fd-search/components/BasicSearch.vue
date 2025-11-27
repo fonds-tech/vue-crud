@@ -90,7 +90,6 @@ const search = useSearch({
       },
     },
   ],
-  action: { grid: { cols: 1 } },
 })
 
 const crudParams = computed(() => crud.value?.params)
