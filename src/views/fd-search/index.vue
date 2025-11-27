@@ -13,6 +13,7 @@ import BasicSearch from "./components/BasicSearch.vue"
 import CompactSearch from "./components/CompactSearch.vue"
 import AdvancedSearch from "./components/AdvancedSearch.vue"
 import StackedActions from "./components/StackedActions.vue"
+import CustomSlotSearch from "./components/CustomSlotSearch.vue"
 import OverflowCollapse from "./components/OverflowCollapse.vue"
 
 const componentCatalog: ComponentMeta[] = [
@@ -63,6 +64,16 @@ const componentCatalog: ComponentMeta[] = [
     description: "集成级联选择、滑块、评分等复杂组件。演示 onSearch/onReset 生命周期钩子，用于处理异步逻辑或参数转换。",
     component: AdvancedSearch,
     componentName: "AdvancedSearch",
+    tagType: "danger",
+  },
+  // 5. 深度定制
+  {
+    key: "custom-slot",
+    title: "插槽与外部控制",
+    badge: "Custom",
+    description: "高阶用法：演示表单项插槽 (Slot)、动作区插槽、属性动态计算 (Dynamic Props) 以及通过 Expose API 进行外部控制。",
+    component: CustomSlotSearch,
+    componentName: "CustomSlotSearch",
     tagType: "danger",
   },
 ]

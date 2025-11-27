@@ -271,9 +271,12 @@ const methods = useMethods({ options, model, form: formRef })
 
 /**
  * 类型守卫：判断配置项是否为 FormComponent 对象
+ * 支持仅声明 slot/props/options/on/style 等场景（即使未显式提供 is）
  */
 function isComponentConfig(component?: FormComponentSlot): component is FormComponent {
-  return Boolean(component && typeof component === "object" && "is" in component)
+  if (!component || typeof component !== "object")
+    return false
+  return "is" in component || "slot" in component || "props" in component || "options" in component || "on" in component || "style" in component
 }
 
 function wrapVNode(node: VNode) {
