@@ -1,6 +1,14 @@
 <template>
   <div class="search-variant">
     <el-card class="variant-card">
+      <div class="variant-meta">
+        <p class="variant-meta__scene">
+          场景：工具栏式轻量搜索
+        </p>
+        <p class="variant-meta__tips">
+          特点：字段精简、按钮靠右附加“保存条件”操作
+        </p>
+      </div>
       <fd-crud ref="crudRef" class="crud-shell">
         <fd-search ref="searchRef" />
       </fd-crud>
@@ -112,6 +120,22 @@ const crudParams = computed(() => crudRef.value?.params)
   padding: 16px;
   background: var(--app-bg);
   border-radius: var(--radius-md);
+}
+
+.variant-meta {
+  margin-bottom: 12px;
+
+  &__scene {
+    color: var(--text-main);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__tips {
+    color: var(--text-sub);
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
 }
 
 .panel-title {

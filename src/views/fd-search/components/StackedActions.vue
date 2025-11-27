@@ -7,10 +7,6 @@
     </el-card>
 
     <el-card class="variant-card">
-      <div class="panel-title">
-        <h3>参数快照</h3>
-        <span>实时同步</span>
-      </div>
       <pre>{{ crudParams }}</pre>
     </el-card>
   </div>
@@ -93,6 +89,22 @@ const crudParams = computed(() => crudRef.value?.params)
   padding: 16px;
   background: var(--app-bg);
   border-radius: var(--radius-md);
+}
+
+.variant-meta {
+  margin-bottom: 12px;
+
+  &__scene {
+    color: var(--text-main);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__tips {
+    color: var(--text-sub);
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
 }
 
 .panel-title {

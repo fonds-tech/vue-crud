@@ -1,13 +1,21 @@
 <template>
-  <div class="basic-search">
-    <el-card>
-      <fd-crud ref="crud">
+  <div class="search-variant">
+    <el-card class="variant-card">
+      <div class="variant-meta">
+        <p class="variant-meta__scene">
+          场景：通用列表
+        </p>
+        <p class="variant-meta__tips">
+          特点：输入/选择/日期组合，默认搜索/重置
+        </p>
+      </div>
+      <fd-crud ref="crud" class="crud-shell">
         <fd-search ref="search" />
       </fd-crud>
     </el-card>
 
-    <el-card>
-      <pre class="basic-search__snapshot">{{ crudParams }}</pre>
+    <el-card class="variant-card">
+      <pre class="variant-snapshot">{{ crudParams }}</pre>
     </el-card>
   </div>
 </template>
@@ -96,13 +104,41 @@ const search = useSearch({
 const crudParams = computed(() => crud.value?.params)
 </script>
 
-<style lang="scss">
-.basic-search {
-  gap: 12px;
+<style scoped lang="scss">
+.search-variant {
+  gap: 16px;
   display: flex;
   flex-direction: column;
 
-  &__snapshot {
+  .variant-card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+  }
+
+  .crud-shell {
+    padding: 16px;
+    background: var(--app-bg);
+    border-radius: var(--radius-md);
+  }
+
+  .variant-meta {
+    margin-bottom: 12px;
+
+    &__scene {
+      color: var(--text-main);
+      margin: 0;
+      font-weight: 600;
+    }
+
+    &__tips {
+      color: var(--text-sub);
+      margin: 4px 0 0;
+      font-size: 12px;
+    }
+  }
+
+  .variant-snapshot {
     color: #e5e7eb;
     margin: 0;
     padding: 16px;

@@ -1,6 +1,14 @@
 <template>
   <div class="search-variant">
     <el-card class="variant-card">
+      <div class="variant-meta">
+        <p class="variant-meta__scene">
+          场景：复杂筛选
+        </p>
+        <p class="variant-meta__tips">
+          特点：级联/多选/滑块/评分，支持 onSearch/onReset 钩子
+        </p>
+      </div>
       <fd-crud ref="crudRef" class="crud-shell">
         <fd-search ref="searchRef" />
       </fd-crud>
@@ -204,6 +212,22 @@ const crudParams = computed(() => crudRef.value?.params)
   padding: 16px;
   background: var(--app-bg);
   border-radius: var(--radius-md);
+}
+
+.variant-meta {
+  margin-bottom: 12px;
+
+  &__scene {
+    color: var(--text-main);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__tips {
+    color: var(--text-sub);
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
 }
 
 .panel-title {

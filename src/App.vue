@@ -456,7 +456,6 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
 
   &__content {
     flex: 1;
-    margin: 0 auto;
   }
 }
 
