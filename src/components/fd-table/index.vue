@@ -1,5 +1,8 @@
 <template>
-  <div class="fd-table" :class="{ 'is-fullscreen': isFullscreen }">
+  <div
+    class="fd-table" :class="[rootAttrs.class, { 'is-fullscreen': isFullscreen }]"
+    :style="rootAttrs.style"
+  >
     <!-- 工具条：用于放置过滤、刷新等操作 -->
     <div v-if="shouldShowToolbar" class="fd-table__toolbar">
       <slot name="toolbar" />
@@ -274,7 +277,6 @@
 <script setup lang="ts">
 import type { TableDict, TableScope, TableAction, TableColumn, TableOptions, TableComponent, TableUseOptions } from "./type"
 import Draggable from "vuedraggable"
-import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { ElTable } from "element-plus"
@@ -312,7 +314,15 @@ const tableRows = ref<Record<string, any>[]>([])
 const selectedRows = ref<Record<string, any>[]>([])
 const isFullscreen = ref(false)
 const tableRef = ref<InstanceType<typeof ElTable>>()
-const attrsRecord = attrs as Record<string, any>
+const attrsRecord = computed(() => attrs as Record<string, any>)
+const rootAttrs = computed(() => {
+  const { class: className, style } = attrsRecord.value
+  return { class: className, style }
+})
+const tableAttrs = computed(() => {
+  const { class: _class, style: _style, ...rest } = attrsRecord.value
+  return rest
+})
 
 // ---------------------------
 // 配置：表格/列配置、表格尺寸选项、分页信息
@@ -370,7 +380,8 @@ function getColumnId(column: TableColumn, index: number) {
 }
 
 function getVersion(columns: TableColumn[]) {
-  return columns.map((column, index) => getColumnId(column, index)).join("|")
+  const ids = columns.map((column, index) => getColumnId(column, index))
+  return Array.from(new Set(ids)).sort().join("|")
 }
 
 function readCache(version: string) {
@@ -528,7 +539,7 @@ function saveColumns() {
 // 衍生数据：加载状态、插槽列表、可见列、分页区间
 // ---------------------------
 const isLoading = computed(() => crud.loading)
-const rowKeyProp = computed(() => (tableOptions.table.rowKey as string) || crud.dict?.primaryId || "id")
+const rowKeyProp = computed(() => tableOptions.table.rowKey ?? crud.dict?.primaryId ?? "id")
 const shouldShowToolbar = computed(() => Boolean(slots.toolbar || tableOptions.table.tools))
 const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !["toolbar", "header", "default"].includes(key)))
 
@@ -570,13 +581,13 @@ const elTableProps = computed(() => {
     height: "100%",
     highlightCurrentRow: true,
     headerCellClassName: "fd-table__header-cell",
-    ...attrsRecord,
+    ...tableAttrs.value,
     ...rest,
   }
 })
 
-const paginationStart = computed(() => (paginationState.currentPage - 1) * paginationState.pageSize + 1)
-const paginationEnd = computed(() => Math.min(paginationState.currentPage * paginationState.pageSize, paginationState.total))
+const paginationStart = computed(() => (paginationState.total === 0 ? 0 : (paginationState.currentPage - 1) * paginationState.pageSize + 1))
+const paginationEnd = computed(() => (paginationState.total === 0 ? 0 : Math.min(paginationState.currentPage * paginationState.pageSize, paginationState.total)))
 
 interface ContextMenuItem {
   label: string
@@ -821,10 +832,10 @@ function getSlotName(component: TableComponent | undefined, scope: any) {
 }
 
 /**
- * 直接替换表格数据，模板内部始终使用深拷贝副本
+ * 直接替换表格数据，浅拷贝数组避免改动入参
  */
 function setData(rows: Record<string, any>[]) {
-  tableRows.value = clone(rows)
+  tableRows.value = Array.isArray(rows) ? [...rows] : []
 }
 
 /**
@@ -850,9 +861,16 @@ function clearSelection() {
 /**
  * 通过 row-key 字段定位数据行，供多处复用
  */
+function getRowKeyValue(row: Record<string, any>) {
+  const rowKey = rowKeyProp.value
+  if (typeof rowKey === "function")
+    return rowKey(row)
+  return row?.[rowKey as string]
+}
+
 function findRowsByKey(rowKey: string | number | Array<string | number>) {
   const keys = Array.isArray(rowKey) ? rowKey : [rowKey]
-  return tableRows.value.filter(row => keys.includes(row[rowKeyProp.value]))
+  return tableRows.value.filter(row => keys.includes(getRowKeyValue(row)))
 }
 
 function select(rowKey: string | number | Array<string | number>, checked = true) {
@@ -925,6 +943,8 @@ function toggleFullscreen(full?: boolean) {
  */
 function onCellContextmenu(row: any, column: any, event: MouseEvent) {
   event.preventDefault()
+  const rowIndex = tableRows.value.findIndex(item => item === row)
+  const scope = { row, column, $index: rowIndex >= 0 ? rowIndex : 0 }
   const actionColumn = tableOptions.columns.find(item => item.type === "action")
   if (!actionColumn) {
     contextMenuState.items = [
@@ -935,14 +955,11 @@ function onCellContextmenu(row: any, column: any, event: MouseEvent) {
     ]
   }
   else {
-    const resolvedActions = resolveActions({ row, column, $index: 0 }, actionColumn.actions).filter(action => !isHidden(action, { row, column, $index: 0 }))
-    contextMenuState.items = resolvedActions.map(action => ({
+    const resolvedActions = resolveActions(scope, actionColumn.actions)
+    const menuActions = resolvedActions.filter(action => isBuiltinAction(action) && !isHidden(action, scope))
+    contextMenuState.items = menuActions.map(action => ({
       label: action.text ?? crud.dict?.label?.[action.type ?? ""] ?? "操作",
-      action: () => {
-        if (action.type) {
-          handleBuiltinAction(action, { row, column, $index: 0 })
-        }
-      },
+      action: () => handleBuiltinAction(action, scope),
     }))
     contextMenuState.items.unshift({
       label: "刷新",
