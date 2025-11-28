@@ -24,6 +24,7 @@ const statusDict: TableDict[] = [
 ]
 
 const table = useTable({
+  name: "basic-table",
   table: { border: true, stripe: true, rowKey: "id" },
   columns: [
     { prop: "name", label: "姓名", minWidth: 120 },

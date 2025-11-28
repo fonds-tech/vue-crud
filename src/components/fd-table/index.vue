@@ -355,7 +355,10 @@ interface ColumnSetting {
 
 const columnSettings = ref<ColumnSetting[]>([])
 
-const cacheKey = computed(() => (props.name ? `fd-table:${props.name}:columns` : undefined))
+const cacheKey = computed(() => {
+  const tableName = props.name ?? tableOptions.name
+  return tableName ? `fd-table:${tableName}:columns` : undefined
+})
 const isAllChecked = computed(() => columnSettings.value.length > 0 && columnSettings.value.every(item => item.show))
 const isIndeterminate = computed(() => {
   const visible = columnSettings.value.filter(item => item.show)
@@ -1080,7 +1083,7 @@ defineExpose({
   &__column-wrapper {
     gap: 2px;
     display: flex;
-    padding: 0 6px;
+    padding: 0 2px;
     flex-direction: column;
   }
 
