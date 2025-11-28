@@ -25,7 +25,7 @@ export interface CrudRef {
   rowDelete: (...selection: any[]) => Promise<void> | void
   rowClose: () => void
   refresh: (params?: CrudParams) => Promise<any>
-  getPermission: (key: "page" | "list" | "info" | "update" | "add" | "delete") => boolean
+  getPermission: (key: "page" | "list" | "detail" | "update" | "add" | "delete") => boolean
   paramsReplace: (params: CrudParams) => CrudParams
   getParams: () => CrudParams
   setParams: (data: CrudParams) => void

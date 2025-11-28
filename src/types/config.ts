@@ -7,7 +7,6 @@ export interface Dict {
     update: string
     delete: string
     detail?: string
-    info?: string
     [key: string]: string | undefined
   }
   pagination?: {
@@ -44,7 +43,6 @@ export interface Permission {
   list?: boolean
   delete?: boolean
   update?: boolean
-  info?: boolean
   detail?: boolean
   [key: string]: any
 }

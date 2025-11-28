@@ -218,7 +218,7 @@ async function append(data: Record<string, any> = {}) {
 }
 
 function getDetailApiName() {
-  return crud.dict?.api?.detail ?? crud.dict?.api?.info ?? "detail"
+  return crud.dict?.api?.detail ?? "detail"
 }
 
 function requestDetail(query: Record<string, any>, done: (value: Record<string, any>) => void) {

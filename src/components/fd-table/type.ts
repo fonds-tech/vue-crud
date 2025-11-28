@@ -1,5 +1,5 @@
 import type { TableProps, TableInstance, TableColumnCtx } from "element-plus"
-import type { VNode, CSSProperties, Component as VueComponent } from "vue"
+import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
 /**
  * 表格数据记录类型
@@ -126,7 +126,7 @@ export interface TableComponent<T extends TableRecord = TableRecord> {
   slot?: string | ((scope?: TableScope<T>) => string)
   style?: CSSProperties | ((scope?: TableScope<T>) => CSSProperties)
   props?: Record<string, any> | ((scope?: TableScope<T>) => Record<string, any>)
-  slots?: Record<string, VNode | (() => VNode)> | ((scope?: TableScope<T>) => Record<string, VNode | (() => VNode)>)
+  slots?: Record<string, VNodeChild | (() => VNodeChild)> | ((scope?: TableScope<T>) => Record<string, VNodeChild | (() => VNodeChild)>)
 }
 
 /**

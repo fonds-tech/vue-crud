@@ -205,7 +205,7 @@ const cache = ref(0)
 const options = reactive<DetailOptions>({
   dialog: {
     width: "60%",
-    title: crud.dict?.label?.detail ?? crud.dict?.label?.info ?? "详情",
+    title: crud.dict?.label?.detail ?? "详情",
     showClose: true,
     destroyOnClose: true,
     loadingText: "正在加载中...",
@@ -427,7 +427,7 @@ function use(useOptions: DetailUseOptions) {
  * 根据 CRUD 字典获取详情接口 key
  */
 function getDetailApiName() {
-  return crud.dict?.api?.detail ?? crud.dict?.api?.info ?? "detail"
+  return crud.dict?.api?.detail ?? "detail"
 }
 
 /**
@@ -572,7 +572,7 @@ function proxyHandler(payload: unknown) {
   if (!payload || typeof payload !== "object")
     return
   const proxyPayload = payload as { name?: string, data?: Record<string, any>[] }
-  if (proxyPayload.name !== "info")
+  if (proxyPayload.name !== "detail")
     return
   const row = proxyPayload.data?.[0]
   if (row)

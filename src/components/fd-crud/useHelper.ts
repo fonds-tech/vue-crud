@@ -18,7 +18,7 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
   const refreshRd = ref(0)
 
   // 获取权限
-  function getPermission(key: "page" | "list" | "info" | "update" | "add" | "delete"): boolean {
+  function getPermission(key: "page" | "list" | "detail" | "update" | "add" | "delete"): boolean {
     return Boolean(crud.permission?.[key])
   }
 
@@ -139,7 +139,7 @@ export function useHelper({ config, crud, mitt }: HelperOptions) {
   // 打开详情
   function rowInfo(data: any) {
     mitt.emit("crud.proxy", {
-      name: "info",
+      name: "detail",
       data: [data],
     })
   }
