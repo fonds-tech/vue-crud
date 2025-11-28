@@ -776,16 +776,21 @@ defineExpose({
 
   &__footer {
     gap: 12px;
+    color: var(--el-text-color-regular);
     display: flex;
+    font-size: var(--el-font-size-base);
     align-items: center;
     justify-content: space-between;
   }
 
   &__tips {
-    color: var(--el-text-color-secondary);
-    display: flex;
-    font-size: 12px;
-    flex-direction: column;
+    gap: 12px;
+    color: var(--el-text-color-regular);
+    display: inline-flex;
+    font-size: var(--el-font-size-base);
+    align-items: center;
+    line-height: 32px; // 与分页行高一致
+    white-space: nowrap;
   }
 
   &__columns {
