@@ -11,6 +11,10 @@ export type TableRecord = Record<string, any>
  */
 export interface TableOptions<T extends TableRecord = TableRecord> {
   /**
+   * 表格实例名，用于列缓存 key
+   */
+  name?: string
+  /**
    * 表格属性
    * @description 继承 Element Plus Table 的全部 props，额外提供 tools/fullscreen 开关
    */
@@ -40,6 +44,18 @@ export interface TableColumn<T extends TableRecord = TableRecord> extends BaseCo
    * 标题
    */
   label?: string
+  /**
+   * 初始是否展示
+   */
+  show?: boolean
+  /**
+   * 是否允许在列设置中排序，默认 true，action 列默认 false
+   */
+  sort?: boolean
+  /**
+   * 是否固定（禁止排序），默认 false
+   */
+  pinned?: boolean
   /**
    * 默认值
    */

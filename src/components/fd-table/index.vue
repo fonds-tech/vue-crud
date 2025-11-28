@@ -35,7 +35,7 @@
           </template>
         </el-dropdown>
 
-        <el-popover width="220" placement="bottom" trigger="click">
+        <el-popover :hide-after="0" :teleported="false" width="220px" placement="bottom-start" trigger="click" popper-class="fd-table__column-popover">
           <template #reference>
             <span class="fd-table__tool-trigger">
               <el-tooltip content="列设置">
@@ -47,11 +47,77 @@
               </el-tooltip>
             </span>
           </template>
-          <div class="fd-table__columns">
-            <el-checkbox
-              v-for="column in columnVisibilityOptions" :key="column.id" v-model="column.show"
-              :label="column.label"
-            />
+          <div class="fd-table__column-panel">
+            <div class="fd-table__column-header">
+              <el-checkbox
+                :model-value="isAllChecked"
+                :indeterminate="isIndeterminate"
+                label="全选"
+                @change="toggleAllColumns"
+              />
+              <el-button link type="primary" @click="resetColumns">
+                重置
+              </el-button>
+            </div>
+            <el-scrollbar class="fd-table__column-scroll">
+              <draggable
+                v-model="columnSettings"
+                item-key="id"
+                :animation="180"
+                ghost-class="fd-table__drag-ghost"
+                chosen-class="fd-table__drag-chosen"
+                :move="onDragMove"
+                @end="onDragEnd"
+              >
+                <template #item="{ element }">
+                  <div class="fd-table__column-wrapper">
+                    <div
+                      class="fd-table__column-item"
+                      :class="{
+                        'is-locked': element.pinned,
+                        'is-disabled': !element.sort,
+                      }"
+                    >
+                      <el-icon class="fd-table__drag" :class="{ 'is-disabled': !element.sort }">
+                        <IconTablerDragDrop />
+                      </el-icon>
+                      <el-checkbox
+                        :model-value="element.show"
+                        @change="onColumnShowChange(element.id, $event)"
+                      />
+                      <span class="fd-table__column-label">{{ element.label }}</span>
+                      <div class="fd-table__fixed-actions">
+                        <el-button
+                          link size="small"
+                          :class="{ 'is-active': element.fixed === 'left' }"
+                          @click="toggleFixed(element.id, 'left')"
+                        >
+                          <el-icon>
+                            <IconTablerPinFilled v-if="element.fixed === 'left'" class="fd-table__icon-rotate-left" />
+                            <IconTablerPin v-else class="fd-table__icon-rotate-left" />
+                          </el-icon>
+                        </el-button>
+                        <el-button
+                          link size="small"
+                          :class="{ 'is-active': element.fixed === 'right' }"
+                          @click="toggleFixed(element.id, 'right')"
+                        >
+                          <el-icon>
+                            <IconTablerPinFilled v-if="element.fixed === 'right'" class="fd-table__icon-rotate-right" />
+                            <IconTablerPin v-else class="fd-table__icon-rotate-right" />
+                          </el-icon>
+                        </el-button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </draggable>
+            </el-scrollbar>
+            <div class="fd-table__column-footer">
+              <el-button type="primary" class="fd-table__column-save" @click="saveColumns">
+                保存
+              </el-button>
+            </div>
           </div>
         </el-popover>
 
@@ -94,7 +160,7 @@
           </el-table-column>
           <el-table-column
             v-else-if="column.type === 'action'" :align="column.align || 'center'"
-            :fixed="column.fixed || 'right'" :width="column.width || 200" v-bind="column"
+            :fixed="column.fixed || 'right'" :width="column.width || 120" v-bind="column"
           >
             <template #default="scope">
               <div class="fd-table__actions">
@@ -207,6 +273,7 @@
 
 <script setup lang="ts">
 import type { TableDict, TableScope, TableAction, TableColumn, TableOptions, TableComponent, TableUseOptions } from "./type"
+import Draggable from "vuedraggable"
 import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
@@ -223,6 +290,17 @@ defineOptions({
 // ---------------------------
 // 基础上下文：插槽、属性、CRUD 核心
 // ---------------------------
+const props = defineProps<{
+  /**
+   * 表格实例名，作为列缓存 key 使用
+   */
+  name?: string
+}>()
+
+const emit = defineEmits<{
+  (e: "columnsChange", columns: TableColumn[]): void
+}>()
+
 const attrs = useAttrs()
 const slots = useSlots()
 const { crud, mitt } = useCore()
@@ -265,24 +343,183 @@ const paginationState = reactive({
   pageSizes: [10, 20, 50, 100],
 })
 
-const columnVisibilityOptions = ref<{ id: string, label: string, show: boolean }[]>([])
+interface ColumnSetting {
+  id: string
+  label: string
+  show: boolean
+  order: number
+  sort: boolean
+  pinned: boolean
+  fixed?: "left" | "right"
+}
 
-// 自动同步列显示开关，保留用户勾选状态
+const columnSettings = ref<ColumnSetting[]>([])
+
+const cacheKey = computed(() => (props.name ? `fd-table:${props.name}:columns` : undefined))
+const isAllChecked = computed(() => columnSettings.value.length > 0 && columnSettings.value.every(item => item.show))
+const isIndeterminate = computed(() => {
+  const visible = columnSettings.value.filter(item => item.show)
+  return visible.length > 0 && visible.length < columnSettings.value.length
+})
+
+function getColumnId(column: TableColumn, index: number) {
+  return column.__id || column.prop || column.label || `col_${index}`
+}
+
+function getVersion(columns: TableColumn[]) {
+  return columns.map((column, index) => getColumnId(column, index)).join("|")
+}
+
+function readCache(version: string) {
+  if (!cacheKey.value || typeof localStorage === "undefined")
+    return undefined
+  try {
+    const raw = localStorage.getItem(cacheKey.value)
+    if (!raw)
+      return undefined
+    const parsed = JSON.parse(raw) as {
+      version: string
+      order: string[]
+      columns: Record<string, { show: boolean, pinned?: boolean, fixed?: "left" | "right" }>
+    }
+    if (parsed.version !== version)
+      return undefined
+    return parsed
+  }
+  catch {
+    // 读取失败直接跳过缓存
+    return undefined
+  }
+}
+
+function writeCache() {
+  if (!cacheKey.value || typeof localStorage === "undefined")
+    return
+  try {
+    const version = getVersion(tableOptions.columns)
+    const order = columnSettings.value.filter(item => item.sort).sort((a, b) => a.order - b.order).map(item => item.id)
+    const columns = Object.fromEntries(
+      columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]),
+    )
+    localStorage.setItem(cacheKey.value, JSON.stringify({ version, order, columns }))
+  }
+  catch {
+    // 写入失败不影响主流程
+  }
+}
+
+function rebuildColumnSettings(cols: TableColumn[], useCache = true) {
+  const version = getVersion(cols)
+  const cache = useCache ? readCache(version) : undefined
+  const orderMap = new Map<string, number>()
+  cache?.order?.forEach((id, idx) => orderMap.set(id, idx))
+
+  const settings: ColumnSetting[] = cols.map((column, index) => {
+    const id = getColumnId(column, index)
+    const pinned = cache?.columns?.[id]?.pinned ?? column.pinned ?? false
+    const sort = (column.sort ?? (column.type !== "action")) && !pinned
+    const fixed = cache?.columns?.[id]?.fixed ?? (column as any)?.fixed ?? undefined
+    const baseOrder = sort ? (orderMap.get(id) ?? index) : index
+    return {
+      id,
+      label: column.label || column.prop || id,
+      show: cache?.columns?.[id]?.show ?? (column.show ?? true),
+      order: baseOrder,
+      sort,
+      pinned,
+      fixed,
+    }
+  })
+
+  columnSettings.value = settings
+  sortColumnSettings()
+}
+
 watch(
   () => tableOptions.columns,
   (cols) => {
-    columnVisibilityOptions.value = cols.map((column, index) => {
-      const id = column.__id || column.prop || column.label || `col_${index}`
-      const previous = columnVisibilityOptions.value.find(item => item.id === id)
-      return {
-        id,
-        label: column.label || column.prop || id,
-        show: previous?.show ?? true,
-      }
-    })
+    if (cols && cols.length) {
+      rebuildColumnSettings(cols)
+    }
   },
   { deep: true },
 )
+
+function onColumnShowChange(id: string, value: boolean) {
+  columnSettings.value = columnSettings.value.map(item => item.id === id ? { ...item, show: value } : item)
+}
+
+function toggleAllColumns(value: boolean) {
+  columnSettings.value = columnSettings.value.map(item => ({ ...item, show: value }))
+}
+
+function sortColumnSettings() {
+  const rank = (fixed?: "left" | "right") => {
+    if (fixed === "left")
+      return 0
+    if (fixed === "right")
+      return 2
+    return 1
+  }
+  columnSettings.value = [...columnSettings.value]
+    .sort((a, b) => {
+      const r = rank(a.fixed) - rank(b.fixed)
+      if (r !== 0)
+        return r
+      return a.order - b.order
+    })
+    .map((item, idx) => ({ ...item, order: idx }))
+}
+
+function syncOrderFromList() {
+  columnSettings.value = columnSettings.value.map((item, index) => ({
+    ...item,
+    order: index,
+  }))
+}
+
+function onDragEnd() {
+  syncOrderFromList()
+  sortColumnSettings()
+}
+
+function onDragMove(evt: any) {
+  const dragged = evt?.draggedContext?.element as ColumnSetting | undefined
+  const related = evt?.relatedContext?.element as ColumnSetting | undefined
+  if (!dragged || !dragged.sort)
+    return false
+  if (dragged.pinned || related?.pinned)
+    return false
+  if (dragged.fixed !== related?.fixed)
+    return false
+  return true
+}
+
+function toggleFixed(id: string, fixed: "left" | "right") {
+  columnSettings.value = columnSettings.value.map((item) => {
+    if (item.id !== id)
+      return item
+    const nextFixed = item.fixed === fixed ? undefined : fixed
+    return {
+      ...item,
+      fixed: nextFixed,
+      sort: (item.sort ?? true) && !item.pinned,
+    }
+  })
+  sortColumnSettings()
+}
+
+function resetColumns() {
+  if (cacheKey.value && typeof localStorage !== "undefined") {
+    localStorage.removeItem(cacheKey.value)
+  }
+  rebuildColumnSettings(tableOptions.columns, false)
+}
+
+function saveColumns() {
+  writeCache()
+  emit("columnsChange", visibleColumns.value)
+}
 
 // ---------------------------
 // 衍生数据：加载状态、插槽列表、可见列、分页区间
@@ -293,9 +530,36 @@ const shouldShowToolbar = computed(() => Boolean(slots.toolbar || tableOptions.t
 const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !["toolbar", "header", "default"].includes(key)))
 
 const visibleColumns = computed(() => {
-  const visibleFields = new Set(columnVisibilityOptions.value.filter(item => item.show).map(item => item.id))
-  return tableOptions.columns.filter(column => visibleFields.has(column.__id || column.prop || column.label || ""))
+  if (!columnSettings.value.length)
+    return tableOptions.columns
+
+  const idToColumn = new Map<string, TableColumn>()
+  tableOptions.columns.forEach((column, index) => {
+    const id = getColumnId(column, index)
+    idToColumn.set(id, column)
+  })
+
+  return columnSettings.value
+    .filter(item => item.show)
+    .map((state) => {
+      const column = idToColumn.get(state.id)
+      if (!column)
+        return undefined
+      return {
+        ...column,
+        fixed: state.fixed,
+      }
+    })
+    .filter(Boolean) as TableColumn[]
 })
+
+watch(
+  visibleColumns,
+  (cols) => {
+    emit("columnsChange", cols)
+  },
+  { deep: true },
+)
 
 const elTableProps = computed(() => {
   const { tools, fullscreen: _fullscreen, ...rest } = tableOptions.table
@@ -383,13 +647,11 @@ function use(useOptions: TableUseOptions) {
   if (useOptions.columns) {
     tableOptions.columns = useOptions.columns.map((column, index) => ({
       __id: column.prop || column.label || `col_${index}`,
+      show: column.show ?? true,
+      sort: column.sort ?? (column.type !== "action"),
       ...column,
     }))
-    columnVisibilityOptions.value = tableOptions.columns.map(column => ({
-      id: column.__id || column.prop || column.label || "",
-      label: column.label || column.prop || "",
-      show: true,
-    }))
+    rebuildColumnSettings(tableOptions.columns)
   }
 }
 
@@ -793,10 +1055,115 @@ defineExpose({
     white-space: nowrap;
   }
 
-  &__columns {
-    gap: 6px;
+  &__column-panel {
     display: flex;
     flex-direction: column;
+  }
+
+  &__column-header {
+    display: flex;
+    align-items: center;
+    padding-left: 6px;
+    padding-bottom: 4px;
+    justify-content: space-between;
+  }
+
+  &__column-scroll {
+    border-top: 1px solid var(--el-border-color-lighter);
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+
+  &__column-footer {
+    margin-top: 6px;
+  }
+
+  &__column-wrapper {
+    gap: 2px;
+    display: flex;
+    padding: 0 6px;
+    flex-direction: column;
+  }
+
+  &__column-item {
+    gap: 8px;
+    display: flex;
+    padding: 0 4px;
+    align-items: center;
+    border-radius: 6px;
+
+    &.is-locked {
+      opacity: 0.85;
+    }
+
+    &.is-disabled .fd-table__drag {
+      color: var(--el-text-color-placeholder);
+      cursor: not-allowed;
+    }
+
+    &:hover {
+      background: var(--el-fill-color-light);
+    }
+  }
+
+  &__drag {
+    color: var(--el-text-color-primary);
+    cursor: grab;
+    font-weight: 700;
+
+    &.is-disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__column-label {
+    flex: 1;
+    color: var(--el-text-color-primary);
+    cursor: default;
+    overflow: hidden;
+    font-size: var(--el-font-size-base);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__pin {
+    color: var(--el-color-primary);
+  }
+
+  &__column-save {
+    width: 100%;
+  }
+
+  &__drag-ghost {
+    border: 1px dashed var(--el-color-primary);
+    opacity: 0.8;
+    background: var(--el-fill-color-light);
+    border-radius: 6px;
+  }
+
+  &__drag-chosen {
+    opacity: 0.9;
+  }
+
+  &__fixed-actions {
+    gap: 4px;
+    display: inline-flex;
+
+    .el-button.is-active {
+      color: var(--el-color-primary);
+    }
+
+    .el-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .fd-table__icon-rotate-left {
+      transform: rotate(0deg);
+    }
+
+    .fd-table__icon-rotate-right {
+      transform: rotate(-90deg);
+    }
   }
 
   &__actions {
@@ -837,6 +1204,10 @@ defineExpose({
       color: var(--el-color-primary);
       background-color: var(--el-fill-color-light);
     }
+  }
+
+  .el-popper.fd-table__column-popover {
+    padding: 6px;
   }
 }
 </style>

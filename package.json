@@ -51,14 +51,17 @@
     "@fonds/utils": "catalog:",
     "element-plus": "catalog:",
     "lodash-es": "catalog:",
+    "sortablejs": "catalog:",
     "uuid": "catalog:",
     "vue": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "vuedraggable": "catalog:"
   },
   "devDependencies": {
     "@antfu/ni": "catalog:",
     "@antfu/utils": "catalog:",
     "@fonds/eslint-config": "catalog:",
+    "@iconify-json/tabler": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
@@ -74,6 +77,8 @@
     "tinyexec": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
+    "unplugin-icons": "catalog:",
+    "unplugin-vue-components": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitepress": "catalog:",

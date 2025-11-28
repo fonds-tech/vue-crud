@@ -1,7 +1,10 @@
 import { resolve } from "node:path"
 import vue from "@vitejs/plugin-vue"
 import dts from "vite-plugin-dts"
+import Icons from "unplugin-icons/vite"
 import vueJsx from "@vitejs/plugin-vue-jsx"
+import Components from "unplugin-vue-components/vite"
+import IconsResolver from "unplugin-icons/resolver"
 import { defineConfig } from "vite"
 
 // https://vitejs.dev/config/
@@ -9,6 +12,18 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
+    Components({
+      resolvers: [
+        IconsResolver({
+          prefix: "Icon",
+          enabledCollections: ["tabler"],
+        }),
+      ],
+    }),
+    Icons({
+      compiler: "vue3",
+      autoInstall: true,
+    }),
     dts({
       include: ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
       outDir: "dist/types",
