@@ -448,14 +448,17 @@ function handleThemeChange(e: MediaQueryListEvent | MediaQueryList) {
     width: 100%;
     display: flex;
     padding: 24px;
+    overflow: hidden;
     position: relative;
     box-sizing: border-box;
-    overflow-y: auto;
     flex-direction: column;
   }
 
   &__content {
     flex: 1;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
   }
 }
 

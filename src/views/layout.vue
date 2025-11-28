@@ -74,9 +74,10 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
 <style scoped lang="scss">
 .layout {
+  gap: 20px;
+  flex: 1;
   display: flex;
-  max-width: 100%;
-  min-height: 100%;
+  overflow: hidden;
   flex-direction: column;
 
   &__header {
@@ -84,7 +85,6 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    margin-bottom: 24px;
     justify-content: space-between;
   }
 
@@ -147,7 +147,6 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__preview {
-    gap: 20px;
     flex: 1;
     border: 1px solid var(--card-border);
     display: flex;
@@ -155,6 +154,7 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
     overflow: hidden;
     background: var(--card-bg);
     box-shadow: var(--shadow-md);
+    box-sizing: border-box;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     border-radius: var(--radius-xl);
     flex-direction: column;
@@ -169,8 +169,6 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
     display: flex;
     background: var(--card-bg);
     align-items: center;
-    border-bottom: 1px solid var(--divider-color);
-    padding-bottom: 10px;
     justify-content: space-between;
   }
 
@@ -225,7 +223,9 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__preview-body {
-    min-height: 520px;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
   }
 }
 </style>

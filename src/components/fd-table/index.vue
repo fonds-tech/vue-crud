@@ -8,7 +8,7 @@
         <el-tooltip content="刷新">
           <el-button circle size="small" @click="refresh()">
             <el-icon>
-              <refresh />
+              <refresh-icon />
             </el-icon>
           </el-button>
         </el-tooltip>
@@ -212,7 +212,7 @@ import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { ElTable } from "element-plus"
 import { isFunction } from "@/utils/check"
-import { Setting, Operation, FullScreen } from "@element-plus/icons-vue"
+import { Setting, Operation, FullScreen, Refresh as RefreshIcon } from "@element-plus/icons-vue"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onMounted, onBeforeUnmount } from "vue"
 
 defineOptions({
@@ -300,6 +300,7 @@ const visibleColumns = computed(() => {
 const elTableProps = computed(() => {
   const { tools, fullscreen: _fullscreen, ...rest } = tableOptions.table
   return {
+    height: "100%",
     highlightCurrentRow: true,
     headerCellClassName: "fd-table__header-cell",
     ...attrsRecord,
@@ -737,6 +738,7 @@ defineExpose({
   gap: 12px;
   height: 100%;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
 
   &.is-fullscreen {
@@ -769,7 +771,7 @@ defineExpose({
 
   &__body {
     flex: 1;
-    min-height: 0;
+    overflow: hidden;
   }
 
   &__footer {

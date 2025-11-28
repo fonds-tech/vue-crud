@@ -1,58 +1,36 @@
 <template>
-  <section class="demo-card">
-    <h4 class="demo-card__title">
-      操作列与自定义单元格
-    </h4>
-    <p class="demo-card__desc">
-      演示操作列、具名插槽渲染和自定义事件处理。
-    </p>
-
-    <fd-crud ref="crudRef">
-      <fd-table ref="tableRef">
-        <template #status="{ row }">
-          <el-tag :type="row.status ? 'success' : 'danger'" size="small">
-            {{ row.status ? "启用" : "禁用" }}
-          </el-tag>
-        </template>
-        <template #actionSlots="{ row }">
-          <el-link type="primary" @click="handleView(row)">
-            查看
-          </el-link>
-          <el-link type="warning" @click="handleEdit(row)">
-            编辑
-          </el-link>
-        </template>
-      </fd-table>
-    </fd-crud>
-  </section>
+  <fd-crud ref="crudRef">
+    <fd-table ref="tableRef">
+      <template #status="{ row }">
+        <el-tag :type="row.status ? 'success' : 'danger'" size="small">
+          {{ row.status ? "启用" : "禁用" }}
+        </el-tag>
+      </template>
+      <template #actionSlots="{ row }">
+        <el-link type="primary" @click="handleView(row)">
+          查看
+        </el-link>
+        <el-link type="warning" @click="handleEdit(row)">
+          编辑
+        </el-link>
+      </template>
+    </fd-table>
+  </fd-crud>
 </template>
 
 <script setup lang="ts">
 import type { TableAction, TableColumn } from "@/components/fd-table/type"
 import { ElMessage } from "element-plus"
+import { TableMockService } from "../mockService"
 import { useCrud, useTable } from "@/hooks"
 
 defineOptions({
-  name: "action-table-demo",
+  name: "action-table",
 })
 
 const crudRef = useCrud({
-  service: {
-    async page() {
-      return { list: rows, pagination: { total: rows.length, page: 1, size: rows.length } }
-    },
-  },
-})
-
-const tableRef = useTable(
-  {
-    table: { border: true, size: "small", rowKey: "id" },
-    columns,
-  },
-  (table) => {
-    table.setData(rows)
-  },
-)
+  service: new TableMockService(),
+}, crud => crud.refresh())
 
 const actionColumn: TableColumn = {
   type: "action",
@@ -72,11 +50,12 @@ const columns: TableColumn[] = [
   actionColumn,
 ]
 
-const rows = [
-  { id: 1, name: "韩立", account: "hanli", status: 1 },
-  { id: 2, name: "唐三", account: "tangsan", status: 0 },
-  { id: 3, name: "王林", account: "wanglin", status: 1 },
-]
+const tableRef = useTable(
+  {
+    table: { border: true, size: "small", rowKey: "id" },
+    columns,
+  },
+)
 
 function handleView(row: any) {
   ElMessage.info(`查看：${row.name}`)
@@ -86,22 +65,3 @@ function handleEdit(row: any) {
   ElMessage.success(`编辑：${row.account}`)
 }
 </script>
-
-<style scoped lang="scss">
-.demo-card {
-  border: 1px solid var(--card-border);
-  padding: 16px;
-  background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius-lg);
-
-  &__title {
-    margin: 0 0 4px 0;
-  }
-
-  &__desc {
-    color: var(--text-sub);
-    margin: 0 0 12px 0;
-  }
-}
-</style>

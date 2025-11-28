@@ -56,3 +56,12 @@ provide("mitt", mitt)
 
 defineExpose(crud)
 </script>
+
+<style lang="scss">
+.fd-crud {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+}
+</style>

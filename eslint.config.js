@@ -8,36 +8,10 @@ export default eslint(
     pnpm: true,
     stylistic: true,
     typescript: true,
-    formatters: {
-      prettierOptions: {
-        arrowParens: "always",
-        bracketSameLine: false,
-        bracketSpacing: true,
-        endOfLine: "auto",
-        printWidth: 180,
-        proseWrap: "always",
-        semi: false,
-        singleAttributePerLine: false,
-        singleQuote: false,
-        tabWidth: 2,
-        trailingComma: "all",
-        useTabs: false,
-        vueIndentScriptAndStyle: false,
-        jsxBracketSameLine: false,
-        jsxSingleQuote: false,
-      },
-    },
+    formatters: true,
   },
-  {
-    rules: {
-      "no-console": "off",
-      "ts/ban-ts-comment": "off",
-      "fonds/if-newline": "off",
-    },
-  },
-  {
-    ignores: [
-      ".serena",
-    ],
-  },
+  { rules: {
+    "no-console": "off",
+  } },
+  { ignores: [".serena"] },
 )
