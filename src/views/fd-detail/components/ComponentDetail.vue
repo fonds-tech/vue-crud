@@ -33,7 +33,7 @@ const detailOptions: DetailUseOptions = {
       label: "头像",
       component: {
         is: "el-avatar",
-        props: data => ({ src: data.avatar, size: "large" }),
+        props: data => ({ src: data.avatar, size: "large", shape: "circle" }),
       },
     },
     {
@@ -52,7 +52,7 @@ const detailOptions: DetailUseOptions = {
       label: "评分",
       component: {
         is: "el-rate",
-        props: { disabled: true, allowHalf: true },
+        props: data => ({ modelValue: Number(data.score), disabled: true, allowHalf: true, size: "small" }),
       },
     },
     {
@@ -60,7 +60,7 @@ const detailOptions: DetailUseOptions = {
       label: "进度",
       component: {
         is: "el-progress",
-        props: { textInside: true, strokeWidth: 20 },
+        props: data => ({ textInside: true, strokeWidth: 20, percentage: data.progress }),
       },
     },
     {

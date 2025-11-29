@@ -50,7 +50,13 @@ const options: DetailUseOptions = {
     { field: "status", label: "状态", component: { slot: "status" }, group: "basic" },
     { field: "manager", label: "负责人", group: "basic" },
     { field: "remark", label: "备注", span: 2, group: "meta" },
-    { field: "tags", label: "标签", span: 2, group: "meta", formatter: (value: string[]) => value.join(" / ") },
+    {
+      field: "tags",
+      label: "标签",
+      span: 2,
+      group: "meta",
+      formatter: (value?: string[]) => (value ?? []).join(" / "),
+    },
   ],
   slots: () => ({
     // 分组标题附加信息

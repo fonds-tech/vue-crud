@@ -6,7 +6,7 @@
     @open="handleOpen"
     @close="handleClose"
   >
-    <slot :data="data" :loading="loading" :visible="visible" :refresh="refresh" :set-data="setData">
+    <slot :data="data.value" :loading="loading" :visible="visible" :refresh="refresh" :set-data="setData">
       <el-space
         :key="cache"
         v-loading="loading"
@@ -29,7 +29,7 @@
             <slot
               v-if="slotNameOf(slotComponent)"
               :name="slotNameOf(slotComponent)!"
-              :data="data"
+              :data="data.value"
               :group="group"
               :index="groupIndex"
               v-bind="scope ?? {}"
@@ -64,7 +64,7 @@
                 <slot
                   name="label"
                   :index="itemIndex"
-                  :data="data"
+                  :data="data.value"
                   :value="getFieldValue(item)"
                   :item="item"
                 />
@@ -79,7 +79,7 @@
                   v-if="slotNameOf(slotComponent)"
                   :name="slotNameOf(slotComponent)!"
                   :index="itemIndex"
-                  :data="data"
+                  :data="data.value"
                   :value="getFieldValue(item)"
                 />
                 <component
@@ -103,7 +103,7 @@
                 v-if="slotNameOf(item.component)"
                 :name="slotNameOf(item.component)!"
                 :index="itemIndex"
-                :data="data"
+                :data="data.value"
                 :value="getFieldValue(item)"
               />
               <component
@@ -148,7 +148,7 @@
               v-else-if="slotNameOf(action.component)"
               :name="slotNameOf(action.component)!"
               :index="index"
-              :data="data"
+              :data="data.value"
             />
             <component
               :is="componentOf(action.component)"
@@ -173,14 +173,14 @@
 </template>
 
 <script setup lang="ts">
-import type { DetailItem, DetailGroup, DetailAction, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
+import type { DetailItem, DetailGroup, DetailSlots, DetailAction, DetailExpose, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
 import FdDialog from "../fd-dialog/index.vue"
 import { clone } from "@fonds/utils"
 import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
-import { pick, merge } from "lodash-es"
+import { pick, merge, mergeWith } from "lodash-es"
 import { ElSpace, ElButton, ElMessage, ElDescriptions, ElDescriptionsItem } from "element-plus"
-import { ref, watch, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
+import { ref, watch, markRaw, computed, reactive, useAttrs, useSlots, defineSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 
 defineOptions({
   name: "fd-detail",
@@ -188,6 +188,17 @@ defineOptions({
 })
 
 const emit = defineEmits(["open", "close", "beforeOpen", "beforeClose"])
+defineSlots<Record<string, (props: {
+  index?: number
+  data: any
+  value?: any
+  item?: DetailItem
+  group?: any
+  loading?: boolean
+  visible?: boolean
+  refresh?: (params?: Record<string, any>) => any
+  setData?: (value: Record<string, any>) => void
+}) => any>>()
 
 const { crud, mitt } = useCore()
 const userSlots = useSlots()
@@ -314,7 +325,13 @@ function isDetailComponent(target?: DetailComponentSlot): target is DetailCompon
 
 /** 读取自定义插槽名称 */
 function slotNameOf(value?: DetailComponentSlot) {
-  if (!value || !isDetailComponent(value))
+  if (!value)
+    return undefined
+  if (typeof value === "string")
+    return value
+  if (typeof value === "object" && "slot" in (value as Record<string, any>))
+    return resolveMaybe((value as DetailComponent).slot)
+  if (!isDetailComponent(value))
     return undefined
   return resolveMaybe(value.slot)
 }
@@ -323,9 +340,14 @@ function slotNameOf(value?: DetailComponentSlot) {
 function componentOf(value?: DetailComponentSlot) {
   if (!value)
     return undefined
+  if (typeof value === "string")
+    return undefined
+  if (typeof value === "object" && "slot" in (value as Record<string, any>))
+    return undefined
   if (isDetailComponent(value))
     return resolveMaybe(value.is)
-  return value
+  const resolved = value
+  return typeof resolved === "object" && resolved !== null ? markRaw(resolved) : resolved
 }
 
 /** 获取组件事件 */
@@ -350,21 +372,28 @@ function componentStyle(value?: DetailComponentSlot) {
 }
 
 /** 获取组件具名插槽 */
-function componentSlots(value?: DetailComponentSlot) {
+function componentSlots(value?: DetailComponentSlot): Record<string, DetailComponentSlot> {
   if (!value || !isDetailComponent(value))
-    return {}
+    return {} as Record<string, DetailComponentSlot>
   const slotsValue = resolveMaybe(value.slots)
-  return slotsValue || {}
+  const resolved = slotsValue ?? {}
+  if (typeof resolved === "object" && resolved !== null)
+    return markRaw(resolved as Record<string, DetailComponentSlot>)
+  // 非对象（如布尔）统一视为无效 slots
+  return {} as Record<string, DetailComponentSlot>
 }
 
 /** 字段/分组 slots 统一处理 */
-function slots(target?: { slots?: any }) {
+function slots(target?: { slots?: DetailSlots }) {
   if (!target || typeof target !== "object" || !("slots" in target))
-    return {}
+    return {} as Record<string, DetailComponentSlot>
   const slotValue = (target as { slots?: DetailDescriptions["slots"] }).slots
   if (!slotValue)
-    return {}
-  return isFunction(slotValue) ? slotValue(data.value) : slotValue
+    return {} as Record<string, DetailComponentSlot>
+  const resolved = isFunction(slotValue) ? slotValue(data.value) : slotValue
+  if (typeof resolved === "object" && resolved !== null)
+    return markRaw(resolved as Record<string, DetailComponentSlot>)
+  return {} as Record<string, DetailComponentSlot>
 }
 
 /** 统一的显隐判断 */
@@ -419,7 +448,11 @@ function ensureActions() {
  * 外部调用，用于动态合并配置
  */
 function use(useOptions: DetailUseOptions) {
-  merge(options, useOptions)
+  mergeWith(options, useOptions, (_objValue, srcValue) => {
+    if (Array.isArray(srcValue))
+      return srcValue
+    return undefined
+  })
   ensureActions()
 }
 
@@ -458,47 +491,74 @@ function requestDetail(query: Record<string, any>, done: (value: Record<string, 
 }
 
 /**
+ * 统一的详情流程：优先触发 onDetail 钩子，否则按 query 调用后端
+ */
+function runDetailFlow(params: Record<string, any>, defaultQuery: Record<string, any> = {}) {
+  let requested = false
+  const done = (value: Record<string, any> = {}) => {
+    setData(value)
+    loading.value = false
+  }
+  const next = (query: Record<string, any>) => {
+    requested = true
+    loading.value = true
+    paramsCache.value = clone(query)
+    return requestDetail(query, done)
+  }
+  const finalizeIfIdle = () => {
+    if (!requested)
+      loading.value = false
+  }
+
+  if (isFunction(options.onDetail)) {
+    const result = options.onDetail(params, { done, next, close })
+    const maybePromise = result as unknown
+    if (typeof maybePromise === "object" && maybePromise !== null && "finally" in (maybePromise as any) && typeof (maybePromise as any).finally === "function") {
+      return (maybePromise as Promise<any>).finally(finalizeIfIdle)
+    }
+    finalizeIfIdle()
+    return result
+  }
+
+  const query = Object.keys(defaultQuery).length ? defaultQuery : params
+  if (!Object.keys(query).length) {
+    finalizeIfIdle()
+    return
+  }
+  return next(query)
+}
+
+/**
  * 打开详情弹窗，默认按主键自动查询
  */
 function detail(row: Record<string, any>) {
+  if (!row || typeof row !== "object") {
+    ElMessage.warning("无效的详情数据")
+    return
+  }
   setData(row)
   visible.value = true
   loading.value = true
-  const done = (value: Record<string, any> = {}) => {
-    setData(value)
+  const primaryKey = crud.dict?.primaryId ?? "id"
+  const defaultQuery = pick(row, [primaryKey])
+  if (defaultQuery[primaryKey] === undefined || defaultQuery[primaryKey] === null) {
+    loading.value = false
+    ElMessage.warning(`缺少主键字段 ${primaryKey}`)
+    return
   }
-  const next = (query: Record<string, any>) => {
-    return requestDetail(query, done)
-  }
-  if (isFunction(options.onDetail)) {
-    return options.onDetail(row, { done, next, close })
-  }
-  else {
-    const primaryKey = crud.dict?.primaryId ?? "id"
-    const query = pick(row, [primaryKey])
-    return next(query)
-  }
+  return runDetailFlow(row, defaultQuery)
 }
 
 /**
  * 主动刷新详情（可覆盖部分查询参数）
  */
 function refresh(params: Record<string, any> = {}) {
-  const done = (value: Record<string, any> = {}) => {
-    setData(value)
-  }
-  const next = (query: Record<string, any>) => {
-    loading.value = true
-    return requestDetail(query, done)
-  }
-  if (isFunction(options.onDetail)) {
-    return options.onDetail(params, { next, done, close })
-  }
   const query = merge(clone(paramsCache.value), params)
   if (!Object.keys(query).length) {
+    loading.value = false
     return
   }
-  return next(query)
+  return runDetailFlow(query, query)
 }
 
 /**
@@ -587,9 +647,9 @@ onBeforeUnmount(() => {
   mitt?.off?.("crud.proxy", proxyHandler)
 })
 
-defineExpose({
+defineExpose<DetailExpose<Record<string, any>>>({
   get data() {
-    return data.value
+    return data.value as Record<string, any>
   },
   use,
   close,
