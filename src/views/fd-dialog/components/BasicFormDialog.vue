@@ -1,29 +1,9 @@
 <template>
-  <div class="dialog-demo">
-    <el-card class="dialog-demo__card">
-      <template #header>
-        <div class="dialog-demo__header">
-          <div>
-            <p class="dialog-demo__eyebrow">
-              Form + CRUD
-            </p>
-            <h3>配置化表单弹窗</h3>
-          </div>
-          <el-tag size="small" type="primary" effect="dark">
-            fd-form
-          </el-tag>
-        </div>
-      </template>
-
-      <p class="dialog-demo__desc">
-        展示 `fd-dialog` 与 `fd-form` 的典型组合：打开弹窗填写信息、提交后提示并自动重置。
-      </p>
-
-      <el-button type="primary" size="large" :loading="saving" @click="openDialog">
-        <el-icon><plus /></el-icon>
-        新建用户
-      </el-button>
-    </el-card>
+  <div class="dialog-example">
+    <el-button type="primary" size="large" :loading="saving" @click="openDialog">
+      <el-icon><plus /></el-icon>
+      新建用户
+    </el-button>
 
     <fd-dialog
       v-model="dialogVisible"
@@ -33,7 +13,7 @@
       destroy-on-close
       @closed="handleDialogClosed"
     >
-      <fd-form ref="formRef" class="dialog-demo__form" />
+      <fd-form ref="formRef" class="dialog-example__form" />
 
       <template #footer>
         <el-button :disabled="saving" @click="dialogVisible = false">
@@ -142,43 +122,14 @@ function mockRequest<T>(payload: T) {
 </script>
 
 <style scoped>
-.dialog-demo {
-  gap: 16px;
-  display: flex;
+.dialog-example {
+  gap: 12px;
+  display: inline-flex;
+  align-items: flex-start;
   flex-direction: column;
 }
 
-.dialog-demo__card {
-  border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-}
-
-.dialog-demo__header {
-  gap: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dialog-demo__eyebrow {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.dialog-demo__card h3 {
-  margin: 6px 0 0;
-}
-
-.dialog-demo__desc {
-  color: var(--text-sub);
-  margin: 0 0 16px;
-}
-
-.dialog-demo__form {
-  padding: 24px;
+.dialog-example__form {
+  padding: 16px 0 0;
 }
 </style>

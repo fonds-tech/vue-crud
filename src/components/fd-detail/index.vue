@@ -188,6 +188,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
+/** 详情弹窗生命周期事件，保持与外部事件命名一致 */
 const emit = defineEmits(["open", "close", "beforeOpen", "beforeClose"])
 defineSlots<Record<string, (props: {
   index?: number
@@ -231,6 +232,7 @@ const options = reactive<DetailOptions>({
   },
 })
 
+// 初始化时保证底部至少有一个确认按钮，避免出现无动作的空 footer
 ensureActions()
 
 // 过滤掉 class，其余 attrs 传递给 fd-dialog
@@ -312,19 +314,19 @@ watch(
   },
 )
 
-/** 工具：解析静态值或动态函数返回值 */
+/** 工具：解析静态值或动态函数返回值；依赖当前详情数据进行求值。 */
 function resolveMaybe<T>(value?: DetailMaybeFn<T>): T | undefined {
   if (isFunction(value))
     return value(data.value)
   return value
 }
 
-/** 判断是否为组件配置对象 */
+/** 判断是否为组件配置对象，避免将插槽名误判为组件。 */
 function isDetailComponent(target?: DetailComponentSlot): target is DetailComponent {
   return Boolean(target && typeof target === "object" && "is" in (target as Record<string, any>))
 }
 
-/** 读取自定义插槽名称 */
+/** 读取自定义插槽名称，支持直接传入 slot 名或从组件配置中解析。 */
 function slotNameOf(value?: DetailComponentSlot) {
   if (!value)
     return undefined
@@ -337,7 +339,7 @@ function slotNameOf(value?: DetailComponentSlot) {
   return resolveMaybe(value.slot)
 }
 
-/** 获取组件引用 */
+/** 获取组件引用，排除纯字符串/slot 占位，确保返回可渲染的组件定义。 */
 function componentOf(value?: DetailComponentSlot) {
   if (!value)
     return undefined
@@ -351,28 +353,28 @@ function componentOf(value?: DetailComponentSlot) {
   return typeof resolved === "object" && resolved !== null ? markRaw(resolved) : resolved
 }
 
-/** 获取组件事件 */
+/** 获取组件事件，避免未配置时返回 undefined。 */
 function componentEvents(value?: DetailComponentSlot) {
   if (!value || !isDetailComponent(value))
     return {}
   return resolveMaybe(value.on) ?? {}
 }
 
-/** 获取组件 props */
+/** 获取组件 props，默认返回空对象，便于 v-bind 展开。 */
 function componentProps(value?: DetailComponentSlot) {
   if (!value || !isDetailComponent(value))
     return {}
   return resolveMaybe(value.props) ?? {}
 }
 
-/** 获取组件 style */
+/** 获取组件 style，未配置时返回 undefined 以避免覆盖默认样式。 */
 function componentStyle(value?: DetailComponentSlot) {
   if (!value || !isDetailComponent(value))
     return undefined
   return resolveMaybe(value.style)
 }
 
-/** 获取组件具名插槽 */
+/** 获取组件具名插槽，防御性处理非对象输入。 */
 function componentSlots(value?: DetailComponentSlot): Record<string, DetailComponentSlot> {
   if (!value || !isDetailComponent(value))
     return {} as Record<string, DetailComponentSlot>
@@ -384,7 +386,7 @@ function componentSlots(value?: DetailComponentSlot): Record<string, DetailCompo
   return {} as Record<string, DetailComponentSlot>
 }
 
-/** 字段/分组 slots 统一处理 */
+/** 字段/分组 slots 统一处理，支持函数/对象两种写法。 */
 function slots(target?: { slots?: DetailSlots }) {
   if (!target || typeof target !== "object" || !("slots" in target))
     return {} as Record<string, DetailComponentSlot>
@@ -397,7 +399,7 @@ function slots(target?: { slots?: DetailSlots }) {
   return {} as Record<string, DetailComponentSlot>
 }
 
-/** 统一的显隐判断 */
+/** 统一的显隐判断，支持布尔与函数两种隐藏条件。 */
 function isVisible(target: { hidden?: DetailItem["hidden"] | DetailAction["hidden"] }) {
   const hidden = target?.hidden
   if (isFunction(hidden))
@@ -405,12 +407,12 @@ function isVisible(target: { hidden?: DetailItem["hidden"] | DetailAction["hidde
   return !hidden
 }
 
-/** 解析字段标题 */
+/** 解析字段标题，兼容函数/静态文本。 */
 function resolveLabel(item: DetailItem) {
   return resolveMaybe(item.label) ?? ""
 }
 
-/** 获取字段值（含默认值） */
+/** 获取字段值（含默认值），缺省时读取 item.value。 */
 function getFieldValue(item: DetailItem) {
   const field = item.field as string
   const current = data.value?.[field]
@@ -420,7 +422,7 @@ function getFieldValue(item: DetailItem) {
   return current
 }
 
-/** 格式化显示值 */
+/** 格式化显示值，优先使用 formatter，否则直接输出。 */
 function formatValue(item: DetailItem) {
   const value = getFieldValue(item)
   if (isFunction(item.formatter))
@@ -428,7 +430,7 @@ function formatValue(item: DetailItem) {
   return value ?? ""
 }
 
-/** 获取动作按钮文案 */
+/** 获取动作按钮文案，支持字典与自定义文本。 */
 function resolveActionText(action: DetailAction) {
   return resolveMaybe(action.text) ?? crud.dict?.label?.confirm ?? "确定"
 }
@@ -445,9 +447,7 @@ function ensureActions() {
   }
 }
 
-/**
- * 外部调用，用于动态合并配置
- */
+/** 外部调用，用于动态合并配置（数组整体替换，其余按 lodash mergeWith）。 */
 function use(useOptions: DetailUseOptions) {
   mergeWith(options, useOptions, (_objValue, srcValue) => {
     if (Array.isArray(srcValue))
@@ -458,14 +458,14 @@ function use(useOptions: DetailUseOptions) {
 }
 
 /**
- * 根据 CRUD 字典获取详情接口 key
+ * 根据 CRUD 字典获取详情接口 key。
  */
 function getDetailApiName() {
   return crud.dict?.api?.detail ?? "detail"
 }
 
 /**
- * 请求详情数据并在成功后触发 done
+ * 请求详情数据并在成功后触发 done。
  */
 function requestDetail(query: Record<string, any>, done: (value: Record<string, any>) => void) {
   const apiName = getDetailApiName()
@@ -492,7 +492,9 @@ function requestDetail(query: Record<string, any>, done: (value: Record<string, 
 }
 
 /**
- * 统一的详情流程：优先触发 onDetail 钩子，否则按 query 调用后端
+ * 统一的详情流程：优先触发 onDetail 钩子，否则按 query 调用后端。
+ * @param params 原始行数据
+ * @param defaultQuery 默认查询参数（通常包含主键）
  */
 function runDetailFlow(params: Record<string, any>, defaultQuery: Record<string, any> = {}) {
   let requested = false
@@ -537,7 +539,8 @@ function runDetailFlow(params: Record<string, any>, defaultQuery: Record<string,
 }
 
 /**
- * 打开详情弹窗，默认按主键自动查询
+ * 打开详情弹窗，默认按主键自动查询。
+ * @description 在设置可见性前校验主键，避免空壳弹窗；返回查询 Promise 以便调用方链式处理。
  */
 function detail(row: DetailData) {
   if (!row || typeof row !== "object") {
@@ -556,9 +559,7 @@ function detail(row: DetailData) {
   return runDetailFlow(row, defaultQuery)
 }
 
-/**
- * 主动刷新详情（可覆盖部分查询参数）
- */
+/** 主动刷新详情（可覆盖部分查询参数）；无缓存时直接退出并复位 loading，返回查询 Promise。 */
 function refresh(params: Record<string, any> = {}) {
   const query = merge(clone(paramsCache.value), params)
   if (!Object.keys(query).length) {
@@ -579,17 +580,13 @@ function getData() {
   return clone(data.value)
 }
 
-/**
- * 清空状态，防止数据残留
- */
+/** 清空状态，防止数据残留，但不主动关闭弹窗。 */
 function clearData() {
   data.value = {}
   paramsCache.value = {}
 }
 
-/**
- * 关闭弹窗
- */
+/** 关闭弹窗，保持数据快照到 closed 钩子触发后再清理。 */
 function close() {
   visible.value = false
   loading.value = false
@@ -601,17 +598,20 @@ function handleBeforeOpen() {
   options.onBeforeOpen?.()
 }
 
+/** 关闭前抛出快照，供外部存档或二次确认。 */
 function handleBeforeClose() {
   const snapshot = getData()
   emit("beforeClose", snapshot)
   options.onBeforeClose?.(snapshot)
 }
 
+/** 打开后回调，留给调用方做副作用（如埋点）。 */
 function handleOpen() {
   emit("open")
   options.onOpen?.()
 }
 
+/** 弹窗关闭事件：同步通知外部，不立即清理数据（等待 closed）。 */
 function handleClose() {
   const snapshot = getData()
   emit("close", snapshot)
@@ -638,7 +638,7 @@ function detailHandler(row: unknown) {
   if (row && typeof row === "object")
     handleDetailEvent(row as DetailData)
 }
-/** crud.proxy 事件处理 */
+/** crud.proxy 事件处理：与表格代理事件保持一致。 */
 function proxyHandler(payload: unknown) {
   if (!payload || typeof payload !== "object")
     return

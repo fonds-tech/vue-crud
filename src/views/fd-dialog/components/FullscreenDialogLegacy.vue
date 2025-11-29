@@ -1,44 +1,24 @@
 <template>
-  <div class="dialog-demo">
-    <el-card class="dialog-demo__card">
-      <template #header>
-        <div class="dialog-demo__header">
-          <div>
-            <p class="dialog-demo__eyebrow">
-              Fullscreen Control
-            </p>
-            <h3>全屏模式与方法调用</h3>
-          </div>
-          <el-tag size="small" type="warning" effect="light">
-            API
-          </el-tag>
-        </div>
-      </template>
+  <div class="dialog-example">
+    <el-space wrap>
+      <el-button plain @click="openByApi">
+        通过方法打开
+      </el-button>
+      <el-button plain @click="toggleFullscreen">
+        切换全屏
+      </el-button>
+      <el-button plain @click="closeByApi">
+        关闭弹窗
+      </el-button>
+    </el-space>
 
-      <p class="dialog-demo__desc">
-        `fd-dialog` 暴露 `open/close/fullscreen` 方法，并提供 `dialogVisible/fullscreenActive` 状态，可用于打造自定义控制面板。
-      </p>
-
-      <div class="dialog-demo__actions">
-        <el-button plain @click="openByApi">
-          通过方法打开
-        </el-button>
-        <el-button plain @click="toggleFullscreen">
-          切换全屏
-        </el-button>
-        <el-button plain @click="closeByApi">
-          关闭弹窗
-        </el-button>
-      </div>
-
-      <el-alert
-        type="info"
-        :closable="false"
-        show-icon
-        :title="`当前状态：${visibleState}`"
-        class="dialog-demo__alert"
-      />
-    </el-card>
+    <el-alert
+      type="info"
+      :closable="false"
+      show-icon
+      :title="`当前状态：${visibleState}`"
+      class="dialog-example__alert"
+    />
 
     <fd-dialog
       ref="dialogRef"
@@ -135,47 +115,15 @@ function handleClose() {
 </script>
 
 <style scoped>
-.dialog-demo {
-  gap: 16px;
-  display: flex;
+.dialog-example {
+  gap: 12px;
+  display: inline-flex;
+  align-items: flex-start;
   flex-direction: column;
 }
 
-.dialog-demo__card {
-  border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-}
-
-.dialog-demo__header {
-  gap: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dialog-demo__eyebrow {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.dialog-demo__desc {
-  color: var(--text-sub);
-  margin: 0 0 12px;
-}
-
-.dialog-demo__actions {
-  gap: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.dialog-demo__alert {
-  margin-top: 8px;
+.dialog-example__alert {
+  width: 100%;
 }
 
 .fullscreen-dialog__body {

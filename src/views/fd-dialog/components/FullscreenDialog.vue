@@ -1,12 +1,5 @@
 <template>
-  <section class="demo-card">
-    <h4 class="demo-card__title">
-      全屏与滚动内容
-    </h4>
-    <p class="demo-card__desc">
-      展示全屏切换、长内容滚动与自定义 footer。
-    </p>
-
+  <div class="dialog-example">
     <el-button type="primary" @click="open">
       打开全屏弹窗
     </el-button>
@@ -28,7 +21,7 @@
         </div>
       </template>
     </fd-dialog>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -56,21 +49,11 @@ function toggle() {
 </script>
 
 <style scoped lang="scss">
-.demo-card {
-  border: 1px solid var(--card-border);
-  padding: 16px;
-  background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius-lg);
-
-  &__title {
-    margin: 0 0 4px 0;
-  }
-
-  &__desc {
-    color: var(--text-sub);
-    margin: 0 0 12px 0;
-  }
+.dialog-example {
+  gap: 12px;
+  display: inline-flex;
+  align-items: flex-start;
+  flex-direction: column;
 }
 
 .scroll-content {

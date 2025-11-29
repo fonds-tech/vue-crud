@@ -6,6 +6,7 @@
     :show-close="false"
     :model-value="dialogVisible"
     @update:model-value="handleModelValueUpdate"
+    @update:fullscreen="handleFullscreenUpdate"
     @open="emitEvent('open')"
     @opened="emitEvent('opened')"
     @close="emitEvent('close')"
@@ -19,10 +20,9 @@
           {{ props.title }}
         </div>
         <div class="fd-dialog__actions">
-          <el-button
+          <div
             class="fd-dialog__action"
-            text
-            circle
+            role="button"
             :aria-label="fullscreenButtonLabel"
             :title="fullscreenButtonLabel"
             @click="handleToggleFullscreen"
@@ -30,12 +30,19 @@
             <el-icon>
               <component :is="fullscreenButtonIcon" />
             </el-icon>
-          </el-button>
-          <el-button v-if="shouldRenderCloseAction" class="fd-dialog__action" text circle @click="handleCloseClick">
+          </div>
+          <div
+            v-if="shouldRenderCloseAction"
+            class="fd-dialog__action"
+            role="button"
+            aria-label="关闭弹窗"
+            title="关闭弹窗"
+            @click="handleCloseClick"
+          >
             <el-icon>
               <component :is="closeIcon" />
             </el-icon>
-          </el-button>
+          </div>
         </div>
       </div>
     </template>
@@ -51,10 +58,11 @@
 </template>
 
 <script setup lang="ts">
-import type { DialogEmits } from "element-plus/es/components/dialog/src/dialog"
-import { dialogEmits, dialogProps } from "element-plus"
+import IconTablerX from "~icons/tabler/x"
+import IconTablerMaximize from "~icons/tabler/maximize"
+import IconTablerMinimize from "~icons/tabler/minimize"
+import { dialogProps } from "element-plus"
 import { ref, watch, computed, useAttrs } from "vue"
-import { Close, FullScreen, ScaleToOriginal } from "@element-plus/icons-vue"
 
 defineOptions({
   name: "fd-dialog",
@@ -69,12 +77,20 @@ const props = defineProps({
   },
 })
 
-// 继承 Element Plus 的事件定义，保证 emit 参数一致
-type EmitFn = <T extends keyof DialogEmits>(name: T, ...args: Parameters<DialogEmits[T]>) => void
-const emit = defineEmits(dialogEmits) as EmitFn
-const emitEvent: EmitFn = (name, ...args) => emit(name, ...args)
+// 继承 Element Plus 的事件定义，并扩展 update:fullscreen 事件
+const emit = defineEmits<{
+  (event: "open"): void
+  (event: "opened"): void
+  (event: "close"): void
+  (event: "closed"): void
+  (event: "update:modelValue", value: boolean): void
+  (event: "openAutoFocus"): void
+  (event: "closeAutoFocus"): void
+  (event: "update:fullscreen", value: boolean): void
+}>()
+const emitEvent = emit
 
-const closeIcon = Close
+const closeIcon = IconTablerX
 
 const attrs = useAttrs()
 const attrsRecord = attrs as Record<string, unknown> & { class?: unknown }
@@ -108,6 +124,11 @@ function handleToggleFullscreen() {
   fullscreenActive.value = !fullscreenActive.value
 }
 
+function handleFullscreenUpdate(value: boolean) {
+  fullscreenActive.value = value
+  emitEvent("update:fullscreen", value)
+}
+
 function handleCloseClick() {
   dialogVisible.value = false
   emitEvent("update:modelValue", false)
@@ -121,7 +142,7 @@ const scrollbarHeight = computed(() => {
 })
 
 const fullscreenButtonLabel = computed(() => (fullscreenActive.value ? "退出全屏" : "全屏"))
-const fullscreenButtonIcon = computed(() => (fullscreenActive.value ? ScaleToOriginal : FullScreen))
+const fullscreenButtonIcon = computed(() => (fullscreenActive.value ? IconTablerMinimize : IconTablerMaximize))
 const shouldRenderCloseAction = computed(() => props.showClose !== false)
 
 const dialogCssClass = computed(() => {
@@ -210,7 +231,6 @@ defineExpose({
   }
 
   &__actions {
-    gap: 4px;
     display: inline-flex;
     align-items: center;
   }
@@ -218,10 +238,15 @@ defineExpose({
   &__action {
     color: var(--el-text-color-secondary, #606266);
     width: 32px;
+    cursor: pointer;
     height: 32px;
+    display: flex;
     transition:
       color 0.2s ease,
       background-color 0.2s ease;
+    align-items: center;
+    border-radius: 50%;
+    justify-content: center;
 
     &:hover {
       color: var(--el-color-primary, #409eff);

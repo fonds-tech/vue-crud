@@ -1,33 +1,13 @@
 <template>
-  <div class="dialog-demo">
-    <el-card class="dialog-demo__card">
-      <template #header>
-        <div class="dialog-demo__header">
-          <div>
-            <p class="dialog-demo__eyebrow">
-              Scrollable Content
-            </p>
-            <h3>长内容与滚动容器</h3>
-          </div>
-          <el-tag size="small" type="success" effect="plain">
-            height
-          </el-tag>
-        </div>
-      </template>
-
-      <p class="dialog-demo__desc">
-        利用 `height` 属性可限制可滚动区域，适合展示审批日志、系统公告等长内容。
-      </p>
-
-      <el-space wrap>
-        <el-button type="primary" @click="dialogVisible = true">
-          查看最新日志
-        </el-button>
-        <el-button text type="primary" @click="shuffleLogs">
-          刷新日志
-        </el-button>
-      </el-space>
-    </el-card>
+  <div class="dialog-example">
+    <el-space wrap>
+      <el-button type="primary" @click="dialogVisible = true">
+        查看最新日志
+      </el-button>
+      <el-button text type="primary" @click="shuffleLogs">
+        刷新日志
+      </el-button>
+    </el-space>
 
     <fd-dialog
       v-model="dialogVisible"
@@ -91,36 +71,11 @@ function generateLogs(): TimelineLog[] {
 </script>
 
 <style scoped>
-.dialog-demo {
-  gap: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.dialog-demo__card {
-  border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-}
-
-.dialog-demo__header {
+.dialog-example {
   gap: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dialog-demo__eyebrow {
-  color: var(--text-sub);
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.dialog-demo__desc {
-  color: var(--text-sub);
-  margin: 0 0 16px;
+  display: inline-flex;
+  align-items: flex-start;
+  flex-direction: column;
 }
 
 .scroll-dialog__body {
