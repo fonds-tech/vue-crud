@@ -3,27 +3,25 @@ import type { DescriptionProps } from "element-plus/es/components/descriptions/s
 import type { VNodeChild, CSSProperties, ExtractPropTypes, Component as VueComponent } from "vue"
 
 /**
- * 通用详情数据类型
- * @description 使用 Record 以兼容任意业务字段
+ * 通用详情数据类型。
+ * @description 使用 Record 以兼容任意业务字段，便于透传任意字段。
  */
 export type DetailData = Record<string, any>
 
 /**
- * 支持「静态值 / 动态函数」的联合类型
+ * 支持「静态值 / 动态函数」的联合类型。
  * @template T 目标值类型
  * @template D 详情数据类型
  */
 export type DetailMaybeFn<T, D extends DetailData = DetailData> = T | ((data: D) => T)
 
 /**
- * 详情组件支持的插槽结构
- * @description 既支持字符串组件名，也支持组件实例或 render 函数
+ * 详情组件支持的插槽结构。
+ * @remarks 既支持字符串组件名，也支持组件实例或 render 函数。
  */
 export type DetailComponentSlot = string | VueComponent | DetailComponent | (() => VNodeChild)
 
-/**
- * 自定义渲染组件配置
- */
+/** 自定义渲染组件配置。 */
 export interface DetailComponent<D extends DetailData = DetailData> {
   /** 组件类型，可根据数据动态切换 */
   is?: DetailMaybeFn<string | VueComponent, D>
@@ -39,11 +37,11 @@ export interface DetailComponent<D extends DetailData = DetailData> {
   slots?: DetailMaybeFn<Record<string, DetailComponentSlot>, D>
 }
 
-/** 插槽集合定义（字段/分组复用） */
+/** 插槽集合定义（字段/分组复用）。 */
 export type DetailSlots<D extends DetailData = DetailData> = DetailMaybeFn<Record<string, DetailComponentSlot>, D>
 
 /**
- * 单个详情字段配置
+ * 单个详情字段配置。
  */
 export interface DetailItem<D extends DetailData = DetailData> {
   /** 对应数据字段 */
@@ -66,13 +64,11 @@ export interface DetailItem<D extends DetailData = DetailData> {
   component?: DetailComponent<D>
 }
 
-/**
- * 底部操作按钮配置
- */
+/** 底部操作按钮配置。 */
 export interface DetailAction<D extends DetailData = DetailData> {
   /** 按钮文本 */
   text?: DetailMaybeFn<string | undefined, D>
-  /** 内置动作类型 */
+  /** 内置动作类型，默认 ok 为确认关闭 */
   type?: "ok"
   /** 隐藏条件 */
   hidden?: DetailMaybeFn<boolean, D>
@@ -80,9 +76,7 @@ export interface DetailAction<D extends DetailData = DetailData> {
   component?: DetailComponent<D>
 }
 
-/**
- * 分组配置
- */
+/** 分组配置。 */
 export interface DetailGroup<D extends DetailData = DetailData> {
   /** 唯一名称 */
   name?: string | number
@@ -92,21 +86,21 @@ export interface DetailGroup<D extends DetailData = DetailData> {
   descriptions?: DetailDescriptions<D>
 }
 
-/** descriptions 组件配置，扩充 slots 字段 */
+/** descriptions 组件配置，扩充 slots 字段。 */
 export type DetailDescriptions<D extends DetailData = DetailData> = Partial<DescriptionProps> & {
   slots?: DetailSlots<D>
 }
 
 type NativeDialogProps = Omit<ExtractPropTypes<typeof dialogProps>, "modelValue">
 
-/** 弹窗配置（复用 fd-dialog 的 props） */
+/** 弹窗配置（复用 fd-dialog 的 props）。 */
 export type DetailDialogProps = Partial<NativeDialogProps> & {
   /** 加载态提示 */
   loadingText?: string
 }
 
 /**
- * 详情组件完整配置
+ * 详情组件完整配置。
  */
 export interface DetailOptions<D extends DetailData = DetailData> {
   dialog: DetailDialogProps
@@ -114,24 +108,37 @@ export interface DetailOptions<D extends DetailData = DetailData> {
   groups: DetailGroup<D>[]
   actions: DetailAction<D>[]
   descriptions: DetailDescriptions<D>
+  /** 弹窗打开后触发（已可见） */
   onOpen?: () => void
+  /** 弹窗打开前触发（尚未可见） */
   onBeforeOpen?: () => void
+  /** 弹窗关闭后触发（已不可见） */
   onClose?: (data: D) => void
+  /** 弹窗关闭前触发（尚可见） */
   onBeforeClose?: (data: D) => void
+  /**
+   * 自定义详情获取流程。
+   * @param row 当前行数据（包含主键）
+   * @param ctx 辅助方法集
+   * - done: 手动写入数据并结束 loading
+   * - next: 按给定查询参数调用默认 service
+   * - close: 关闭弹窗
+   */
   onDetail?: (row: D, ctx: { done: (data: D) => void, next: (params: Record<string, any>) => Promise<any>, close: () => void }) => void
 }
 
 /**
- * use 方法支持的参数
+ * use 方法支持的参数（浅合并 DeepPartial，数组整体替换）。
  */
 export type DetailUseOptions<D extends DetailData = DetailData> = import("../fd-form/type").DeepPartial<DetailOptions<D>> & Record<string, any>
 
 /**
- * 组件暴露的实例方法
+ * 组件暴露的实例方法。
  */
 export interface DetailExpose<D extends DetailData = DetailData> {
+  /** 当前数据快照 */
   readonly data: D
-  /** 合并配置 */
+  /** 合并配置，数组将整体替换 */
   use: (options: DetailUseOptions<D>) => void
   /** 关闭弹窗 */
   close: () => void
@@ -148,6 +155,6 @@ export interface DetailExpose<D extends DetailData = DetailData> {
 }
 
 /**
- * 详情组件实例引用
+ * 详情组件实例引用。
  */
 export type DetailRef<D extends DetailData = DetailData> = DetailExpose<D>

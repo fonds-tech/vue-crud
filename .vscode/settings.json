@@ -1,13 +1,12 @@
 {
-  // Disable the default formatter, use eslint instead
-  "prettier.enable": true,
-  "editor.formatOnSave": false,
-  // Auto fix
+  "eslint.useFlatConfig": true,
+  "prettier.enable": false,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never"
   },
-  // Silent the stylistic rules in you IDE, but still auto fix them
   "eslint.rules.customizations": [
     {
       "rule": "style/*",
@@ -46,7 +45,6 @@
       "severity": "off"
     }
   ],
-  // Enable eslint for all supported languages
   "eslint.validate": [
     "javascript",
     "javascriptreact",

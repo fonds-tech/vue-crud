@@ -5,6 +5,7 @@
     :class="dialogClass"
     @open="handleOpen"
     @close="handleClose"
+    @closed="handleClosed"
   >
     <slot :data="data.value" :loading="loading" :visible="visible" :refresh="refresh" :set-data="setData">
       <el-space
@@ -173,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DetailItem, DetailGroup, DetailSlots, DetailAction, DetailExpose, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
+import type { DetailData, DetailItem, DetailGroup, DetailSlots, DetailAction, DetailExpose, DetailMaybeFn, DetailOptions, DetailComponent, DetailUseOptions, DetailDescriptions, DetailComponentSlot } from "./type"
 import FdDialog from "../fd-dialog/index.vue"
 import { clone } from "@fonds/utils"
 import { useCore } from "@/hooks"
@@ -206,7 +207,7 @@ const instance = getCurrentInstance()
 const attrs = useAttrs() as Record<string, unknown> & { class?: unknown }
 
 // 数据状态：当前详情数据/请求缓存/弹窗可见性/加载态
-const data = ref<Record<string, any>>({})
+const data = ref<DetailData>({})
 const paramsCache = ref<Record<string, any>>({})
 const visible = ref(false)
 const loading = ref(false)
@@ -511,13 +512,20 @@ function runDetailFlow(params: Record<string, any>, defaultQuery: Record<string,
   }
 
   if (isFunction(options.onDetail)) {
-    const result = options.onDetail(params, { done, next, close })
-    const maybePromise = result as unknown
-    if (typeof maybePromise === "object" && maybePromise !== null && "finally" in (maybePromise as any) && typeof (maybePromise as any).finally === "function") {
-      return (maybePromise as Promise<any>).finally(finalizeIfIdle)
+    try {
+      const result = options.onDetail(params, { done, next, close })
+      return Promise.resolve(result)
+        .catch((error: any) => {
+          ElMessage.error(error?.message ?? "详情查询失败")
+          throw error
+        })
+        .finally(finalizeIfIdle)
     }
-    finalizeIfIdle()
-    return result
+    catch (error: any) {
+      ElMessage.error(error?.message ?? "详情查询失败")
+      finalizeIfIdle()
+      return Promise.reject(error)
+    }
   }
 
   const query = Object.keys(defaultQuery).length ? defaultQuery : params
@@ -531,21 +539,20 @@ function runDetailFlow(params: Record<string, any>, defaultQuery: Record<string,
 /**
  * 打开详情弹窗，默认按主键自动查询
  */
-function detail(row: Record<string, any>) {
+function detail(row: DetailData) {
   if (!row || typeof row !== "object") {
     ElMessage.warning("无效的详情数据")
+    return
+  }
+  const primaryKey = crud.dict?.primaryId ?? "id"
+  const defaultQuery = pick(row, [primaryKey])
+  if (defaultQuery[primaryKey] === undefined || defaultQuery[primaryKey] === null) {
+    ElMessage.warning(`缺少主键字段 ${primaryKey}`)
     return
   }
   setData(row)
   visible.value = true
   loading.value = true
-  const primaryKey = crud.dict?.primaryId ?? "id"
-  const defaultQuery = pick(row, [primaryKey])
-  if (defaultQuery[primaryKey] === undefined || defaultQuery[primaryKey] === null) {
-    loading.value = false
-    ElMessage.warning(`缺少主键字段 ${primaryKey}`)
-    return
-  }
   return runDetailFlow(row, defaultQuery)
 }
 
@@ -564,7 +571,7 @@ function refresh(params: Record<string, any> = {}) {
 /**
  * 手动设置详情数据
  */
-function setData(value: Record<string, any>) {
+function setData(value: DetailData) {
   data.value = clone(value ?? {})
 }
 
@@ -609,13 +616,17 @@ function handleClose() {
   const snapshot = getData()
   emit("close", snapshot)
   options.onClose?.(snapshot)
+}
+
+/** 弹窗完全关闭后再清理数据，避免关闭动画期间数据闪空 */
+function handleClosed() {
   clearData()
 }
 
 /**
  * 处理 mitt detail / proxy 的统一逻辑
  */
-function handleDetailEvent(row: Record<string, any>) {
+function handleDetailEvent(row: DetailData) {
   if (!row)
     return
   setData(row)
@@ -625,7 +636,7 @@ function handleDetailEvent(row: Record<string, any>) {
 /** mitt detail 事件处理 */
 function detailHandler(row: unknown) {
   if (row && typeof row === "object")
-    handleDetailEvent(row as Record<string, any>)
+    handleDetailEvent(row as DetailData)
 }
 /** crud.proxy 事件处理 */
 function proxyHandler(payload: unknown) {
@@ -647,9 +658,9 @@ onBeforeUnmount(() => {
   mitt?.off?.("crud.proxy", proxyHandler)
 })
 
-defineExpose<DetailExpose<Record<string, any>>>({
+defineExpose<DetailExpose<DetailData>>({
   get data() {
-    return data.value as Record<string, any>
+    return data.value as DetailData
   },
   use,
   close,
