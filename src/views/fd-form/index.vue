@@ -15,7 +15,6 @@ import TabsForm from "./components/TabsForm.vue"
 import BasicForm from "./components/BasicForm.vue"
 import StepsForm from "./components/StepsForm.vue"
 import DynamicForm from "./components/DynamicForm.vue"
-import WorkflowForm from "./components/WorkflowForm.vue"
 import ComponentPlayground from "./components/ComponentPlayground.vue"
 
 const componentCatalog: ComponentMeta[] = [
@@ -38,12 +37,12 @@ const componentCatalog: ComponentMeta[] = [
     tagType: "success",
   },
   {
-    key: "workflow",
-    title: "审批提交流程",
-    badge: "工作流",
-    description: "包含日期、标签、开关和滑块，模拟审批信息收集。",
-    component: WorkflowForm,
-    componentName: "WorkflowForm",
+    key: "steps",
+    title: "多步骤审批",
+    badge: "Steps",
+    description: "分步填写并联动步骤条，适合长流程审批。",
+    component: StepsForm,
+    componentName: "StepsForm",
     tagType: "success",
   },
   {
@@ -53,15 +52,6 @@ const componentCatalog: ComponentMeta[] = [
     description: "使用 setOptions/hideItem/setRequired 实现客户类型联动。",
     component: DynamicForm,
     componentName: "DynamicForm",
-    tagType: "success",
-  },
-  {
-    key: "steps",
-    title: "多步骤审批",
-    badge: "Steps",
-    description: "分步填写并联动步骤条，适合长流程审批。",
-    component: StepsForm,
-    componentName: "StepsForm",
     tagType: "success",
   },
   {
