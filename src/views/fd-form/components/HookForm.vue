@@ -35,12 +35,26 @@
 </template>
 
 <script setup lang="ts">
-import type { FormUseOptions } from "@/components/fd-form/type"
 import { clone } from "@fonds/utils"
 import { useForm } from "@/hooks"
-import { computed } from "vue"
+import { ref, computed } from "vue"
 
-const initialPayload = {
+interface HookFormModel {
+  productName: string
+  sku: string
+  price: number | string
+  seats: number | string
+  tags: string | string[]
+  metadata: string
+  startOnlineWindow: string
+  endOnlineWindow: string
+  onlineWindow: any[]
+  activeFlag: number
+  auditNotes: string
+  activeSwitch?: boolean
+}
+
+const initialPayload: HookFormModel = {
   productName: "AI 协同套餐",
   sku: "SKU-2024-001",
   price: "199",
@@ -54,11 +68,8 @@ const initialPayload = {
   auditNotes: "",
 }
 
-const formRef = useForm(clone(options))
-const formModel = computed(() => formRef.value?.model ?? {})
 const submitPayload = ref<Record<string, any>>({})
-
-const options: FormUseOptions = {
+const formRef = useForm<HookFormModel>({
   model: initialPayload,
   grid: {
     cols: 2,
@@ -132,9 +143,10 @@ const options: FormUseOptions = {
       field: "activeSwitch",
       label: "是否激活",
       hook: {
-        bind: (_value, { model }) => model.activeFlag === 1,
-        submit: (value, { model }) => {
-          model.activeFlag = value ? 1 : 0
+        bind: (_value: unknown, { model }: { model: Record<string, any> }) => (model as HookFormModel).activeFlag === 1,
+        submit: (value: boolean, { model }: { model: Record<string, any> }) => {
+          const typedModel = model as HookFormModel
+          typedModel.activeFlag = value ? 1 : 0
           return undefined
         },
       },
@@ -147,7 +159,8 @@ const options: FormUseOptions = {
       component: { is: "el-input", props: { type: "textarea", rows: 2, maxlength: 120, showWordLimit: true } },
     },
   ],
-}
+})
+const formModel = computed(() => formRef.value?.model ?? ({} as HookFormModel))
 
 function handleSubmit() {
   formRef.value?.submit().then(({ values }) => {
@@ -167,32 +180,76 @@ function handleRebind() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .form-variant {
-  gap: 16px;
+  gap: 12px;
   display: flex;
   flex-direction: column;
 }
 
 .variant-card {
-  border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
-  border-radius: 20px;
+  border: 1px solid var(--el-border-color-light, #e4e7ed);
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  background-color: var(--el-bg-color, #ffffff);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    border-color: var(--el-color-primary-light-7, #c6e2ff);
+  }
+
+  :deep(.el-card__body) {
+    padding: 24px;
+  }
 }
 
 .action-row {
   gap: 12px;
   display: flex;
-  margin-top: 16px;
+  flex-wrap: wrap;
+  border-top: 1px dashed var(--el-border-color-lighter, #ebeef5);
   justify-content: flex-end;
 }
 
 .panel-title {
-  color: #909399;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   justify-content: space-between;
+
+  h3 {
+    gap: 10px;
+    color: var(--el-text-color-primary, #303133);
+    margin: 0;
+    display: flex;
+    font-size: 16px;
+    align-items: center;
+    font-weight: 600;
+
+    &::before {
+      width: 4px;
+      height: 16px;
+      content: "";
+      border-radius: 2px;
+      background-color: var(--el-color-primary, #409eff);
+    }
+  }
+
+  span {
+    color: var(--el-color-success, #67c23a);
+    padding: 4px 10px;
+    font-size: 12px;
+    background: var(--el-color-success-light-9, #f0f9eb);
+    font-weight: 500;
+    border-radius: 6px;
+  }
 }
 
 .payload-panel {
@@ -202,19 +259,36 @@ function handleRebind() {
 }
 
 .payload-column h4 {
-  color: #cfd3dc;
+  color: var(--el-text-color-primary, #303133);
   margin: 0 0 8px;
   font-size: 14px;
 }
 
 pre {
-  color: #e5e7eb;
+  color: #a6accd;
+  border: 1px solid #1b1e2b;
   margin: 0;
-  padding: 16px;
+  padding: 20px;
   overflow: auto;
-  background: #111827;
-  max-height: 260px;
-  font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  border-radius: 14px;
+  font-size: 13px;
+  background: #292d3e;
+  max-height: 300px;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.6;
+  border-radius: 8px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #454b66;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 </style>

@@ -176,14 +176,8 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__component-name {
-    color: var(--text-muted);
     padding: 2px 6px;
-    font-size: 0.9em;
-    background: var(--bg-app);
     font-family: monospace;
-    font-weight: 400;
-    margin-left: 8px;
-    border-radius: 4px;
   }
 
   &__badge {

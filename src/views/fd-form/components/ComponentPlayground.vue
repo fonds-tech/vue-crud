@@ -157,15 +157,32 @@ function handleReset() {
 
 <style scoped lang="scss">
 .form-variant {
-  gap: 16px;
+  gap: 12px;
   display: flex;
   flex-direction: column;
 }
 
 .variant-card {
-  border: none;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
-  border-radius: 20px;
+  border: 1px solid var(--el-border-color-light, #e4e7ed);
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  background-color: var(--el-bg-color, #ffffff);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    border-color: var(--el-color-primary-light-7, #c6e2ff);
+  }
+
+  :deep(.el-card__body) {
+    padding: 24px;
+  }
 }
 
 .section-title {
@@ -181,20 +198,38 @@ function handleReset() {
   gap: 12px;
   display: flex;
   flex-wrap: wrap;
-  margin-top: 16px;
+  border-top: 1px dashed var(--el-border-color-lighter, #ebeef5);
   justify-content: flex-end;
 }
 
 .panel-title {
-  color: #909399;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   justify-content: space-between;
+
+  h3,
+  h4 {
+    gap: 10px;
+    color: var(--el-text-color-primary, #303133);
+    margin: 0;
+    display: flex;
+    font-size: 16px;
+    align-items: center;
+    font-weight: 600;
+
+    &::before {
+      width: 4px;
+      height: 16px;
+      content: "";
+      border-radius: 2px;
+      background-color: var(--el-color-primary, #409eff);
+    }
+  }
 }
 
 .step-desc {
-  color: #606266;
+  color: var(--el-text-color-regular, #606266);
   display: block;
   font-size: 13px;
   margin-top: 4px;
@@ -213,13 +248,30 @@ function handleReset() {
 }
 
 pre {
-  color: #e5e7eb;
+  color: #a6accd;
+  border: 1px solid #1b1e2b;
   margin: 0;
-  padding: 16px;
+  padding: 20px;
   overflow: auto;
-  background: #111827;
-  max-height: 260px;
-  font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  border-radius: 14px;
+  font-size: 13px;
+  background: #292d3e;
+  max-height: 300px;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.6;
+  border-radius: 8px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #454b66;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 </style>

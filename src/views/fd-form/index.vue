@@ -25,6 +25,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "标准布局",
     description: "1 列控件展示基础校验，适合入门场景。",
     component: BasicForm,
+    componentName: "BasicForm",
     tagType: "success",
   },
   {
@@ -33,6 +34,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Tabs + 折叠",
     description: "三大分组 + 折叠行演示，展示 help/extra/tooltip。",
     component: TabsForm,
+    componentName: "TabsForm",
     tagType: "success",
   },
   {
@@ -41,6 +43,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "工作流",
     description: "包含日期、标签、开关和滑块，模拟审批信息收集。",
     component: WorkflowForm,
+    componentName: "WorkflowForm",
     tagType: "success",
   },
   {
@@ -49,6 +52,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Action API",
     description: "使用 setOptions/hideItem/setRequired 实现客户类型联动。",
     component: DynamicForm,
+    componentName: "DynamicForm",
     tagType: "success",
   },
   {
@@ -57,6 +61,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Steps",
     description: "分步填写并联动步骤条，适合长流程审批。",
     component: StepsForm,
+    componentName: "StepsForm",
     tagType: "success",
   },
   {
@@ -65,6 +70,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Hook",
     description: "演示 number/json/datetimeRange 等 hook 对齐后端结构。",
     component: HookForm,
+    componentName: "HookForm",
     tagType: "success",
   },
   {
@@ -73,6 +79,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Mode",
     description: "setMode + bindFields 复用表单，支持新增/编辑态切换。",
     component: ModeForm,
+    componentName: "ModeForm",
     tagType: "success",
   },
   {
@@ -81,6 +88,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Component",
     description: "演示 component 对象 props/options/slots/on/style 的完整用法。",
     component: ComponentPlayground,
+    componentName: "ComponentPlayground",
     tagType: "warning",
   },
 ]
