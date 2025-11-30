@@ -274,8 +274,6 @@ function handleValidateField() {
     display: flex;
     flex-wrap: wrap;
     border-top: 1px dashed var(--el-border-color-lighter, #ebeef5);
-    margin-top: 24px;
-    padding-top: 20px;
     justify-content: flex-end;
   }
 

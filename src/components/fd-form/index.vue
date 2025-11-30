@@ -676,8 +676,5 @@ defineExpose({
   .el-space {
     width: 100%;
   }
-  .el-form-item {
-    margin-bottom: 0;
-  }
 }
 </style>
