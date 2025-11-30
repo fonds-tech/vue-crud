@@ -147,6 +147,7 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__preview {
+    gap: 20px;
     flex: 1;
     border: 1px solid var(--card-border);
     display: flex;
