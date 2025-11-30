@@ -20,9 +20,9 @@ const ElFormStub = defineComponent({
   },
   setup(_, { slots, expose }) {
     const api = {
-      validate: (callback?: (errors?: Record<string, any>) => void) => {
-        callback?.(undefined)
-        return Promise.resolve()
+      validate: (callback?: (isValid?: boolean, errors?: Record<string, any>) => void) => {
+        callback?.(true, undefined)
+        return Promise.resolve(true)
       },
       validateField: () => Promise.resolve(),
       resetFields: () => undefined,

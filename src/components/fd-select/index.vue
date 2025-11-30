@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
+import { clone } from "@fonds/utils"
 import { merge, isEqual } from "lodash-es"
-import { clone, debounce } from "@fonds/utils"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type OptionRecord = Record<string, any>
@@ -212,19 +212,20 @@ function handleClear() {
   emit("clear")
 }
 
-// 处理搜索输入，触发防抖刷新
+// 搜索请求的防抖计时器，使用 trailing 模式避免立刻触发
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+
+// 处理搜索输入，触发防抖刷新（仅 trailing）
 function handleFilterInput(value: string) {
   currentSearchTerm.value = value
-  debouncedRefresh(value)
+  if (searchTimer)
+    clearTimeout(searchTimer)
+  if (value && typeof props.api === "function") {
+    searchTimer = setTimeout(() => refresh({ [props.searchField]: value }), props.debounce)
+  }
   if (value)
     emit("search", value)
 }
-
-// 防抖后的刷新函数
-const debouncedRefresh = debounce((value: string) => {
-  if (value && typeof props.api === "function")
-    refresh({ [props.searchField]: value })
-}, props.debounce)
 
 // 解析选项特定字段值
 function resolveOptionField(option: OptionRecord, key: string | undefined) {

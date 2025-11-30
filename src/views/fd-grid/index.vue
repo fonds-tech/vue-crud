@@ -74,9 +74,9 @@ const componentCatalog: ComponentMeta[] = [
   },
   {
     key: "suffix",
-    title: "后缀操作区",
-    badge: "表单场景",
-    description: "Suffix 节点始终位于网格末尾，适合放置搜索/重置按钮。",
+    title: "高级搜索布局",
+    badge: "实战",
+    description: "结合 Suffix 属性实现操作区始终置底右对齐的高级筛选场景。",
     component: SuffixGrid,
     componentName: "SuffixGrid",
     tagType: "primary",

@@ -24,6 +24,7 @@ export interface GridItemState {
   span: ComputedRef<number>
   offset: ComputedRef<number>
   suffix: ComputedRef<boolean>
+  el: HTMLElement | null
 }
 
 export interface GridContext {

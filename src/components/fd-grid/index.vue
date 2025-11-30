@@ -1,5 +1,5 @@
 <template>
-  <div class="fd-grid" :style="gridStyle">
+  <div ref="rootRef" class="fd-grid" :style="gridStyle">
     <slot />
   </div>
 </template>
@@ -23,24 +23,32 @@ const props = withDefaults(defineProps<GridProps>(), {
   collapsedRows: 1,
 })
 
-const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1920)
-
-function handleResize() {
-  if (typeof window === "undefined") {
-    return
-  }
-  viewportWidth.value = window.innerWidth
-}
+const rootRef = ref<HTMLElement | null>(null)
+const viewportWidth = ref(1920)
+let resizeObserver: ResizeObserver | null = null
 
 onMounted(() => {
-  if (typeof window !== "undefined") {
-    window.addEventListener("resize", handleResize)
+  // 初始宽度
+  if (rootRef.value) {
+    viewportWidth.value = rootRef.value.clientWidth
+  }
+
+  if (typeof ResizeObserver !== "undefined" && rootRef.value) {
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width
+        // 简单的防抖或直接设置，这里直接设置
+        viewportWidth.value = width
+      }
+    })
+    resizeObserver.observe(rootRef.value)
   }
 })
 
 onBeforeUnmount(() => {
-  if (typeof window !== "undefined") {
-    window.removeEventListener("resize", handleResize)
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
   }
 })
 
@@ -52,6 +60,22 @@ const resolvedColGap = computed(() => Math.max(0, resolveResponsiveValue(props.c
 const resolvedCollapsed = computed(() => props.collapsed)
 const resolvedCollapsedRows = computed(() => Math.max(1, props.collapsedRows))
 
+// 基于 DOM 位置排序后的 items
+const sortedItems = computed(() => {
+  const list = [...items.value]
+  if (list.every(item => item.el)) {
+    return list.sort((a, b) => {
+      if (!a.el || !b.el) return 0
+      // compareDocumentPosition 返回值掩码：4 表示 b 在 a 后面 (FOLLOWING)
+      const position = a.el.compareDocumentPosition(b.el)
+      if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1
+      if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1
+      return 0
+    })
+  }
+  return list
+})
+
 const visibilityState = computed(() => {
   const map = new Map<symbol, boolean>()
   const displayIds = new Set<symbol>()
@@ -59,14 +83,17 @@ const visibilityState = computed(() => {
   const collapsed = resolvedCollapsed.value
   const collapsedRowsValue = resolvedCollapsedRows.value
 
-  const effectiveItems = items.value.map((item) => {
+  // 使用排序后的列表进行计算
+  const effectiveItems = sortedItems.value.map((item) => {
     const span = clampValue(item.span.value, 1, colsValue)
     const offset = clampValue(item.offset.value, 0, Math.max(colsValue - 1, 0))
-    const effectiveSpan = Math.min(offset > 0 ? span + offset : span, colsValue)
+    // Offset 这里只影响布局空间计算，不影响 span 本身（margin-left 实现）
+    // 但是计算是否换行时，offset 实际上消耗了行空间
+    const effectiveSpan = Math.min(span + offset, colsValue)
     return {
       id: item.id,
       suffix: item.suffix.value,
-      span: effectiveSpan,
+      span: effectiveSpan, // 包含 offset 的总宽度
     }
   })
 
@@ -80,6 +107,8 @@ const visibilityState = computed(() => {
   const exceedsRows = (spanSum: number) => Math.ceil(spanSum / colsValue) > collapsedRowsValue
   let spanSum = 0
 
+  // 优先保留 Suffix 节点
+  // 注意：如果 Suffix 节点很大，可能会占据大量空间
   effectiveItems.forEach((entry) => {
     if (entry.suffix) {
       spanSum += entry.span
@@ -118,12 +147,18 @@ const gridStyle = computed<CSSProperties>(() => ({
   gridTemplateColumns: `repeat(${resolvedCols.value}, minmax(0, 1fr))`,
   columnGap: `${resolvedColGap.value}px`,
   rowGap: `${resolvedRowGap.value}px`,
+  // gap shorthand
   gap: `${resolvedRowGap.value}px ${resolvedColGap.value}px`,
 }))
 
 const registerItem: GridContext["registerItem"] = (state) => {
   const exists = items.value.some(item => item.id === state.id)
-  items.value = exists ? items.value.map(item => (item.id === state.id ? state : item)) : [...items.value, state]
+  if (exists) {
+    items.value = items.value.map(item => (item.id === state.id ? state : item))
+  }
+  else {
+    items.value = [...items.value, state]
+  }
 }
 
 const unregisterItem: GridContext["unregisterItem"] = (id) => {
@@ -151,7 +186,8 @@ provide(gridInjectionKey, context)
 
 <style scoped>
 .fd-grid {
+  width: 100%;
   height: fit-content;
-  display: grid;
+  display: grid; /* Ensure resize observer works on full width */
 }
 </style>

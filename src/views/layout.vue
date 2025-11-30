@@ -42,7 +42,9 @@
       </div>
 
       <div class="layout__preview-body dot-pattern">
-        <component :is="activeComponent.component" />
+        <el-scrollbar class="layout__preview-scrollbar" height="100%">
+          <component :is="activeComponent.component" />
+        </el-scrollbar>
       </div>
     </div>
   </div>
@@ -227,6 +229,10 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
     flex: 1;
     display: flex;
     overflow: hidden;
+  }
+
+  &__preview-scrollbar {
+    flex: 1;
   }
 }
 </style>

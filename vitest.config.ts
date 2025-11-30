@@ -8,11 +8,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "~icons": fileURLToPath(new URL("./test/__mocks__/icons", import.meta.url)),
     },
   },
   test: {
     environment: "happy-dom",
     watch: false,
+    setupFiles: ["./test/setupTests.ts"],
     server: {
       deps: {
         inline: ["vitest-package-exports"],

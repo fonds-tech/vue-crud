@@ -33,7 +33,7 @@
     </template>
 
     <el-scrollbar :height="scrollbarHeight">
-      <div class="fd-dialog__scrollbar">
+      <div class="fd-dialog__scrollbar" :data-height="scrollbarHeight">
         <slot />
       </div>
     </el-scrollbar>
@@ -123,8 +123,14 @@ function handleCloseClick() {
 
 const scrollbarHeight = computed(() => {
   const { height } = props
-  if (height === undefined || height === null || height === "") return undefined
-  return typeof height === "number" ? `${height}px` : height
+  if (typeof height === "number")
+    return `${height}px`
+  if (height === undefined || height === null || height === "")
+    return "60vh"
+  const numeric = Number(height)
+  if (!Number.isNaN(numeric) && String(numeric) === String(height))
+    return `${numeric}px`
+  return height
 })
 
 const fullscreenButtonLabel = computed(() => (fullscreenActive.value ? "退出全屏" : "全屏"))

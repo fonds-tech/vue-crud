@@ -1,4 +1,4 @@
-import AddButton from "../index"
+import AddButton from "../index.vue"
 
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"

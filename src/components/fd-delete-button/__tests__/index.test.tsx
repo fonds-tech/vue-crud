@@ -1,5 +1,5 @@
 import ElementPlus from "element-plus"
-import DeleteButton from "../index"
+import DeleteButton from "../index.vue"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 

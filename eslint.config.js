@@ -10,8 +10,11 @@ export default eslint(
     typescript: true,
     formatters: true,
   },
-  { rules: {
-    "no-console": "off",
-  } },
+  {
+    rules: {
+      "no-console": "off",
+      "vue/singleline-html-element-content-newline": "off",
+    },
+  },
   { ignores: [".serena"] },
 )
