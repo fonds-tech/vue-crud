@@ -72,15 +72,12 @@
       <!-- Sidebar -->
       <aside class="app__sidebar">
         <nav class="app__nav">
-          <div v-for="(group, index) in navGroups" :key="index" class="app__nav-group">
-            <h3 class="app__nav-title">{{ group.title }}</h3>
-            <router-link v-for="item in group.items" :key="item.path" :to="item.path" class="app__nav-item">
-              <span class="app__nav-icon">
-                <component :is="item.icon" />
-              </span>
-              <span class="app__nav-item-label">{{ item.label }}</span>
-            </router-link>
-          </div>
+          <router-link v-for="item in navItems" :key="item.path" :to="item.path" class="app__nav-item">
+            <span class="app__nav-icon">
+              <component :is="item.icon" />
+            </span>
+            <span class="app__nav-item-label">{{ item.label }}</span>
+          </router-link>
         </nav>
       </aside>
 
@@ -102,38 +99,22 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import { Cpu, Edit, Grid, Delete, Search, Upload, Message, Pointer, Tickets, DataLine, Document, Operation, CirclePlus, Connection, MoreFilled } from "@element-plus/icons-vue"
 
-// Grouped Navigation Items
-const navGroups = [
-  {
-    title: "Data & List",
-    items: [
-      { path: "/fd-crud", label: "Crud Engine", icon: Cpu },
-      { path: "/fd-table", label: "Data Table", icon: DataLine },
-      { path: "/fd-grid", label: "Grid Layout", icon: Grid },
-      { path: "/fd-detail", label: "Detail View", icon: Tickets },
-      { path: "/fd-search", label: "Search Filter", icon: Search },
-    ],
-  },
-  {
-    title: "Form & Input",
-    items: [
-      { path: "/fd-form", label: "Smart Form", icon: Document },
-      { path: "/fd-upsert", label: "Upsert", icon: Edit },
-      { path: "/fd-select", label: "Select", icon: Pointer },
-      { path: "/fd-cascader", label: "Cascader", icon: Connection },
-      { path: "/fd-option", label: "Options", icon: Operation },
-      { path: "/fd-import", label: "Import", icon: Upload },
-    ],
-  },
-  {
-    title: "Components",
-    items: [
-      { path: "/fd-dialog", label: "Dialog", icon: Message },
-      { path: "/fd-context-menu", label: "Context Menu", icon: MoreFilled },
-      { path: "/fd-add-button", label: "Add Button", icon: CirclePlus },
-      { path: "/fd-delete-button", label: "Delete Button", icon: Delete },
-    ],
-  },
+const navItems = [
+  { path: "/fd-crud", label: "Crud", icon: Cpu },
+  { path: "/fd-table", label: "Table", icon: DataLine },
+  { path: "/fd-grid", label: "Grid", icon: Grid },
+  { path: "/fd-detail", label: "Detail", icon: Tickets },
+  { path: "/fd-search", label: "Search", icon: Search },
+  { path: "/fd-form", label: "Form", icon: Document },
+  { path: "/fd-upsert", label: "Upsert", icon: Edit },
+  { path: "/fd-select", label: "Select", icon: Pointer },
+  { path: "/fd-cascader", label: "Cascader", icon: Connection },
+  { path: "/fd-option", label: "Option", icon: Operation },
+  { path: "/fd-import", label: "Import", icon: Upload },
+  { path: "/fd-dialog", label: "Dialog", icon: Message },
+  { path: "/fd-context-menu", label: "Context Menu", icon: MoreFilled },
+  { path: "/fd-add-button", label: "Add Button", icon: CirclePlus },
+  { path: "/fd-delete-button", label: "Delete Button", icon: Delete },
 ]
 
 const isDark = ref(false)
@@ -433,26 +414,10 @@ onUnmounted(() => {
 }
 
 .app__nav {
-  gap: 24px;
+  gap: 4px;
   display: flex;
   padding: 24px 16px;
   flex-direction: column;
-}
-
-.app__nav-group {
-  gap: 4px;
-  display: flex;
-  flex-direction: column;
-}
-
-.app__nav-title {
-  color: var(--text-group-title);
-  margin: 0 0 8px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  user-select: none;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .app__nav-item {
