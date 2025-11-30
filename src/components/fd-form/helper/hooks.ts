@@ -187,7 +187,7 @@ function parse<T extends FormModel, K extends keyof HookTree<T>>(
     const config = hook as { bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>, submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn> }
     const pipes = config[phase]
     if (pipes) {
-      const normalized = (isArray(pipes) ? pipes : [pipes])
+      const normalized = (isArray(pipes) ? pipes : [pipes]) as Array<FormHookKey | FormHookFn>
       stack.push(...normalized)
     }
   }

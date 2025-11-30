@@ -36,13 +36,13 @@
             {{ activeComponent.description }}
           </p>
         </div>
-        <el-tag effect="plain" :type="activeComponent.tagType || 'primary'" round class="layout__meta-tag">
+        <div class="layout__badge">
           {{ activeComponent.badge }}
-        </el-tag>
+        </div>
       </div>
 
-      <div class="layout__preview-body dot-pattern">
-        <el-scrollbar class="layout__preview-scrollbar" height="100%">
+      <div class="layout__preview-body">
+        <el-scrollbar class="layout__preview-scrollbar" view-class="layout__scrollbar-view">
           <component :is="activeComponent.component" />
         </el-scrollbar>
       </div>
@@ -61,7 +61,7 @@ export interface ComponentMeta {
   description: string
   component: Component
   componentName?: string
-  tagType?: "primary" | "success" | "info" | "warning" | "danger"
+  tagType?: string // Deprecated, kept for compatibility but unused visually
 }
 
 const props = defineProps<{
@@ -76,14 +76,14 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
 <style scoped lang="scss">
 .layout {
-  gap: 20px;
-  flex: 1;
+  gap: 24px;
+  height: 100%;
   display: flex;
   overflow: hidden;
   flex-direction: column;
 
   &__header {
-    gap: 20px;
+    gap: 24px;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -92,147 +92,123 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
   &__header-content {
     h2 {
-      margin: 0 0 6px 0;
-      font-size: 28px;
-      background: var(--primary-gradient);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     p {
-      color: var(--text-sub);
+      color: var(--text-secondary);
       margin: 0;
       font-size: 14px;
     }
   }
 
-  &__title {
-    font: inherit;
-  }
-
-  &__description {
-    font: inherit;
-  }
-
   &__tabs {
-    gap: 2px;
+    gap: 4px;
+    border: 1px solid var(--border-color);
     display: flex;
     padding: 4px;
-    background: var(--divider-color);
+    background: var(--bg-surface);
     border-radius: var(--radius-md);
   }
 
   &__tab {
-    color: var(--text-sub);
+    color: var(--text-secondary);
     border: none;
     cursor: pointer;
     padding: 6px 16px;
     font-size: 13px;
     background: transparent;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
     font-weight: 500;
-    border-radius: 6px;
+    border-radius: 4px;
 
-    &:hover {
-      color: var(--text-title);
+    &:hover:not(.layout__tab--active) {
+      color: var(--text-main);
+      background-color: var(--bg-app);
     }
 
     &--active {
-      color: var(--text-title);
-      background: var(--card-bg);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-      font-weight: 600;
+      color: var(--color-primary);
+      font-weight: 500;
+      background-color: var(--color-primary-light);
     }
   }
 
   &__preview {
-    gap: 20px;
     flex: 1;
-    border: 1px solid var(--card-border);
+    border: 1px solid var(--border-color);
     display: flex;
-    padding: 20px;
     overflow: hidden;
-    background: var(--card-bg);
-    box-shadow: var(--shadow-md);
-    box-sizing: border-box;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border-radius: var(--radius-xl);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
     flex-direction: column;
-
-    &:hover {
-      box-shadow: var(--shadow-md), var(--shadow-glow);
-      border-color: rgba(59, 130, 246, 0.3);
-    }
   }
 
   &__preview-info {
     display: flex;
-    background: var(--card-bg);
+    padding: 20px 24px;
     align-items: center;
+    border-bottom: 1px solid var(--divider-color);
     justify-content: space-between;
+    background-color: var(--bg-surface);
   }
 
   &__info-text {
     h3 {
-      color: var(--text-title);
+      color: var(--text-main);
       margin: 0 0 4px 0;
       font-size: 16px;
       font-weight: 600;
     }
 
     p {
-      color: var(--text-sub);
+      color: var(--text-muted);
       margin: 0;
       font-size: 13px;
     }
   }
 
-  &__preview-title {
-    font: inherit;
-  }
-
-  &__preview-description {
-    font: inherit;
-  }
-
   &__component-name {
-    color: var(--text-sub);
+    color: var(--text-muted);
+    padding: 2px 6px;
     font-size: 0.9em;
-    font-weight: bold;
+    background: var(--bg-app);
+    font-family: monospace;
+    font-weight: 400;
+    margin-left: 8px;
+    border-radius: 4px;
   }
 
-  &__meta-tag {
-    border: none;
+  &__badge {
+    color: var(--color-primary);
+    padding: 4px 12px;
+    font-size: 12px;
     font-weight: 600;
-
-    &.el-tag--primary,
-    &.el-tag--info {
-      color: #3b82f6;
-      background: rgba(59, 130, 246, 0.1);
-    }
-
-    &.el-tag--success {
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-    }
-
-    &.el-tag--warning {
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.1);
-    }
+    border-radius: 20px;
+    background-color: var(--color-primary-light);
   }
 
   &__preview-body {
     flex: 1;
-    display: flex;
     overflow: hidden;
+    position: relative;
+    background-color: var(--bg-surface);
   }
 
   &__preview-scrollbar {
-    flex: 1;
+    height: 100%;
   }
+}
+
+/* Deep selector for scrollbar content padding */
+:deep(.layout__scrollbar-view) {
+  padding: 24px;
+  box-sizing: border-box;
+  min-height: 100%;
 }
 </style>

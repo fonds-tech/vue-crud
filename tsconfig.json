@@ -21,5 +21,5 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "test/*.ts", "vite.config.ts", "vitest.config.ts", "docs/.vitepress/**/*.ts"],
-  "exclude": ["src/App.vue", "node_modules", "dist"]
+  "exclude": ["node_modules", "dist"]
 }
