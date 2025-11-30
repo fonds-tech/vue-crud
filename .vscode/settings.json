@@ -58,5 +58,8 @@
     "yaml",
     "scss",
     "css"
-  ]
+  ],
+  "[vue]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

@@ -22,6 +22,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "基础",
     description: "fd-dialog 透传属性，基础打开/关闭。",
     component: BasicDialog,
+    componentName: "BasicDialog",
     tagType: "success",
   },
   {
@@ -30,6 +31,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "进阶",
     description: "自定义 footer + 全屏切换 + 长内容滚动。",
     component: FullscreenDialog,
+    componentName: "FullscreenDialog",
     tagType: "warning",
   },
   {
@@ -38,6 +40,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "表单",
     description: "结合 fd-form 的校验与提交流程。",
     component: BasicFormDialog,
+    componentName: "BasicFormDialog",
     tagType: "primary",
   },
   {
@@ -46,6 +49,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "API",
     description: "open/close/fullscreen 方法与可见性状态展示。",
     component: FullscreenDialogLegacy,
+    componentName: "FullscreenDialogLegacy",
     tagType: "primary",
   },
   {
@@ -54,6 +58,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "滚动",
     description: "演示自定义高度与时间轴内容滚动。",
     component: ScrollDialog,
+    componentName: "ScrollDialog",
     tagType: "info",
   },
 ]

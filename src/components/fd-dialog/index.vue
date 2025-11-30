@@ -15,40 +15,27 @@
     @close-auto-focus="emitEvent('closeAutoFocus')"
   >
     <template #header>
-      <div class="fd-dialog__header">
-        <div class="fd-dialog__title">
-          {{ props.title }}
+      <div class="fd-dialog__title">
+        {{ props.title }}
+      </div>
+      <div class="fd-dialog__actions">
+        <div class="fd-dialog__action" role="button" :aria-label="fullscreenButtonLabel" :title="fullscreenButtonLabel" @click="handleToggleFullscreen">
+          <el-icon>
+            <component :is="fullscreenButtonIcon" />
+          </el-icon>
         </div>
-        <div class="fd-dialog__actions">
-          <div
-            class="fd-dialog__action"
-            role="button"
-            :aria-label="fullscreenButtonLabel"
-            :title="fullscreenButtonLabel"
-            @click="handleToggleFullscreen"
-          >
-            <el-icon>
-              <component :is="fullscreenButtonIcon" />
-            </el-icon>
-          </div>
-          <div
-            v-if="shouldRenderCloseAction"
-            class="fd-dialog__action"
-            role="button"
-            aria-label="关闭弹窗"
-            title="关闭弹窗"
-            @click="handleCloseClick"
-          >
-            <el-icon>
-              <component :is="closeIcon" />
-            </el-icon>
-          </div>
+        <div v-if="shouldRenderCloseAction" class="fd-dialog__action" role="button" aria-label="关闭弹窗" title="关闭弹窗" @click="handleCloseClick">
+          <el-icon>
+            <component :is="closeIcon" />
+          </el-icon>
         </div>
       </div>
     </template>
 
-    <el-scrollbar class="fd-dialog__scrollbar" :height="scrollbarHeight">
-      <slot />
+    <el-scrollbar :height="scrollbarHeight">
+      <div class="fd-dialog__scrollbar">
+        <slot />
+      </div>
     </el-scrollbar>
 
     <template #footer>
@@ -136,8 +123,7 @@ function handleCloseClick() {
 
 const scrollbarHeight = computed(() => {
   const { height } = props
-  if (height === undefined || height === null || height === "")
-    return undefined
+  if (height === undefined || height === null || height === "") return undefined
   return typeof height === "number" ? `${height}px` : height
 })
 
@@ -154,8 +140,7 @@ const dialogCssClass = computed(() => {
 const dialogNativeAttrs = computed(() => {
   const result: Record<string, unknown> = {}
   Object.keys(attrsRecord).forEach((key) => {
-    if (key === "class")
-      return
+    if (key === "class") return
     result[key] = attrsRecord[key]
   })
   return result
@@ -194,30 +179,22 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .fd-dialog {
-  display: flex;
-  flex-direction: column;
-
-  :deep(.el-dialog__header) {
-    margin: 0;
-    padding: 0;
-    border-bottom: none;
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 0;
-  }
-
-  :deep(.el-dialog__footer) {
-    padding: 16px 24px;
-    border-top: 1px solid var(--el-border-color-lighter, #ebeef5);
-  }
-
-  &__header {
-    gap: 12px;
+  padding: 0 !important;
+  .el-dialog__header {
     display: flex;
+    padding: var(--el-dialog-padding-primary);
     align-items: center;
+    border-bottom: 1px solid var(--el-border-color);
+  }
+  &__scrollbar {
+    flex: 1;
+    padding: var(--el-dialog-padding-primary);
+  }
+  .el-dialog__footer {
+    padding: var(--el-dialog-padding-primary);
+    border-top: 1px solid var(--el-border-color);
   }
 
   &__title {
@@ -231,36 +208,44 @@ defineExpose({
   }
 
   &__actions {
+    gap: 10px;
     display: inline-flex;
     align-items: center;
   }
 
   &__action {
     color: var(--el-text-color-secondary, #606266);
-    width: 32px;
+    width: 20px;
     cursor: pointer;
-    height: 32px;
+    height: 20px;
     display: flex;
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
+    z-index: 1;
+    position: relative;
+    transition: color 0.2s ease;
     align-items: center;
-    border-radius: 50%;
     justify-content: center;
+
+    &::before {
+      top: 50%;
+      left: 50%;
+      width: 32px;
+      height: 32px;
+      content: "";
+      opacity: 0;
+      z-index: -1;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      background-color: var(--el-color-primary-light-9, #ecf5ff);
+    }
 
     &:hover {
       color: var(--el-color-primary, #409eff);
-      background-color: var(--el-color-primary-light-9, #ecf5ff);
-    }
-  }
 
-  &__scrollbar {
-    flex: 1;
-    padding: 16px 24px;
-
-    :deep(.el-scrollbar__wrap) {
-      box-sizing: border-box;
-      padding-right: 8px;
+      &::before {
+        opacity: 1;
+      }
     }
   }
 }

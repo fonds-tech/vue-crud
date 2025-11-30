@@ -1,13 +1,14 @@
 <template>
   <div class="dialog-example">
     <el-space wrap>
-      <el-button type="primary" @click="dialogVisible = true">
-        查看最新日志
+      <el-button type="primary" :icon="List" @click="dialogVisible = true">
+        发布日志
       </el-button>
       <el-button text type="primary" @click="shuffleLogs">
         刷新日志
       </el-button>
     </el-space>
+    <span class="operation-tip">点击查看长列表内容的滚动效果</span>
 
     <fd-dialog
       v-model="dialogVisible"
@@ -37,6 +38,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+import { List } from "@element-plus/icons-vue"
 
 interface TimelineLog {
   id: number
@@ -73,9 +75,13 @@ function generateLogs(): TimelineLog[] {
 <style scoped>
 .dialog-example {
   gap: 12px;
-  display: inline-flex;
-  align-items: flex-start;
-  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.operation-tip {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .scroll-dialog__body {

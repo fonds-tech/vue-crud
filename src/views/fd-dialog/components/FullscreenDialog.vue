@@ -1,8 +1,9 @@
 <template>
   <div class="dialog-example">
-    <el-button type="primary" @click="open">
-      打开全屏弹窗
+    <el-button type="primary" :icon="Monitor" @click="open">
+      全屏预览
     </el-button>
+    <span class="operation-tip">点击预览演示弹窗全屏切换与响应式布局</span>
 
     <fd-dialog ref="dialogRef" title="全屏弹窗示例" :fullscreen="fullscreen" height="60vh">
       <div class="scroll-content">
@@ -27,6 +28,7 @@
 <script setup lang="ts">
 import type { DialogExpose } from "@/components/fd-dialog/type"
 import { ref } from "vue"
+import { Monitor } from "@element-plus/icons-vue"
 
 defineOptions({
   name: "fullscreen-dialog-demo",
@@ -51,14 +53,13 @@ function toggle() {
 <style scoped lang="scss">
 .dialog-example {
   gap: 12px;
-  display: inline-flex;
-  align-items: flex-start;
-  flex-direction: column;
+  display: flex;
+  align-items: center;
 }
 
-.scroll-content {
-  overflow: auto;
-  max-height: 320px;
+.operation-tip {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .footer-actions {

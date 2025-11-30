@@ -1,16 +1,19 @@
 <template>
   <div class="dialog-example">
-    <el-space wrap>
-      <el-button plain @click="openByApi">
-        通过方法打开
-      </el-button>
-      <el-button plain @click="toggleFullscreen">
-        切换全屏
-      </el-button>
-      <el-button plain @click="closeByApi">
-        关闭弹窗
-      </el-button>
-    </el-space>
+    <div class="trigger-area">
+      <el-space wrap>
+        <el-button plain :icon="Cpu" @click="openByApi">
+          打开巡检报告
+        </el-button>
+        <el-button plain @click="toggleFullscreen">
+          切换全屏
+        </el-button>
+        <el-button plain @click="closeByApi">
+          关闭弹窗
+        </el-button>
+      </el-space>
+      <span class="operation-tip">演示通过 API 控制弹窗状态</span>
+    </div>
 
     <el-alert
       type="info"
@@ -87,7 +90,8 @@
 </template>
 
 <script setup lang="ts">
-import type { DialogExpose } from "./types"
+import type { DialogExpose } from "@/components/fd-dialog/type"
+import { Cpu } from "@element-plus/icons-vue"
 import { ref, computed } from "vue"
 
 const dialogVisible = ref(false)
@@ -116,10 +120,21 @@ function handleClose() {
 
 <style scoped>
 .dialog-example {
-  gap: 12px;
-  display: inline-flex;
+  gap: 16px;
+  display: flex;
   align-items: flex-start;
   flex-direction: column;
+}
+
+.trigger-area {
+  gap: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.operation-tip {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .dialog-example__alert {

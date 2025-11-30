@@ -1,9 +1,9 @@
 <template>
   <div class="dialog-example">
-    <el-button type="primary" size="large" :loading="saving" @click="openDialog">
-      <el-icon><plus /></el-icon>
+    <el-button type="primary" :icon="Plus" @click="openDialog">
       新建用户
     </el-button>
+    <span class="operation-tip">点击新建用户演示表单校验与提交流程</span>
 
     <fd-dialog
       v-model="dialogVisible"
@@ -124,9 +124,13 @@ function mockRequest<T>(payload: T) {
 <style scoped>
 .dialog-example {
   gap: 12px;
-  display: inline-flex;
-  align-items: flex-start;
-  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.operation-tip {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .dialog-example__form {

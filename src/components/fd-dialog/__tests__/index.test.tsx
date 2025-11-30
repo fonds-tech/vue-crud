@@ -18,7 +18,7 @@ const ElDialogStub = defineComponent({
       default: false,
     },
   },
-  emits: ["update:modelValue", "open", "opened", "close", "closed", "openAutoFocus", "closeAutoFocus"],
+  emits: ["update:modelValue", "update:fullscreen", "open", "opened", "close", "closed", "openAutoFocus", "closeAutoFocus"],
   setup(props, { slots, attrs }) {
     return () =>
       h(
@@ -163,6 +163,16 @@ describe("fd-dialog", () => {
     expect(exposed.dialogVisible.value).toBe(true)
     await wrapper.setProps({ fullscreen: true })
     await nextTick()
+    expect(exposed.fullscreenActive.value).toBe(true)
+  })
+
+  it("能响应 el-dialog 的 update:fullscreen 事件并向外透传", async () => {
+    const wrapper = mountDialog({ props: { fullscreen: false } })
+    const dialogStub = wrapper.findComponent(ElDialogStub)
+    const exposed = getExpose(wrapper)
+    dialogStub.vm.$emit("update:fullscreen", true)
+    await nextTick()
+    expect(wrapper.emitted("update:fullscreen")?.[0]).toEqual([true])
     expect(exposed.fullscreenActive.value).toBe(true)
   })
 
