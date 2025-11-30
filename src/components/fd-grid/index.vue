@@ -184,10 +184,9 @@ const context: GridContext = {
 provide(gridInjectionKey, context)
 </script>
 
-<style scoped>
+<style lang="scss">
 .fd-grid {
-  width: 100%;
   height: fit-content;
-  display: grid; /* Ensure resize observer works on full width */
+  display: grid;
 }
 </style>

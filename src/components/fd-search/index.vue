@@ -366,6 +366,13 @@ defineExpose({
 
   &__form {
     flex: 1;
+    .el-form-item {
+      margin-bottom: 0;
+    }
+  }
+
+  &__action {
+    width: auto;
   }
 
   &__icon {
