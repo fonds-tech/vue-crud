@@ -9,6 +9,7 @@ import type {
   FormOptions,
   FormItemRuleWithMeta,
 } from "../type"
+import formHook from "./hooks"
 import { dataset } from "../../../utils/dataset"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 
@@ -149,6 +150,22 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     // 赋值新数据
     Object.entries(normalizedValues).forEach(([field, fieldValue]) => {
       setField(field as keyof T | string, fieldValue)
+    })
+
+    // 执行 bind 阶段钩子，确保重新绑定时类型/结构与组件期望一致
+    options.items.forEach((item) => {
+      if (!item.hook || !item.field)
+        return
+      const fieldKey = String(item.field)
+      const currentValue = model[fieldKey as keyof T]
+      if (!isDef(currentValue))
+        return
+      formHook.bind({
+        hook: item.hook,
+        model,
+        field: fieldKey,
+        value: currentValue,
+      })
     })
 
     // 对已绑定的数据，重置校验提示，避免必填规则变更后立即报错

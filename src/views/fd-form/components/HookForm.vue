@@ -4,13 +4,13 @@
       <fd-form ref="formRef" />
       <div class="action-row">
         <el-button type="primary" @click="handleSubmit">
-          转换并提交
+          提交
         </el-button>
         <el-button @click="handleReset">
           重置
         </el-button>
         <el-button type="warning" plain @click="handleRebind">
-          回滚为后端值
+          绑定
         </el-button>
       </div>
     </el-card>
@@ -29,6 +29,10 @@
           <h4>最新提交</h4>
           <pre>{{ submitPayload }}</pre>
         </div>
+        <div class="payload-column">
+          <h4>最近回滚差异</h4>
+          <pre>{{ rollbackChanges }}</pre>
+        </div>
       </div>
     </el-card>
   </div>
@@ -37,7 +41,7 @@
 <script setup lang="ts">
 import { clone } from "@fonds/utils"
 import { useForm } from "@/hooks"
-import { ref, computed } from "vue"
+import { ref, computed, nextTick, onMounted } from "vue"
 
 interface HookFormModel {
   productName: string
@@ -49,9 +53,8 @@ interface HookFormModel {
   startOnlineWindow: string
   endOnlineWindow: string
   onlineWindow: any[]
-  activeFlag: number
   auditNotes: string
-  activeSwitch?: boolean
+  activeSwitch?: number
 }
 
 const initialPayload: HookFormModel = {
@@ -64,18 +67,19 @@ const initialPayload: HookFormModel = {
   startOnlineWindow: "2024-08-01",
   endOnlineWindow: "2024-08-31",
   onlineWindow: [],
-  activeFlag: 1,
+  activeSwitch: 1,
   auditNotes: "",
 }
 
 const submitPayload = ref<Record<string, any>>({})
+const rollbackChanges = ref<Record<string, { from: any, to: any }>>({})
+// 打印当前表单模型，便于观察 hook 转换后的整体数据
+function logModel(label: string) {
+  console.log(`[HookForm Model:${label}]`, clone(formModel.value ?? {}))
+}
+
 const formRef = useForm<HookFormModel>({
   model: initialPayload,
-  grid: {
-    cols: 2,
-    colGap: 16,
-    rowGap: 14,
-  },
   form: {
     labelWidth: "110px",
   },
@@ -143,12 +147,8 @@ const formRef = useForm<HookFormModel>({
       field: "activeSwitch",
       label: "是否激活",
       hook: {
-        bind: (_value: unknown, { model }: { model: Record<string, any> }) => (model as HookFormModel).activeFlag === 1,
-        submit: (value: boolean, { model }: { model: Record<string, any> }) => {
-          const typedModel = model as HookFormModel
-          typedModel.activeFlag = value ? 1 : 0
-          return undefined
-        },
+        bind: "boolean",
+        submit: "number",
       },
       component: { is: "el-switch", props: { activeText: "上线", inactiveText: "下线" } },
     },
@@ -162,10 +162,30 @@ const formRef = useForm<HookFormModel>({
 })
 const formModel = computed(() => formRef.value?.model ?? ({} as HookFormModel))
 
+// 初次绑定后打印一次完整模型，确认 bind 阶段转换
+onMounted(() => {
+  nextTick(() => logModel("after-initial-bind"))
+})
+
+// 计算当前模型与目标数据的差异，便于回滚时定位变化
+function diffChanges(current: Record<string, any>, target: Record<string, any>) {
+  const diff: Record<string, { from: any, to: any }> = {}
+  const keys = new Set([...Object.keys(current), ...Object.keys(target)])
+  keys.forEach((key) => {
+    const prev = current[key]
+    const next = target[key]
+    // 简单深比较：结构较浅时使用 JSON 序列化即可满足演示需求
+    if (JSON.stringify(prev) !== JSON.stringify(next)) {
+      diff[key] = { from: clone(prev), to: clone(next) }
+    }
+  })
+  return diff
+}
+
 function handleSubmit() {
   formRef.value?.submit().then(({ values }) => {
     submitPayload.value = clone(values)
-    console.log("HookForm Submit:", values)
+    console.log("HookForm Submit (after hooks):", values)
   }).catch((err) => {
     console.error("HookForm Submit Error:", err)
   })
@@ -176,7 +196,13 @@ function handleReset() {
 }
 
 function handleRebind() {
-  formRef.value?.bindFields(clone(initialPayload))
+  const before = clone(formModel.value ?? {})
+  console.log("HookForm Before Rollback Model:", before)
+  const next = clone(initialPayload)
+  rollbackChanges.value = diffChanges(before, next)
+  console.log("HookForm Rollback Diff:", rollbackChanges.value)
+  formRef.value?.bindFields(next)
+  logModel("after-rollback-bind")
 }
 </script>
 
