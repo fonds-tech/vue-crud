@@ -247,6 +247,7 @@ watch(() => formModel.value.customerType, (type) => {
   const nextManagers = managerOptions[(type as "enterprise" | "personal") ?? "enterprise"]
   formRef.value.setOptions("accountManager", [...nextManagers] as any[])
   formRef.value.setRequired("accountManager", true)
+  formRef.value.clearValidate("accountManager")
   if (!nextManagers.find(item => item.value === formModel.value.accountManager)) {
     formRef.value.setField("accountManager", "")
   }
@@ -278,6 +279,7 @@ function handleSubmit() {
 
 function handleReset() {
   formRef.value?.resetFields()
+  formRef.value?.clearValidate(["accountManager"])
 }
 
 function loadEnterprise() {

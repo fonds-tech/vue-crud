@@ -271,6 +271,7 @@ const options = reactive<FormOptions>({
   form: {
     labelWidth: "auto", // 默认标签宽度自动
     scrollToError: true, // 校验失败自动滚动到错误项
+    validateOnRuleChange: false, // 动态规则更新不触发即时校验，避免联动场景误报
   },
   grid: {
     cols: 1,

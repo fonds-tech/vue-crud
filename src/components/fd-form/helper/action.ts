@@ -150,6 +150,12 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     Object.entries(normalizedValues).forEach(([field, fieldValue]) => {
       setField(field as keyof T | string, fieldValue)
     })
+
+    // 对已绑定的数据，重置校验提示，避免必填规则变更后立即报错
+    const fields = Object.keys(normalizedValues)
+    if (fields.length && form.value?.clearValidate) {
+      form.value.clearValidate(fields)
+    }
   }
 
   // 通过路径设置数据
@@ -234,6 +240,10 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     item.rules = ruleList
     // 重新应用校验规则后清理当前字段的校验状态，避免旧错误残留
     form.value?.clearValidate?.([String(field)])
+    // 若启用了 validate-on-rule-change，仍可能在下一轮触发；显式标记避免同步校验
+    if (form.value) {
+      form.value.clearValidate([String(field)])
+    }
   }
 
   const actions: FormActions<T> = {
