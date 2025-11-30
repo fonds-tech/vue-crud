@@ -10,9 +10,7 @@
 import type { ComponentMeta } from "../layout.vue"
 import Layout from "../layout.vue"
 import BasicSearch from "./components/BasicSearch.vue"
-import CompactSearch from "./components/CompactSearch.vue"
 import AdvancedSearch from "./components/AdvancedSearch.vue"
-import StackedActions from "./components/StackedActions.vue"
 import CustomSlotSearch from "./components/CustomSlotSearch.vue"
 import OverflowCollapse from "./components/OverflowCollapse.vue"
 
@@ -27,26 +25,6 @@ const componentCatalog: ComponentMeta[] = [
     componentName: "BasicSearch",
     tagType: "success",
   },
-  // 2. 布局变体
-  {
-    key: "compact",
-    title: "紧凑布局",
-    badge: "Layout",
-    description: "适用于顶部工具栏或低高度场景。通过调整 Grid 间距和列数，使界面更紧凑，操作区可自定义添加额外按钮。",
-    component: CompactSearch,
-    componentName: "CompactSearch",
-    tagType: "info",
-  },
-  {
-    key: "stacked-actions",
-    title: "纵向动作栏",
-    badge: "Layout",
-    description: "将操作按钮区独立为一整行或纵向排列。适用于移动端适配、侧边栏搜索或需要强调操作按钮的场景。",
-    component: StackedActions,
-    componentName: "StackedActions",
-    tagType: "info",
-  },
-  // 3. 交互特性
   {
     key: "overflow",
     title: "折叠展开",

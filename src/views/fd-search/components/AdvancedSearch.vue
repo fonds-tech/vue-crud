@@ -22,8 +22,10 @@ const crudRef = useCrud(
   {
     service: new SearchMockService(),
     permission: { add: true, delete: true, update: true, page: true },
-    onRefresh: (params) => {
-      console.log("🚀 ~ params:", params)
+    onRefresh: (params, { next }) => {
+      console.log("AdvancedSearch onRefresh params:", params)
+      // 调用 next 才会真正触发 service.page 并关闭 loading
+      return next(params)
     },
   },
   (crud) => {
