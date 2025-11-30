@@ -109,10 +109,67 @@
               <component :is="value" />
             </template>
           </component>
+
+          <fd-grid v-bind="options.grid">
+            <template v-for="(item, _index) in itemsOfGroup(child.name ?? index)" :key="`${item.field ?? _index}`">
+              <fd-grid-item
+                v-show="showInGroup(item, child.name ?? index)"
+                :span="resolveSpan(item)"
+                :offset="resolveOffset(item)"
+              >
+                <el-form-item
+                  v-bind="item"
+                  :prop="String(item.field)"
+                  :rules="rules(item)"
+                  :required="required(item)"
+                >
+                  <template v-if="extra(item)" #extra>
+                    {{ extra(item) }}
+                  </template>
+
+                  <template v-for="(com, name) in slots(item)" :key="name" #[name]>
+                    <slot v-if="slot(com)" :name="slot(com)" :model="model" />
+                    <component
+                      :is="is(com)"
+                      v-else-if="is(com)"
+                      v-bind="componentProps(com)"
+                      :ref="bindComponentRef(com)"
+                      :style="style(com)"
+                      v-on="on(com)"
+                    >
+                      <template v-for="(value, childSlot) in slots(com)" :key="childSlot" #[childSlot]>
+                        <component :is="value" />
+                      </template>
+                    </component>
+                  </template>
+
+                  <slot
+                    v-if="slot(item.component)"
+                    :name="slot(item.component)"
+                    :model="model"
+                    :item="item"
+                  />
+                  <component
+                    :is="is(item.component)"
+                    v-else-if="is(item.component)"
+                    v-bind="formatProps(item)"
+                    :ref="bindComponentRef(item.component)"
+                    v-model="model[item.field as string]"
+                    :style="style(item.component)"
+                    v-on="on(item.component)"
+                  >
+                    <template v-for="(value, childSlot) in slots(item.component)" :key="childSlot" #[childSlot]>
+                      <component :is="value" />
+                    </template>
+                  </component>
+                </el-form-item>
+              </fd-grid-item>
+            </template>
+          </fd-grid>
         </el-tab-pane>
       </el-tabs>
 
-      <fd-grid v-bind="options.grid">
+      <fd-grid v-if="options.group?.type !== 'tabs'" v-bind="options.grid">
         <template v-for="(item, _index) in options.items" :key="`${item.field ?? _index}`">
           <fd-grid-item
             v-show="show(item)"
@@ -268,6 +325,24 @@ const action = useAction({ options, model, form: formRef })
 
 // 初始化 Methods Hook (提供 validate, submit 等表单原生方法)
 const methods = useMethods({ options, model, form: formRef })
+
+// Tabs 模式下按分组筛选表单项
+function itemsOfGroup(groupName: string | number) {
+  if (options.group?.type !== "tabs" || !options.group.children?.length)
+    return []
+  const fallback = options.group.children[0]?.name
+  return options.items.filter(item => (item.group ?? fallback) === groupName)
+}
+
+// Tabs 模式下的显隐判断（不依赖全局 activeGroupName）
+function showInGroup(item: FormItem, groupName: string | number) {
+  if (resolveProp<boolean>(item, "hidden"))
+    return false
+  const itemGroup = item.group ?? options.group?.children?.[0]?.name
+  if (itemGroup && itemGroup !== groupName)
+    return false
+  return true
+}
 
 /**
  * 类型守卫：判断配置项是否为 FormComponent 对象
