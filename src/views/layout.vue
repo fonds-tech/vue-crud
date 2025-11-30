@@ -76,9 +76,10 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
 <style scoped lang="scss">
 .layout {
-  gap: 24px;
+  gap: 12px;
   height: 100%;
   display: flex;
+  padding: 12px;
   overflow: hidden;
   flex-direction: column;
 
@@ -150,10 +151,11 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__preview-info {
+    margin: 0 12px;
     display: flex;
-    padding: 20px 24px;
+    padding: 12px 0;
     align-items: center;
-    border-bottom: 1px solid var(--divider-color);
+    border-bottom: 1px solid var(--border-color);
     justify-content: space-between;
     background-color: var(--bg-surface);
   }
@@ -207,7 +209,7 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
 
 /* Deep selector for scrollbar content padding */
 :deep(.layout__scrollbar-view) {
-  padding: 24px;
+  padding: 12px;
   box-sizing: border-box;
   min-height: 100%;
 }

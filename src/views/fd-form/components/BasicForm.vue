@@ -242,7 +242,7 @@ function handleValidateField() {
 
 <style lang="scss" scoped>
 .basic-form {
-  gap: 24px;
+  gap: 12px;
   display: flex;
   flex-direction: column;
 
