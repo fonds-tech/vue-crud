@@ -8,8 +8,8 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Basic from "./components/Basic.vue"
 import Layout from "../layout.vue"
-import BasicUpsert from "./components/BasicUpsert.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -17,7 +17,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "新增/编辑",
     badge: "基础",
     description: "open 模式切换 + onSubmit 回调示例。",
-    component: BasicUpsert,
+    component: Basic,
     tagType: "success",
   },
 ]

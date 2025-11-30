@@ -1,5 +1,4 @@
 <template>
-  <!-- eslint-disable vue/no-unused-refs -->
   <fd-crud ref="crudRef">
     <fd-table ref="tableRef" />
     <fd-detail ref="detailRef" />
