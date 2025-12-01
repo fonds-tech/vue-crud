@@ -1,4 +1,4 @@
-import type { TableProps, TableInstance, TableColumnCtx } from "element-plus"
+import type { TableProps, TableInstance, TableColumnCtx, PaginationProps } from "element-plus"
 import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
 /**
@@ -24,6 +24,10 @@ export interface TableOptions<T extends TableRecord = TableRecord> {
    * 列配置
    */
   columns: TableColumn<T>[]
+  /**
+   * 分页配置（透传 el-pagination 的属性，如 layout、pageSizes、background 等）
+   */
+  pagination?: Partial<PaginationProps>
 }
 
 /**

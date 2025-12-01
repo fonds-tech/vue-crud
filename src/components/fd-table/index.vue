@@ -268,9 +268,7 @@
         <span>第 {{ paginationStart }}-{{ paginationEnd }} 条</span>
       </div>
       <el-pagination
-        layout="total, sizes, prev, pager, next, jumper" :current-page="paginationState.currentPage"
-        background
-        :page-size="paginationState.pageSize" :total="paginationState.total" :page-sizes="paginationState.pageSizes"
+        v-bind="paginationProps"
         @current-change="onPageChange" @size-change="onPageSizeChange"
       />
     </div>
@@ -346,6 +344,13 @@ const tableAttrs = computed(() => {
 // ---------------------------
 // 配置：表格/列配置、表格尺寸选项、分页信息
 // ---------------------------
+const defaultPagination = {
+  layout: "total, sizes, prev, pager, next, jumper",
+  background: true,
+  pageSize: 20,
+  pageSizes: [10, 20, 50, 100],
+}
+
 const tableOptions = reactive<TableOptions>({
   table: {
     border: true,
@@ -355,6 +360,7 @@ const tableOptions = reactive<TableOptions>({
     rowKey: "id",
   },
   columns: [],
+  pagination: { ...defaultPagination },
 })
 
 const tableSizeOptions = [
@@ -367,10 +373,20 @@ const initialCrudParams = crud?.getParams?.() ?? crud?.params ?? {}
 const paginationState = reactive({
   total: 0,
   // 兜底 crud 未注入或 getParams 未定义场景，避免初始化时报错
-  pageSize: initialCrudParams.size ?? 20,
+  pageSize: initialCrudParams.size ?? tableOptions.pagination?.pageSize ?? defaultPagination.pageSize ?? defaultPagination.pageSizes[0],
   currentPage: initialCrudParams.page ?? 1,
-  pageSizes: [10, 20, 50, 100],
+  pageSizes: tableOptions.pagination?.pageSizes ?? defaultPagination.pageSizes,
 })
+
+const paginationProps = computed(() => ({
+  layout: tableOptions.pagination?.layout ?? defaultPagination.layout,
+  background: tableOptions.pagination?.background ?? defaultPagination.background,
+  ...tableOptions.pagination,
+  pageSizes: paginationState.pageSizes,
+  pageSize: paginationState.pageSize,
+  total: paginationState.total,
+  currentPage: paginationState.currentPage,
+}))
 
 interface ColumnSetting {
   id: string
@@ -674,11 +690,23 @@ function closeContextMenu() {
   contextMenuState.visible = false
 }
 
+function applyPaginationOptions(pagination?: TableOptions["pagination"]) {
+  if (!pagination)
+    return
+  if (pagination.pageSizes)
+    paginationState.pageSizes = [...pagination.pageSizes]
+  if (pagination.pageSize)
+    paginationState.pageSize = Number(pagination.pageSize)
+  if (pagination.currentPage)
+    paginationState.currentPage = Number(pagination.currentPage)
+}
+
 /**
  * 由 fd-crud 主体注入的 use 方法，合并外部配置
  */
 function use(useOptions: TableUseOptions) {
   merge(tableOptions, useOptions)
+  applyPaginationOptions(useOptions.pagination)
   if (useOptions.columns) {
     tableOptions.columns = useOptions.columns.map((column, index) => ({
       __id: column.prop || column.label || `col_${index}`,
