@@ -1,41 +1,34 @@
 <template>
   <layout
-    title="fd-crud 容器示例"
-    description="组合 search/table/detail/upsert 的完整流程"
+    title="fd-crud 综合示例"
+    description="展示 Search + Table + Detail + Upsert 的完整集成方案。"
     :components="componentCatalog"
   />
 </template>
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Basic from "./components/Basic.vue"
 import Layout from "../layout.vue"
-import ClassicCrud from "./components/ClassicCrud.vue"
-import CompactCrud from "./components/CompactCrud.vue"
-import BasicCrudDemo from "./components/BasicCrudDemo.vue"
+import Advanced from "./components/Advanced.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
     key: "basic",
-    title: "基础 CRUD",
-    badge: "基础",
-    description: "完整组合示例，包含搜索、表格、详情与新增编辑。",
-    component: BasicCrudDemo,
+    title: "基础集成",
+    badge: "Basic",
+    description: "标准的 CRUD 流程，包含完整的搜索、列表、新增、编辑、详情、删除功能。",
+    component: Basic,
+    componentName: "Basic",
     tagType: "success",
   },
   {
-    key: "classic",
-    title: "经典布局",
-    badge: "示例",
-    description: "原有经典 CRUD 示例，包含工具栏与表单/详情。",
-    component: ClassicCrud,
-    tagType: "warning",
-  },
-  {
-    key: "compact",
-    title: "紧凑布局",
-    badge: "示例",
-    description: "紧凑型 CRUD 布局示例。",
-    component: CompactCrud,
+    key: "advanced",
+    title: "高级特性",
+    badge: "Advanced",
+    description: "展示批量操作、导入导出 (Import/Export) 组件以及自定义工具栏按钮的集成。",
+    component: Advanced,
+    componentName: "Advanced",
     tagType: "warning",
   },
 ]

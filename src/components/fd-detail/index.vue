@@ -122,6 +122,18 @@
                   <component :is="value" />
                 </template>
               </component>
+              <template v-else-if="resolveDict(item)">
+                <el-tag
+                  v-if="getDictMatch(item)"
+                  :type="getDictMatch(item)!.type"
+                  :color="getDictMatch(item)!.color"
+                >
+                  {{ getDictMatch(item)!.label }}
+                </el-tag>
+                <template v-else>
+                  {{ formatValue(item) }}
+                </template>
+              </template>
               <template v-else>
                 {{ formatValue(item) }}
               </template>
@@ -180,7 +192,7 @@ import { clone } from "@fonds/utils"
 import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
 import { pick, merge, mergeWith } from "lodash-es"
-import { ElSpace, ElButton, ElMessage, ElDescriptions, ElDescriptionsItem } from "element-plus"
+import { ElTag, ElSpace, ElButton, ElMessage, ElDescriptions, ElDescriptionsItem } from "element-plus"
 import { ref, watch, markRaw, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 
 defineOptions({
@@ -420,6 +432,20 @@ function getFieldValue(item: DetailItem) {
     return resolveMaybe(item.value)
   }
   return current
+}
+
+/** 解析字典配置 */
+function resolveDict(item: DetailItem) {
+  return resolveMaybe(item.dict)
+}
+
+/** 获取匹配的字典项 */
+function getDictMatch(item: DetailItem) {
+  const dict = resolveDict(item)
+  if (!dict)
+    return undefined
+  const value = getFieldValue(item)
+  return dict.find(d => d.value === value)
 }
 
 /** 格式化显示值，优先使用 formatter，否则直接输出。 */

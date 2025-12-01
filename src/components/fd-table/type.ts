@@ -96,7 +96,7 @@ export interface TableColumn<T extends TableRecord = TableRecord> extends BaseCo
 export interface TableDict {
   label: string
   value: string | number
-  type?: "success" | "warning" | "danger" | "info" | "default"
+  type?: "success" | "warning" | "danger" | "info" | "default" | "primary"
   color?: string
   icon?: string | VueComponent
 }

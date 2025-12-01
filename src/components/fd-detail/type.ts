@@ -1,3 +1,4 @@
+import type { TableDict } from "../fd-table/type"
 import type { dialogProps } from "element-plus"
 import type { DescriptionProps } from "element-plus/es/components/descriptions/src/description"
 import type { VNodeChild, CSSProperties, ExtractPropTypes, Component as VueComponent } from "vue"
@@ -56,6 +57,8 @@ export interface DetailItem<D extends DetailData = DetailData> {
   group?: DetailMaybeFn<string | number | undefined, D>
   /** 隐藏条件 */
   hidden?: DetailMaybeFn<boolean, D>
+  /** 字典配置 */
+  dict?: DetailMaybeFn<TableDict[], D>
   /** 自定义格式化函数 */
   formatter?: (value: any, data: D) => any
   /** 插槽配置 */

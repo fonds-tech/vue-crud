@@ -103,7 +103,7 @@ const props = defineProps({
     default: "导入",
   },
   api: {
-    type: String,
+    type: [String, Function] as PropType<string | UploadExecutor>,
     default: "",
   },
   uploadApi: {
@@ -208,8 +208,11 @@ const uploadExecutor = computed<UploadExecutor | undefined>(() => {
   if (isFunction(props.upload)) {
     return props.upload
   }
+  if (isFunction(props.api)) {
+    return props.api
+  }
   const apiName = props.api || props.uploadApi
-  if (apiName && isFunction(crud.service?.[apiName])) {
+  if (isString(apiName) && apiName && isFunction(crud.service?.[apiName])) {
     return (payload: FormData) => crud.service[apiName](payload)
   }
   return undefined

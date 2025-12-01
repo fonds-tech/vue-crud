@@ -251,6 +251,7 @@
       </div>
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper" :current-page="paginationState.currentPage"
+        background
         :page-size="paginationState.pageSize" :total="paginationState.total" :page-sizes="paginationState.pageSizes"
         @current-change="onPageChange" @size-change="onPageSizeChange"
       />

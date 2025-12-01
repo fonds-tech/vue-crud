@@ -59,6 +59,7 @@ defineExpose(crud)
 
 <style lang="scss">
 .fd-crud {
+  gap: 12px;
   flex: 1;
   display: flex;
   overflow: hidden;
