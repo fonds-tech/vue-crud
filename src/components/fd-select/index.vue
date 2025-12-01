@@ -88,7 +88,8 @@ defineOptions({
 })
 
 const props = withDefaults(
-  defineProps<Omit<ElSelectProps, "modelValue"> & CustomProps>(),
+  // 将 Element Plus 的 props 设为 Partial，避免默认值属性在类型上变成必填，提升使用灵活性
+  defineProps<Omit<Partial<ElSelectProps>, "modelValue"> & CustomProps>(),
   {
     params: () => ({}),
     searchField: "keyword",

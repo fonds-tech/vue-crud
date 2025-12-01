@@ -5,7 +5,6 @@ import FdTable from "../views/fd-table/index.vue"
 import FdDetail from "../views/fd-detail/index.vue"
 import FdDialog from "../views/fd-dialog/index.vue"
 import FdImport from "../views/fd-import/index.vue"
-import FdOption from "../views/fd-option/index.vue"
 import FdSearch from "../views/fd-search/index.vue"
 import FdSelect from "../views/fd-select/index.vue"
 import FdUpsert from "../views/fd-upsert/index.vue"
@@ -89,11 +88,6 @@ const routes = [
     path: "/context-menu",
     name: "ContextMenu",
     component: FdContextMenu,
-  },
-  {
-    path: "/fd-option",
-    name: "fd-option",
-    component: FdOption,
   },
   {
     path: "/fd-add-button",

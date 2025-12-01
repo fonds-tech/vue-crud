@@ -1,33 +1,45 @@
 <template>
   <layout
-    title="fd-select 选择器示例"
-    description="展示静态选项与远程搜索两种用法"
+    title="fd-select 下拉选择"
+    description="基于 Element Plus Select 封装，内置远程搜索、参数联动、自动防抖与数据回填机制"
     :components="componentCatalog"
   />
 </template>
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Basic from "./components/Basic.vue"
 import Layout from "../layout.vue"
-import BasicSelect from "./components/BasicSelect.vue"
-import RemoteSelect from "./components/RemoteSelect.vue"
+import Remote from "./components/Remote.vue"
+import Advanced from "./components/Advanced.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
     key: "basic",
-    title: "基础下拉",
-    badge: "基础",
-    description: "静态选项，支持清空与多选。",
-    component: BasicSelect,
+    title: "基础用法",
+    badge: "Basic",
+    description: "包含基础单选、自定义字段映射 (label-key/value-key) 以及多选模式 (Multiple)。",
+    component: Basic,
+    componentName: "Basic",
     tagType: "success",
   },
   {
     key: "remote",
     title: "远程搜索",
-    badge: "进阶",
-    description: "模拟接口搜索，演示 loading 与防抖。",
-    component: RemoteSelect,
+    badge: "Remote",
+    description: "演示 API 远程搜索功能，包含防抖控制 (debounce) 与动态参数联动 (Params)。",
+    component: Remote,
+    componentName: "Remote",
     tagType: "warning",
+  },
+  {
+    key: "advanced",
+    title: "高级特性",
+    badge: "Advanced",
+    description: "展示自定义插槽 (Slots)、完整对象回传 (Event) 以及手动方法调用 (Expose)。",
+    component: Advanced,
+    componentName: "Advanced",
+    tagType: "info",
   },
 ]
 </script>

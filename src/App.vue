@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue"
-import { Cpu, Edit, Grid, Delete, Search, Upload, Message, Pointer, Tickets, DataLine, Document, Operation, CirclePlus, Connection, MoreFilled } from "@element-plus/icons-vue"
+import { Cpu, Edit, Grid, Delete, Search, Upload, Message, Pointer, Tickets, DataLine, Document, CirclePlus, Connection, MoreFilled } from "@element-plus/icons-vue"
 
 const navItems = [
   { path: "/fd-crud", label: "Crud", icon: Cpu },
@@ -109,7 +109,6 @@ const navItems = [
   { path: "/fd-upsert", label: "Upsert", icon: Edit },
   { path: "/fd-select", label: "Select", icon: Pointer },
   { path: "/fd-cascader", label: "Cascader", icon: Connection },
-  { path: "/fd-option", label: "Option", icon: Operation },
   { path: "/fd-import", label: "Import", icon: Upload },
   { path: "/fd-dialog", label: "Dialog", icon: Message },
   { path: "/fd-context-menu", label: "Context Menu", icon: MoreFilled },

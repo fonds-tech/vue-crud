@@ -17,7 +17,8 @@ defineOptions({
 })
 
 const props = withDefaults(
-  defineProps<ElOptionProps & {
+  // 将 Element Plus 的 OptionProps 设为 Partial，避免默认值属性被强制视为必填
+  defineProps<Partial<ElOptionProps> & {
     /**
      * 选项对象
      * @description 如果提供，自动从对象中提取 label/value
