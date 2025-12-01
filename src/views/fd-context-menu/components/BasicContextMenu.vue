@@ -68,7 +68,7 @@ function handleContextMenu(event: MouseEvent) {
 .context-card {
   border: none;
   padding: 24px;
-  background: var(--card-bg);
+  background: var(--el-bg-color);
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
   border-radius: 18px;
 }

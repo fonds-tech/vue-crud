@@ -113,6 +113,6 @@ const upsert = useUpsert({ items: [{ field: "name", label: "姓名", component: 
   border: 1px solid var(--el-border-color-lighter);
   padding: 20px;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 }
 </style>

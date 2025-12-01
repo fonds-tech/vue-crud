@@ -159,28 +159,28 @@ onUnmounted(() => {
 <style scoped lang="scss">
 /* Theme Variables */
 :global(:root) {
-  /* Color Palette - Modern Indigo/Slate with better saturation */
-  --color-primary: #6366f1; /* Indigo 500 */
-  --color-primary-hover: #4f46e5; /* Indigo 600 */
-  --color-primary-light: #e0e7ff; /* Indigo 100 - More visible */
-  --color-primary-bg: #eef2ff; /* Indigo 50 */
+  /* Color Palette - Material Design 3 Inspired */
+  --color-primary: #6200ee; /* Purple 500 */
+  --color-primary-hover: #3700b3; /* Purple 700 */
+  --color-primary-light: #ede7f6; /* Deep Purple 50 */
+  --color-primary-bg: #f3e5f5; /* Purple 50 (Alt) */
   --color-primary-contrast: #ffffff;
 
-  /* Backgrounds - Softer, cleaner */
-  --bg-app: #f8fafc; /* Slate 50 */
-  --bg-header: rgba(255, 255, 255, 0.8);
+  /* Backgrounds */
+  --bg-app: #f5f5f5; /* Grey 100 */
+  --bg-header: rgba(255, 255, 255, 0.9);
   --bg-sidebar: #ffffff;
   --bg-surface: #ffffff;
 
-  /* Text - Sharper contrast */
-  --text-main: #0f172a; /* Slate 900 */
-  --text-secondary: #475569; /* Slate 600 */
-  --text-muted: #94a3b8; /* Slate 400 */
-  --text-group-title: #64748b; /* Slate 500 */
+  /* Text */
+  --text-main: #000000;
+  --text-secondary: #424242; /* Grey 800 */
+  --text-muted: #757575; /* Grey 600 */
+  --text-group-title: #616161; /* Grey 700 */
 
   /* Borders & Separators */
-  --border-color: #e2e8f0; /* Slate 200 */
-  --divider-color: #f1f5f9;
+  --border-color: #e0e0e0; /* Grey 300 */
+  --divider-color: #eeeeee;
 
   /* UI Metrics */
   --radius-lg: 16px;
@@ -189,34 +189,35 @@ onUnmounted(() => {
   --header-height: 60px;
   --sidebar-width: 260px;
 
-  /* Shadows - Modern, diffused */
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  /* Shadows - Material Design Elevation */
+  --shadow-lg: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
 
   /* Transitions */
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 :global(html.dark) {
-  --color-primary: #818cf8; /* Indigo 400 */
-  --color-primary-hover: #6366f1; /* Indigo 500 */
-  --bg-app: #020617;
-  --color-primary-bg: rgba(99, 102, 241, 0.1);
-  --color-primary-light: rgba(99, 102, 241, 0.2); /* Slate 950 */
-  --bg-surface: #0f172a; /* Slate 900 */
-  --bg-header: rgba(2, 6, 23, 0.75);
+  /* Material Dark Theme */
+  --color-primary: #bb86fc; /* Purple 200 */
+  --color-primary-hover: #3700b3; /* Purple 700 */
+  --bg-app: #121212;
+  --bg-header: rgba(30, 30, 30, 0.9);
 
-  --text-main: #f8fafc;
-  --bg-sidebar: #0f172a; /* Slate 50 */
-  --text-secondary: #cbd5e1; /* Slate 300 */
-  --text-muted: #64748b; /* Slate 500 */
-  --text-group-title: #475569; /* Slate 600 */
+  --text-main: #ffffff;
+  --bg-sidebar: #1e1e1e;
+  --bg-surface: #1e1e1e;
+  --text-muted: rgba(255, 255, 255, 0.5);
 
-  --border-color: #1e293b; /* Slate 800 */
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --divider-color: #1e293b;
+  --border-color: #2c2c2c;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --color-primary-bg: rgba(187, 134, 252, 0.08);
+  --text-group-title: rgba(255, 255, 255, 0.6);
+  --color-primary-light: rgba(187, 134, 252, 0.12); /* Dark Grey */
+  --shadow-md: 0 4px 5px 0 rgba(0, 0, 0, 0.5), 0 1px 10px 0 rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 1px -1px rgba(0, 0, 0, 0.5), 0 1px 1px 0 rgba(0, 0, 0, 0.4), 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --divider-color: #2c2c2c;
 }
 
 .app {
@@ -245,13 +246,12 @@ onUnmounted(() => {
   /* border-bottom: 1px solid var(--border-color); Removed border for cleaner look */
   box-shadow: var(--shadow-sm); /* Added soft shadow */
   backdrop-filter: blur(20px); /* Increased blur */
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.75); /* More transparent */
   position: relative;
+  justify-content: center;
+  background-color: var(--bg-header);
 }
 
 :global(html.dark) .app__header {
-  background-color: rgba(2, 6, 23, 0.65); /* Dark mode transparency */
   box-shadow: 0 4px 20px -1px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle border in dark mode */
 }

@@ -152,7 +152,7 @@ const queryParams = computed(() => ({
   padding: 24px;
   border-radius: 8px;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 }
 
 .demo-title {
@@ -229,7 +229,7 @@ const queryParams = computed(() => ({
   font-weight: bold;
   border-radius: 50%;
   justify-content: center;
-  background-color: var(--el-color-primary-light-8);
+  background-color: var(--el-fill-color-light);
 }
 
 .user-info {

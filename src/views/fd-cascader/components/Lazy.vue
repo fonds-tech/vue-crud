@@ -60,7 +60,7 @@ const props: CascaderProps = {
   padding: 24px;
   border-radius: 8px;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 }
 
 .demo-title {
