@@ -181,7 +181,7 @@ import { useCore } from "@/hooks"
 import { isFunction } from "@/utils/check"
 import { pick, merge, mergeWith } from "lodash-es"
 import { ElSpace, ElButton, ElMessage, ElDescriptions, ElDescriptionsItem } from "element-plus"
-import { ref, watch, markRaw, computed, reactive, useAttrs, useSlots, defineSlots, onBeforeUnmount, getCurrentInstance } from "vue"
+import { ref, watch, markRaw, computed, reactive, useAttrs, useSlots, onBeforeUnmount, getCurrentInstance } from "vue"
 
 defineOptions({
   name: "fd-detail",
