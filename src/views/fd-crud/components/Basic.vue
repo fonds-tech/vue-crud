@@ -2,7 +2,14 @@
   <div class="demo-container">
     <fd-crud ref="crud">
       <fd-search ref="search" />
-      <fd-table ref="table" />
+      <fd-table ref="table">
+        <template #toolbar>
+          <fd-add-button />
+          <fd-delete-button />
+          <fd-import />
+          <fd-export />
+        </template>
+      </fd-table>
       <fd-detail ref="detail" />
       <fd-upsert ref="upsert" />
     </fd-crud>
@@ -20,7 +27,7 @@ const service = new CrudMockService()
 
 const crud = useCrud({
   service,
-  permission: { add: true, update: true, delete: true, detail: true }, // 启用所有权限
+  permission: { add: true, update: true, delete: true, detail: true, import: true, export: true }, // 启用所有权限
 }, crud => crud.refresh())
 
 // 字典定义
@@ -62,6 +69,30 @@ const search = useSearch({
         is: "el-select",
         props: { placeholder: "全部状态", clearable: true },
         options: statusDict,
+      },
+    },
+    {
+      field: "account",
+      label: "账号",
+      component: { is: "el-input", props: { placeholder: "账号" } },
+    },
+    {
+      field: "phone",
+      label: "手机号",
+      component: { is: "el-input", props: { placeholder: "手机号" } },
+    },
+    {
+      field: "createTimeRange",
+      label: "入职时间",
+      component: {
+        is: "el-date-picker",
+        props: {
+          type: "daterange",
+          rangeSeparator: "至",
+          startPlaceholder: "开始日期",
+          endPlaceholder: "结束日期",
+          valueFormat: "YYYY-MM-DD",
+        },
       },
     },
   ],

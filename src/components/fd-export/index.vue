@@ -2,10 +2,7 @@
   <div v-if="crud.getPermission('export' as any)" class="fd-export">
     <div class="fd-export__trigger" @click="onClickExport">
       <slot name="trigger">
-        <el-button :loading="loading">
-          <template #icon>
-            <el-icon><download /></el-icon>
-          </template>
+        <el-button :loading="loading" type="warning">
           <slot>导出</slot>
         </el-button>
       </slot>
@@ -16,12 +13,11 @@
 <script setup lang="ts">
 import type { Options } from "./type"
 import { useCore } from "@/hooks"
-import { Download } from "@element-plus/icons-vue"
 import { isFunction } from "@/utils/check"
 import { downloadFile } from "@/utils/file"
 import { merge, cloneDeep } from "lodash-es"
 import { ref, watch, reactive } from "vue"
-import { ElIcon, ElButton, ElMessage, ElNotification } from "element-plus"
+import { ElButton, ElMessage, ElNotification } from "element-plus"
 
 defineOptions({ name: "fd-export" })
 

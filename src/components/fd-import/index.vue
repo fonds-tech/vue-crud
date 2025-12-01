@@ -144,7 +144,7 @@ const props = defineProps({
   },
   buttonType: {
     type: String as PropType<ButtonType>,
-    default: "primary",
+    default: "success",
   },
   autoRefresh: {
     type: Boolean,
