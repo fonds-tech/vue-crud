@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
 import { clone } from "@fonds/utils"
-import { merge, isEqual } from "lodash-es"
+import { get, merge, isEqual } from "lodash-es"
 import { ref, watch, computed, useAttrs, useSlots } from "vue"
 
 type OptionRecord = Record<string, any>
@@ -36,10 +36,20 @@ type ApiHandler = (params: Record<string, any>) => Promise<OptionRecord[]>
 // 扩展出来的增强属性，承担远程获取与交互控制职责
 interface CustomProps {
   /**
-   * 远程数据获取函数
-   * @description 返回 Promise<OptionRecord[]>
+   * 远程数据获取函数或接口 URL
+   * @description 支持函数返回 Promise 或直接传入 API 地址字符串
    */
-  api?: ApiHandler
+  api?: ApiHandler | string
+  /**
+   * 请求方法 (仅当 api 为 string 时有效)
+   * @default 'GET'
+   */
+  method?: "GET" | "POST"
+  /**
+   * 响应数据取值路径 (仅当 api 为 string 时有效)
+   * @description 例如 'data.list'，默认为空即响应体本身为数组
+   */
+  dataKey?: string
   /**
    * 额外的请求参数
    * @description 可以是静态对象或动态生成函数
@@ -91,6 +101,8 @@ const props = withDefaults(
   // 将 Element Plus 的 props 设为 Partial，避免默认值属性在类型上变成必填，提升使用灵活性
   defineProps<Omit<Partial<ElSelectProps>, "modelValue"> & CustomProps>(),
   {
+    method: "GET",
+    dataKey: "",
     params: () => ({}),
     searchField: "keyword",
     refreshOnBlur: true,
@@ -143,7 +155,7 @@ watch(
   () => props.api,
   () => {
     remoteOptionList.value = []
-    if (props.immediate && typeof props.api === "function")
+    if (props.immediate && props.api)
       refresh()
   },
   { immediate: true },
@@ -167,15 +179,59 @@ function resolveParams(extra: Record<string, any> = {}) {
 
 // 远程刷新选项，同时处理加载状态与异常兜底
 async function refresh(extra: Record<string, any> = {}) {
-  if (typeof props.api !== "function") {
+  if (!props.api) {
     remoteOptionList.value = []
     return
   }
+
   optionLoading.value = true
   try {
     const payload = resolveParams(extra)
-    const result = await props.api(payload)
+    let result: OptionRecord[] = []
+
+    if (typeof props.api === "function") {
+      result = await props.api(payload)
+    }
+    else if (typeof props.api === "string") {
+      const url = new URL(props.api, window.location.origin)
+      const fetchOptions: RequestInit = {
+        method: props.method,
+        headers: {
+          Accept: "application/json",
+        },
+      }
+
+      if (props.method === "POST") {
+        fetchOptions.body = JSON.stringify(payload)
+        fetchOptions.headers = { ...fetchOptions.headers, "Content-Type": "application/json" }
+      }
+      else {
+        Object.keys(payload).forEach((key) => {
+          const val = payload[key]
+          if (val !== undefined && val !== null)
+            url.searchParams.append(key, String(val))
+        })
+      }
+
+      const response = await fetch(url.toString(), fetchOptions)
+      if (!response.ok)
+        throw new Error(`Request failed: ${response.status}`)
+
+      const json = await response.json()
+      if (props.dataKey) {
+        const list = get(json, props.dataKey)
+        result = Array.isArray(list) ? list : []
+      }
+      else {
+        result = Array.isArray(json) ? json : []
+      }
+    }
+
     remoteOptionList.value = Array.isArray(result) ? result : []
+  }
+  catch (error) {
+    console.error("[fd-select] fetch error:", error)
+    remoteOptionList.value = []
   }
   finally {
     optionLoading.value = false
@@ -221,7 +277,7 @@ function handleFilterInput(value: string) {
   currentSearchTerm.value = value
   if (searchTimer)
     clearTimeout(searchTimer)
-  if (value && typeof props.api === "function") {
+  if (value && props.api) {
     searchTimer = setTimeout(() => refresh({ [props.searchField]: value }), props.debounce)
   }
   if (value)
@@ -246,6 +302,8 @@ const forwardedProps = computed(() => {
   const {
     api,
     params,
+    method,
+    dataKey,
     searchField,
     refreshOnBlur,
     refreshOnFocus,
@@ -269,9 +327,8 @@ const selectBindingProps = computed(() => {
     if (payload.filterable === undefined)
       payload.filterable = true
   }
-  // 同步 loading 状态
-  if (payload.loading === undefined)
-    payload.loading = optionLoading.value
+  // 同步 loading 状态（强制与远程请求一致，避免被上层覆盖）
+  payload.loading = optionLoading.value
   return payload
 })
 
