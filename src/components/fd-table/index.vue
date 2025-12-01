@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="fd-table" :class="[rootAttrs.class, { 'is-fullscreen': isFullscreen }]"
-    :style="rootAttrs.style"
-  >
+  <div class="fd-table" :class="[rootAttrs.class, { 'is-fullscreen': isFullscreen }]" :style="rootAttrs.style">
     <!-- 工具条：用于放置过滤、刷新等操作 -->
     <div v-if="shouldShowToolbar" class="fd-table__toolbar">
       <slot name="toolbar" />
@@ -28,10 +25,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item
-                v-for="size in tableSizeOptions" :key="size.value" :command="size.value"
-                :class="{ 'is-active': size.value === tableOptions.table.size }"
-              >
+              <el-dropdown-item v-for="size in tableSizeOptions" :key="size.value" :command="size.value" :class="{ 'is-active': size.value === tableOptions.table.size }">
                 {{ size.label }}
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -52,15 +46,8 @@
           </template>
           <div class="fd-table__column-panel">
             <div class="fd-table__column-header">
-              <el-checkbox
-                :model-value="isAllChecked"
-                :indeterminate="isIndeterminate"
-                label="全选"
-                @change="toggleAllColumns"
-              />
-              <el-button link type="primary" @click="resetColumns">
-                重置
-              </el-button>
+              <el-checkbox :model-value="isAllChecked" :indeterminate="isIndeterminate" label="全选" @change="toggleAllColumns" />
+              <el-button link type="primary" @click="resetColumns"> 重置 </el-button>
             </div>
             <el-scrollbar class="fd-table__column-scroll">
               <draggable
@@ -84,27 +71,16 @@
                       <el-icon class="fd-table__drag" :class="{ 'is-disabled': !element.sort }">
                         <IconTablerDragDrop />
                       </el-icon>
-                      <el-checkbox
-                        :model-value="element.show"
-                        @change="onColumnShowChange(element.id, $event)"
-                      />
+                      <el-checkbox :model-value="element.show" @change="onColumnShowChange(element.id, $event)" />
                       <span class="fd-table__column-label">{{ element.label }}</span>
                       <div class="fd-table__fixed-actions">
-                        <el-button
-                          link size="small"
-                          :class="{ 'is-active': element.fixed === 'left' }"
-                          @click="toggleFixed(element.id, 'left')"
-                        >
+                        <el-button link size="small" :class="{ 'is-active': element.fixed === 'left' }" @click="toggleFixed(element.id, 'left')">
                           <el-icon>
                             <IconTablerPinFilled v-if="element.fixed === 'left'" class="fd-table__icon-rotate-left" />
                             <IconTablerPin v-else class="fd-table__icon-rotate-left" />
                           </el-icon>
                         </el-button>
-                        <el-button
-                          link size="small"
-                          :class="{ 'is-active': element.fixed === 'right' }"
-                          @click="toggleFixed(element.id, 'right')"
-                        >
+                        <el-button link size="small" :class="{ 'is-active': element.fixed === 'right' }" @click="toggleFixed(element.id, 'right')">
                           <el-icon>
                             <IconTablerPinFilled v-if="element.fixed === 'right'" class="fd-table__icon-rotate-right" />
                             <IconTablerPin v-else class="fd-table__icon-rotate-right" />
@@ -117,9 +93,7 @@
               </draggable>
             </el-scrollbar>
             <div class="fd-table__column-footer">
-              <el-button type="primary" class="fd-table__column-save" @click="saveColumns">
-                保存
-              </el-button>
+              <el-button type="primary" class="fd-table__column-save" @click="saveColumns"> 保存 </el-button>
             </div>
           </div>
         </el-popover>
@@ -146,7 +120,8 @@
         :data="tableRows"
         :row-key="rowKeyProp"
         v-bind="elTableProps"
-        @selection-change="onSelectionChange" @row-contextmenu="onCellContextmenu"
+        @selection-change="onSelectionChange"
+        @row-contextmenu="onCellContextmenu"
       >
         <!-- 透传除默认/工具栏/页眉外的所有具名插槽 -->
         <template v-for="slotName in namedExtraSlots" #[slotName]="scope" :key="slotName">
@@ -161,23 +136,20 @@
               <slot name="expand" v-bind="scope" />
             </template>
           </el-table-column>
-          <el-table-column
-            v-else-if="column.type === 'action'" :align="column.align || 'center'"
-            :fixed="column.fixed || 'right'" :width="column.width || 120" v-bind="column"
-          >
+          <el-table-column v-else-if="column.type === 'action'" :align="column.align || 'center'" :fixed="column.fixed || 'right'" :width="column.width || 120" v-bind="column">
             <template #default="scope">
               <div class="fd-table__actions">
                 <template v-for="(action, actionIndex) in resolveActions(scope, column.actions)" :key="actionIndex">
                   <template v-if="!isHidden(action, scope)">
-                    <el-link
-                      v-if="isBuiltinAction(action)" :type="getActionType(action)"
-                      @click="handleBuiltinAction(action, scope)"
-                    >
-                      {{ action.text ?? crud.dict?.label?.[action.type!] ?? '操作' }}
+                    <el-link v-if="isBuiltinAction(action)" :type="getActionType(action)" @click="handleBuiltinAction(action, scope)">
+                      {{ action.text ?? crud.dict?.label?.[action.type!] ?? "操作" }}
                     </el-link>
                     <slot
-                      v-else-if="getSlotName(action.component, scope)" :name="getSlotName(action.component, scope)!"
-                      :row="scope.row" :column="scope.column" :row-index="scope.$index"
+                      v-else-if="getSlotName(action.component, scope)"
+                      :name="getSlotName(action.component, scope)!"
+                      :row="scope.row"
+                      :column="scope.column"
+                      :row-index="scope.$index"
                     />
                     <component
                       :is="getComponentIs(action.component, scope)"
@@ -186,10 +158,7 @@
                       :style="getComponentStyle(action.component, scope)"
                       v-on="getComponentEvents(action.component, scope)"
                     >
-                      <template
-                        v-for="(value, slotName) in getComponentSlots(action.component, scope)" :key="slotName"
-                        #[slotName]
-                      >
+                      <template v-for="(value, slotName) in getComponentSlots(action.component, scope)" :key="slotName" #[slotName]>
                         <component :is="value" />
                       </template>
                     </component>
@@ -198,10 +167,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            v-else :prop="column.prop" :align="column.align || 'center'"
-            :min-width="column.minWidth || 120" v-bind="column"
-          >
+          <el-table-column v-else :prop="column.prop" :align="column.align || 'center'" :min-width="column.minWidth || 120" v-bind="column">
             <template #header>
               <template v-if="getHeaderComponent(column)">
                 <component
@@ -210,11 +176,7 @@
                   :style="getComponentStyle(getHeaderComponent(column), { column, $index: -1, row: undefined })"
                   v-on="getComponentEvents(getHeaderComponent(column), { column, $index: -1, row: undefined })"
                 >
-                  <template
-                    v-for="(value, slotName) in getComponentSlots(getHeaderComponent(column), { column, $index: -1, row: undefined })"
-                    :key="slotName"
-                    #[slotName]
-                  >
+                  <template v-for="(value, slotName) in getComponentSlots(getHeaderComponent(column), { column, $index: -1, row: undefined })" :key="slotName" #[slotName]>
                     <component :is="value" />
                   </template>
                 </component>
@@ -232,25 +194,24 @@
             </template>
 
             <template #default="scope">
-              <el-tag
-                v-if="hasDict(column, scope)" size="small" :type="getDictType(column, scope)"
-                :color="getDictColor(column, scope)"
-              >
+              <el-tag v-if="hasDict(column, scope)" size="small" :type="getDictType(column, scope)" :color="getDictColor(column, scope)">
                 {{ getDictLabel(column, scope) }}
               </el-tag>
               <slot
-                v-else-if="getSlotName(column.component, scope)" :name="getSlotName(column.component, scope)!"
-                :row="scope.row" :column="scope.column" :row-index="scope.$index"
+                v-else-if="getSlotName(column.component, scope)"
+                :name="getSlotName(column.component, scope)!"
+                :row="scope.row"
+                :column="scope.column"
+                :row-index="scope.$index"
               />
               <component
                 :is="getComponentIs(column.component, scope)"
-                v-else-if="getComponentIs(column.component, scope)" v-bind="getComponentProps(column.component, scope)"
-                :style="getComponentStyle(column.component, scope)" v-on="getComponentEvents(column.component, scope)"
+                v-else-if="getComponentIs(column.component, scope)"
+                v-bind="getComponentProps(column.component, scope)"
+                :style="getComponentStyle(column.component, scope)"
+                v-on="getComponentEvents(column.component, scope)"
               >
-                <template
-                  v-for="(value, slotName) in getComponentSlots(column.component, scope)" :key="slotName"
-                  #[slotName]
-                >
+                <template v-for="(value, slotName) in getComponentSlots(column.component, scope)" :key="slotName" #[slotName]>
                   <component :is="value" />
                 </template>
               </component>
@@ -267,24 +228,14 @@
         <span v-if="selectedRows.length">已选择 {{ selectedRows.length }} 条</span>
         <span>第 {{ paginationStart }}-{{ paginationEnd }} 条</span>
       </div>
-      <el-pagination
-        v-bind="paginationProps"
-        @current-change="onPageChange" @size-change="onPageSizeChange"
-      />
+      <el-pagination v-bind="paginationProps" @current-change="onPageChange" @size-change="onPageSizeChange" />
     </div>
   </div>
 
   <!-- 右键菜单挂载到 body，避免被表格裁剪 -->
   <teleport to="body">
-    <div
-      v-if="contextMenuState.visible" class="fd-table__context-menu"
-      :style="{ top: `${contextMenuState.y}px`, left: `${contextMenuState.x}px` }"
-    >
-      <div
-        v-for="(item, index) in contextMenuState.items" :key="index"
-        class="fd-table__context-menu-item"
-        @click="handleContextAction(item)"
-      >
+    <div v-if="contextMenuState.visible" class="fd-table__context-menu" :style="{ top: `${contextMenuState.y}px`, left: `${contextMenuState.x}px` }">
+      <div v-for="(item, index) in contextMenuState.items" :key="index" class="fd-table__context-menu-item" @click="handleContextAction(item)">
         {{ item.label }}
       </div>
     </div>
@@ -420,19 +371,16 @@ function getVersion(columns: TableColumn[]) {
 }
 
 function readCache(version: string) {
-  if (!cacheKey.value || typeof localStorage === "undefined")
-    return undefined
+  if (!cacheKey.value || typeof localStorage === "undefined") return undefined
   try {
     const raw = localStorage.getItem(cacheKey.value)
-    if (!raw)
-      return undefined
+    if (!raw) return undefined
     const parsed = JSON.parse(raw) as {
       version: string
       order: string[]
       columns: Record<string, { show: boolean, pinned?: boolean, fixed?: "left" | "right" }>
     }
-    if (parsed.version !== version)
-      return undefined
+    if (parsed.version !== version) return undefined
     return parsed
   }
   catch {
@@ -442,14 +390,14 @@ function readCache(version: string) {
 }
 
 function writeCache() {
-  if (!cacheKey.value || typeof localStorage === "undefined")
-    return
+  if (!cacheKey.value || typeof localStorage === "undefined") return
   try {
     const version = getVersion(tableOptions.columns)
-    const order = columnSettings.value.filter(item => item.sort).sort((a, b) => a.order - b.order).map(item => item.id)
-    const columns = Object.fromEntries(
-      columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]),
-    )
+    const order = columnSettings.value
+      .filter(item => item.sort)
+      .sort((a, b) => a.order - b.order)
+      .map(item => item.id)
+    const columns = Object.fromEntries(columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]))
     localStorage.setItem(cacheKey.value, JSON.stringify({ version, order, columns }))
   }
   catch {
@@ -466,15 +414,15 @@ function rebuildColumnSettings(cols: TableColumn[], useCache = true) {
   const settings: ColumnSetting[] = cols.map((column, index) => {
     const id = getColumnId(column, index)
     const pinned = cache?.columns?.[id]?.pinned ?? column.pinned ?? false
-    const sort = (column.sort ?? (column.type !== "action")) && !pinned
+    const sort = (column.sort ?? column.type !== "action") && !pinned
     // 行为列默认右侧固定，便于操作按钮保持可见
     const rawFixed = cache?.columns?.[id]?.fixed ?? (column as any)?.fixed ?? undefined
     const fixed = rawFixed ?? (column.type === "action" ? "right" : undefined)
-    const baseOrder = sort ? (orderMap.get(id) ?? index) : index
+    const baseOrder = sort ? orderMap.get(id) ?? index : index
     return {
       id,
       label: column.label || column.prop || id,
-      show: cache?.columns?.[id]?.show ?? (column.show ?? true),
+      show: cache?.columns?.[id]?.show ?? column.show ?? true,
       order: baseOrder,
       sort,
       pinned,
@@ -497,7 +445,7 @@ watch(
 )
 
 function onColumnShowChange(id: string, value: boolean) {
-  columnSettings.value = columnSettings.value.map(item => item.id === id ? { ...item, show: value } : item)
+  columnSettings.value = columnSettings.value.map(item => (item.id === id ? { ...item, show: value } : item))
 }
 
 function toggleAllColumns(value: boolean) {
@@ -506,17 +454,14 @@ function toggleAllColumns(value: boolean) {
 
 function sortColumnSettings() {
   const rank = (fixed?: "left" | "right") => {
-    if (fixed === "left")
-      return 0
-    if (fixed === "right")
-      return 2
+    if (fixed === "left") return 0
+    if (fixed === "right") return 2
     return 1
   }
   columnSettings.value = [...columnSettings.value]
     .sort((a, b) => {
       const r = rank(a.fixed) - rank(b.fixed)
-      if (r !== 0)
-        return r
+      if (r !== 0) return r
       return a.order - b.order
     })
     .map((item, idx) => ({ ...item, order: idx }))
@@ -537,19 +482,15 @@ function onDragEnd() {
 function onDragMove(evt: any) {
   const dragged = evt?.draggedContext?.element as ColumnSetting | undefined
   const related = evt?.relatedContext?.element as ColumnSetting | undefined
-  if (!dragged || !dragged.sort)
-    return false
-  if (dragged.pinned || related?.pinned)
-    return false
-  if (dragged.fixed !== related?.fixed)
-    return false
+  if (!dragged || !dragged.sort) return false
+  if (dragged.pinned || related?.pinned) return false
+  if (dragged.fixed !== related?.fixed) return false
   return true
 }
 
 function toggleFixed(id: string, fixed: "left" | "right") {
   columnSettings.value = columnSettings.value.map((item) => {
-    if (item.id !== id)
-      return item
+    if (item.id !== id) return item
     const nextFixed = item.fixed === fixed ? undefined : fixed
     return {
       ...item,
@@ -581,8 +522,7 @@ const shouldShowToolbar = computed(() => Boolean(slots.toolbar || tableOptions.t
 const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !["toolbar", "header", "default"].includes(key)))
 
 const visibleColumns = computed(() => {
-  if (!columnSettings.value.length)
-    return tableOptions.columns
+  if (!columnSettings.value.length) return tableOptions.columns
 
   const idToColumn = new Map<string, TableColumn>()
   tableOptions.columns.forEach((column, index) => {
@@ -594,8 +534,7 @@ const visibleColumns = computed(() => {
     .filter(item => item.show)
     .map((state) => {
       const column = idToColumn.get(state.id)
-      if (!column)
-        return undefined
+      if (!column) return undefined
       return {
         ...column,
         fixed: state.fixed,
@@ -641,15 +580,12 @@ const contextMenuState = reactive({
 // 事件总线：与 crud 核心保持同步
 // ---------------------------
 function tableRefreshHandler(payload: unknown) {
-  if (!payload || typeof payload !== "object")
-    return
+  if (!payload || typeof payload !== "object") return
   const data = payload as { list?: any[], page?: number, count?: number, pageSize?: number }
   tableRows.value = Array.isArray(data.list) ? data.list : []
   paginationState.total = data.count ?? tableRows.value.length
-  if (data.page)
-    paginationState.currentPage = data.page
-  if (data.pageSize)
-    paginationState.pageSize = data.pageSize
+  if (data.page) paginationState.currentPage = data.page
+  if (data.pageSize) paginationState.pageSize = data.pageSize
 }
 
 function tableSelectHandler(rowKey: unknown, checked?: boolean) {
@@ -691,14 +627,10 @@ function closeContextMenu() {
 }
 
 function applyPaginationOptions(pagination?: TableOptions["pagination"]) {
-  if (!pagination)
-    return
-  if (pagination.pageSizes)
-    paginationState.pageSizes = [...pagination.pageSizes]
-  if (pagination.pageSize)
-    paginationState.pageSize = Number(pagination.pageSize)
-  if (pagination.currentPage)
-    paginationState.currentPage = Number(pagination.currentPage)
+  if (!pagination) return
+  if (pagination.pageSizes) paginationState.pageSizes = [...pagination.pageSizes]
+  if (pagination.pageSize) paginationState.pageSize = Number(pagination.pageSize)
+  if (pagination.currentPage) paginationState.currentPage = Number(pagination.currentPage)
 }
 
 /**
@@ -711,7 +643,7 @@ function use(useOptions: TableUseOptions) {
     tableOptions.columns = useOptions.columns.map((column, index) => ({
       __id: column.prop || column.label || `col_${index}`,
       show: column.show ?? true,
-      sort: column.sort ?? (column.type !== "action"),
+      sort: column.sort ?? column.type !== "action",
       align: column.align ?? "center",
       ...column,
     }))
@@ -758,10 +690,8 @@ function onPageSizeChange(size: number) {
  * 将 actions 转换为统一数组，兼容函数/静态写法
  */
 function resolveActions(scope: any, actions?: TableAction[] | ((scope: TableScope) => TableAction[])) {
-  if (!actions)
-    return []
-  if (typeof actions === "function")
-    return actions(scope)
+  if (!actions) return []
+  if (typeof actions === "function") return actions(scope)
   return actions
 }
 
@@ -770,8 +700,7 @@ function isBuiltinAction(action: TableAction) {
 }
 
 function getActionType(action: TableAction) {
-  if (action.type === "delete")
-    return "danger"
+  if (action.type === "delete") return "danger"
   return "primary"
 }
 
@@ -789,8 +718,7 @@ function handleBuiltinAction(action: TableAction, scope: any) {
 
 function isHidden(item: TableAction | TableColumn, scope: any) {
   const hidden = item.hidden
-  if (typeof hidden === "function")
-    return hidden(scope)
+  if (typeof hidden === "function") return hidden(scope)
   return Boolean(hidden)
 }
 
@@ -799,22 +727,19 @@ function isHidden(item: TableAction | TableColumn, scope: any) {
  */
 function hasDict(column: TableColumn, scope: any) {
   const dict = resolveDict(column, scope)
-  if (!dict)
-    return false
+  if (!dict) return false
   return Boolean(dict.find(item => item.value === scope.row[column.prop || ""]))
 }
 
 function resolveDict(column: TableColumn, scope: any): TableDict[] | undefined {
   const dictData = column.dict
-  if (!dictData)
-    return undefined
+  if (!dictData) return undefined
   return typeof dictData === "function" ? dictData(scope) : dictData
 }
 
 function getDictEntry(column: TableColumn, scope: any) {
   const dict = resolveDict(column, scope)
-  if (!dict)
-    return undefined
+  if (!dict) return undefined
   return dict.find(item => item.value === scope.row[column.prop || ""])
 }
 
@@ -832,51 +757,44 @@ function getDictType(column: TableColumn, scope: any) {
 
 function formatCell(column: TableColumn, scope: any) {
   const { formatter, prop, value } = column
-  if (typeof formatter === "function")
-    return formatter(scope)
-  if (prop)
-    return scope.row[prop]
+  if (typeof formatter === "function") return formatter(scope)
+  if (prop) return scope.row[prop]
   return value ?? ""
 }
 
 function getComponentIs(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return undefined
+  if (!component) return undefined
   const value = component.is
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value
 }
 
 function getComponentProps(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return {}
+  if (!component) return {}
   const value = component.props
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value ?? {}
 }
 
 function getComponentStyle(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return undefined
+  if (!component) return undefined
   const value = component.style
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value
 }
 
 function getComponentEvents(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return {}
+  if (!component) return {}
   const value = component.on
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value ?? {}
 }
 
 function getComponentSlots(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return {}
+  if (!component) return {}
   const value = component.slots
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value ?? {}
 }
 
 function getColumnSlots(column: TableColumn) {
   const value = column.slots
-  return typeof value === "function" ? value() : (value ?? {})
+  return typeof value === "function" ? value() : value ?? {}
 }
 
 function getHeaderComponent(column: TableColumn) {
@@ -884,8 +802,7 @@ function getHeaderComponent(column: TableColumn) {
 }
 
 function getSlotName(component: TableComponent | undefined, scope: any) {
-  if (!component)
-    return undefined
+  if (!component) return undefined
   const value = component.slot
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value
 }
@@ -922,8 +839,7 @@ function clearSelection() {
  */
 function getRowKeyValue(row: Record<string, any>) {
   const rowKey = rowKeyProp.value
-  if (typeof rowKey === "function")
-    return rowKey(row)
+  if (typeof rowKey === "function") return rowKey(row)
   return row?.[rowKey as string]
 }
 
