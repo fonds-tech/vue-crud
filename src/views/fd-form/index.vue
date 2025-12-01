@@ -9,12 +9,12 @@
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
 import Layout from "../layout.vue"
-import HookForm from "./components/HookForm.vue"
-import ModeForm from "./components/ModeForm.vue"
-import TabsForm from "./components/TabsForm.vue"
-import BasicForm from "./components/BasicForm.vue"
-import StepsForm from "./components/StepsForm.vue"
-import DynamicForm from "./components/DynamicForm.vue"
+import HookForm from "./components/Hook.vue"
+import ModeForm from "./components/Mode.vue"
+import TabsForm from "./components/Tabs.vue"
+import BasicForm from "./components/Basic.vue"
+import StepsForm from "./components/Steps.vue"
+import DynamicForm from "./components/Dynamic.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -23,7 +23,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "标准布局",
     description: "1 列控件展示基础校验，适合入门场景。",
     component: BasicForm,
-    componentName: "BasicForm",
+    componentName: "Basic",
     tagType: "success",
   },
   {
@@ -32,7 +32,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Tabs + 折叠",
     description: "三大分组 + 折叠行演示，展示 help/extra/tooltip。",
     component: TabsForm,
-    componentName: "TabsForm",
+    componentName: "Tabs",
     tagType: "success",
   },
   {
@@ -41,7 +41,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Steps",
     description: "分步填写并联动步骤条，适合长流程审批。",
     component: StepsForm,
-    componentName: "StepsForm",
+    componentName: "Steps",
     tagType: "success",
   },
   {
@@ -50,7 +50,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Action API",
     description: "使用 setOptions/hideItem/setRequired 实现客户类型联动。",
     component: DynamicForm,
-    componentName: "DynamicForm",
+    componentName: "Dynamic",
     tagType: "success",
   },
   {
@@ -59,7 +59,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Hook",
     description: "演示 number/json/datetimeRange 等 hook 对齐后端结构。",
     component: HookForm,
-    componentName: "HookForm",
+    componentName: "Hook",
     tagType: "success",
   },
   {
@@ -68,7 +68,7 @@ const componentCatalog: ComponentMeta[] = [
     badge: "Mode",
     description: "setMode + bindFields 复用表单，支持新增/编辑态切换。",
     component: ModeForm,
-    componentName: "ModeForm",
+    componentName: "Mode",
     tagType: "success",
   },
 ]
