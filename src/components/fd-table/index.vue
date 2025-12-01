@@ -8,22 +8,22 @@
       <slot name="toolbar" />
 
       <div v-if="tableOptions.table.tools" class="fd-table__tools">
-        <el-tooltip content="刷新">
-          <el-button circle size="small" @click="refresh()">
+        <el-tooltip content="刷新" placement="top">
+          <div class="fd-table__tool-btn" role="button" tabindex="0" @click="refresh()">
             <el-icon>
               <refresh-icon />
             </el-icon>
-          </el-button>
+          </div>
         </el-tooltip>
 
         <el-dropdown trigger="click" @command="onSizeChange">
           <span class="fd-table__tool-trigger">
-            <el-tooltip content="尺寸">
-              <el-button circle size="small">
+            <el-tooltip content="尺寸" placement="top">
+              <div class="fd-table__tool-btn" role="button" tabindex="0">
                 <el-icon>
                   <operation />
                 </el-icon>
-              </el-button>
+              </div>
             </el-tooltip>
           </span>
           <template #dropdown>
@@ -41,12 +41,12 @@
         <el-popover :hide-after="0" :teleported="false" width="220px" placement="bottom-start" trigger="click" popper-class="fd-table__column-popover">
           <template #reference>
             <span class="fd-table__tool-trigger">
-              <el-tooltip content="列设置">
-                <el-button circle size="small">
+              <el-tooltip content="列设置" placement="top">
+                <div class="fd-table__tool-btn" role="button" tabindex="0">
                   <el-icon>
                     <setting />
                   </el-icon>
-                </el-button>
+                </div>
               </el-tooltip>
             </span>
           </template>
@@ -124,13 +124,13 @@
           </div>
         </el-popover>
 
-        <el-tooltip content="全屏">
-          <el-button circle size="small" @click="toggleFullscreen()">
+        <el-tooltip content="全屏" placement="top">
+          <div class="fd-table__tool-btn" role="button" tabindex="0" @click="toggleFullscreen()">
             <el-icon>
               <full-screen v-if="isFullscreen" />
               <full-screen v-else />
             </el-icon>
-          </el-button>
+          </div>
         </el-tooltip>
       </div>
     </div>
@@ -1048,6 +1048,40 @@ defineExpose({
     gap: 8px;
     display: flex;
     margin-left: auto;
+  }
+
+  &__tool-btn {
+    color: var(--el-text-color-regular);
+    width: 32px;
+    border: 1px solid var(--el-border-color);
+    cursor: pointer;
+    height: 32px;
+    display: inline-flex;
+    padding: 0;
+    min-width: 32px;
+    transition: all 0.2s ease;
+    align-items: center;
+    border-radius: var(--el-border-radius-base);
+    justify-content: center;
+    background-color: var(--el-fill-color-blank);
+
+    &:hover {
+      color: var(--el-color-primary);
+      border-color: var(--el-color-primary);
+      background-color: var(--el-color-primary-light-9);
+    }
+
+    &:active {
+      color: var(--el-color-primary);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+      border-color: var(--el-color-primary);
+      background-color: var(--el-color-primary-light-8);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--el-color-primary);
+      outline-offset: 1px;
+    }
   }
 
   &__tool-trigger {
