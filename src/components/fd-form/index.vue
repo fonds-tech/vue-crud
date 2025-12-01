@@ -271,7 +271,7 @@ const options = reactive<FormOptions>({
   form: {
     labelWidth: "auto", // 默认标签宽度自动
     scrollToError: true, // 校验失败自动滚动到错误项
-    validateOnRuleChange: false, // 动态规则更新不触发即时校验，避免联动场景误报
+    validateOnRuleChange: true, // 动态规则更新不触发即时校验，避免联动场景误报
   },
   grid: {
     cols: 1,
@@ -611,9 +611,19 @@ function normalizeItems() {
       })
     }
 
-    // 如果标记为 required，自动注入 Element Plus 校验规则
+    // 如果标记为 required，自动注入 Element Plus 校验规则（自定义非空校验，支持数字/布尔）
     if (required(item)) {
-      const rule: InternalRule = { required: true, message: `${item.label ?? fieldKey}为必填项`, _inner: true }
+      const rule: InternalRule = {
+        _inner: true,
+        trigger: ["change", "blur"],
+        validator: (_rule, value, callback) => {
+          const isEmpty = value === undefined || value === null || value === ""
+          if (isEmpty)
+            callback(new Error(`${item.label ?? fieldKey}为必填项`))
+          else
+            callback()
+        },
+      }
       if (isNoEmpty(item.rules)) {
         const ruleList: InternalRule[] = (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as InternalRule[]
         // 替换或添加内部规则

@@ -106,7 +106,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
           // 克隆数据，避免 hook 修改影响原始 model
           const values = clone(model) as T
 
-          const normalizedErrors = invalidFields as Record<string, any> | undefined
+          const normalizedErrors = normalizeErrors(invalidFields as Record<string, any> | undefined, values)
           const hasErrors = Boolean(normalizedErrors && Object.keys(normalizedErrors).length > 0)
 
           if (!hasErrors) {
@@ -140,4 +140,35 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
   }
 
   return methods
+}
+
+/**
+ * 过滤已填写字段的必填错误，避免值存在但仍被判定必填
+ */
+function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<string, any> | undefined, values: T) {
+  if (!errors)
+    return errors
+
+  const result: Record<string, any> = {}
+  Object.keys(errors).forEach((field) => {
+    const fieldErrors = errors[field]
+    const value = (values as Record<string, any>)[field]
+    // 判空规则：仅 undefined/null/\"\" 视为未填；0/false/数组等都视为有值
+    const isEmpty = value === undefined || value === null || value === ""
+
+    const isRequiredError = (err: any) =>
+      err?.required === true
+      || err?.type === "required"
+      || err?._inner === true
+      || (typeof err?.message === "string" && err.message.includes("必填"))
+
+    const filtered = Array.isArray(fieldErrors)
+      ? fieldErrors.filter(err => !(isRequiredError(err) && !isEmpty))
+      : fieldErrors
+
+    if (Array.isArray(filtered) && filtered.length > 0)
+      result[field] = filtered
+  })
+
+  return Object.keys(result).length ? result : undefined
 }
