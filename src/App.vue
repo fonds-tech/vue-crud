@@ -6,10 +6,10 @@
         <div class="app__brand">
           <div class="app__brand-logo">
             <div class="logo-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M9 12h6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M12 9v6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
           </div>
@@ -59,11 +59,6 @@
               </svg>
             </transition>
           </button>
-          <div class="app__user-profile">
-            <div class="app__avatar">
-              <span>A</span>
-            </div>
-          </div>
         </div>
       </div>
     </header>
@@ -159,27 +154,27 @@ onUnmounted(() => {
 <style scoped lang="scss">
 /* Theme Variables */
 :global(:root) {
-  /* Color Palette - Material Design 3 Inspired */
-  --color-primary: #6200ee; /* Purple 500 */
-  --color-primary-hover: #3700b3; /* Purple 700 */
-  --color-primary-light: #ede7f6; /* Deep Purple 50 */
-  --color-primary-bg: #f3e5f5; /* Purple 50 (Alt) */
+  /* Color Palette - Razer Inspired */
+  --color-primary: #00c000; /* Vibrant Green (Readable on Light) */
+  --color-primary-bg: #f2fff2;
+  --color-primary-hover: #009000;
+  --color-primary-light: #e6f9e6;
   --color-primary-contrast: #ffffff;
 
   /* Backgrounds */
-  --bg-app: #f5f5f5; /* Grey 100 */
+  --bg-app: #f5f5f5;
   --bg-header: rgba(255, 255, 255, 0.9);
   --bg-sidebar: #ffffff;
   --bg-surface: #ffffff;
 
   /* Text */
   --text-main: #000000;
-  --text-secondary: #424242; /* Grey 800 */
-  --text-muted: #757575; /* Grey 600 */
-  --text-group-title: #616161; /* Grey 700 */
+  --text-muted: #757575;
+  --text-secondary: #424242;
+  --text-group-title: #616161;
 
   /* Borders & Separators */
-  --border-color: #e0e0e0; /* Grey 300 */
+  --border-color: #e0e0e0;
   --divider-color: #eeeeee;
 
   /* UI Metrics */
@@ -189,7 +184,7 @@ onUnmounted(() => {
   --header-height: 60px;
   --sidebar-width: 260px;
 
-  /* Shadows - Material Design Elevation */
+  /* Shadows */
   --shadow-lg: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
@@ -199,25 +194,29 @@ onUnmounted(() => {
 }
 
 :global(html.dark) {
-  /* Material Dark Theme */
-  --color-primary: #bb86fc; /* Purple 200 */
-  --color-primary-hover: #3700b3; /* Purple 700 */
-  --bg-app: #121212;
-  --bg-header: rgba(30, 30, 30, 0.9);
+  /* Razer Dark Theme */
+  --color-primary: #44d62c; /* Razer Neon Green */
+  --color-primary-bg: rgba(68, 214, 44, 0.1);
+  --color-primary-hover: #00d000;
+  --color-primary-light: rgba(68, 214, 44, 0.15);
 
+  /* Backgrounds */
+  --bg-app: #050505; /* Deep Black */
+  --bg-surface: #111111; /* Off Black */
+  --bg-header: rgba(5, 5, 5, 0.9);
+  --bg-sidebar: #111111;
+
+  /* Text */
   --text-main: #ffffff;
-  --bg-sidebar: #1e1e1e;
-  --bg-surface: #1e1e1e;
   --text-muted: rgba(255, 255, 255, 0.5);
-
-  --border-color: #2c2c2c;
   --text-secondary: rgba(255, 255, 255, 0.7);
-  --color-primary-bg: rgba(187, 134, 252, 0.08);
   --text-group-title: rgba(255, 255, 255, 0.6);
-  --color-primary-light: rgba(187, 134, 252, 0.12); /* Dark Grey */
+
+  /* Borders & Separators */
   --shadow-md: 0 4px 5px 0 rgba(0, 0, 0, 0.5), 0 1px 10px 0 rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
   --shadow-sm: 0 2px 1px -1px rgba(0, 0, 0, 0.5), 0 1px 1px 0 rgba(0, 0, 0, 0.4), 0 1px 3px 0 rgba(0, 0, 0, 0.4);
-  --divider-color: #2c2c2c;
+  --border-color: #222222;
+  --divider-color: #222222;
 }
 
 .app {
@@ -284,8 +283,8 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   display: flex;
-  background: linear-gradient(135deg, var(--color-primary), #4f46e5);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, #333333, #000000);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease;
   align-items: center;
   border-radius: 10px;
