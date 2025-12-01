@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Api from "./components/Api.vue"
 import Basic from "./components/Basic.vue"
 import Layout from "../layout.vue"
 import Remote from "./components/Remote.vue"
@@ -31,6 +32,15 @@ const componentCatalog: ComponentMeta[] = [
     component: Remote,
     componentName: "Remote",
     tagType: "warning",
+  },
+  {
+    key: "api",
+    title: "API 配置",
+    badge: "New",
+    description: "直接传入 API URL 字符串实现数据加载，支持自定义 Method、DataKey 与 SearchField。",
+    component: Api,
+    componentName: "Api",
+    tagType: "danger",
   },
   {
     key: "advanced",
