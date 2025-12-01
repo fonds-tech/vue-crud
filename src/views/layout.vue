@@ -42,9 +42,14 @@
       </div>
 
       <div class="layout__preview-body">
-        <el-scrollbar class="layout__preview-scrollbar" view-class="layout__scrollbar-view">
-          <component :is="activeComponent.component" />
+        <el-scrollbar v-if="useScrollbar">
+          <div class="layout__preview-scrollbar">
+            <component :is="activeComponent.component" />
+          </div>
         </el-scrollbar>
+        <div v-else class="layout__preview-scrollbar layout__preview-scrollbar--native">
+          <component :is="activeComponent.component" />
+        </div>
       </div>
     </div>
   </div>
@@ -64,11 +69,20 @@ export interface ComponentMeta {
   tagType?: string // Deprecated, kept for compatibility but unused visually
 }
 
-const props = defineProps<{
-  title: string
-  description: string
-  components: ComponentMeta[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    title: string
+    description: string
+    components: ComponentMeta[]
+    /**
+     * 是否使用 el-scrollbar 包裹内容，关闭时使用原生滚动
+     */
+    useScrollbar?: boolean
+  }>(),
+  {
+    useScrollbar: true,
+  },
+)
 
 const activeComponentKey = ref(props.components[0]?.key)
 const activeComponent = computed(() => props.components.find(item => item.key === activeComponentKey.value) ?? props.components[0])
@@ -197,7 +211,15 @@ const activeComponent = computed(() => props.components.find(item => item.key ==
   }
 
   &__preview-scrollbar {
+    flex: 1;
+    display: flex;
+    padding: 12px;
+    flex-direction: column;
+  }
+
+  &__preview-scrollbar--native {
     height: 100%;
+    overflow: auto;
   }
 }
 

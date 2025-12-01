@@ -1,19 +1,17 @@
 <template>
-  <div class="demo-container">
-    <fd-crud ref="crud">
-      <fd-search ref="search" />
-      <fd-table ref="table">
-        <template #toolbar>
-          <fd-add-button />
-          <fd-delete-button />
-          <fd-import />
-          <fd-export />
-        </template>
-      </fd-table>
-      <fd-detail ref="detail" />
-      <fd-upsert ref="upsert" />
-    </fd-crud>
-  </div>
+  <fd-crud ref="crud">
+    <fd-search ref="search" />
+    <fd-table ref="table">
+      <template #toolbar>
+        <fd-add-button />
+        <fd-delete-button />
+        <fd-import />
+        <fd-export />
+      </template>
+    </fd-table>
+    <fd-detail ref="detail" />
+    <fd-upsert ref="upsert" />
+  </fd-crud>
 </template>
 
 <script setup lang="ts">
@@ -175,12 +173,3 @@ const upsert = useUpsert({
   ],
 })
 </script>
-
-<style scoped>
-.demo-container {
-  border: 1px solid var(--el-border-color-lighter);
-  padding: 20px;
-  border-radius: 8px;
-  background-color: var(--el-bg-color);
-}
-</style>

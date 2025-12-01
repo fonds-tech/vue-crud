@@ -1,5 +1,6 @@
 <template>
   <layout
+    :use-scrollbar="false"
     title="fd-crud 综合示例"
     description="展示 Search + Table + Detail + Upsert 的完整集成方案。"
     :components="componentCatalog"
