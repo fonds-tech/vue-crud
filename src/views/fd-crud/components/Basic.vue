@@ -100,11 +100,11 @@ const search = useSearch({
 const table = useTable({
   columns: [
     { type: "selection" },
-    { prop: "name", label: "姓名", minWidth: 100 },
+    { prop: "name", label: "姓名", help: "这是姓名", minWidth: 100 },
     { prop: "account", label: "账号", minWidth: 120 },
     { prop: "phone", label: "手机号", minWidth: 140 },
     { prop: "occupation", label: "岗位", dict: occupationDict, width: 100 },
-    { prop: "wages", label: "薪资", sortable: "custom", minWidth: 100, formatter: (row: any) => row.wages != null ? `¥${Number(row.wages).toLocaleString()}` : "-" },
+    { prop: "wages", label: "薪资", help: "这是薪资", sortable: "custom", minWidth: 100, formatter: (row: any) => row.wages != null ? `¥${Number(row.wages).toLocaleString()}` : "-" },
     { prop: "status", label: "状态", dict: statusDict, width: 80 },
     { prop: "createTime", label: "入职时间", minWidth: 120 },
     {

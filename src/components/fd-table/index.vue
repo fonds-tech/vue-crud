@@ -203,14 +203,32 @@
             :min-width="column.minWidth || 120" v-bind="column"
           >
             <template #header>
-              <el-space :size="4" align="center">
-                <span>{{ column.label }}</span>
-                <el-tooltip v-if="column.help" :content="column.help">
-                  <el-icon class="fd-table__help">
-                    <operation />
-                  </el-icon>
-                </el-tooltip>
-              </el-space>
+              <template v-if="getHeaderComponent(column)">
+                <component
+                  :is="getComponentIs(getHeaderComponent(column), { column, $index: -1, row: undefined })"
+                  v-bind="getComponentProps(getHeaderComponent(column), { column, $index: -1, row: undefined })"
+                  :style="getComponentStyle(getHeaderComponent(column), { column, $index: -1, row: undefined })"
+                  v-on="getComponentEvents(getHeaderComponent(column), { column, $index: -1, row: undefined })"
+                >
+                  <template
+                    v-for="(value, slotName) in getComponentSlots(getHeaderComponent(column), { column, $index: -1, row: undefined })"
+                    :key="slotName"
+                    #[slotName]
+                  >
+                    <component :is="value" />
+                  </template>
+                </component>
+              </template>
+              <template v-else>
+                <el-space :size="4" align="center">
+                  <span>{{ column.label }}</span>
+                  <el-tooltip v-if="column.help" :content="column.help" placement="top">
+                    <el-icon class="fd-table__help">
+                      <IconTablerHelp />
+                    </el-icon>
+                  </el-tooltip>
+                </el-space>
+              </template>
             </template>
 
             <template #default="scope">
@@ -828,6 +846,15 @@ function getComponentSlots(component: TableComponent | undefined, scope: any) {
   return isFunction(value) ? (value as (scope?: any) => any)(scope) : value ?? {}
 }
 
+function getColumnSlots(column: TableColumn) {
+  const value = column.slots
+  return typeof value === "function" ? value() : (value ?? {})
+}
+
+function getHeaderComponent(column: TableColumn) {
+  return (getColumnSlots(column) as any).header as TableComponent | undefined
+}
+
 function getSlotName(component: TableComponent | undefined, scope: any) {
   if (!component)
     return undefined
@@ -1232,7 +1259,13 @@ defineExpose({
   }
 
   &__help {
-    cursor: help;
+    color: var(--el-text-color-secondary);
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--el-color-primary);
+    }
   }
 
   &__context-menu {

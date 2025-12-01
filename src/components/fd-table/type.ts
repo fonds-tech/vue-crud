@@ -114,6 +114,7 @@ export interface TableAction<T extends TableRecord = TableRecord> {
 /**
  * 插槽集合
  */
+// 支持 header 自定义渲染：配置 slots.header 即可替换默认表头内容
 export type TableSlots<T extends TableRecord = TableRecord> = Record<string, TableComponent<T>>
 
 /**
