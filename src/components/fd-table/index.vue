@@ -666,6 +666,7 @@ function use(useOptions: TableUseOptions) {
       __id: column.prop || column.label || `col_${index}`,
       show: column.show ?? true,
       sort: column.sort ?? (column.type !== "action"),
+      align: column.align ?? "center",
       ...column,
     }))
     rebuildColumnSettings(tableOptions.columns)

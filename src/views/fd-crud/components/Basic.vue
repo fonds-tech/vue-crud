@@ -99,6 +99,7 @@ const search = useSearch({
 // 表格配置
 const table = useTable({
   columns: [
+    { type: "selection" },
     { prop: "name", label: "姓名", minWidth: 100 },
     { prop: "account", label: "账号", minWidth: 120 },
     { prop: "phone", label: "手机号", minWidth: 140 },
