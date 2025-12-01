@@ -432,7 +432,9 @@ function rebuildColumnSettings(cols: TableColumn[], useCache = true) {
     const id = getColumnId(column, index)
     const pinned = cache?.columns?.[id]?.pinned ?? column.pinned ?? false
     const sort = (column.sort ?? (column.type !== "action")) && !pinned
-    const fixed = cache?.columns?.[id]?.fixed ?? (column as any)?.fixed ?? undefined
+    // 行为列默认右侧固定，便于操作按钮保持可见
+    const rawFixed = cache?.columns?.[id]?.fixed ?? (column as any)?.fixed ?? undefined
+    const fixed = rawFixed ?? (column.type === "action" ? "right" : undefined)
     const baseOrder = sort ? (orderMap.get(id) ?? index) : index
     return {
       id,
