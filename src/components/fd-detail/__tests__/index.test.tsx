@@ -201,7 +201,7 @@ describe("fd-detail", () => {
     const exposed = getExpose(wrapper)
     exposed.use({
       items: [
-        { field: "name", label: "姓名" },
+        { prop: "name", label: "姓名" },
       ],
     })
     exposed.setData({ name: "张三" })
@@ -215,7 +215,7 @@ describe("fd-detail", () => {
     const detailFn = vi.fn().mockResolvedValue({ name: "李四" })
     const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
     const exposed = getExpose(wrapper)
-    exposed.use({ items: [{ field: "name", label: "姓名" }] })
+    exposed.use({ items: [{ prop: "name", label: "姓名" }] })
     await exposed.detail({ id: "100", extra: "ignored" })
     await nextTick()
     expect(detailFn).toHaveBeenCalledWith({ id: "100" })

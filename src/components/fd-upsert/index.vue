@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import type { FormItemProp } from "element-plus"
 import type { FormRef, FormItem, FormRecord, FormUseOptions } from "../fd-form/type"
 import type { UpsertMode, UpsertAction, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "./type"
 import FdForm from "../fd-form/index.vue"
@@ -343,7 +344,7 @@ async function submit(extra: Record<string, any> = {}) {
   const errors = result?.errors
   if (errors && Object.keys(errors).length) {
     loading.value = false
-    return Promise.reject(errors)
+    return null
   }
   const payload = merge(clone(values), clone(extra))
   const done = () => {
@@ -367,7 +368,6 @@ async function submit(extra: Record<string, any> = {}) {
         return res
       })
       .catch((err: any) => {
-        ElMessage.error(err?.message ?? "提交失败")
         loading.value = false
         throw err
       })
@@ -398,23 +398,23 @@ defineExpose({
   next: handleNext,
   prev: handlePrev,
   bindFields: (data?: Record<string, any>) => formRef.value?.bindFields(data ?? {}),
-  setField: (field: string, value: any) => formRef.value?.setField(field, value),
-  getField: (field?: string) => formRef.value?.getField(field),
-  setItem: (field: string, data: Record<string, any>) => formRef.value?.setItem(field, data),
-  setOptions: (field: string, value: any[]) => formRef.value?.setOptions(field, value),
-  getOptions: (field: string) => formRef.value?.getOptions(field),
-  setProps: (field: string, value: Record<string, any>) => formRef.value?.setProps(field, value),
-  setStyle: (field: string, value: Record<string, any>) => formRef.value?.setStyle(field, value),
-  hideItem: (field: string | string[]) => formRef.value?.hideItem(field as any),
-  showItem: (field: string | string[]) => formRef.value?.showItem(field as any),
+  setField: (prop: FormItemProp, value: any) => formRef.value?.setField(prop, value),
+  getField: (prop?: FormItemProp) => formRef.value?.getField(prop),
+  setItem: (prop: FormItemProp, data: Record<string, any>) => formRef.value?.setItem(prop, data),
+  setOptions: (prop: FormItemProp, value: any[]) => formRef.value?.setOptions(prop, value),
+  getOptions: (prop: FormItemProp) => formRef.value?.getOptions(prop),
+  setProps: (prop: FormItemProp, value: Record<string, any>) => formRef.value?.setProps(prop, value),
+  setStyle: (prop: FormItemProp, value: Record<string, any>) => formRef.value?.setStyle(prop, value),
+  hideItem: (prop: FormItemProp | FormItemProp[]) => formRef.value?.hideItem(prop as any),
+  showItem: (prop: FormItemProp | FormItemProp[]) => formRef.value?.showItem(prop as any),
   collapse: () => formRef.value?.collapse(),
   validate: (callback?: any) => formRef.value?.validate(callback),
-  validateField: (field: any, callback?: any) => formRef.value?.validateField(field, callback),
-  resetFields: (field?: any) => formRef.value?.resetFields(field),
-  clearFields: (field?: any) => formRef.value?.clearFields(field),
-  clearValidate: (field?: any) => formRef.value?.clearValidate(field),
+  validateField: (prop: FormItemProp | FormItemProp[], callback?: any) => formRef.value?.validateField(prop as any, callback),
+  resetFields: (prop?: FormItemProp | FormItemProp[]) => formRef.value?.resetFields(prop as any),
+  clearFields: (prop?: FormItemProp | FormItemProp[]) => formRef.value?.clearFields(prop as any),
+  clearValidate: (prop?: FormItemProp | FormItemProp[]) => formRef.value?.clearValidate(prop as any),
   setFields: (data: Record<string, any>) => formRef.value?.setFields(data),
-  scrollToField: (field: any) => formRef.value?.scrollToField(field),
+  scrollToField: (prop: FormItemProp) => formRef.value?.scrollToField(prop),
 })
 </script>
 

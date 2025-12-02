@@ -54,7 +54,7 @@
 
           <template
             v-for="(item, itemIndex) in group.items"
-            :key="item.field ?? itemIndex"
+            :key="item.prop ?? itemIndex"
           >
             <el-descriptions-item
               v-if="isVisible(item)"
@@ -125,7 +125,7 @@
               <template v-else-if="resolveDict(item)">
                 <el-tag
                   v-if="getDictMatch(item)"
-                  :type="getDictMatch(item)!.type"
+                  :type="tagType(getDictMatch(item))"
                   :color="getDictMatch(item)!.color"
                 >
                   {{ getDictMatch(item)!.label }}
@@ -426,8 +426,10 @@ function resolveLabel(item: DetailItem) {
 
 /** 获取字段值（含默认值），缺省时读取 item.value。 */
 function getFieldValue(item: DetailItem) {
-  const field = item.field as string
-  const current = data.value?.[field]
+  const prop = (item as DetailItem & { field?: string }).prop ?? (item as { field?: string }).field
+  if (!prop)
+    return resolveMaybe(item.value)
+  const current = data.value?.[prop]
   if (current === undefined || current === null) {
     return resolveMaybe(item.value)
   }
@@ -446,6 +448,14 @@ function getDictMatch(item: DetailItem) {
     return undefined
   const value = getFieldValue(item)
   return dict.find(d => d.value === value)
+}
+
+/** 过滤字典 type，仅返回 Element Plus 允许的类型，避免类型不兼容告警。 */
+function tagType(match?: ReturnType<typeof getDictMatch>) {
+  const type = match?.type
+  if (!type || type === "default")
+    return undefined
+  return type
 }
 
 /** 格式化显示值，优先使用 formatter，否则直接输出。 */

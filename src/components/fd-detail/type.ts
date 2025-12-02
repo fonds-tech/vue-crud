@@ -46,7 +46,7 @@ export type DetailSlots<D extends DetailData = DetailData> = DetailMaybeFn<Recor
  */
 export interface DetailItem<D extends DetailData = DetailData> {
   /** 对应数据字段 */
-  field: keyof D | string
+  prop: keyof D | string
   /** 字段标题 */
   label?: DetailMaybeFn<string | undefined, D>
   /** 栅格占用 */
