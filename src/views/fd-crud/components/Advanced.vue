@@ -1,35 +1,25 @@
 <template>
-  <div class="demo-container">
-    <fd-crud ref="crud">
-      <fd-search ref="search" />
+  <fd-crud ref="crud">
+    <fd-search ref="search" />
 
-      <fd-table ref="table">
-        <!-- 自定义工具栏 -->
-        <template #toolbar>
-          <fd-add-button />
-          <fd-delete-button /> <!-- 批量删除按钮 -->
-          <fd-import
-            :api="importApi"
-            temp-url="https://example.com/template.xlsx"
-            @success="handleImportSuccess"
-          />
-          <fd-export
-            :api="exportApi"
-            file-name="员工数据"
-          />
+    <fd-table ref="table">
+      <!-- 自定义工具栏 -->
+      <template #toolbar>
+        <fd-add-button />
+        <fd-delete-button />
+        <!-- 批量删除按钮 -->
+        <fd-import :api="importApi" temp-url="https://example.com/template.xlsx" @success="handleImportSuccess" />
+        <fd-export :api="exportApi" file-name="员工数据" />
 
-          <div style="flex: 1"></div>
+        <div style="flex: 1"></div>
 
-          <el-button type="primary" plain @click="handleCustomAction">
-            自定义操作
-          </el-button>
-        </template>
-      </fd-table>
+        <el-button type="primary" plain @click="handleCustomAction"> 自定义操作 </el-button>
+      </template>
+    </fd-table>
 
-      <fd-detail ref="detail" />
-      <fd-upsert ref="upsert" />
-    </fd-crud>
-  </div>
+    <fd-detail ref="detail" />
+    <fd-upsert ref="upsert" />
+  </fd-crud>
 </template>
 
 <script setup lang="ts">
@@ -41,10 +31,13 @@ defineOptions({ name: "advanced-crud" })
 
 const service = new CrudMockService()
 
-const crud = useCrud({
-  service,
-  permission: { add: true, update: true, delete: true, detail: true },
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service,
+    permission: { add: true, update: true, delete: true, detail: true },
+  },
+  crud => crud.refresh(),
+)
 
 // 模拟导入导出 API
 function importApi(data: FormData) {
@@ -77,10 +70,7 @@ function handleCustomAction() {
 
 // 搜索配置
 const search = useSearch({
-  grid: { cols: 4 },
-  items: [
-    { field: "keyword", label: "关键词", component: { is: "el-input", props: { placeholder: "搜索..." } } },
-  ],
+  items: [{ prop: "keyword", label: "关键词", component: { is: "el-input", props: { placeholder: "搜索..." } } }],
 })
 
 // 表格配置
@@ -104,15 +94,11 @@ const table = useTable({
 })
 
 // 详情 & Upsert 配置 (简化版)
-const detail = useDetail({ items: [{ field: "name", label: "姓名" }, { field: "remark", label: "备注" }] })
+const detail = useDetail({
+  items: [
+    { field: "name", label: "姓名" },
+    { field: "remark", label: "备注" },
+  ],
+})
 const upsert = useUpsert({ items: [{ prop: "name", label: "姓名", component: { is: "el-input" } }] })
 </script>
-
-<style scoped>
-.demo-container {
-  border: 1px solid var(--el-border-color-lighter);
-  padding: 20px;
-  border-radius: 8px;
-  background-color: var(--el-bg-color);
-}
-</style>

@@ -221,7 +221,7 @@ describe("fd-search", () => {
     const options: Parameters<SearchExpose["use"]>[0] = {
       model: { keyword: "" },
       items: [
-        { field: "keyword", label: "关键字", component: { is: "el-input" } },
+        { prop: "keyword", label: "关键字", component: { is: "el-input" } },
       ],
       action: {
         items: [{ type: "search", text: "查询" }],
@@ -232,7 +232,7 @@ describe("fd-search", () => {
     expect(formExpose.use).toHaveBeenCalledWith(expect.objectContaining({
       model: expect.objectContaining({ keyword: "" }),
       items: expect.arrayContaining([
-        expect.objectContaining({ field: "keyword" }),
+        expect.objectContaining({ prop: "keyword" }),
       ]),
     }))
   })

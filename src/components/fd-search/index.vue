@@ -127,7 +127,7 @@ function getActionItemProps(action: SearchAction) {
 function resolveActionCol(action: SearchAction) {
   const merged = action.col ?? {}
   return {
-    span: resolveResponsiveValue(merged.span ?? 12, viewportWidth.value, 12),
+    span: resolveResponsiveValue(merged.span ?? 1, viewportWidth.value, 1),
     offset: resolveResponsiveValue(merged.offset ?? 0, viewportWidth.value, 0),
   }
 }

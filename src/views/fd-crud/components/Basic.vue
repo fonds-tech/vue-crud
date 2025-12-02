@@ -44,15 +44,14 @@ const statusDict: TableDict[] = [
 
 // 搜索配置
 const search = useSearch({
-  grid: { cols: 3 },
   items: [
     {
-      field: "keyword",
+      prop: "keyword",
       label: "关键词",
       component: { is: "el-input", props: { placeholder: "姓名/账号/手机号" } },
     },
     {
-      field: "occupation",
+      prop: "occupation",
       label: "岗位",
       component: {
         is: "el-select",
@@ -61,7 +60,7 @@ const search = useSearch({
       },
     },
     {
-      field: "status",
+      prop: "status",
       label: "状态",
       component: {
         is: "el-select",
@@ -70,17 +69,17 @@ const search = useSearch({
       },
     },
     {
-      field: "account",
+      prop: "account",
       label: "账号",
       component: { is: "el-input", props: { placeholder: "账号" } },
     },
     {
-      field: "phone",
+      prop: "phone",
       label: "手机号",
       component: { is: "el-input", props: { placeholder: "手机号" } },
     },
     {
-      field: "createTimeRange",
+      prop: "createTimeRange",
       label: "入职时间",
       component: {
         is: "el-date-picker",
@@ -94,6 +93,8 @@ const search = useSearch({
       },
     },
   ],
+  grid: { cols: 3 },
+  action: { grid: { cols: 1 } },
 })
 
 // 表格配置
