@@ -37,7 +37,7 @@ const advancedOptions: SearchOptions = {
   grid: { cols: 3 },
   items: [
     {
-      field: "keyword",
+      prop: "keyword",
       label: "关键词",
       component: {
         is: "el-input",
@@ -45,7 +45,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "status",
+      prop: "status",
       label: "状态",
       component: {
         is: "el-select",
@@ -57,7 +57,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "department",
+      prop: "department",
       label: "所属部门",
       component: {
         is: "el-cascader",
@@ -86,7 +86,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "tags",
+      prop: "tags",
       label: "用户标签",
       component: {
         is: "el-select",
@@ -100,7 +100,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "createTime",
+      prop: "createTime",
       label: "创建时间",
       component: {
         is: "el-date-picker",
@@ -116,7 +116,7 @@ const advancedOptions: SearchOptions = {
       span: 4,
     },
     {
-      field: "notify",
+      prop: "notify",
       label: "需要通知",
       component: {
         is: "el-switch",
@@ -124,7 +124,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "salaryRange",
+      prop: "salaryRange",
       label: "金额区间(万)",
       component: {
         is: "el-slider",
@@ -133,7 +133,7 @@ const advancedOptions: SearchOptions = {
       span: 4,
     },
     {
-      field: "approval",
+      prop: "approval",
       label: "审批状态",
       component: {
         is: "el-radio-group",
@@ -147,7 +147,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "priority",
+      prop: "priority",
       label: "优先级",
       component: {
         is: "el-rate",
@@ -155,7 +155,7 @@ const advancedOptions: SearchOptions = {
       },
     },
     {
-      field: "remarks",
+      prop: "remarks",
       label: "备注",
       component: {
         is: "el-input",

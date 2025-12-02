@@ -29,7 +29,7 @@ const detailOptions: DetailUseOptions = {
   descriptions: { column: 1, border: true },
   items: [
     {
-      field: "avatar",
+      prop: "avatar",
       label: "头像",
       component: {
         is: "el-avatar",
@@ -37,7 +37,7 @@ const detailOptions: DetailUseOptions = {
       },
     },
     {
-      field: "website",
+      prop: "website",
       label: "官网",
       component: {
         is: "el-link",
@@ -48,7 +48,7 @@ const detailOptions: DetailUseOptions = {
       },
     },
     {
-      field: "score",
+      prop: "score",
       label: "评分",
       component: {
         is: "el-rate",
@@ -56,7 +56,7 @@ const detailOptions: DetailUseOptions = {
       },
     },
     {
-      field: "progress",
+      prop: "progress",
       label: "进度",
       component: {
         is: "el-progress",
@@ -64,7 +64,7 @@ const detailOptions: DetailUseOptions = {
       },
     },
     {
-      field: "tags",
+      prop: "tags",
       label: "标签组",
       component: {
         slot: "tags",

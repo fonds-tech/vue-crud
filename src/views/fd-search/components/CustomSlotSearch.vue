@@ -69,7 +69,7 @@ const options: SearchOptions = {
   grid: { cols: 3 },
   items: [
     {
-      field: "keyword",
+      prop: "keyword",
       label: "关键词",
       component: {
         is: "el-input",
@@ -77,7 +77,7 @@ const options: SearchOptions = {
       },
     },
     {
-      field: "region",
+      prop: "region",
       label: "地区(Slot)",
       component: {
         slot: "custom-region", // 对应 template #custom-region
@@ -85,7 +85,7 @@ const options: SearchOptions = {
       value: "cn", // 默认值
     },
     {
-      field: "dynamicStatus",
+      prop: "dynamicStatus",
       label: "动态属性",
       component: {
         is: "el-select",

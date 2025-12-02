@@ -125,14 +125,14 @@ const table = useTable({
 // 详情配置
 const detail = useDetail({
   items: [
-    { field: "name", label: "姓名" },
-    { field: "account", label: "账号" },
-    { field: "phone", label: "手机号" },
-    { field: "occupation", label: "岗位", dict: occupationDict },
-    { field: "wages", label: "薪资" },
-    { field: "status", label: "状态", dict: statusDict },
-    { field: "createTime", label: "入职时间" },
-    { field: "remark", label: "备注", span: 2 },
+    { prop: "name", label: "姓名" },
+    { prop: "account", label: "账号" },
+    { prop: "phone", label: "手机号" },
+    { prop: "occupation", label: "岗位", dict: occupationDict },
+    { prop: "wages", label: "薪资" },
+    { prop: "status", label: "状态", dict: statusDict },
+    { prop: "createTime", label: "入职时间" },
+    { prop: "remark", label: "备注", span: 2 },
   ],
 })
 

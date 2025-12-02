@@ -48,25 +48,25 @@ const formOptions: FormUseOptions = {
   },
   items: [
     {
-      field: "name",
+      prop: "name",
       label: "姓名",
       component: { is: "el-input", props: { placeholder: "请输入姓名" } },
       rules: [{ required: true, message: "请输入姓名", trigger: "blur" }],
     },
     {
-      field: "account",
+      prop: "account",
       label: "账号",
       component: { is: "el-input", props: { placeholder: "请输入域账号" } },
       rules: [{ required: true, message: "请输入账号", trigger: "blur" }],
     },
     {
-      field: "phone",
+      prop: "phone",
       label: "手机号",
       component: { is: "el-input", props: { placeholder: "11 位手机号码" } },
       rules: [{ required: true, message: "请输入手机号", trigger: "blur" }],
     },
     {
-      field: "email",
+      prop: "email",
       label: "邮箱",
       component: { is: "el-input", props: { placeholder: "name@example.com" } },
       rules: [
@@ -75,12 +75,12 @@ const formOptions: FormUseOptions = {
       ],
     },
     {
-      field: "status",
+      prop: "status",
       label: "账号启用",
       component: { is: "el-switch", props: { activeText: "启用", inactiveText: "禁用" } },
     },
     {
-      field: "remark",
+      prop: "remark",
       label: "备注",
       component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 200 } },
     },

@@ -36,21 +36,21 @@ function mockApi(id: string) {
 const detailOptions: DetailUseOptions = {
   dialog: { title: "异步详情加载" },
   items: [
-    { field: "id", label: "ID" },
-    { field: "title", label: "标题" },
+    { prop: "id", label: "ID" },
+    { prop: "title", label: "标题" },
     {
-      field: "type",
+      prop: "type",
       label: "类型",
       formatter: val => (val === "text" ? "文本" : "图片"),
     },
     {
-      field: "content",
+      prop: "content",
       label: "内容",
       span: 2,
       hidden: data => data.type !== "text",
     },
     {
-      field: "imageUrl",
+      prop: "imageUrl",
       label: "预览图",
       span: 2,
       hidden: data => data.type !== "image",
@@ -60,7 +60,7 @@ const detailOptions: DetailUseOptions = {
       },
     },
     {
-      field: "extraInfo",
+      prop: "extraInfo",
       label: "额外信息",
       span: 2,
       hidden: data => !data.showExtra,

@@ -24,16 +24,16 @@ const detailOptions: DetailUseOptions = {
     direction: "vertical", // 标签在上方
   },
   items: [
-    { field: "name", label: "计划标题", span: 3 }, // 占满一行
-    { field: "department", label: "部门" },
-    { field: "manager", label: "负责人" },
-    { field: "priority", label: "优先级" },
-    { field: "startDate", label: "开始日期" },
-    { field: "endDate", label: "结束日期" },
-    { field: "budget", label: "预算" },
-    { field: "description", label: "详细描述", span: 3 }, // 占满
-    { field: "auditUser", label: "审核人", span: 2 }, // 占 2/3
-    { field: "auditTime", label: "审核时间", span: 1 },
+    { prop: "name", label: "计划标题", span: 3 }, // 占满一行
+    { prop: "department", label: "部门" },
+    { prop: "manager", label: "负责人" },
+    { prop: "priority", label: "优先级" },
+    { prop: "startDate", label: "开始日期" },
+    { prop: "endDate", label: "结束日期" },
+    { prop: "budget", label: "预算" },
+    { prop: "description", label: "详细描述", span: 3 }, // 占满
+    { prop: "auditUser", label: "审核人", span: 2 }, // 占 2/3
+    { prop: "auditTime", label: "审核时间", span: 1 },
   ],
 }
 

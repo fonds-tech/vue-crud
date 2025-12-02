@@ -22,7 +22,7 @@ const crud = useCrud({ service: new SearchMockService() }, crud => crud.refresh(
 const search = useSearch({
   items: [
     {
-      field: "keyword",
+      prop: "keyword",
       label: "关键词",
       component: {
         is: "el-input",
@@ -30,7 +30,7 @@ const search = useSearch({
       },
     },
     {
-      field: "status",
+      prop: "status",
       label: "状态",
       component: {
         is: "el-select",
@@ -42,7 +42,7 @@ const search = useSearch({
       },
     },
     {
-      field: "owner",
+      prop: "owner",
       label: "负责人",
       component: {
         is: "el-input",
@@ -50,7 +50,7 @@ const search = useSearch({
       },
     },
     {
-      field: "type",
+      prop: "type",
       label: "类型",
       component: {
         is: "el-select",
@@ -62,7 +62,7 @@ const search = useSearch({
       },
     },
     {
-      field: "notify",
+      prop: "notify",
       label: "需要通知",
       component: {
         is: "el-select",
@@ -74,7 +74,7 @@ const search = useSearch({
       },
     },
     {
-      field: "createRange",
+      prop: "createRange",
       label: "创建日期",
       component: {
         is: "el-date-picker",

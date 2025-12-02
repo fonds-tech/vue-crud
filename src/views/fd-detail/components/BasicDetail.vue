@@ -109,17 +109,17 @@ const detailRef = useDetail({
   descriptions: { column: 2 },
   items: [
     {
-      field: "avatar",
+      prop: "avatar",
       label: "头像",
       component: {
         is: "el-avatar",
         props: (data: any) => ({ src: data.avatar, size: 64, shape: "circle" }),
       },
     },
-    { field: "name", label: "姓名" },
-    { field: "account", label: "账号" },
+    { prop: "name", label: "姓名" },
+    { prop: "account", label: "账号" },
     {
-      field: "priority",
+      prop: "priority",
       label: "优先级",
       component: {
         is: "el-tag",
@@ -128,7 +128,7 @@ const detailRef = useDetail({
       },
     },
     {
-      field: "progress",
+      prop: "progress",
       label: "进度",
       component: {
         is: "el-progress",
@@ -136,7 +136,7 @@ const detailRef = useDetail({
       },
     },
     {
-      field: "score",
+      prop: "score",
       label: "评分",
       component: {
         is: "el-rate",
@@ -144,7 +144,7 @@ const detailRef = useDetail({
       },
     },
     {
-      field: "website",
+      prop: "website",
       label: "个人主页",
       component: {
         is: "el-link",
@@ -152,9 +152,9 @@ const detailRef = useDetail({
         slots: { default: () => "点击访问" },
       },
     },
-    { field: "status", label: "状态", formatter: (value: number) => (value ? "启用" : "禁用") },
-    { field: "createTime", label: "创建时间" },
-    { field: "remark", label: "备注", span: 2 },
+    { prop: "status", label: "状态", formatter: (value: number) => (value ? "启用" : "禁用") },
+    { prop: "createTime", label: "创建时间" },
+    { prop: "remark", label: "备注", span: 2 },
   ],
 })
 </script>
