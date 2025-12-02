@@ -247,8 +247,8 @@ import type { TableDict, TableScope, TableAction, TableColumn, TableOptions, Tab
 import Draggable from "vuedraggable"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
-import { ElTable } from "element-plus"
 import { isFunction } from "@/utils/check"
+import { ElTable, ElMessage } from "element-plus"
 import { Setting, Operation, FullScreen, Refresh as RefreshIcon } from "@element-plus/icons-vue"
 import { ref, watch, computed, reactive, useAttrs, useSlots, onMounted, onBeforeUnmount } from "vue"
 
@@ -518,6 +518,7 @@ function resetColumns() {
 function saveColumns() {
   writeCache()
   emit("columnsChange", visibleColumns.value)
+  ElMessage.success("保存成功")
 }
 
 // ---------------------------
@@ -1169,15 +1170,22 @@ defineExpose({
     width: 100%;
   }
 
-  &__drag-ghost {
-    border: 1px dashed var(--el-color-primary);
-    opacity: 0.8;
-    background: var(--el-fill-color-light);
+  &__drag-ghost,
+  &__drag-chosen {
+    opacity: 0.9;
+    position: relative;
     border-radius: 6px;
   }
 
-  &__drag-chosen {
-    opacity: 0.9;
+  &__drag-ghost::after,
+  &__drag-chosen::after {
+    inset: 0;
+    border: 1px dashed var(--el-color-primary);
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 6px;
+    pointer-events: none;
   }
 
   &__fixed-actions {
