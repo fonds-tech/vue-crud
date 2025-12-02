@@ -88,30 +88,30 @@ const formRef = useForm<HookFormModel>({
   },
   items: [
     {
-      field: "productName",
+      prop: "productName",
       label: "产品名称",
       component: { is: "el-input", props: { maxlength: 40, showWordLimit: true } },
       rules: [{ required: true, message: "请输入产品名称", trigger: "blur" }],
     },
     {
-      field: "sku",
+      prop: "sku",
       label: "内部 SKU",
       component: { is: "el-input", props: { placeholder: "SKU-xxx" } },
     },
     {
-      field: "price",
+      prop: "price",
       label: "售卖价格",
       hook: "number",
       component: { is: "el-input-number", props: { min: 0, step: 10, controlsPosition: "right" } },
     },
     {
-      field: "seats",
+      prop: "seats",
       label: "席位数",
       hook: "number",
       component: { is: "el-input-number", props: { min: 1, step: 5 } },
     },
     {
-      field: "onlineWindow",
+      prop: "onlineWindow",
       label: "上线窗口",
       value: [],
       hook: "datetimeRange",
@@ -122,7 +122,7 @@ const formRef = useForm<HookFormModel>({
       extra: () => "hook: datetimeRange 自动拆分 start/end 字段",
     },
     {
-      field: "tags",
+      prop: "tags",
       label: "特性标签",
       hook: "splitJoin",
       component: {
@@ -137,14 +137,14 @@ const formRef = useForm<HookFormModel>({
       },
     },
     {
-      field: "metadata",
+      prop: "metadata",
       label: "配置 JSON",
       hook: "json",
       span: 2,
       component: { is: "el-input", props: { type: "textarea", rows: 3 } },
     },
     {
-      field: "activeSwitch",
+      prop: "activeSwitch",
       label: "是否激活",
       hook: {
         bind: "boolean",
@@ -153,7 +153,7 @@ const formRef = useForm<HookFormModel>({
       component: { is: "el-switch", props: { activeText: "上线", inactiveText: "下线" } },
     },
     {
-      field: "auditNotes",
+      prop: "auditNotes",
       label: "审批备注",
       span: 2,
       component: { is: "el-input", props: { type: "textarea", rows: 2, maxlength: 120, showWordLimit: true } },

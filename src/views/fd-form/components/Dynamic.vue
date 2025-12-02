@@ -125,13 +125,13 @@ const formRef = useForm<CustomerFormModel>({
   },
   items: [
     {
-      field: "customerName",
+      prop: "customerName",
       label: "客户名称",
       component: { is: "el-input", props: { placeholder: "请输入客户名" } },
       rules: [{ required: true, message: "请输入客户名称", trigger: "blur" }],
     },
     {
-      field: "customerType",
+      prop: "customerType",
       label: "客户类型",
       component: {
         is: "el-select",
@@ -142,7 +142,7 @@ const formRef = useForm<CustomerFormModel>({
       },
     },
     {
-      field: "region",
+      prop: "region",
       label: "所属区域",
       component: {
         is: "el-select",
@@ -155,7 +155,7 @@ const formRef = useForm<CustomerFormModel>({
       rules: [{ required: true, message: "请选择区域", trigger: "change" }],
     },
     {
-      field: "city",
+      prop: "city",
       label: "城市",
       component: {
         is: "el-select",
@@ -165,7 +165,7 @@ const formRef = useForm<CustomerFormModel>({
       rules: [{ required: true, message: "请选择城市", trigger: "change" }],
     },
     {
-      field: "package",
+      prop: "package",
       label: "订阅套餐",
       component: {
         is: "el-radio-group",
@@ -177,7 +177,7 @@ const formRef = useForm<CustomerFormModel>({
       },
     },
     {
-      field: "accountManager",
+      prop: "accountManager",
       label: "客户经理",
       component: {
         is: "el-select",
@@ -187,7 +187,7 @@ const formRef = useForm<CustomerFormModel>({
       rules: [{ required: true, message: "请选择客户经理", trigger: "change" }],
     },
     {
-      field: "needInvoice",
+      prop: "needInvoice",
       label: "需要开票",
       component: {
         is: "el-switch",
@@ -195,27 +195,27 @@ const formRef = useForm<CustomerFormModel>({
       },
     },
     {
-      field: "invoiceTitle",
+      prop: "invoiceTitle",
       label: "发票抬头",
       hidden: true,
       component: { is: "el-input", props: { placeholder: "企业抬头" } },
     },
     {
-      field: "taxId",
+      prop: "taxId",
       label: "税号",
       hidden: true,
       component: { is: "el-input", props: { placeholder: "请输入统一信用代码" } },
       rules: [{ min: 15, max: 20, message: "税号需 15-20 位", trigger: "blur" }],
     },
     {
-      field: "invoiceEmail",
+      prop: "invoiceEmail",
       label: "接收邮箱",
       hidden: true,
       component: { is: "el-input", props: { placeholder: "finance@example.com" } },
       rules: [{ type: "email", message: "邮箱格式不正确", trigger: ["blur", "change"] }],
     },
     {
-      field: "serviceLevel",
+      prop: "serviceLevel",
       label: "服务等级",
       span: 2,
       component: {
@@ -253,19 +253,19 @@ watch(() => formModel.value.customerType, (type) => {
   }
 }, { immediate: true })
 
-const invoiceFields = ["invoiceTitle", "taxId", "invoiceEmail"] as const
+const invoiceProps = ["invoiceTitle", "taxId", "invoiceEmail"] as const
 
 watch(() => formModel.value.needInvoice, (need) => {
   if (!formRef.value)
     return
-  const targets = invoiceFields as readonly string[]
+  const targets = invoiceProps as readonly string[]
   if (need) {
     formRef.value.showItem(targets as any)
-    invoiceFields.forEach(field => formRef.value?.setRequired(field, true))
+    invoiceProps.forEach(prop => formRef.value?.setRequired(prop, true))
   }
   else {
     formRef.value.hideItem(targets as any)
-    invoiceFields.forEach(field => formRef.value?.setRequired(field, false))
+    invoiceProps.forEach(prop => formRef.value?.setRequired(prop, false))
   }
 }, { immediate: true })
 

@@ -118,14 +118,14 @@ const form = useForm<StepsFormModel>(
     },
     items: [
       {
-        field: "applicant",
+        prop: "applicant",
         label: "申请人",
         component: { is: "el-input", props: { placeholder: "请输入申请人姓名" } },
         rules: [{ required: true, message: "请填写申请人姓名", trigger: "blur" }],
         hidden: model => model.__step !== "profile",
       },
       {
-        field: "department",
+        prop: "department",
         label: "所属部门",
         component: {
           is: "el-select",
@@ -140,7 +140,7 @@ const form = useForm<StepsFormModel>(
         hidden: model => model.__step !== "profile",
       },
       {
-        field: "email",
+        prop: "email",
         label: "联系邮箱",
         component: { is: "el-input", props: { placeholder: "name@example.com" } },
         rules: [
@@ -150,7 +150,7 @@ const form = useForm<StepsFormModel>(
         hidden: model => model.__step !== "profile",
       },
       {
-        field: "timeline",
+        prop: "timeline",
         label: "排期范围",
         component: {
           is: "el-date-picker",
@@ -160,7 +160,7 @@ const form = useForm<StepsFormModel>(
         hidden: model => model.__step !== "project",
       },
       {
-        field: "budget",
+        prop: "budget",
         label: "预算(万元)",
         component: { is: "el-input-number", props: { min: 0, max: 500, step: 5 } },
         rules: [
@@ -170,7 +170,7 @@ const form = useForm<StepsFormModel>(
         hidden: model => model.__step !== "project",
       },
       {
-        field: "reviewer",
+        prop: "reviewer",
         label: "审批人",
         component: {
           is: "el-select",
@@ -185,14 +185,14 @@ const form = useForm<StepsFormModel>(
         hidden: model => model.__step !== "project",
       },
       {
-        field: "remark",
+        prop: "remark",
         label: "补充说明",
         span: 2,
         component: { is: "el-input", props: { type: "textarea", rows: 3, maxlength: 150, showWordLimit: true } },
         hidden: model => model.__step !== "confirm",
       },
       {
-        field: "agree",
+        prop: "agree",
         label: "协议确认",
         component: {
           is: "el-switch",

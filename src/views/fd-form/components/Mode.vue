@@ -91,19 +91,19 @@ const form = useForm<ProjectPayload>(
     },
     items: [
       {
-        field: "projectName",
+        prop: "projectName",
         label: "项目标题",
         component: { is: "el-input", props: { placeholder: "请输入项目标题" } },
         rules: [{ required: true, message: "请输入项目标题", trigger: "blur" }],
       },
       {
-        field: "projectCode",
+        prop: "projectCode",
         label: "项目编号",
         component: { is: "el-input", props: { placeholder: "内部唯一编码" } },
         rules: [{ required: true, message: "请输入编号", trigger: "blur" }],
       },
       {
-        field: "owner",
+        prop: "owner",
         label: "负责人",
         component: {
           is: "el-select",
@@ -115,7 +115,7 @@ const form = useForm<ProjectPayload>(
         },
       },
       {
-        field: "priority",
+        prop: "priority",
         label: "优先级",
         component: {
           is: "el-radio-group",
@@ -127,13 +127,13 @@ const form = useForm<ProjectPayload>(
         },
       },
       {
-        field: "budget",
+        prop: "budget",
         label: "预算 (万)",
         component: { is: "el-input-number", props: { min: 0, max: 500, step: 10 } },
         rules: [{ required: true, type: "number", message: "请输入预算", trigger: "blur" }],
       },
       {
-        field: "status",
+        prop: "status",
         label: "审批状态",
         component: {
           is: "el-select",
@@ -145,7 +145,7 @@ const form = useForm<ProjectPayload>(
         },
       },
       {
-        field: "attachments",
+        prop: "attachments",
         label: "附件列表",
         span: 2,
         component: {
@@ -159,7 +159,7 @@ const form = useForm<ProjectPayload>(
         },
       },
       {
-        field: "reviewComment",
+        prop: "reviewComment",
         label: "评审意见",
         span: 2,
         component: { is: "el-input", props: { type: "textarea", rows: 3 } },

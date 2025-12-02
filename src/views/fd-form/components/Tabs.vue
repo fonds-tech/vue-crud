@@ -86,7 +86,7 @@ const form = useForm<TabsFormModel>({
   },
   items: [
     {
-      field: "company",
+      prop: "company",
       label: "企业名称",
       group: "basic",
       help: "工商登记名称",
@@ -98,7 +98,7 @@ const form = useForm<TabsFormModel>({
       rules: [{ required: true, message: "请输入企业名称", trigger: "blur" }],
     },
     {
-      field: "industry",
+      prop: "industry",
       label: "行业",
       tooltip: "用于匹配行业模板",
       group: "basic",
@@ -115,7 +115,7 @@ const form = useForm<TabsFormModel>({
       rules: [{ required: true, message: "请选择行业", trigger: "change" }],
     },
     {
-      field: "size",
+      prop: "size",
       label: "企业规模",
       group: "basic",
       component: {
@@ -129,7 +129,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "website",
+      prop: "website",
       label: "官网地址",
       span: 2,
       group: "basic",
@@ -140,7 +140,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "contact",
+      prop: "contact",
       label: "联系人",
       group: "contacts",
       component: {
@@ -150,7 +150,7 @@ const form = useForm<TabsFormModel>({
       rules: [{ required: true, message: "请填写联系人姓名", trigger: "blur" }],
     },
     {
-      field: "mobile",
+      prop: "mobile",
       label: "联系电话",
       group: "contacts",
       component: {
@@ -160,7 +160,7 @@ const form = useForm<TabsFormModel>({
       rules: [{ required: true, message: "请输入联系电话", trigger: "blur" }],
     },
     {
-      field: "email",
+      prop: "email",
       label: "邮箱",
       group: "contacts",
       span: 2,
@@ -171,7 +171,7 @@ const form = useForm<TabsFormModel>({
       ],
     },
     {
-      field: "city",
+      prop: "city",
       label: "所在城市",
       group: "contacts",
       component: {
@@ -186,7 +186,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "creditLimit",
+      prop: "creditLimit",
       label: "授信额度 (万)",
       group: "control",
       tooltip: "用于审批中的额度参考",
@@ -197,7 +197,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "invoiceTitle",
+      prop: "invoiceTitle",
       label: "开票抬头",
       group: "control",
       component: {
@@ -206,14 +206,14 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "taxNo",
+      prop: "taxNo",
       label: "税号",
       group: "control",
       component: { is: "el-input", props: { placeholder: "请输入 15-20 位税号" } },
       rules: [{ min: 15, max: 20, message: "税号长度 15-20 位", trigger: "blur" }],
     },
     {
-      field: "riskLevel",
+      prop: "riskLevel",
       label: "风险级别",
       group: "control",
       component: {
@@ -226,7 +226,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "notifyTeam",
+      prop: "notifyTeam",
       label: "通知团队",
       group: "control",
       component: {
@@ -235,7 +235,7 @@ const form = useForm<TabsFormModel>({
       },
     },
     {
-      field: "remark",
+      prop: "remark",
       label: "备注",
       group: "control",
       span: 2,
@@ -292,7 +292,7 @@ function handleReset() {
   gap: 12px;
   display: flex;
   flex-wrap: wrap;
-  border-top: 1px dashed var(--el-border-color-lighter, #ebeef5);
+  margin-top: 20px;
   justify-content: flex-end;
 }
 
