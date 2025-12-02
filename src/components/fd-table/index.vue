@@ -414,14 +414,21 @@ function rebuildColumnSettings(cols: TableColumn[], useCache = true) {
   const settings: ColumnSetting[] = cols.map((column, index) => {
     const id = getColumnId(column, index)
     const pinned = cache?.columns?.[id]?.pinned ?? column.pinned ?? false
-    const sort = (column.sort ?? column.type !== "action") && !pinned
+    const isNonSortableType = column.type === "action" || column.type === "selection"
+    const sort = !isNonSortableType && (column.sort ?? true) && !pinned
     // 行为列默认右侧固定，便于操作按钮保持可见
     const rawFixed = cache?.columns?.[id]?.fixed ?? (column as any)?.fixed ?? undefined
-    const fixed = rawFixed ?? (column.type === "action" ? "right" : undefined)
+    const fixed = rawFixed
+      ?? (column.type === "action"
+        ? "right"
+        : column.type === "selection"
+          ? "left"
+          : undefined)
     const baseOrder = sort ? orderMap.get(id) ?? index : index
+    const label = column.label || (column.type === "selection" ? "选择" : column.prop) || id
     return {
       id,
-      label: column.label || column.prop || id,
+      label,
       show: cache?.columns?.[id]?.show ?? column.show ?? true,
       order: baseOrder,
       sort,
