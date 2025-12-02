@@ -221,8 +221,7 @@ export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormIt
    */
   value?: any
   /**
-   * 栅格占据的列数 (共24格)
-   * @default 24
+   * 栅格占据的列数
    */
   span?: GridItemProps["span"]
   /**
