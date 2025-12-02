@@ -108,7 +108,7 @@ describe("fd-form", () => {
       model: { name: "Tom" }, // 设置初始模型数据
       items: [
         {
-          field: "name", // 字段名
+          prop: "name", // 字段名
           label: "名称", // 标签
           component: { is: BasicInput }, // 使用 BasicInput 组件
           required: true, // 必填项
@@ -144,7 +144,7 @@ describe("fd-form", () => {
       onSubmit, // 绑定提交回调
       items: [
         {
-          field: "title", // 字段名
+          prop: "title", // 字段名
           label: "标题", // 标签
           component: { is: BasicInput }, // 使用 BasicInput 组件
         },
@@ -167,13 +167,13 @@ describe("fd-form", () => {
       model: { tags: "x,y", price: 5 }, // 初始数据
       items: [
         {
-          field: "tags", // tags 字段
+          prop: "tags", // tags 字段
           label: "标签",
           hook: "split", // 使用 split hook，将字符串转为数组
           component: { is: FlexibleInput }, // 使用 FlexibleInput
         },
         {
-          field: "price", // price 字段
+          prop: "price", // price 字段
           label: "价格",
           component: { is: BasicInput }, // 使用 BasicInput
         },
@@ -188,7 +188,7 @@ describe("fd-form", () => {
     expect(form.getField("price")).toBe(15) // 验证 price 字段更新
 
     form.setProps("price", { placeholder: "请输入金额" }) // 动态设置组件 props
-    const priceItem = form.items.find(item => item.field === "price") // 查找 price 表单项
+    const priceItem = form.items.find(item => item.prop === "price") // 查找 price 表单项
     const priceProps = typeof priceItem?.component?.props === "function"
       ? priceItem.component.props(form.model) // 如果 props 是函数，则执行获取结果
       : priceItem?.component?.props // 否则直接获取 props
@@ -214,7 +214,7 @@ describe("fd-form", () => {
       },
       items: [
         {
-          field: "foo",
+          prop: "foo",
           label: "Foo",
           component: { is: BasicInput },
         },

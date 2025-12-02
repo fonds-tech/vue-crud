@@ -5,6 +5,8 @@ import type { FormInstance, FormItemProp, FormValidateCallback, FormValidationRe
 import formHook from "./hooks"
 import { clone, isDef, isFunction } from "@fonds/utils"
 
+const propToString = (prop?: FormItemProp) => (Array.isArray(prop) ? prop.join(".") : String(prop ?? ""))
+
 interface MethodsContext<T extends FormRecord = FormRecord> {
   options: FormOptions<T>
   form: Ref<FormInstance | undefined>
@@ -112,13 +114,13 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
           if (!hasErrors) {
             // 遍历所有表单项，执行 submit 阶段的 hook
             options.items.forEach((item) => {
-              const fieldName = String(item.field)
-              if (item.hook && item.field && isDef(values[fieldName as keyof T])) {
+              const propName = propToString(item.prop)
+              if (item.hook && item.prop && isDef(values[propName as keyof T])) {
                 formHook.submit({
                   hook: item.hook,
                   model: values,
-                  field: fieldName,
-                  value: values[fieldName as keyof T],
+                  field: propName,
+                  value: values[propName as keyof T],
                 })
               }
             })

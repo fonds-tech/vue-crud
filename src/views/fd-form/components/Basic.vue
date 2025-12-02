@@ -71,14 +71,14 @@ const roleOptions = [
 const form = useForm({
   items: [
     {
-      field: "name",
+      prop: "name",
       label: "姓名",
       span: 24,
       component: { is: "el-input", props: { placeholder: "请输入姓名" } },
       rules: [{ required: true, message: "请输入姓名", trigger: "blur" }],
     },
     {
-      field: "age",
+      prop: "age",
       label: "年龄",
       span: 12,
       component: { is: "el-input-number", props: { min: 0, style: { width: "100%" } } },
@@ -88,7 +88,7 @@ const form = useForm({
       ],
     },
     {
-      field: "role",
+      prop: "role",
       label: "角色",
       span: 12,
       component: {
@@ -99,7 +99,7 @@ const form = useForm({
       rules: [{ required: true, message: "请选择角色", trigger: "change" }],
     },
     {
-      field: "birthday",
+      prop: "birthday",
       label: "生日",
       span: 12,
       component: {
@@ -108,20 +108,20 @@ const form = useForm({
       },
     },
     {
-      field: "score",
+      prop: "score",
       label: "评分",
       span: 12,
       component: { is: "el-slider" },
     },
     {
-      field: "subscribe",
+      prop: "subscribe",
       label: "订阅简报",
       span: 24,
       component: { is: "el-switch" },
       value: true,
     },
     {
-      field: "desc",
+      prop: "desc",
       label: "备注",
       span: 24,
       component: { is: "el-input", props: { type: "textarea", rows: 3 } },
@@ -132,19 +132,25 @@ const form = useForm({
 // #endregion
 
 // #region 基础操作
-function handleSubmit() {
-  form.value
-    ?.submit()
-    .then((res) => {
-      ElNotification.success({
-        title: "提交成功",
-        message: JSON.stringify(res.values, null, 2),
-      })
-    })
-    .catch((err) => {
-      console.error("Submit Error:", err)
+async function handleSubmit() {
+  if (!form.value)
+    return
+  try {
+    const res = await form.value.submit()
+    const hasErrors = res.errors && Object.keys(res.errors).length > 0
+    if (hasErrors) {
       ElMessage.error("校验失败，请检查表单")
+      return
+    }
+    ElNotification.success({
+      title: "提交成功",
+      message: JSON.stringify(res.values, null, 2),
     })
+  }
+  catch (err) {
+    console.error("Submit Error:", err)
+    ElMessage.error("校验失败，请检查表单")
+  }
 }
 
 function handleReset() {
@@ -203,7 +209,7 @@ function handleSetOptions() {
 function handleToggleDisabled() {
   // 假设我们要切换 'score' 的禁用状态
   // 由于 props 可能是函数，这里为了演示简单断言为对象
-  const item = form.value?.items.find(i => i.field === "score")
+  const item = form.value?.items.find(i => i.prop === "score")
   const currentProps = item?.component.props as Record<string, any> | undefined
   const isDisabled = currentProps?.disabled
 
@@ -212,7 +218,7 @@ function handleToggleDisabled() {
 }
 
 function handleToggleVisible() {
-  const item = form.value?.items.find(i => i.field === "birthday")
+  const item = form.value?.items.find(i => i.prop === "birthday")
 
   // 注意：hidden 可能是函数或布尔值，这里简单处理布尔值情况
   if (item?.hidden) {

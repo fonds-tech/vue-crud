@@ -105,7 +105,7 @@ const table = useTable({
 
 // 详情 & Upsert 配置 (简化版)
 const detail = useDetail({ items: [{ field: "name", label: "姓名" }, { field: "remark", label: "备注" }] })
-const upsert = useUpsert({ items: [{ field: "name", label: "姓名", component: { is: "el-input" } }] })
+const upsert = useUpsert({ items: [{ prop: "name", label: "姓名", component: { is: "el-input" } }] })
 </script>
 
 <style scoped>

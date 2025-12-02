@@ -48,11 +48,11 @@ export interface FormOptions<T extends FormRecord = FormRecord> {
    * 下一步回调
    * @description 仅在 steps 布局下有效
    */
-  onNext?: (model: T, ctx: { next: () => void }) => void
+  onNext?: (values: T, context: { next: () => void }) => void
   /**
    * 提交回调
    */
-  onSubmit?: (model: T, errors: Record<string, any> | undefined) => void
+  onSubmit?: (values: T, errors: Record<string, any> | undefined) => void
 }
 
 /**
@@ -206,12 +206,12 @@ export type InternalRule = FormItemRuleWithMeta
  * 表单项配置接口
  * @description 定义表单中每一个字段的显示、交互和校验逻辑
  */
-export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormItemProps, "prop" | "rules" | "required"> {
+export interface FormItem<T extends FormRecord = FormRecord> extends Omit<FormItemProps, "rules" | "required"> {
   /**
-   * 字段名
-   * @description 对应 FormModel 中的属性路径
+   * 字段标识
+   * @description 对应表单模型的属性路径，可为字符串或路径数组（如 'a.b.0' 或 ['a', 'b', '0']）
    */
-  field: keyof T | string
+  prop: FormItemProp
   /**
    * 标签文本
    */
@@ -354,17 +354,17 @@ export interface FormActions<T extends FormRecord = FormRecord> {
   /**
    * 获取字段值
    */
-  getField: (field?: keyof T | string) => any
+  getField: (prop?: FormItemProp) => any
   /**
    * 设置字段值
    */
-  setField: (field: keyof T | string, value: any) => void
+  setField: (prop: FormItemProp, value: any) => void
   /**
    * 更新表单项配置
-   * @param field 字段名
+   * @param prop 表单项 prop
    * @param data 新的配置部分
    */
-  setItem: (field: keyof T | string, data: Partial<FormItem<T>>) => void
+  setItem: (prop: FormItemProp, data: Partial<FormItem<T>>) => void
   /**
    * 批量绑定数据到表单模型
    */
@@ -378,27 +378,27 @@ export interface FormActions<T extends FormRecord = FormRecord> {
    * 设置组件选项数据
    * @description 快捷更新 Select/Radio 等组件的 options
    */
-  setOptions: (field: keyof T | string, value: any[]) => void
+  setOptions: (prop: FormItemProp, value: any[]) => void
   /**
    * 获取组件选项数据
    */
-  getOptions: (field: keyof T | string) => any[] | undefined
+  getOptions: (prop: FormItemProp) => any[] | undefined
   /**
    * 设置组件 Props
    */
-  setProps: (field: keyof T | string, value: Record<string, any>) => void
+  setProps: (prop: FormItemProp, value: Record<string, any>) => void
   /**
    * 设置组件样式
    */
-  setStyle: (field: keyof T | string, style: Record<string, any>) => void
+  setStyle: (prop: FormItemProp, style: Record<string, any>) => void
   /**
    * 隐藏表单项
    */
-  hideItem: (field: keyof T | string | Array<keyof T | string>) => void
+  hideItem: (prop: FormItemProp | FormItemProp[]) => void
   /**
    * 显示表单项
    */
-  showItem: (field: keyof T | string | Array<keyof T | string>) => void
+  showItem: (prop: FormItemProp | FormItemProp[]) => void
   /**
    * 切换折叠状态
    */
@@ -406,7 +406,7 @@ export interface FormActions<T extends FormRecord = FormRecord> {
   /**
    * 设置字段是否必填
    */
-  setRequired: (field: keyof T | string, required: boolean) => void
+  setRequired: (prop: FormItemProp, required: boolean) => void
 }
 
 /**

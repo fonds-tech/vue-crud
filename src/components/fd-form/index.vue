@@ -111,7 +111,7 @@
           </component>
 
           <fd-grid v-bind="options.grid">
-            <template v-for="(item, _index) in itemsOfGroup(child.name ?? index)" :key="`${item.field ?? _index}`">
+            <template v-for="(item, _index) in itemsOfGroup(child.name ?? index)" :key="propKey(item.prop, _index)">
               <fd-grid-item
                 v-show="showInGroup(item, child.name ?? index)"
                 :span="resolveSpan(item)"
@@ -119,7 +119,7 @@
               >
                 <el-form-item
                   v-bind="item"
-                  :prop="String(item.field)"
+                  :prop="item.prop"
                   :rules="rules(item)"
                   :required="required(item)"
                 >
@@ -154,8 +154,9 @@
                     v-else-if="is(item.component)"
                     v-bind="formatProps(item)"
                     :ref="bindComponentRef(item.component)"
-                    v-model="model[item.field as string]"
+                    :model-value="getModelValue(item.prop)"
                     :style="style(item.component)"
+                    @update:model-value="(val: any) => setModelValue(item.prop, val)"
                     v-on="on(item.component)"
                   >
                     <template v-for="(value, childSlot) in slots(item.component)" :key="childSlot" #[childSlot]>
@@ -170,7 +171,7 @@
       </el-tabs>
 
       <fd-grid v-if="options.group?.type !== 'tabs'" v-bind="options.grid">
-        <template v-for="(item, _index) in options.items" :key="`${item.field ?? _index}`">
+        <template v-for="(item, _index) in options.items" :key="propKey(item.prop, _index)">
           <fd-grid-item
             v-show="show(item)"
             :span="resolveSpan(item)"
@@ -178,7 +179,7 @@
           >
             <el-form-item
               v-bind="item"
-              :prop="String(item.field)"
+              :prop="item.prop"
               :rules="rules(item)"
               :required="required(item)"
             >
@@ -213,8 +214,9 @@
                 v-else-if="is(item.component)"
                 v-bind="formatProps(item)"
                 :ref="bindComponentRef(item.component)"
-                v-model="model[item.field as string]"
+                :model-value="getModelValue(item.prop)"
                 :style="style(item.component)"
+                @update:model-value="(val: any) => setModelValue(item.prop, val)"
                 v-on="on(item.component)"
               >
                 <template v-for="(value, childSlot) in slots(item.component)" :key="childSlot" #[childSlot]>
@@ -230,7 +232,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from "element-plus"
+import type { FormInstance, FormItemProp } from "element-plus"
 import type { VNode, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormItem,
@@ -391,6 +393,52 @@ const props = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp
 
 // 解析组件样式 (style 属性)
 const style = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<CSSProperties | undefined>(com, "style") : undefined)
+
+// prop 工具：格式化 / 读写模型，支持 a.b 或 ['a','b'] 路径
+function toPathArray(prop?: FormItemProp): string[] | undefined {
+  if (prop === undefined || prop === null)
+    return undefined
+  if (Array.isArray(prop))
+    return prop.map(String)
+  const path = String(prop).split(".").filter(Boolean)
+  return path.length ? path : undefined
+}
+
+function propKey(prop?: FormItemProp, fallback?: string | number) {
+  const path = toPathArray(prop)
+  if (path?.length)
+    return path.join(".")
+  return String(fallback ?? "")
+}
+
+function getModelValue(prop?: FormItemProp) {
+  const path = toPathArray(prop)
+  if (!path?.length)
+    return model
+  let cursor: any = model
+  for (const segment of path) {
+    if (cursor == null || typeof cursor !== "object")
+      return undefined
+    cursor = cursor[segment]
+  }
+  return cursor
+}
+
+function setModelValue(prop: FormItemProp, value: any) {
+  const path = toPathArray(prop)
+  if (!path?.length)
+    return
+  let cursor: any = model
+  for (let i = 0; i < path.length; i++) {
+    const key = path[i]!
+    if (i === path.length - 1) {
+      cursor[key] = value
+      return
+    }
+    cursor[key] = cursor[key] ?? {}
+    cursor = cursor[key]
+  }
+}
 
 function resolveSpan(item: FormItem) {
   return item.span ?? defaultItemSpan
@@ -572,7 +620,7 @@ function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined 
 
 // 类型守卫：判断是否为有效表单项配置
 function isFormItemConfig(value: DeepPartial<FormItem> | FormItem | undefined): value is FormItem {
-  return Boolean(value && value.field && value.component)
+  return Boolean(value && value.prop && value.component)
 }
 
 // 确保组件配置对象存在默认结构
@@ -595,19 +643,19 @@ function normalizeItems() {
   options.items.forEach((item) => {
     ensureComponentDefaults(item)
 
-    const fieldKey = String(item.field)
+    const propName = propKey(item.prop)
     // 应用默认值 (仅当 model 中无值时)
-    if (isDef(item.value) && !isDef(model[fieldKey])) {
-      model[fieldKey] = clone(item.value)
+    if (isDef(item.value) && !isDef(getModelValue(item.prop))) {
+      setModelValue(item.prop, clone(item.value))
     }
 
     // 执行 bind 阶段的数据转换 hook
-    if (item.hook && item.field) {
+    if (item.hook && item.prop) {
       formHook.bind({
         hook: item.hook,
         model,
-        field: fieldKey,
-        value: model[fieldKey],
+        field: propName,
+        value: getModelValue(item.prop),
       })
     }
 
@@ -619,7 +667,7 @@ function normalizeItems() {
         validator: (_rule, value, callback) => {
           const isEmpty = value === undefined || value === null || value === ""
           if (isEmpty)
-            callback(new Error(`${item.label ?? fieldKey}为必填项`))
+            callback(new Error(`${item.label ?? propName}为必填项`))
           else
             callback()
         },

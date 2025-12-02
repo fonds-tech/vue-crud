@@ -139,34 +139,34 @@ const detail = useDetail({
 const upsert = useUpsert({
   form: { labelWidth: "100px" },
   items: [
-    { field: "name", label: "姓名", required: true, component: { is: "el-input" } },
-    { field: "account", label: "账号", required: true, component: { is: "el-input" } },
+    { prop: "name", label: "姓名", required: true, component: { is: "el-input" } },
+    { prop: "account", label: "账号", required: true, component: { is: "el-input" } },
     {
-      field: "phone",
+      prop: "phone",
       label: "手机号",
       required: true,
       component: { is: "el-input" },
       rules: [{ pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号" }],
     },
     {
-      field: "occupation",
+      prop: "occupation",
       label: "岗位",
       required: true,
       component: { is: "el-select", props: { style: "width: 100%" }, options: occupationDict },
     },
     {
-      field: "wages",
+      prop: "wages",
       label: "薪资",
       component: { is: "el-input-number", props: { min: 0, style: "width: 100%" } },
     },
     {
-      field: "status",
+      prop: "status",
       label: "状态",
       component: { is: "el-switch", props: { activeValue: 1, inactiveValue: 0 } },
       value: 1, // 默认值
     },
     {
-      field: "remark",
+      prop: "remark",
       label: "备注",
       span: 2,
       component: { is: "el-input", props: { type: "textarea", rows: 3 } },
