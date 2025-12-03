@@ -15,12 +15,18 @@ interface MethodsContext<T extends FormRecord = FormRecord> {
 
 /**
  * 表单原生方法 Hook
- * @description 封装 Element Plus Form 的原生方法，并增强 submit 逻辑
+ * @description 封装 Element Plus Form 的原生方法，并增强 submit 逻辑 (hooks 处理)
+ * @param params 方法上下文对象
+ * @param params.options 表单配置选项
+ * @param params.form Element Plus Form 实例引用
+ * @param params.model 表单数据模型
+ * @returns 表单方法集合
  */
 export function useMethods<T extends FormRecord = FormRecord>({ options, form, model }: MethodsContext<T>): FormMethods<T> {
   /**
    * 确保字段参数为字符串数组
    * @param field 单个或多个字段名
+   * @returns 字段名数组
    */
   const ensureFieldsArray = (field?: Arrayable<FormItemProp>): string[] | undefined => {
     if (!field)
@@ -30,7 +36,11 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
   }
 
   const methods: FormMethods<T> = {
-    // 验证整个表单
+    /**
+     * 验证整个表单
+     * @param callback 验证完成的回调
+     * @returns Promise<boolean>
+     */
     validate(callback?: FormValidateCallback) {
       if (!form.value) {
         callback?.(true)
@@ -41,7 +51,12 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
       })
     },
 
-    // 验证指定字段
+    /**
+     * 验证指定字段
+     * @param props 单个或多个字段 prop
+     * @param callback 验证回调
+     * @returns Promise
+     */
     validateField(props?: Arrayable<FormItemProp>, callback?: FormValidateCallback) {
       if (!form.value) {
         callback?.(true)
@@ -50,7 +65,11 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
       return form.value.validateField(props, callback)
     },
 
-    // 重置表单项，将其值重置为初始值，并移除校验结果
+    /**
+     * 重置表单项
+     * @description 将其值重置为初始值，并移除校验结果
+     * @param field 单个或多个字段 prop
+     */
     resetFields(field?: Arrayable<FormItemProp>) {
       form.value?.resetFields(field)
     },
@@ -58,6 +77,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
     /**
      * 清空字段值 (手动删除 model 中的属性)
      * @description 与 resetFields 不同，此方法直接从 model 中移除属性，且不依赖初始值
+     * @param field 单个或多个字段 prop
      */
     clearFields(field?: Arrayable<FormItemProp>) {
       const targets = ensureFieldsArray(field)
@@ -76,19 +96,29 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
       form.value?.clearValidate(field)
     },
 
-    // 移除表单项的校验结果
+    /**
+     * 移除表单项的校验结果
+     * @param field 单个或多个字段 prop
+     */
     clearValidate(field?: Arrayable<FormItemProp>) {
       form.value?.clearValidate(field)
     },
 
-    // 批量设置字段值 (直接赋值，不触发特殊逻辑)
+    /**
+     * 批量设置字段值
+     * @description 直接赋值到 model，不触发特殊逻辑
+     * @param data 键值对数据
+     */
     setFields(data: Record<string, any>) {
       Object.keys(data).forEach((key) => {
         model[key as keyof T] = data[key]
       })
     },
 
-    // 滚动到指定表单项
+    /**
+     * 滚动到指定表单项
+     * @param field 字段 prop
+     */
     scrollToField(field: FormItemProp) {
       form.value?.scrollToField(field)
     },
@@ -98,8 +128,10 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
      * @description
      * 1. 执行表单校验
      * 2. 校验通过后，克隆当前 model 数据
-     * 3. 执行配置在表单项上的 submit hook (数据转换)
-     * 4. 触发 callback 和 options.onSubmit
+     * 3. 过滤掉“假阳性”的必填错误 (值存在但被误判的情况)
+     * 4. 执行配置在表单项上的 submit hook (数据转换)
+     * 5. 触发 callback 和 options.onSubmit
+     * @param callback 可选的回调
      * @returns Promise 返回处理后的数据和可能的错误
      */
     submit(callback?: (model: T, errors: Record<string, any> | undefined) => void) {
@@ -108,6 +140,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
           // 克隆数据，避免 hook 修改影响原始 model
           const values = clone(model) as T
 
+          // 过滤无效错误
           const normalizedErrors = normalizeErrors(invalidFields as Record<string, any> | undefined, values)
           const hasErrors = Boolean(normalizedErrors && Object.keys(normalizedErrors).length > 0)
 
@@ -115,6 +148,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
             // 遍历所有表单项，执行 submit 阶段的 hook
             options.items.forEach((item) => {
               const propName = propToString(item.prop)
+              // 只有当 model 中存在该值时才执行 hook
               if (item.hook && item.prop && isDef(values[propName as keyof T])) {
                 formHook.submit({
                   hook: item.hook,
@@ -126,11 +160,12 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
             })
           }
 
+          // 调用一次性回调
           if (isFunction(callback)) {
             callback(values, normalizedErrors)
           }
 
-          // 触发全局 onSubmit 回调（仅在校验通过后）
+          // 触发全局 onSubmit 回调（仅在校验通过后触发）
           if (!hasErrors && isFunction(options.onSubmit)) {
             options.onSubmit(values, undefined)
           }
@@ -145,7 +180,13 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
 }
 
 /**
- * 过滤已填写字段的必填错误，避免值存在但仍被判定必填
+ * 过滤已填写字段的必填错误
+ * @description
+ * 某些情况下（如自定义组件值更新滞后），validator 可能报告必填错误，但 model 实际已有值。
+ * 此函数用于再次确认 model 值是否真的为空，如果非空则忽略必填错误。
+ * @param errors 原始错误对象
+ * @param values 当前表单数据
+ * @returns 过滤后的错误对象或 undefined
  */
 function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<string, any> | undefined, values: T) {
   if (!errors)
@@ -155,15 +196,18 @@ function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<strin
   Object.keys(errors).forEach((field) => {
     const fieldErrors = errors[field]
     const value = (values as Record<string, any>)[field]
-    // 判空规则：仅 undefined/null/\"\" 视为未填；0/false/数组等都视为有值
+
+    // 判空规则：仅 undefined/null/"" 视为未填；0/false/[] 等都视为有值
     const isEmpty = value === undefined || value === null || value === ""
 
+    // 判断是否为必填相关错误
     const isRequiredError = (err: any) =>
       err?.required === true
       || err?.type === "required"
       || err?._inner === true
       || (typeof err?.message === "string" && err.message.includes("必填"))
 
+    // 过滤掉：是必填错误 且 值不为空 的项
     const filtered = Array.isArray(fieldErrors)
       ? fieldErrors.filter(err => !(isRequiredError(err) && !isEmpty))
       : fieldErrors

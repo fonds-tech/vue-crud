@@ -40,11 +40,18 @@ export interface FormEngine {
 
 export type FormHelpers = ReturnType<typeof createHelpers>
 
-// 表单核心引擎：管理配置、模型、动作与辅助方法
+/**
+ * 表单核心引擎
+ * @description 管理配置 (options)、数据模型 (model)、动作 (action) 与辅助方法 (helpers)
+ * 它是 UI 无关的逻辑层，驱动 index.tsx 和 form-render.tsx
+ * @returns 表单引擎实例
+ */
 export function useFormEngine(): FormEngine {
+  // 生成唯一 ID，用于无障碍属性等
   const id = typeof useId === "function" ? useId() : `fd-form-${Math.random().toString(36).slice(2)}`
   const formRef = ref<FormInstance>()
 
+  // 响应式配置对象，初始化默认值
   const options = reactive<FormOptions>({
     key: 0,
     mode: "add",
@@ -65,10 +72,15 @@ export function useFormEngine(): FormEngine {
     },
   })
 
+  // 响应式数据模型，直接引用 options.model
   const model = reactive(options.model) as FormRecord
 
+  // Steps 模式的当前步骤
   const step = ref(1)
+  // Tabs 模式的当前激活面板名称
   const activeGroupName = ref<string | number | undefined>(undefined)
+
+  // 计算最终激活的分组名称 (处理默认值)
   const resolvedActiveGroup = computed<string | number | undefined>(() => {
     if (options.group?.type !== "tabs" || !options.group.children?.length) {
       return undefined
@@ -76,6 +88,7 @@ export function useFormEngine(): FormEngine {
     return activeGroupName.value ?? options.group.children[0]?.name
   })
 
+  // 监听分组变化，自动修正激活的 Tab
   watch(
     () => ({
       type: options.group?.type,
@@ -99,11 +112,17 @@ export function useFormEngine(): FormEngine {
     { deep: true, immediate: true },
   )
 
+  // 创建辅助函数集合
   const helpers = createHelpers({ options, model, resolvedActiveGroup })
+  // 创建操作动作集合
   const action = useAction({ options, model, form: formRef })
+  // 创建表单方法集合
   const methods = useMethods({ options, model, form: formRef })
 
-  // 合并用户入参到内部 options，并重置必要状态
+  /**
+   * 合并用户传入的 options 到内部响应式 options
+   * @param useOptions 用户配置
+   */
   function mergeFormOptions(useOptions: FormUseOptions = {}) {
     if (useOptions.key !== undefined) {
       options.key = Number(useOptions.key)
@@ -120,6 +139,7 @@ export function useFormEngine(): FormEngine {
     if (useOptions.group) {
       options.group = merge({}, options.group, useOptions.group)
     }
+    // items 数组全量替换，而非深度合并，避免顺序混乱或残留
     if (useOptions.items) {
       const nextItems = useOptions.items.filter(helpers.isFormItemConfig)
       options.items.splice(0, options.items.length, ...nextItems)
@@ -130,25 +150,35 @@ export function useFormEngine(): FormEngine {
     if (useOptions.onSubmit) {
       options.onSubmit = useOptions.onSubmit
     }
+    // model 数据全量替换
     if (useOptions.model) {
       Object.keys(model).forEach((key) => {
         delete model[key]
       })
       Object.assign(model, useOptions.model)
     }
+    // 重置步骤
     step.value = 1
   }
 
-  // 规范化表单项：应用默认值、执行 bind hook、注入 required 校验
+  /**
+   * 规范化表单项配置
+   * 1. 补全组件默认结构
+   * 2. 应用默认值
+   * 3. 执行 bind hook
+   * 4. 注入必填校验规则
+   */
   function normalizeItems() {
     options.items.forEach((item) => {
       helpers.ensureComponentDefaults(item)
 
       const propName = helpers.propKey(item.prop)
+      // 如果配置了默认值且 model 中无值，则应用默认值
       if (isDef(item.value) && !isDef(helpers.getModelValue(item.prop))) {
         helpers.setModelValue(item.prop, clone(item.value))
       }
 
+      // 执行 bind hook
       if (item.hook && item.prop) {
         formHook.bind({
           hook: item.hook,
@@ -158,9 +188,11 @@ export function useFormEngine(): FormEngine {
         })
       }
 
+      // 处理 required 配置，生成内部校验规则
       if (helpers.required(item)) {
         const rule: InternalRule = {
-          _inner: true,
+          required: true,
+          _inner: true, // 标记为内部规则
           trigger: ["change", "blur"],
           validator: (_rule, value, callback) => {
             const isEmpty = value === undefined || value === null || value === ""
@@ -186,7 +218,10 @@ export function useFormEngine(): FormEngine {
     })
   }
 
-  // 对外公开入口：合并配置并初始化表单
+  /**
+   * 初始化/更新表单
+   * @param useOptions 初始化配置选项
+   */
   function use(useOptions: FormUseOptions = {}) {
     mergeFormOptions(useOptions)
     normalizeItems()
@@ -198,7 +233,9 @@ export function useFormEngine(): FormEngine {
     }
   }
 
-  // 下一步（Steps 模式）：校验通过后调用 onNext 或提交
+  /**
+   * Steps 模式：下一步
+   */
   function next() {
     methods.validate((isValid) => {
       if (!isValid)
@@ -228,7 +265,9 @@ export function useFormEngine(): FormEngine {
     })
   }
 
-  // 上一步（Steps 模式）
+  /**
+   * Steps 模式：上一步
+   */
   function prev() {
     if (step.value > 1) {
       step.value -= 1
@@ -252,7 +291,15 @@ export function useFormEngine(): FormEngine {
   }
 }
 
-// 渲染与逻辑辅助：统一属性解析、模型读写、显隐校验、组件解析等
+/**
+ * 渲染与逻辑辅助工厂
+ * @description 提供一套纯函数工具，用于处理属性解析、模型读写、动态渲染逻辑等
+ * @param params 配置参数对象
+ * @param params.options 表单配置选项
+ * @param params.model 表单数据模型
+ * @param params.resolvedActiveGroup 当前激活的分组名称 (Computed)
+ * @returns 辅助函数集合
+ */
 export function createHelpers({
   options,
   model,
@@ -262,6 +309,13 @@ export function createHelpers({
   model: FormRecord
   resolvedActiveGroup: ComputedRef<string | number | undefined>
 }) {
+  // --- 路径与模型工具 ---
+
+  /**
+   * 将 prop 转换为路径数组
+   * @param prop 字符串或数组形式的 prop
+   * @returns 路径数组
+   */
   function toPathArray(prop?: FormItemProp): string[] | undefined {
     if (prop === undefined || prop === null)
       return undefined
@@ -271,6 +325,12 @@ export function createHelpers({
     return path.length ? path : undefined
   }
 
+  /**
+   * 获取 prop 的字符串键
+   * @param prop 表单项 prop
+   * @param fallback 回退值
+   * @returns 字符串形式的键
+   */
   function propKey(prop?: FormItemProp, fallback?: string | number) {
     const path = toPathArray(prop)
     if (path?.length)
@@ -278,6 +338,11 @@ export function createHelpers({
     return String(fallback ?? "")
   }
 
+  /**
+   * 读取模型值 (支持嵌套)
+   * @param prop 表单项 prop
+   * @returns 对应的值
+   */
   function getModelValue(prop?: FormItemProp) {
     const path = toPathArray(prop)
     if (!path?.length)
@@ -291,6 +356,11 @@ export function createHelpers({
     return cursor
   }
 
+  /**
+   * 设置模型值 (支持嵌套，自动创建路径)
+   * @param prop 表单项 prop
+   * @param value 要设置的值
+   */
   function setModelValue(prop: FormItemProp, value: any) {
     const path = toPathArray(prop)
     if (!path?.length)
@@ -307,19 +377,34 @@ export function createHelpers({
     }
   }
 
-  // 判断组件配置是否具备组件属性
+  // --- 组件解析工具 ---
+
+  /**
+   * 判断是否为组件配置对象
+   * @param component 组件插槽内容或配置
+   * @returns 是否为 FormComponent 配置对象
+   */
   function isComponentConfig(component?: FormComponentSlot): component is FormComponent {
     if (!component || typeof component !== "object")
       return false
+    // 只要包含任意组件配置属性，即视为组件配置
     return "is" in component || "slot" in component || "props" in component || "options" in component || "on" in component || "style" in component
   }
 
-  // 将 VNode 包装为可渲染组件，避免响应式污染
+  /**
+   * 包装 VNode 为组件 (防止被 Vue 视为响应式数据)
+   * @param node VNode
+   * @returns 包装后的组件
+   */
   function wrapVNode(node: VNode) {
     return markRaw(defineComponent({ name: "fd-form-vnode-wrapper", setup: () => () => node }))
   }
 
-  // 解析组件 is：支持字符串、组件对象、VNode、函数
+  /**
+   * 解析 component.is
+   * @param com 组件配置或插槽内容
+   * @returns 解析出的组件类型或组件对象
+   */
   function is(com?: FormComponentSlot) {
     if (!com)
       return undefined
@@ -337,19 +422,70 @@ export function createHelpers({
     return resolved as string | VueComponent
   }
 
-  // 解析组件属性相关工具
+  // --- 动态属性解析工具 ---
+
+  /**
+   * 解析动态属性 (支持函数求值)
+   * @param target 目标对象
+   * @param prop 属性名
+   * @returns 解析后的值
+   */
+  function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined {
+    if (!target || typeof target !== "object")
+      return undefined
+    const value = (target as Record<string, any>)[prop]
+    if (isFunction(value)) {
+      return value(model) as TValue | undefined
+    }
+    return value as TValue | undefined
+  }
+
+  /**
+   * 获取组件事件监听器配置
+   * @param com 组件配置
+   * @returns 监听器对象
+   */
   const onListeners = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, (...args: any[]) => void>>(com, "on") ?? {} : {})
+
+  /**
+   * 获取组件插槽名称 (如果作为插槽使用)
+   * @param com 组件配置
+   * @returns 插槽名称
+   */
   const slotNameOf = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<string | undefined>(com, "slot") : undefined)
+
+  /**
+   * 获取组件基础 props 配置
+   * @param com 组件配置
+   * @returns props 对象
+   */
   const componentBaseProps = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, any>>(com, "props") ?? {} : {})
+
+  /**
+   * 获取组件样式配置
+   * @param com 组件配置
+   * @returns 样式对象
+   */
   const styleOf = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<CSSProperties | undefined>(com, "style") : undefined)
+
+  /**
+   * 获取组件选项数据 (options)
+   * @param com 组件配置
+   * @returns 选项数组
+   */
   const componentOptions = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<any[]>(com, "options") : undefined)
 
-  // 判断对象是否包含 slots 配置
+  // --- 插槽工具 ---
+
   function hasSlotsProp(target: unknown): target is Record<string, any> {
     return Boolean(target && typeof target === "object" && "slots" in target)
   }
 
-  // 解析 slots 配置
+  /**
+   * 获取组件的子插槽配置
+   * @param target 表单项或组件配置
+   * @returns 插槽配置对象
+   */
   function slotsOf(target?: FormItem | FormComponentSlot) {
     if (!target)
       return {}
@@ -358,10 +494,18 @@ export function createHelpers({
     return resolveProp<Record<string, FormComponentSlot>>(target, "slots") ?? {}
   }
 
-  // 显示逻辑：隐藏属性或 Tabs 非当前分组时不显示
+  // --- 显示与分组逻辑 ---
+
+  /**
+   * 判断表单项是否显示
+   * @param item 表单项配置
+   * @returns 是否显示
+   */
   function show(item: FormItem) {
+    // 1. 检查 hidden 属性
     if (resolveProp<boolean>(item, "hidden"))
       return false
+    // 2. 检查 Tabs 分组归属
     if (options.group?.type === "tabs" && options.group.children?.length) {
       const currentName = resolvedActiveGroup.value
       const itemGroupName = item.group ?? options.group.children[0]?.name
@@ -371,7 +515,11 @@ export function createHelpers({
     return true
   }
 
-  // Tabs 下获取指定分组的表单项
+  /**
+   * 获取指定分组的所有项
+   * @param groupName 分组名称
+   * @returns 表单项列表
+   */
   function itemsOfGroup(groupName: string | number) {
     if (options.group?.type !== "tabs" || !options.group.children?.length)
       return []
@@ -379,7 +527,12 @@ export function createHelpers({
     return options.items.filter(item => (item.group ?? fallback) === groupName)
   }
 
-  // 针对 Tabs 内部使用的显隐判断
+  /**
+   * Tabs 内部渲染时的显隐判断 (双重检查)
+   * @param item 表单项
+   * @param groupName 当前渲染的分组
+   * @returns 是否显示
+   */
   function showInGroup(item: FormItem, groupName: string | number) {
     if (resolveProp<boolean>(item, "hidden"))
       return false
@@ -389,10 +542,15 @@ export function createHelpers({
     return true
   }
 
-  // 额外信息（隐藏时置空）
+  // --- 表单项属性解析 ---
+
   const extra = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? "" : resolveProp<string>(item, "extra"))
 
-  // 必填解析：隐藏时自动取消必填
+  /**
+   * 解析 required 状态
+   * @param item 表单项
+   * @returns 是否必填
+   */
   function required(item: FormItem) {
     if (resolveProp<boolean>(item, "hidden"))
       return false
@@ -400,16 +558,21 @@ export function createHelpers({
     return typeof flag === "boolean" ? flag : undefined
   }
 
-  // 禁用解析
   const disabled = (item: FormItem) => Boolean(resolveProp(item, "disabled"))
 
-  // 规则解析：隐藏项无规则，非必填过滤内部 required 规则
+  /**
+   * 解析校验规则
+   * @description 自动处理显隐状态对规则的影响
+   * @param item 表单项
+   * @returns 校验规则数组
+   */
   function rules(item: FormItem) {
     if (resolveProp<boolean>(item, "hidden"))
       return []
     const fieldRules = resolveProp<FormItemRuleWithMeta | FormItemRuleWithMeta[]>(item, "rules")
     if (!fieldRules)
       return []
+    // 如果非必填，移除内部生成的 required 规则
     if (!required(item)) {
       if (Array.isArray(fieldRules))
         return fieldRules.filter(rule => !rule._inner)
@@ -418,7 +581,12 @@ export function createHelpers({
     return fieldRules
   }
 
-  // 组件 props 补全：自动注入 placeholder/options
+  // --- 属性增强与自动补全 ---
+
+  /**
+   * 计算最终传递给控件的 props (自动注入默认值)
+   * @returns (item: FormItem) => Record<string, any>
+   */
   const formatProps = computed(() => (item: FormItem) => {
     const componentName = is(item.component)
     const baseProps = {
@@ -429,6 +597,7 @@ export function createHelpers({
       baseProps.disabled = true
     }
 
+    // 根据组件类型自动注入 placeholder 或 options
     switch (componentName) {
       case "el-input":
       case "el-input-number":
@@ -465,6 +634,7 @@ export function createHelpers({
         baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
         break
       default: {
+        // 其他组件尝试注入 options
         const optionValues = componentOptions(item.component)
         if (optionValues)
           baseProps.options = optionValues
@@ -475,24 +645,40 @@ export function createHelpers({
     return baseProps
   })
 
-  // 提取组件基础 props（不包含注入逻辑）
+  /**
+   * 提取组件基础 props
+   * @param component 组件配置
+   * @returns props 对象
+   */
   function componentProps(component?: FormComponentSlot) {
     return {
       ...componentBaseProps(component),
     }
   }
 
-  // 栅格列数
+  /**
+   * 解析栅格跨度
+   * @param item 表单项
+   * @returns span 数值
+   */
   function resolveSpan(item: FormItem) {
     return item.span ?? defaultItemSpan
   }
 
-  // 栅格偏移
+  /**
+   * 解析栅格偏移
+   * @param item 表单项
+   * @returns offset 数值
+   */
   function resolveOffset(item: FormItem) {
     return item.offset ?? 0
   }
 
-  // 处理 ref 回调
+  /**
+   * 处理组件 Ref 回调
+   * @param el 组件实例
+   * @param com 组件配置
+   */
   function useRef(el: unknown, com?: FormComponentSlot) {
     if (!isComponentConfig(com))
       return
@@ -502,25 +688,21 @@ export function createHelpers({
     }
   }
 
-  // 生成 ref 绑定函数
+  /**
+   * 生成组件 ref 绑定函数
+   * @param com 组件配置
+   * @returns ref 回调函数
+   */
   function bindComponentRef(com?: FormComponentSlot) {
     return (el: unknown) => {
       useRef(el, com)
     }
   }
 
-  // 动态属性解析：函数则传入 model 执行
-  function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined {
-    if (!target || typeof target !== "object")
-      return undefined
-    const value = (target as Record<string, any>)[prop]
-    if (isFunction(value)) {
-      return value(model) as TValue | undefined
-    }
-    return value as TValue | undefined
-  }
-
-  // 组件配置补默认结构
+  /**
+   * 确保组件配置有默认结构
+   * @param item 表单项
+   */
   function ensureComponentDefaults(item: FormItem) {
     if (!item.component) {
       item.component = {}
@@ -530,12 +712,21 @@ export function createHelpers({
     item.component.style = item.component.style ?? {}
   }
 
-  // 校验表单项配置完整性
+  /**
+   * 校验表单项配置是否合法
+   * @param value 配置对象
+   * @returns 是否合法
+   */
   function isFormItemConfig(value: DeepPartial<FormItem> | FormItem | undefined): value is FormItem {
     return Boolean(value && value.prop && value.component)
   }
 
-  // 事件名归一化：change -> onChange
+  /**
+   * 事件名称规范化
+   * @description change -> onChange
+   * @param listeners 事件监听器对象
+   * @returns 规范化后的监听器
+   */
   function normalizeListeners(listeners?: Record<string, (...args: any[]) => void>) {
     const normalized: Record<string, (...args: any[]) => void> = {}
     if (!listeners)
@@ -543,8 +734,14 @@ export function createHelpers({
     Object.entries(listeners).forEach(([eventName, handler]) => {
       if (!handler)
         return
-      const capitalized = eventName.charAt(0).toUpperCase() + eventName.slice(1)
-      normalized[`on${capitalized}`] = handler
+      // 已经是 onXxx 格式则不处理
+      if (eventName.startsWith("on") && /[A-Z]/.test(eventName.charAt(2))) {
+        normalized[eventName] = handler
+      }
+      else {
+        const capitalized = eventName.charAt(0).toUpperCase() + eventName.slice(1)
+        normalized[`on${capitalized}`] = handler
+      }
     })
     return normalized
   }

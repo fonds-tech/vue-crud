@@ -25,23 +25,28 @@ const formatters: Record<string, FormHookFn> = {
     }
     return value !== undefined && value !== null ? String(value) : value
   },
-  // 字符串分割为数组 (仅在 bind 阶段有意义，通常用于逗号分隔的字符串转数组)
+  // 字符串分割为数组 (通常用于 bind: string -> array)
   split(value) {
     if (isString(value)) {
       return value.split(",").filter(Boolean)
     }
     return isArray(value) ? value : []
   },
-  // 数组合并为字符串 (通常用于 submit 阶段)
+  // 数组合并为字符串 (通常用于 submit: array -> string)
   join(value) {
     return isArray(value) ? value.join(",") : value
   },
-  // 转换为布尔值
+  // 强制转换为布尔值
   boolean(value) {
     return Boolean(value)
   },
-  // 布尔值与数字 0/1 互转
-  booleanNumber(value) {
+  // 布尔值与数字 1/0 互转
+  // bind: 1 -> true, 0 -> false
+  // submit: true -> 1, false -> 0
+  booleanNumber(value, { method }) {
+    if (method === "bind") {
+      return Boolean(value)
+    }
     return value ? 1 : 0
   },
   // 日期范围处理：将数组拆分为 start/end 字段，或将 start/end 字段合并为数组
@@ -51,17 +56,19 @@ const formatters: Record<string, FormHookFn> = {
     }
 
     const key = String(field)
+    // 假设 field 为 'time'，则生成 'startTime', 'endTime'
+    // 若 field 为 'createTime'，则生成 'startCreateTime', 'endCreateTime'
     const prefix = key.charAt(0).toUpperCase() + key.slice(1)
     const start = `start${prefix}`
     const end = `end${prefix}`
 
-    // bind 阶段：从 model 中读取 start/end 字段组合成数组
+    // bind 阶段：从 model 中读取 start/end 字段组合成数组返回给表单项
     if (method === "bind") {
       const rangeValue = [model[start], model[end]]
       return rangeValue.every(entry => entry === undefined) ? [] : rangeValue
     }
 
-    // submit 阶段：将数组拆分回 model 的 start/end 字段
+    // submit 阶段：将数组值拆分写回 model 的 start/end 字段，当前字段值通常设为 undefined 以避免冗余
     if (!isArray(value) || value.length < 2) {
       return undefined
     }
@@ -81,7 +88,7 @@ const formatters: Record<string, FormHookFn> = {
   json(value, { method }) {
     if (method === "bind") {
       try {
-        return JSON.parse(value)
+        return isString(value) ? JSON.parse(value) : value
       }
       catch {
         return {}
@@ -89,7 +96,7 @@ const formatters: Record<string, FormHookFn> = {
     }
     return JSON.stringify(value)
   },
-  // 处理空值：空字符串或空数组转为 undefined
+  // 处理空值：submit 时将空字符串或空数组转为 undefined
   empty(value) {
     if (isString(value)) {
       return value === "" ? undefined : value
@@ -102,8 +109,10 @@ const formatters: Record<string, FormHookFn> = {
 }
 
 /**
- * 标准化字段值并设置到模型中
- * 支持嵌套路径 (e.g. "user.name")
+ * 标准化字段值并设置到模型中 (支持嵌套路径)
+ * @param model 数据模型
+ * @param field 字段路径 (如 "user.info.name")
+ * @param value 要设置的值
  */
 function normalizeField<T extends FormModel>(model: T, field?: FormField, value?: any) {
   if (!field) {
@@ -129,6 +138,11 @@ function normalizeField<T extends FormModel>(model: T, field?: FormField, value?
   cursor[path[path.length - 1]] = value
 }
 
+/**
+ * 从模型中删除字段 (支持嵌套路径)
+ * @param model 数据模型
+ * @param field 字段路径
+ */
 function deleteField<T extends FormModel>(model: T, field?: FormField) {
   if (!field) {
     return
@@ -156,7 +170,7 @@ function deleteField<T extends FormModel>(model: T, field?: FormField) {
 }
 
 /**
- * 解析并执行钩子函数
+ * 解析并执行钩子函数管道
  * @param phase 当前阶段 ('bind' 或 'submit')
  * @param payload 上下文参数
  */
@@ -172,7 +186,7 @@ function parse<T extends FormModel, K extends keyof HookTree<T>>(
 
   const stack: Array<string | FormHookFn> = []
 
-  // 规范化 hook 配置为数组
+  // 规范化 hook 配置为执行栈
   if (isString(hook)) {
     stack.push(hook)
   }
@@ -184,7 +198,10 @@ function parse<T extends FormModel, K extends keyof HookTree<T>>(
   }
   else if (isObject(hook)) {
     // 处理对象配置形式 { bind: ..., submit: ... }
-    const config = hook as { bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>, submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn> }
+    const config = hook as {
+      bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
+      submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
+    }
     const pipes = config[phase]
     if (pipes) {
       const normalized = (isArray(pipes) ? pipes : [pipes]) as Array<FormHookKey | FormHookFn>
@@ -210,30 +227,37 @@ function parse<T extends FormModel, K extends keyof HookTree<T>>(
     }
   })
 
+  // 如果没有字段名，说明仅用于副作用处理，不更新 model
   if (field === undefined) {
     return
   }
 
+  // submit 阶段如果结果为 undefined，则从 model 中移除该字段
   if (phase === "submit" && nextValue === undefined) {
     deleteField(model, field)
     return
   }
 
+  // 更新 model 值
   normalizeField(model, field, nextValue)
 }
 
 const formHook = {
-  // 数据绑定阶段：从数据源 -> 表单模型
+  // 数据绑定阶段：数据源 -> 表单模型
   bind<T extends FormModel>(data: HookTree<T>["bind"]): void {
     parse("bind", data)
   },
-  // 数据提交阶段：从表单模型 -> 提交数据
+  // 数据提交阶段：表单模型 -> 提交数据
   submit<T extends FormModel>(data: HookTree<T>["submit"]): void {
     parse("submit", data)
   },
 }
 
-// 注册自定义钩子
+/**
+ * 注册自定义全局钩子
+ * @param name 钩子名称
+ * @param handler 钩子函数
+ */
 export function registerFormHook(name: string, handler: FormHookFn): void {
   formatters[name] = handler
 }
