@@ -14,7 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     FdAddButton: typeof import('./src/components/fd-add-button/index.vue')['default']
     FdCascader: typeof import('./src/components/fd-cascader/index.vue')['default']
-    FdCrud: typeof import('./src/components/fd-crud/index.vue')['default']
+    FdCrud: typeof import('./src/components/fd-crud/index')['default']
     FdDeleteButton: typeof import('./src/components/fd-delete-button/index.vue')['default']
     FdDetail: typeof import('./src/components/fd-detail/index.vue')['default']
     FdDialog: typeof import('./src/components/fd-dialog/index.vue')['default']
@@ -41,7 +41,7 @@ declare module 'vue' {
 declare global {
   const FdAddButton: typeof import('./src/components/fd-add-button/index.vue')['default']
   const FdCascader: typeof import('./src/components/fd-cascader/index.vue')['default']
-  const FdCrud: typeof import('./src/components/fd-crud/index.vue')['default']
+  const FdCrud: typeof import('./src/components/fd-crud/index')['default']
   const FdDeleteButton: typeof import('./src/components/fd-delete-button/index.vue')['default']
   const FdDetail: typeof import('./src/components/fd-detail/index.vue')['default']
   const FdDialog: typeof import('./src/components/fd-dialog/index.vue')['default']

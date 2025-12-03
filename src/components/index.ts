@@ -1,6 +1,6 @@
 import type { App, Component } from "vue"
-import Crud from "./fd-crud/index.vue"
-import Form from "./fd-form/index.tsx"
+import Crud from "./fd-crud"
+import Form from "./fd-form"
 import Grid from "./fd-grid/index.vue"
 import Table from "./fd-table/index.vue"
 import Detail from "./fd-detail/index.vue"

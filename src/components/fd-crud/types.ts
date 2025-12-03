@@ -5,6 +5,10 @@ export type CrudParams = Record<string, any>
 
 export type CrudService = Record<string, any>
 
+export interface CrudOptions extends Config {
+  service?: CrudService
+}
+
 export interface CrudRef {
   id: string | number | undefined
   loading: boolean
@@ -31,8 +35,4 @@ export interface CrudRef {
   setParams: (data: CrudParams) => void
   use?: (options: Partial<CrudOptions>) => void
   [key: string]: any
-}
-
-export interface CrudOptions extends Config {
-  service?: any
 }

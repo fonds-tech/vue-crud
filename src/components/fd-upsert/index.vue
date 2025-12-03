@@ -45,7 +45,7 @@
 import type { FormItemProp } from "element-plus"
 import type { FormRef, FormItem, FormRecord, FormUseOptions } from "../fd-form/types"
 import type { UpsertMode, UpsertAction, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "./type"
-import FdForm from "../fd-form/index.tsx"
+import FdForm from "../fd-form/form"
 import FdDialog from "../fd-dialog/index.vue"
 import { merge } from "lodash-es"
 import { useUpsertActions } from "./helper/actions"

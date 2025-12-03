@@ -1,4 +1,4 @@
-import Crud from "../index.vue"
+import Crud from ".."
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 
@@ -10,9 +10,30 @@ vi.mock("../../../hooks", () => ({
   }),
 }))
 
-// Mock useHelper
-vi.mock("../useHelper", () => ({
-  useHelper: () => ({}),
+// Mock内部 helper/service 行为以聚焦渲染与 expose
+vi.mock("../helper", () => ({
+  createHelper: () => ({
+    proxy: vi.fn(),
+    set: vi.fn(),
+    on: vi.fn(),
+    rowInfo: vi.fn(),
+    rowAdd: vi.fn(),
+    rowEdit: vi.fn(),
+    rowAppend: vi.fn(),
+    rowDelete: vi.fn(),
+    rowClose: vi.fn(),
+    getPermission: vi.fn(),
+    paramsReplace: vi.fn((x: any) => x),
+    getParams: vi.fn(() => ({})),
+    setParams: vi.fn(),
+  }),
+}))
+
+vi.mock("../service", () => ({
+  createService: () => ({
+    refresh: vi.fn(async () => "refresh"),
+    rowDelete: vi.fn(async () => "delete"),
+  }),
 }))
 
 describe("crud", () => {

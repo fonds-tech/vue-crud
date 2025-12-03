@@ -1,5 +1,5 @@
 import type { FormRef } from "@/components/fd-form/types"
-import FdForm from "../index.tsx"
+import FdForm from "../form.jsx"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 import { h, markRaw, nextTick, defineComponent } from "vue"
