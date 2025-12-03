@@ -1,6 +1,6 @@
 import type { FormItem, FormRecord, FormOptions } from "../type"
 import { createHelpers } from "../useFormEngine"
-import { computed, reactive } from "vue"
+import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe } from "vitest"
 
 function createCtx(resolvedName?: string) {
@@ -15,8 +15,10 @@ function createCtx(resolvedName?: string) {
   })
   const model = reactive<FormRecord>({})
   const resolvedActiveGroup = computed(() => resolvedName)
-  const helpers = createHelpers({ options, model, resolvedActiveGroup })
-  return { options, model, helpers }
+  const step = ref(1)
+  const loadedGroups = ref(new Set<string | number>())
+  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups })
+  return { options, model, helpers, step }
 }
 
 describe("fd-form helpers", () => {
@@ -52,6 +54,35 @@ describe("fd-form helpers", () => {
     }
     expect(helpers.show(item)).toBe(false)
     expect(helpers.showInGroup(item, "g2")).toBe(true)
+  })
+
+  it("steps 下 itemsOfStep 按当前步骤过滤", () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { prop: "a", component: { is: "el-input" }, group: "s1" },
+        { prop: "b", component: { is: "el-input" }, group: "s2" },
+      ],
+      group: {
+        type: "steps",
+        children: [{ name: "s1" }, { name: "s2" }],
+      },
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(1)
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+    })
+    expect(helpers.itemsOfStep().map(i => i.prop)).toEqual(["a"])
+    step.value = 2
+    expect(helpers.itemsOfStep().map(i => i.prop)).toEqual(["b"])
   })
 
   it("normalizeListeners 将事件名转为 onX", () => {

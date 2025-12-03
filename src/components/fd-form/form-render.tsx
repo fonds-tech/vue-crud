@@ -12,6 +12,7 @@ export interface FormRenderContext {
   step: Ref<number>
   activeGroupName: Ref<string | number | undefined>
   resolvedActiveGroup: ComputedRef<string | number | undefined>
+  activeStepName: ComputedRef<string | number | undefined>
   helpers: FormHelpers
   slots: Slots
   attrs: Record<string, any>
@@ -303,10 +304,22 @@ function renderTabs(ctx: FormRenderContext) {
  * @returns 表单 VNode
  */
 export function renderForm(ctx: FormRenderContext) {
-  const { options, model, attrs, formRef } = ctx
+  const { options, model, attrs, formRef, activeStepName, helpers } = ctx
   const groupType = options.group?.type
   const showTabs = groupType === "tabs"
   const showSteps = groupType === "steps"
+  const stepGroupName = showSteps ? activeStepName.value : undefined
+  const stepItems = showSteps ? helpers.itemsOfStep(stepGroupName) : options.items
+
+  const inner = showTabs || showSteps
+    ? (
+        <el-space direction="vertical" fill size={24}>
+          {showSteps && renderSteps(ctx)}
+          {showTabs && renderTabs(ctx)}
+          {!showTabs && renderGrid(ctx, stepItems, stepGroupName)}
+        </el-space>
+      )
+    : renderGrid(ctx, stepItems, stepGroupName)
 
   return (
     <el-form
@@ -317,17 +330,7 @@ export function renderForm(ctx: FormRenderContext) {
       {...options.form}
       {...attrs}
     >
-      <el-space direction="vertical" fill size={24}>
-        {showSteps && renderSteps(ctx)}
-        {showTabs && renderTabs(ctx)}
-        {/* 如果不是 Tabs 模式，直接渲染所有项；如果是 Steps，通常也在这里渲染，但逻辑可能需要根据 Step 过滤？
-            当前逻辑：Steps 模式下，上方显示步骤条，下方渲染所有项。
-            如果 Steps 需要分步显示，itemsOfGroup 逻辑目前仅支持 Tabs。
-            TODO: 完善 Steps 分步显示逻辑，或者假设 Steps 模式下 items 是展平的。
-            目前保留原逻辑：!showTabs 才渲染 Grid。
-        */}
-        {!showTabs && renderGrid(ctx, options.items)}
-      </el-space>
+      {inner}
     </el-form>
   )
 }

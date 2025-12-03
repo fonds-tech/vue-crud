@@ -30,6 +30,7 @@ export interface FormEngine {
   step: Ref<number>
   activeGroupName: Ref<string | number | undefined>
   resolvedActiveGroup: ComputedRef<string | number | undefined>
+  activeStepName: ComputedRef<string | number | undefined>
   action: ReturnType<typeof useAction>
   methods: ReturnType<typeof useMethods>
   use: (opts?: FormUseOptions) => void
@@ -113,11 +114,32 @@ export function useFormEngine(): FormEngine {
   )
 
   // 创建辅助函数集合
-  const helpers = createHelpers({ options, model, resolvedActiveGroup })
+  const loadedGroups = ref<Set<string | number>>(new Set())
+  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups })
   // 创建操作动作集合
   const action = useAction({ options, model, form: formRef })
   // 创建表单方法集合
   const methods = useMethods({ options, model, form: formRef })
+
+  // Tabs 激活面板标记为已加载
+  watch(
+    activeGroupName,
+    (name) => {
+      if (options.group?.type === "tabs")
+        helpers.markGroupLoaded(name)
+    },
+    { immediate: true },
+  )
+
+  // Steps 当前步骤标记为已加载
+  watch(
+    step,
+    () => {
+      if (options.group?.type === "steps")
+        helpers.markGroupLoaded(helpers.activeStepName.value)
+    },
+    { immediate: true },
+  )
 
   /**
    * 合并用户传入的 options 到内部响应式 options
@@ -227,9 +249,14 @@ export function useFormEngine(): FormEngine {
     normalizeItems()
     if (options.group?.type === "tabs") {
       activeGroupName.value = options.group.children?.[0]?.name
+      helpers.markGroupLoaded(activeGroupName.value)
     }
     else {
       activeGroupName.value = undefined
+    }
+    if (options.group?.type === "steps") {
+      step.value = 1
+      helpers.markGroupLoaded(helpers.activeStepName.value)
     }
   }
 
@@ -282,6 +309,7 @@ export function useFormEngine(): FormEngine {
     step,
     activeGroupName,
     resolvedActiveGroup,
+    activeStepName: helpers.activeStepName,
     action,
     methods,
     use,
@@ -298,16 +326,22 @@ export function useFormEngine(): FormEngine {
  * @param params.options 表单配置选项
  * @param params.model 表单数据模型
  * @param params.resolvedActiveGroup 当前激活的分组名称 (Computed)
+ * @param params.step 当前步骤 (Ref)
+ * @param params.loadedGroups 已加载的分组集合 (Ref Set)
  * @returns 辅助函数集合
  */
 export function createHelpers({
   options,
   model,
   resolvedActiveGroup,
+  step,
+  loadedGroups,
 }: {
   options: FormOptions
   model: FormRecord
   resolvedActiveGroup: ComputedRef<string | number | undefined>
+  step: Ref<number>
+  loadedGroups: Ref<Set<string | number>>
 }) {
   // --- 路径与模型工具 ---
 
@@ -525,6 +559,50 @@ export function createHelpers({
       return []
     const fallback = options.group.children[0]?.name
     return options.items.filter(item => (item.group ?? fallback) === groupName)
+  }
+
+  /**
+   * 标记分组已加载（Tabs/Steps 懒渲染可用）
+   * @param name 分组名称或 ID
+   */
+  function markGroupLoaded(name?: string | number) {
+    if (name === undefined)
+      return
+    loadedGroups.value.add(name)
+  }
+
+  /**
+   * 判断分组是否已加载
+   * @param name 分组名称或 ID
+   * @returns 是否已加载
+   */
+  function isGroupLoaded(name?: string | number) {
+    if (name === undefined)
+      return true
+    return loadedGroups.value.has(name)
+  }
+
+  /**
+   * Steps 当前分组名称 (Computed)
+   */
+  const activeStepName = computed<string | number | undefined>(() => {
+    if (options.group?.type !== "steps" || !options.group.children?.length)
+      return undefined
+    const idx = Math.max(0, step.value - 1)
+    return options.group.children[idx]?.name ?? idx + 1
+  })
+
+  /**
+   * Steps 下获取当前或指定分组的表单项
+   * @param groupName 分组名称，默认为当前步骤名
+   * @returns 表单项列表
+   */
+  function itemsOfStep(groupName?: string | number) {
+    if (options.group?.type !== "steps" || !options.group.children?.length)
+      return options.items
+    const target = groupName ?? activeStepName.value ?? options.group.children[0]?.name
+    const fallback = options.group.children[0]?.name
+    return options.items.filter(item => (item.group ?? fallback) === target)
   }
 
   /**
@@ -761,6 +839,10 @@ export function createHelpers({
     slotsOf,
     show,
     itemsOfGroup,
+    itemsOfStep,
+    activeStepName,
+    markGroupLoaded,
+    isGroupLoaded,
     showInGroup,
     extra,
     required,
