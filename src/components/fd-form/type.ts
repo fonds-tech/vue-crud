@@ -160,6 +160,12 @@ export type FormHook
 export type FormMaybeFn<T, M extends FormRecord = FormRecord> = T | ((model: M) => T)
 
 /**
+ * 可选 Promise 包装类型
+ * @description 支持同步或异步返回值
+ */
+export type MaybePromise<T> = T | Promise<T>
+
+/**
  * 表单组件插槽内容类型
  * @description 支持多种形式的组件渲染内容
  */
@@ -213,7 +219,22 @@ export interface FormComponent<T extends FormRecord = FormRecord> {
    * 选项数据
    * @description 专门用于 Select/Radio/Checkbox 等需要 options 数据的组件
    */
-  options?: FormMaybeFn<any[], T>
+  options?: FormMaybeFn<MaybePromise<any[]>, T>
+}
+
+/**
+ * 异步选项加载状态
+ * @description 记录 options 加载过程中的状态、结果与最近一次请求标识
+ */
+export interface FormAsyncOptionsState {
+  /** 是否处于加载中 */
+  loading: boolean
+  /** 最近一次请求返回的数据 */
+  value?: any[]
+  /** 加载错误（若有） */
+  error?: unknown
+  /** 内部使用的请求标识，用于避免竞态污染状态 */
+  requestId?: number
 }
 
 /**
@@ -352,6 +373,16 @@ export interface FormGroup<T extends FormRecord = FormRecord> {
    * 分组列表
    */
   children?: FormGroupChild<T>[]
+  /**
+   * 是否启用懒渲染
+   * @description 默认为 true，未访问的分组不渲染内容，减少初始渲染压力
+   */
+  lazy?: boolean
+  /**
+   * 是否保留已访问分组的内容
+   * @description 默认为 true，切换分组后保留已渲染的节点，避免状态丢失
+   */
+  keepAlive?: boolean
 }
 
 /**
@@ -410,15 +441,27 @@ export interface FormActions<T extends FormRecord = FormRecord> {
    * 更新组件的 options 数据
    * @description 针对 Select/Radio 等组件
    * @param prop 表单项 prop
-   * @param value 选项数组
+   * @param value 选项数组或异步 Promise
    */
-  setOptions: (prop: FormItemProp, value: any[]) => void
+  setOptions: (prop: FormItemProp, value: MaybePromise<any[]>) => void
   /**
    * 获取组件的 options 数据
    * @param prop 表单项 prop
    * @returns 选项数组或 undefined
    */
   getOptions: (prop: FormItemProp) => any[] | undefined
+  /**
+   * 获取组件 options 的加载状态
+   * @param prop 表单项 prop
+   * @returns 加载状态（包含 loading / value / error）
+   */
+  getOptionsState: (prop: FormItemProp) => FormAsyncOptionsState | undefined
+  /**
+   * 主动重新加载组件 options
+   * @description 适用于依赖外部数据的场景，支持重新触发异步请求
+   * @param prop 表单项 prop
+   */
+  reloadOptions: (prop: FormItemProp) => Promise<any[] | undefined>
   /**
    * 更新组件的 Props
    * @param prop 表单项 prop

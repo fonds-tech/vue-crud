@@ -7,16 +7,21 @@ import type {
   FormActions,
   FormMaybeFn,
   FormOptions,
+  MaybePromise,
   FormItemRuleWithMeta,
+  FormAsyncOptionsState,
 } from "../type"
 import formHook from "./hooks"
 import { dataset } from "../../../utils/dataset"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 
+const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as any).then === "function")
+
 interface ActionContext<T extends FormRecord = FormRecord> {
   options: FormOptions<T>
   model: T
   form: Ref<FormInstance | undefined>
+  optionState: Record<string, FormAsyncOptionsState>
 }
 
 function toArray<T>(value: T | T[]): T[] {
@@ -95,9 +100,10 @@ function setModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormIt
  * @param params.options 表单配置选项
  * @param params.model 表单数据模型
  * @param params.form Element Plus Form 实例引用
+ * @param params.optionState 选项状态记录 (Ref Object)
  * @returns 表单操作方法集合
  */
-export function useAction<T extends FormRecord = FormRecord>({ options, model, form }: ActionContext<T>): FormActions<T> {
+export function useAction<T extends FormRecord = FormRecord>({ options, model, form, optionState }: ActionContext<T>): FormActions<T> {
   /**
    * 查找表单项配置对象
    * @param prop 表单项 prop
@@ -108,6 +114,66 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
       return undefined
     const propKey = propToString(prop)
     return options.items.find(item => propToString(item.prop) === propKey)
+  }
+
+  let optionRequestId = 0
+
+  /**
+   * 确保选项状态存在
+   * @param prop 字段 prop
+   * @returns 状态对象
+   */
+  function ensureOptionState(prop?: FormItemProp) {
+    const key = propToString(prop)
+    if (!optionState[key])
+      optionState[key] = { loading: false }
+    return optionState[key]!
+  }
+
+  /**
+   * 将同步/异步 options 同步到状态，处理竞态
+   * @param prop 字段 prop
+   * @param value 选项数据或 Promise
+   * @returns 最新状态
+   */
+  function syncOptionsState(prop: FormItemProp, value: MaybePromise<any[]>) {
+    const state = ensureOptionState(prop)
+    if (isPromiseLike(value)) {
+      const requestId = ++optionRequestId
+      state.loading = true
+      state.error = undefined
+      state.requestId = requestId
+      value
+        .then((data) => {
+          if (state.requestId === requestId) {
+            state.value = data
+            state.loading = false
+          }
+        })
+        .catch((error) => {
+          if (state.requestId === requestId) {
+            state.error = error
+            state.loading = false
+          }
+        })
+      return state
+    }
+    state.value = value
+    state.loading = false
+    state.error = undefined
+    return state
+  }
+
+  /**
+   * 解析表单项配置中的 options
+   * @param prop 字段 prop
+   * @returns 同步或异步 options
+   */
+  function resolveOptionSource(prop: FormItemProp): MaybePromise<any[]> | undefined {
+    const optionValue = findItem(prop)?.component?.options as FormMaybeFn<MaybePromise<any[]>, T> | undefined
+    if (!optionValue)
+      return undefined
+    return isFunction(optionValue) ? optionValue(model) : optionValue
   }
 
   /**
@@ -283,10 +349,11 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * 设置组件选项 (options)
    * @description 针对 Select/Radio 等组件
    * @param prop 字段 prop
-   * @param value 选项数组
+   * @param value 选项数组或 Promise
    */
-  function setOptions(prop: FormItemProp, value: any[]) {
+  function setOptions(prop: FormItemProp, value: MaybePromise<any[]>) {
     set({ prop, key: "options" }, value)
+    syncOptionsState(prop, value)
   }
 
   /**
@@ -295,10 +362,44 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * @returns 选项数组或 undefined
    */
   function getOptions(prop: FormItemProp) {
-    const optionValue = findItem(prop)?.component?.options as FormMaybeFn<any[], T> | undefined
-    if (!optionValue)
+    const optionValue = resolveOptionSource(prop)
+    if (optionValue === undefined)
+      return ensureOptionState(prop).value
+    const state = syncOptionsState(prop, optionValue)
+    if (isPromiseLike(optionValue))
+      return state.value
+    return state.value ?? optionValue
+  }
+
+  /**
+   * 获取选项加载状态
+   * @param prop 字段 prop
+   */
+  function getOptionsState(prop: FormItemProp) {
+    return ensureOptionState(prop)
+  }
+
+  /**
+   * 主动重新加载组件选项
+   * @param prop 字段 prop
+   */
+  async function reloadOptions(prop: FormItemProp) {
+    const optionValue = resolveOptionSource(prop)
+    if (optionValue === undefined)
+      return ensureOptionState(prop).value
+    const state = syncOptionsState(prop, optionValue)
+    try {
+      const data = await Promise.resolve(optionValue)
+      state.value = data
+      state.loading = false
+      state.error = undefined
+      return data
+    }
+    catch (error) {
+      state.error = error
+      state.loading = false
       return undefined
-    return isFunction(optionValue) ? optionValue(model) : optionValue
+    }
   }
 
   /**
@@ -405,6 +506,8 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     setData,
     setOptions,
     getOptions,
+    getOptionsState,
+    reloadOptions,
     setProps,
     setStyle,
     hideItem,

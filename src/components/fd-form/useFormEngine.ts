@@ -6,10 +6,12 @@ import type {
   DeepPartial,
   FormOptions,
   InternalRule,
+  MaybePromise,
   FormComponent,
   FormUseOptions,
   FormComponentSlot,
   FormItemRuleWithMeta,
+  FormAsyncOptionsState,
 } from "./type"
 import formHook from "./helper/hooks"
 import { merge } from "lodash-es"
@@ -115,9 +117,10 @@ export function useFormEngine(): FormEngine {
 
   // 创建辅助函数集合
   const loadedGroups = ref<Set<string | number>>(new Set())
-  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups })
+  const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
+  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups, optionState })
   // 创建操作动作集合
-  const action = useAction({ options, model, form: formRef })
+  const action = useAction({ options, model, form: formRef, optionState })
   // 创建表单方法集合
   const methods = useMethods({ options, model, form: formRef })
 
@@ -328,6 +331,7 @@ export function useFormEngine(): FormEngine {
  * @param params.resolvedActiveGroup 当前激活的分组名称 (Computed)
  * @param params.step 当前步骤 (Ref)
  * @param params.loadedGroups 已加载的分组集合 (Ref Set)
+ * @param params.optionState 选项状态记录 (Ref Object)
  * @returns 辅助函数集合
  */
 export function createHelpers({
@@ -336,12 +340,14 @@ export function createHelpers({
   resolvedActiveGroup,
   step,
   loadedGroups,
+  optionState,
 }: {
   options: FormOptions
   model: FormRecord
   resolvedActiveGroup: ComputedRef<string | number | undefined>
   step: Ref<number>
   loadedGroups: Ref<Set<string | number>>
+  optionState: Record<string, FormAsyncOptionsState>
 }) {
   // --- 路径与模型工具 ---
 
@@ -408,6 +414,78 @@ export function createHelpers({
       }
       cursor[key] = cursor[key] ?? {}
       cursor = cursor[key]
+    }
+  }
+
+  // --- 选项数据加载与缓存 ---
+
+  const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as any).then === "function")
+
+  let optionRequestId = 0
+
+  /**
+   * 确保选项状态存在
+   * @param key 字段键
+   * @returns 状态对象
+   */
+  function ensureOptionState(key: string) {
+    if (!optionState[key])
+      optionState[key] = { loading: false }
+    return optionState[key]!
+  }
+
+  /**
+   * 根据同步/异步来源更新选项状态
+   * @param propKey 字段键
+   * @param value 选项数据或 Promise
+   */
+  function updateOptionState(propKey: string, value: MaybePromise<any[]>) {
+    const state = ensureOptionState(propKey)
+    if (isPromiseLike(value)) {
+      const requestId = ++optionRequestId
+      state.loading = true
+      state.error = undefined
+      state.requestId = requestId
+      value
+        .then((data) => {
+          if (state.requestId === requestId) {
+            state.value = data
+            state.loading = false
+          }
+        })
+        .catch((error) => {
+          if (state.requestId === requestId) {
+            state.error = error
+            state.loading = false
+          }
+        })
+      return state
+    }
+    state.value = value
+    state.loading = false
+    state.error = undefined
+    return state
+  }
+
+  /**
+   * 获取字段的选项状态（触发异步加载）
+   * @param item 表单项
+   * @returns 选项数据与加载状态
+   */
+  function optionsOf(item: FormItem) {
+    const key = propKey(item.prop)
+    const source = componentOptions(item.component)
+    if (source !== undefined) {
+      updateOptionState(key, source)
+    }
+    else {
+      ensureOptionState(key)
+    }
+    const state = optionState[key]
+    return {
+      options: state?.value,
+      loading: state?.loading ?? false,
+      error: state?.error,
     }
   }
 
@@ -507,7 +585,7 @@ export function createHelpers({
    * @param com 组件配置
    * @returns 选项数组
    */
-  const componentOptions = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<any[]>(com, "options") : undefined)
+  const componentOptions = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<MaybePromise<any[]>>(com, "options") : undefined)
 
   // --- 插槽工具 ---
 
@@ -670,9 +748,15 @@ export function createHelpers({
     const baseProps = {
       ...componentBaseProps(item.component),
     }
+    const optionInfo = optionsOf(item)
+    const optionValues = optionInfo.options ?? componentOptions(item.component)
 
     if (disabled(item)) {
       baseProps.disabled = true
+    }
+
+    if (optionInfo.loading) {
+      baseProps.loading = true
     }
 
     // 根据组件类型自动注入 placeholder 或 options
@@ -685,22 +769,17 @@ export function createHelpers({
       case "el-select":
       case "el-cascader":
         baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
-        {
-          const optionValues = componentOptions(item.component)
-          if (optionValues)
-            baseProps.options = optionValues
-        }
+        if (optionValues)
+          baseProps.options = optionValues
         break
       case "el-tree-select": {
         baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
-        const optionValues = componentOptions(item.component)
         if (optionValues)
           baseProps.data = optionValues
         break
       }
       case "el-radio-group":
       case "el-checkbox-group": {
-        const optionValues = componentOptions(item.component)
         if (optionValues)
           baseProps.options = optionValues
         break
@@ -713,7 +792,6 @@ export function createHelpers({
         break
       default: {
         // 其他组件尝试注入 options
-        const optionValues = componentOptions(item.component)
         if (optionValues)
           baseProps.options = optionValues
         break

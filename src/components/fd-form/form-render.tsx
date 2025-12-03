@@ -266,6 +266,8 @@ function renderTabs(ctx: FormRenderContext) {
     return null
 
   const tabSlots = renderComponentSlotMap(helpers, slots, model, helpers.slotsOf(options.group.component), { model })
+  const lazy = options.group.lazy ?? true
+  const keepAlive = options.group.keepAlive ?? true
 
   return (
     <el-tabs
@@ -277,6 +279,9 @@ function renderTabs(ctx: FormRenderContext) {
       {options.group.children.map((child, index) => {
         const childSlots = renderComponentSlotMap(helpers, slots, model, helpers.slotsOf(child.component), { model, name: child.name })
         const groupName = child.name ?? index
+        const isActive = activeGroupName.value === groupName
+        const loaded = helpers.isGroupLoaded(groupName)
+        const shouldRenderContent = !lazy || isActive || (keepAlive && loaded)
 
         return (
           <el-tab-pane
@@ -289,7 +294,7 @@ function renderTabs(ctx: FormRenderContext) {
             {/* Tab 面板顶部内容 */}
             {renderSlotOrComponent(helpers, slots, model, child.component, { model, scope: { name: child.name } })}
             {/* Tab 内部的表单栅格 */}
-            {renderGrid(ctx, helpers.itemsOfGroup(groupName), groupName)}
+            {shouldRenderContent ? renderGrid(ctx, helpers.itemsOfGroup(groupName), groupName) : null}
           </el-tab-pane>
         )
       })}
