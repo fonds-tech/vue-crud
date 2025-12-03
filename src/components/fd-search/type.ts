@@ -126,7 +126,7 @@ export interface SearchExpose<T extends FormRecord = FormRecord> {
   /**
    * fd-form 实例，可直接调用 form API（如 validate）
    */
-  form: Ref<InstanceType<typeof import("../fd-form/index.vue")["default"]> | undefined>
+  form: Ref<InstanceType<typeof import("../fd-form/index.tsx")["default"]> | undefined>
   /**
    * 初始化方法，外部调用时可覆盖默认配置
    */

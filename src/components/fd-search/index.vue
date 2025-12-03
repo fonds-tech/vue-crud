@@ -47,7 +47,7 @@
 import type { GridProps } from "../fd-grid/type"
 import type { FormRecord, FormUseOptions } from "../fd-form/type"
 import type { SearchAction, SearchOptions } from "./type"
-import FdForm from "../fd-form/index.vue"
+import FdForm from "../fd-form/index.tsx"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { clone, isDef } from "@fonds/utils"

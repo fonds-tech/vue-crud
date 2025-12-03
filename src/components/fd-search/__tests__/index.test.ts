@@ -1,4 +1,4 @@
-import type FdFormComponent from "../fd-form/index.vue"
+import type FdFormComponent from "../fd-form/index.tsx"
 import type { SearchExpose } from "../type"
 import type { MountingOptions } from "@vue/test-utils"
 import Search from "../index.vue"
