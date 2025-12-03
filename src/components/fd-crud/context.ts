@@ -1,6 +1,5 @@
 import type Mitt from "../../utils/mitt"
-import type { Dict, Permission } from "../../types/config"
-import type { CrudRef, CrudOptions } from "./types"
+import type { Dict, CrudRef, Permission, CrudOptions } from "./types"
 import { clone, merge } from "@fonds/utils"
 import { inject, reactive } from "vue"
 
