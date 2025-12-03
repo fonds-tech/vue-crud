@@ -1,5 +1,5 @@
-import type { FormItem, FormRecord, FormOptions } from "../type"
-import { createHelpers } from "../useFormEngine"
+import type { FormItem, FormRecord, FormOptions } from "../types"
+import { createHelpers } from "../engine"
 import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe } from "vitest"
 

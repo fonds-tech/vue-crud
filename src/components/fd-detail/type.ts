@@ -133,7 +133,7 @@ export interface DetailOptions<D extends DetailData = DetailData> {
 /**
  * use 方法支持的参数（浅合并 DeepPartial，数组整体替换）。
  */
-export type DetailUseOptions<D extends DetailData = DetailData> = import("../fd-form/type").DeepPartial<DetailOptions<D>> & Record<string, any>
+export type DetailUseOptions<D extends DetailData = DetailData> = import("../fd-form/types").DeepPartial<DetailOptions<D>> & Record<string, any>
 
 /**
  * 组件暴露的实例方法。

@@ -1,6 +1,6 @@
-import type { FormHelpers } from "./useFormEngine"
+import type { FormHelpers } from "./engine"
 import type { FormInstance } from "element-plus"
-import type { FormItem, FormRecord, FormOptions } from "./type"
+import type { FormItem, FormRecord, FormOptions } from "./types"
 import type { Ref, Slots, ComputedRef, Component as VueComponent } from "vue"
 import { h, resolveDynamicComponent } from "vue"
 

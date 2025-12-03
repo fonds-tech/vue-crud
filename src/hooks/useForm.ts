@@ -1,5 +1,5 @@
 import type { Ref } from "vue"
-import type { FormRef, FormModel, FormUseOptions } from "@/components/fd-form/type"
+import type { FormRef, FormModel, FormUseOptions } from "@/components/fd-form/types"
 import { useParent } from "./useParent"
 import { ref, watch } from "vue"
 

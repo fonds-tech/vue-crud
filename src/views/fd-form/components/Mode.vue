@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormRef } from "@/components/fd-form/type"
+import type { FormRef } from "@/components/fd-form/types"
 import { useForm } from "@/hooks"
 import { computed } from "vue"
 

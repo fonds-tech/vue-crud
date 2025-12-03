@@ -1,7 +1,7 @@
-import { renderForm } from "./form-render"
-import { useFormEngine } from "./useFormEngine"
+import { renderForm } from "./render"
+import { useFormEngine } from "./engine"
 import { defineComponent } from "vue"
-import "./index.scss"
+import "./style.scss"
 
 /**
  * FdForm 动态表单组件

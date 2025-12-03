@@ -12,7 +12,7 @@ import type {
   FormMethods,
   FormUseOptions,
   FormComponentSlot,
-} from "../fd-form/type"
+} from "../fd-form/types"
 
 type NativeDialogProps = Omit<ExtractPropTypes<typeof dialogProps>, "modelValue">
 
@@ -95,4 +95,4 @@ export interface UpsertExpose<T extends FormRecord = FormRecord> extends FormAct
 
 export type UpsertRef<T extends FormRecord = FormRecord> = UpsertExpose<T>
 
-export type { FormComponent as UpsertComponent, FormComponentSlot as UpsertComponentSlot, FormGroup as UpsertGroup, FormItem as UpsertItem } from "../fd-form/type"
+export type { FormComponent as UpsertComponent, FormComponentSlot as UpsertComponentSlot, FormGroup as UpsertGroup, FormItem as UpsertItem } from "../fd-form/types"

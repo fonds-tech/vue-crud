@@ -1,5 +1,5 @@
 import type { CrudRef } from "@/types"
-import type { FormRecord } from "../../fd-form/type"
+import type { FormRecord } from "../../fd-form/types"
 import type { Ref, ComputedRef } from "vue"
 import type { UpsertMode, UpsertAction, UpsertOptions } from "../type"
 import { isFunction } from "@fonds/utils"

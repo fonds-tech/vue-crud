@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { Arrayable } from "element-plus/es/utils"
-import type { FormRecord, FormMethods, FormOptions } from "../type"
+import type { FormRecord, FormMethods, FormOptions } from "./types"
 import type { FormInstance, FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
 import formHook from "./hooks"
 import { clone, isDef, isFunction } from "@fonds/utils"

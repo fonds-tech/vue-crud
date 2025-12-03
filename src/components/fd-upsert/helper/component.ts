@@ -1,6 +1,6 @@
 import type { UpsertMode } from "../type"
 import type { Ref, ComputedRef } from "vue"
-import type { FormRecord, FormComponentSlot } from "../../fd-form/type"
+import type { FormRecord, FormComponentSlot } from "../../fd-form/types"
 import { isFunction } from "@fonds/utils"
 
 interface ComponentHelperContext<T extends FormRecord = FormRecord> {

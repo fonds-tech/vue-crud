@@ -10,14 +10,20 @@ import type {
   FormComponent,
   FormUseOptions,
   FormComponentSlot,
+  FilterRuntimeContext,
   FormItemRuleWithMeta,
   FormAsyncOptionsState,
-} from "./type"
-import formHook from "./helper/hooks"
+} from "./types"
+import formHook from "./hooks"
 import { merge } from "lodash-es"
-import { useAction } from "./helper/action"
-import { useMethods } from "./helper/methods"
+import { useAction } from "./actions"
+import { useMethods } from "./methods"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
+import {
+  applyFilters,
+  filterStepItems,
+  filterGroupItems,
+} from "./filters"
 import { ref, useId, watch, isVNode, markRaw, computed, reactive, defineComponent } from "vue"
 
 // 默认栅格占比（单列）
@@ -46,7 +52,7 @@ export type FormHelpers = ReturnType<typeof createHelpers>
 /**
  * 表单核心引擎
  * @description 管理配置 (options)、数据模型 (model)、动作 (action) 与辅助方法 (helpers)
- * 它是 UI 无关的逻辑层，驱动 index.tsx 和 form-render.tsx
+ * 它是 UI 无关的逻辑层，驱动 index.tsx 和 render.tsx
  * @returns 表单引擎实例
  */
 export function useFormEngine(): FormEngine {
@@ -609,37 +615,6 @@ export function createHelpers({
   // --- 显示与分组逻辑 ---
 
   /**
-   * 判断表单项是否显示
-   * @param item 表单项配置
-   * @returns 是否显示
-   */
-  function show(item: FormItem) {
-    // 1. 检查 hidden 属性
-    if (resolveProp<boolean>(item, "hidden"))
-      return false
-    // 2. 检查 Tabs 分组归属
-    if (options.group?.type === "tabs" && options.group.children?.length) {
-      const currentName = resolvedActiveGroup.value
-      const itemGroupName = item.group ?? options.group.children[0]?.name
-      if (itemGroupName && currentName && itemGroupName !== currentName)
-        return false
-    }
-    return true
-  }
-
-  /**
-   * 获取指定分组的所有项
-   * @param groupName 分组名称
-   * @returns 表单项列表
-   */
-  function itemsOfGroup(groupName: string | number) {
-    if (options.group?.type !== "tabs" || !options.group.children?.length)
-      return []
-    const fallback = options.group.children[0]?.name
-    return options.items.filter(item => (item.group ?? fallback) === groupName)
-  }
-
-  /**
    * 标记分组已加载（Tabs/Steps 懒渲染可用）
    * @param name 分组名称或 ID
    */
@@ -670,6 +645,35 @@ export function createHelpers({
     return options.group.children[idx]?.name ?? idx + 1
   })
 
+  const filterContext = computed<FilterRuntimeContext>(() => ({
+    options,
+    resolvedActiveGroup: resolvedActiveGroup.value,
+    activeStepName: activeStepName.value,
+    resolveProp,
+  }))
+
+  /**
+   * 判断表单项是否显示
+   * @param item 表单项配置
+   * @returns 是否显示
+   */
+  function show(item: FormItem) {
+    return applyFilters(item, filterContext.value) !== null
+  }
+
+  /**
+   * 获取指定分组的所有项
+   * @param groupName 分组名称
+   * @returns 表单项列表
+   */
+  function itemsOfGroup(groupName: string | number) {
+    if (options.group?.type !== "tabs" || !options.group.children?.length)
+      return []
+    return filterGroupItems(options.items, filterContext.value, groupName)
+      .map(item => applyFilters(item, filterContext.value, { groupName }))
+      .filter((item): item is FormItem => item !== null)
+  }
+
   /**
    * Steps 下获取当前或指定分组的表单项
    * @param groupName 分组名称，默认为当前步骤名
@@ -678,9 +682,11 @@ export function createHelpers({
   function itemsOfStep(groupName?: string | number) {
     if (options.group?.type !== "steps" || !options.group.children?.length)
       return options.items
-    const target = groupName ?? activeStepName.value ?? options.group.children[0]?.name
-    const fallback = options.group.children[0]?.name
-    return options.items.filter(item => (item.group ?? fallback) === target)
+    const filtered = filterStepItems(options.items, filterContext.value, groupName)
+    const target = groupName ?? filterContext.value.activeStepName
+    return filtered
+      .map(item => applyFilters(item, filterContext.value, { groupName: target }))
+      .filter((item): item is FormItem => item !== null)
   }
 
   /**
@@ -690,12 +696,7 @@ export function createHelpers({
    * @returns 是否显示
    */
   function showInGroup(item: FormItem, groupName: string | number) {
-    if (resolveProp<boolean>(item, "hidden"))
-      return false
-    const itemGroup = item.group ?? options.group?.children?.[0]?.name
-    if (itemGroup && itemGroup !== groupName)
-      return false
-    return true
+    return applyFilters(item, filterContext.value, { groupName }) !== null
   }
 
   // --- 表单项属性解析 ---

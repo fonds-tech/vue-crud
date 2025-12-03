@@ -10,9 +10,9 @@ import type {
   MaybePromise,
   FormItemRuleWithMeta,
   FormAsyncOptionsState,
-} from "../type"
+} from "./types"
 import formHook from "./hooks"
-import { dataset } from "../../../utils/dataset"
+import { dataset } from "../../utils/dataset"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 
 const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as any).then === "function")

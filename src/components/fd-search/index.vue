@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import type { GridProps } from "../fd-grid/type"
-import type { FormRecord, FormUseOptions } from "../fd-form/type"
+import type { FormRecord, FormUseOptions } from "../fd-form/types"
 import type { SearchAction, SearchOptions } from "./type"
 import FdForm from "../fd-form/index.tsx"
 import { merge } from "lodash-es"

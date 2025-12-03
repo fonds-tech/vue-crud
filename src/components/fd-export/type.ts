@@ -1,5 +1,5 @@
 import type FdExport from "./index.vue"
-import type { DeepPartial } from "../fd-form/type"
+import type { DeepPartial } from "../fd-form/types"
 
 export interface Export {
   /**

@@ -603,3 +603,34 @@ export interface FormExpose<T extends FormRecord = FormRecord> extends FormActio
  * 表单组件 Ref 类型
  */
 export type FormRef<T extends FormRecord = FormRecord> = FormExpose<T>
+
+/**
+ * 过滤解析函数
+ * @description 提供过滤逻辑所需的动态属性解析能力
+ */
+export type FilterResolver = <TValue>(target: unknown, prop: string) => TValue | undefined
+
+/**
+ * 过滤运行时上下文
+ * @description 供 filters 纯函数使用的上下文，封装表单配置、分组状态与属性解析器
+ */
+export interface FilterRuntimeContext<T extends FormRecord = FormRecord> {
+  options: FormOptions<T>
+  resolvedActiveGroup?: string | number
+  activeStepName?: string | number
+  resolveProp: FilterResolver
+}
+
+/**
+ * 过滤选项
+ * @description 控制过滤行为的可选参数（如分组）
+ */
+export interface FilterOptions {
+  groupName?: string | number
+}
+
+/**
+ * 过滤函数签名
+ * @description 输入表单项和上下文，输出原表单项或 null（表示过滤掉）
+ */
+export type FilterFn<T extends FormRecord = FormRecord> = (item: FormItem<T>, ctx: FilterRuntimeContext<T>, options?: FilterOptions) => FormItem<T> | null
