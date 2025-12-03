@@ -1,5 +1,6 @@
+import Mitt from "../../utils/mitt"
+import { merge } from "@fonds/utils"
 import { useConfig } from "../../hooks"
-import { Mitt, merge } from "@fonds/utils"
 import { createHelper } from "./helper"
 import { createService } from "./service"
 import { createCrudContext } from "./context"
@@ -16,7 +17,7 @@ export default defineComponent({
   },
   setup(props, { slots, expose }) {
     const ins = getCurrentInstance()
-    const mitt = new Mitt(ins?.uid)
+    const mitt = new Mitt()
     const { dict, permission } = useConfig()
 
     const { crud, config, useCrudOptions } = createCrudContext({

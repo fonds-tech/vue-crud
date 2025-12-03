@@ -1,4 +1,4 @@
-import type { Mitt } from "@fonds/utils"
+import type Mitt from "../../utils/mitt"
 import type { CrudRef, CrudParams, CrudOptions } from "./types"
 import { ref } from "vue"
 import { assign } from "lodash-es"

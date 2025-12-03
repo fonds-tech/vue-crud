@@ -1,4 +1,4 @@
-import type { Mitt } from "@fonds/utils"
+import type Mitt from "../../utils/mitt"
 import type { Dict, Permission } from "../../types/config"
 import type { CrudRef, CrudOptions } from "./types"
 import { clone, merge } from "@fonds/utils"
@@ -12,11 +12,19 @@ interface ContextOptions {
 }
 
 export function createCrudContext({ id, dict, permission, mitt }: ContextOptions) {
-  // 注入全局配置，缺省为响应式空对象
-  const injectedOptions = reactive<CrudOptions>(inject("__crud_options__", {} as CrudOptions))
+  // 注入全局配置，设置基础默认值保证类型完整
+  const defaultConfig: CrudOptions = {
+    dict,
+    permission,
+    style: { size: "default" },
+    events: {},
+    service: {},
+  }
+
+  const injectedOptions = reactive<CrudOptions>(inject("__crud_options__", defaultConfig))
 
   // 配置对象与 CRUD 状态保持独立但可同步
-  const config = reactive<CrudOptions>(merge({}, injectedOptions))
+  const config = reactive<CrudOptions>(merge({}, defaultConfig, injectedOptions))
 
   const crud = reactive<CrudRef>(
     merge(
@@ -26,10 +34,24 @@ export function createCrudContext({ id, dict, permission, mitt }: ContextOptions
         selection: [],
         params: { page: 1, size: 20 },
         service: {},
-        dict: {},
-        permission: {},
+        dict: defaultConfig.dict,
+        permission: defaultConfig.permission,
         mitt,
         config,
+        proxy: () => {},
+        set: () => {},
+        on: () => {},
+        rowInfo: () => {},
+        rowAdd: () => {},
+        rowEdit: () => {},
+        rowAppend: () => {},
+        rowDelete: async () => {},
+        rowClose: () => {},
+        refresh: async () => ({}),
+        getPermission: () => true,
+        paramsReplace: params => params,
+        getParams: () => ({}),
+        setParams: () => {},
       },
       clone({ dict, permission }),
     ),

@@ -44,6 +44,8 @@ function createCrud() {
       sort: {},
     } as any,
     permission: { page: true } as any,
+    style: { size: "default" },
+    events: {},
   })
 
   const crud = reactive<CrudRef>({

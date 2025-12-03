@@ -45,6 +45,11 @@ export const MOCK_USER_LIST = generateMockUsers(240)
 export class CrudMockService {
   dataList = [...MOCK_USER_LIST]
 
+  // 生成 1-3 秒之间的随机延迟
+  private randomDelay(): number {
+    return Math.floor(Math.random() * 2000)
+  }
+
   // 分页列表
   page = async (params: any) => {
     const { keyword, page = 1, size = 20, sort, order, status, occupation, account, phone, createTimeRange } = params || {}
@@ -91,7 +96,7 @@ export class CrudMockService {
             size: Number(size),
           },
         })
-      }, 300)
+      }, this.randomDelay())
     })
   }
 
@@ -104,7 +109,7 @@ export class CrudMockService {
           assign(item, params)
         }
         resolve(null)
-      }, 300)
+      }, this.randomDelay())
     })
   }
 
@@ -119,7 +124,7 @@ export class CrudMockService {
           ...params,
         })
         resolve(id)
-      }, 300)
+      }, this.randomDelay())
     })
   }
 
@@ -129,7 +134,7 @@ export class CrudMockService {
       setTimeout(() => {
         const { id } = params || {}
         resolve(this.dataList.find(e => e.id === Number(id)))
-      }, 100)
+      }, this.randomDelay())
     })
   }
 
@@ -140,7 +145,7 @@ export class CrudMockService {
         const { ids = [] } = params || {}
         this.dataList = this.dataList.filter(e => !ids.includes(e.id))
         resolve(null)
-      }, 300)
+      }, this.randomDelay())
     })
   }
 }

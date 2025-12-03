@@ -89,7 +89,7 @@ export function filterStepItems(items: FormItem[], ctx: FilterRuntimeContext, gr
 
 // 默认规则：可见性（含 Tabs/Steps 分组）
 registerFilter("visibility", (item, ctx, options) => {
-  if (options.groupName !== undefined)
+  if (options?.groupName !== undefined)
     return shouldShowInGroup(item, ctx, options.groupName) ? item : null
   return shouldShowItem(item, ctx) ? item : null
 })

@@ -1,7 +1,9 @@
-import type { FormItem, FormRecord, FormOptions } from "../types"
+import type { FormItem, FormRecord, FormOptions, FormAsyncOptionsState } from "../types"
 import { createHelpers } from "../engine"
 import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe } from "vitest"
+
+const baseItemDefaults = { labelPosition: "", labelWidth: "", showMessage: true } as const
 
 function createCtx(resolvedName?: string) {
   const options = reactive<FormOptions>({
@@ -17,7 +19,8 @@ function createCtx(resolvedName?: string) {
   const resolvedActiveGroup = computed(() => resolvedName)
   const step = ref(1)
   const loadedGroups = ref(new Set<string | number>())
-  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups })
+  const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
+  const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups, optionState })
   return { options, model, helpers, step }
 }
 
@@ -32,6 +35,7 @@ describe("fd-form helpers", () => {
   it("show/required/disabled 解析函数型属性", () => {
     const { helpers } = createCtx()
     const item: FormItem = {
+      ...baseItemDefaults,
       prop: "name",
       label: "名称",
       component: { is: "el-input" },
@@ -47,6 +51,7 @@ describe("fd-form helpers", () => {
   it("tabs 下 show 按 group 过滤", () => {
     const { helpers } = createCtx("g1")
     const item: FormItem = {
+      ...baseItemDefaults,
       prop: "foo",
       label: "Foo",
       component: { is: "el-input" },
@@ -62,8 +67,8 @@ describe("fd-form helpers", () => {
       mode: "add",
       model: {},
       items: [
-        { prop: "a", component: { is: "el-input" }, group: "s1" },
-        { prop: "b", component: { is: "el-input" }, group: "s2" },
+        { ...baseItemDefaults, prop: "a", component: { is: "el-input" }, group: "s1" },
+        { ...baseItemDefaults, prop: "b", component: { is: "el-input" }, group: "s2" },
       ],
       group: {
         type: "steps",
@@ -73,12 +78,14 @@ describe("fd-form helpers", () => {
     })
     const model = reactive<FormRecord>({})
     const step = ref(1)
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
     const helpers = createHelpers({
       options,
       model,
       resolvedActiveGroup: computed(() => undefined),
       step,
       loadedGroups: ref(new Set<string | number>()),
+      optionState,
     })
     expect(helpers.itemsOfStep().map(i => i.prop)).toEqual(["a"])
     step.value = 2
@@ -106,7 +113,7 @@ describe("fd-form helpers", () => {
     const { helpers } = createCtx()
     const comp = helpers.is({ is: "el-input" })
     expect(comp).toBe("el-input")
-    const item: FormItem = { prop: "p", component: { is: "el-input" } }
+    const item: FormItem = { ...baseItemDefaults, prop: "p", component: { is: "el-input" } }
     expect(helpers.resolveSpan(item)).toBe(1)
     expect(helpers.resolveOffset(item)).toBe(0)
   })
