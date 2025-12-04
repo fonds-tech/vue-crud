@@ -169,7 +169,8 @@ describe("fd-crud helper/service logic", () => {
     const refreshSpy = vi.spyOn(service, "refresh").mockResolvedValue({})
     crud.service.remove = vi.fn(async () => ({}))
 
-    await service.rowDelete({ id: 1 })
+    expect(service.rowDelete).toBeDefined()
+    await service.rowDelete?.({ id: 1 })
 
     expect(crud.service.remove).toHaveBeenCalled()
     expect(elMessageSuccess).toHaveBeenCalled()

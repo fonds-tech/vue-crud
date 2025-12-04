@@ -6,7 +6,7 @@ declare module "vue" {
     "fd-grid": typeof import("../components/fd-grid/index.vue")["default"]
     "fd-grid-item": typeof import("../components/fd-grid-item/index.vue")["default"]
     "fd-search": typeof import("../components/fd-search/index.vue")["default"]
-    "fd-table": typeof import("../components/fd-table/index.vue")["default"]
+    "fd-table": typeof import("../components/fd-table/index")["default"]
     "fd-detail": typeof import("../components/fd-detail/index.vue")["default"]
     "fd-dialog": typeof import("../components/fd-dialog/index.vue")["default"]
     "fd-form": typeof import("../components/fd-form/form")["default"]

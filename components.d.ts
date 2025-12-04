@@ -23,11 +23,6 @@ declare module 'vue' {
     FdOption: typeof import('./src/components/fd-option/index.vue')['default']
     FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
     FdSelect: typeof import('./src/components/fd-select/index.vue')['default']
-    FdTable: typeof import('./src/components/fd-table/index.vue')['default']
-    IconTablerDragDrop: typeof import('~icons/tabler/drag-drop')['default']
-    IconTablerHelp: typeof import('~icons/tabler/help')['default']
-    IconTablerPin: typeof import('~icons/tabler/pin')['default']
-    IconTablerPinFilled: typeof import('~icons/tabler/pin-filled')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
@@ -46,11 +41,6 @@ declare global {
   const FdOption: typeof import('./src/components/fd-option/index.vue')['default']
   const FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
   const FdSelect: typeof import('./src/components/fd-select/index.vue')['default']
-  const FdTable: typeof import('./src/components/fd-table/index.vue')['default']
-  const IconTablerDragDrop: typeof import('~icons/tabler/drag-drop')['default']
-  const IconTablerHelp: typeof import('~icons/tabler/help')['default']
-  const IconTablerPin: typeof import('~icons/tabler/pin')['default']
-  const IconTablerPinFilled: typeof import('~icons/tabler/pin-filled')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
 }
