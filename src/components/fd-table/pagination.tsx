@@ -20,10 +20,9 @@ interface PaginationProps {
 }
 
 /**
- * 渲染表格底部，包括分页和选择信息
- *
- * @param props - 底部组件的属性
- * @returns 代表表格底部的 VNode
+ * 渲染表格底部的分页与选中提示区域。
+ * @param {PaginationProps} props - 分页配置对象，包含起止范围、选中数量、传递给 ElPagination 的属性以及页码与页容量变更回调。
+ * @returns 组合提示信息与 Element Plus 分页器的表尾 VNode。
  */
 export function TableFooter(props: PaginationProps) {
   return h("div", { class: "fd-table__footer" }, [

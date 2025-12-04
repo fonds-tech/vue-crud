@@ -5,7 +5,8 @@ import { Operation, FullScreen, Refresh as RefreshIcon } from "@element-plus/ico
 import { ElIcon, ElTooltip, ElDropdown, ElDropdownItem, ElDropdownMenu } from "element-plus"
 
 /**
- * TableToolbar 组件的属性接口
+ * 表格工具栏的属性定义。
+ * 用于控制工具栏显示、工具项配置以及交互回调。
  */
 interface ToolbarProps {
   /** 是否显示工具栏 */
@@ -31,10 +32,11 @@ interface ToolbarProps {
 }
 
 /**
- * 渲染表格工具栏
+ * 表格工具栏组件的渲染函数。
+ * 根据 `show` 控制是否显示，同时提供刷新、尺寸切换、列设置与全屏等操作入口。
  *
- * @param props - 工具栏组件的属性
- * @returns 代表工具栏的 VNode 或 null
+ * @param {ToolbarProps} props - 工具栏组件的属性
+ * @returns 返回渲染后的工具栏 VNode；未启用时返回 null
  */
 export function TableToolbar(props: ToolbarProps) {
   if (!props.show) return null
