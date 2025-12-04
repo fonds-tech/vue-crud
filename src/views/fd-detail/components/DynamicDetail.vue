@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { TableColumn } from "@/components/fd-table/type"
-import type { DetailUseOptions } from "@/components/fd-detail/type"
+import type { DetailUseOptions } from "@/components/fd-detail/types"
 import { ElMessage } from "element-plus"
 import { DetailMockService } from "../mockService"
 import { useCrud, useTable, useDetail } from "@/hooks"

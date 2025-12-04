@@ -1,6 +1,6 @@
 import type { MountingOptions } from "@vue/test-utils"
-import type { DetailRef, DetailUseOptions } from "../type"
-import Detail from "../index.vue"
+import type { DetailRef, DetailUseOptions } from "../types"
+import Detail from "../index"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"
 import { h, nextTick, defineComponent } from "vue"
@@ -88,6 +88,14 @@ const ElButtonStub = defineComponent({
         },
         slots.default?.(),
       )
+  },
+})
+
+const ElTagStub = defineComponent({
+  name: "ElTagStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs }) {
+    return () => h("span", { ...attrs, class: ["el-tag-stub", attrs.class] }, slots.default?.())
   },
 })
 
@@ -182,6 +190,7 @@ function mountDetail(options: { crudOverrides?: Partial<CrudStub>, mounting?: Mo
         "el-descriptions-item": ElDescriptionsItemStub,
         "el-space": ElSpaceStub,
         "el-button": ElButtonStub,
+        "el-tag": ElTagStub,
         ...(options.mounting?.global?.stubs ?? {}),
       },
       ...(options.mounting?.global ?? {}),
