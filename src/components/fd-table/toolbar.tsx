@@ -39,7 +39,9 @@ interface ToolbarProps {
  * @returns 返回渲染后的工具栏 VNode；未启用时返回 null
  */
 export function TableToolbar(props: ToolbarProps) {
+  // show 为 false 时直接返回 null，避免渲染空容器
   if (!props.show) return null
+  // 工具区：左侧透传自定义 toolbar 插槽，右侧提供刷新/尺寸/列设置/全屏四个入口
   return h("div", { class: "fd-table__toolbar" }, [
     props.slots.toolbar?.(),
     props.toolsEnabled

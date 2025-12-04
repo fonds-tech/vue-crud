@@ -47,6 +47,7 @@ function getColumnId(column: TableColumn<TableRecord>, index: number) {
  */
 function getVersion(columns: TableColumn<TableRecord>[]) {
   const ids = columns.map((column, index) => getColumnId(column, index))
+  // 通过排序去重后的 id 串作为版本号，列增删时可使缓存失效
   return Array.from(new Set(ids)).sort().join("|")
 }
 
@@ -67,6 +68,7 @@ function readCache(cacheKey: string | undefined, version: string) {
       order: string[]
       columns: Record<string, { show: boolean, pinned?: boolean, fixed?: "left" | "right" }>
     }
+    // 缓存版本不匹配时丢弃，避免结构变化带来的脏数据
     if (parsed.version !== version) return undefined
     return parsed
   }
@@ -84,6 +86,7 @@ export function writeCache(state: TableState) {
   if (!state.cacheKey.value || typeof localStorage === "undefined") return
   try {
     const version = getVersion(state.tableOptions.columns)
+    // 仅记录可排序列的顺序，固定或禁止排序的列维持原位置
     const order = state.columnSettings.value
       .filter(item => item.sort)
       .sort((a, b) => a.order - b.order)
@@ -107,26 +110,31 @@ export function writeCache(state: TableState) {
 export function rebuildColumnSettings(state: TableState, useCache = true) {
   const version = getVersion(state.tableOptions.columns)
   const cache = useCache ? readCache(state.cacheKey.value, version) : undefined
+  // 缓存中的 order 用于重建排序优先级
   const orderMap = new Map<string, number>()
   cache?.order?.forEach((id, idx) => orderMap.set(id, idx))
 
   const settings: ColumnSetting[] = state.tableOptions.columns.map((column, index) => {
     const id = getColumnId(column, index)
     const pinned = cache?.columns?.[id]?.pinned ?? column.pinned ?? false
+    // 操作列/选择列禁止排序，避免被拖动改变固定列位置
     const isNonSortableType = column.type === "action" || column.type === "selection"
     const sort = !isNonSortableType && (column.sort ?? true) && !pinned
+    // fixed 兼容多种输入：true 视为左固定，其余保持 undefined
     const rawFixed = cache?.columns?.[id]?.fixed ?? column.fixed
     const normalizedFixed: ColumnSetting["fixed"] = rawFixed === "left" || rawFixed === "right"
       ? rawFixed
       : rawFixed === true
         ? "left"
         : undefined
+    // 默认固定策略：action 固定右侧，selection 固定左侧
     const fixed = normalizedFixed
       ?? (column.type === "action"
         ? "right"
         : column.type === "selection"
           ? "left"
           : undefined)
+    // 排序优先使用缓存顺序，否则退回原始索引
     const baseOrder = sort ? orderMap.get(id) ?? index : index
     const label = column.label || (column.type === "selection" ? "选择" : column.prop) || id
     return {
@@ -176,6 +184,7 @@ export function sortColumnSettings(state: TableState) {
     if (fixed === "right") return 2
     return 1
   }
+  // 排序规则：先按固定方向（左优先，右最后），再按 order；最终重置 order 为当前序
   state.columnSettings.value = [...state.columnSettings.value]
     .sort((a, b) => {
       const r = rank(a.fixed) - rank(b.fixed)
@@ -216,6 +225,7 @@ export function onDragEnd(state: TableState) {
 export function onDragMove(evt: DragMoveEvent) {
   const dragged = evt?.draggedContext?.element
   const related = evt?.relatedContext?.element
+  // 禁止拖动不可排序或已固定的列，也禁止跨 fixed 分组交换
   if (!dragged || !dragged.sort) return false
   if (dragged.pinned || related?.pinned) return false
   if (dragged.fixed !== related?.fixed) return false
@@ -274,6 +284,7 @@ export function saveColumns(state: TableState, emit: (columns: TableColumn<Table
  */
 export function ColumnSettingsPanel(props: ColumnSettingsPanelProps): VNode {
   const { state } = props
+  // 整体使用 Popover 包裹，触发器为“列设置”按钮，内容包含选择、拖拽、固定、保存等操作
   return h(
     ElPopover,
     {

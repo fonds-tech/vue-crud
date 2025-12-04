@@ -13,6 +13,7 @@ import { isFunction } from "@/utils/check"
 export function resolveDict<T extends TableRecord>(column: TableColumn<T>, scope: TableScope<T>): TableDict[] | undefined {
   const dictData = column.dict
   if (!dictData) return undefined
+  // 字典既可为静态数组也可为函数，函数模式按行作用域动态生成
   return typeof dictData === "function" ? dictData(scope) : dictData
 }
 
@@ -27,6 +28,7 @@ export function resolveDict<T extends TableRecord>(column: TableColumn<T>, scope
 export function getDictEntry<T extends TableRecord>(column: TableColumn<T>, scope: TableScope<T>) {
   const dict = resolveDict(column, scope)
   if (!dict) return undefined
+  // 以列 prop 对应的行值匹配字典项，用于后续颜色/标签等衍生信息
   return dict.find(item => item.value === scope.row[column.prop || ""])
 }
 
@@ -77,6 +79,7 @@ export function getDictType<T extends TableRecord>(column: TableColumn<T>, scope
 export function hasDict<T extends TableRecord>(column: TableColumn<T>, scope: TableScope<T>) {
   const dict = resolveDict(column, scope)
   if (!dict) return false
+  // 仅当存在匹配 value 的字典项时视为有字典渲染，避免无匹配时误用 tag
   return Boolean(dict.find(item => item.value === scope.row[column.prop || ""]))
 }
 
@@ -90,6 +93,7 @@ export function hasDict<T extends TableRecord>(column: TableColumn<T>, scope: Ta
  */
 export function formatCell<T extends TableRecord>(column: TableColumn<T>, scope: TableScope<T>) {
   const { formatter, prop, value } = column
+  // 优先使用 formatter 进行自定义格式化，其次直接取行字段，最后回退到列默认值
   if (typeof formatter === "function") return formatter(scope)
   if (prop) return (scope.row as Record<string, unknown>)[prop]
   return value ?? ""
@@ -106,6 +110,7 @@ export function formatCell<T extends TableRecord>(column: TableColumn<T>, scope:
 export function getComponentIs<T extends TableRecord>(component: TableComponent<T> | undefined, scope: TableScope<T> | undefined) {
   if (!component) return undefined
   const value = component.is
+  // is 可为动态函数，根据当前作用域选择组件类型或直接返回 VNode
   return isFunction(value) ? (value as (scope?: TableScope<T>) => string | VNode | VueComponent | undefined)(scope) : value
 }
 
@@ -120,6 +125,7 @@ export function getComponentIs<T extends TableRecord>(component: TableComponent<
 export function getComponentProps<T extends TableRecord>(component: TableComponent<T> | undefined, scope: TableScope<T> | undefined) {
   if (!component) return {}
   const value = component.props
+  // props 支持按行计算，便于不同数据行传入不同配置
   return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, unknown>)(scope) : value ?? {}
 }
 
@@ -134,6 +140,7 @@ export function getComponentProps<T extends TableRecord>(component: TableCompone
 export function getComponentStyle<T extends TableRecord>(component: TableComponent<T> | undefined, scope: TableScope<T> | undefined) {
   if (!component) return undefined
   const value = component.style
+  // 样式同样可按作用域生成，支持动态高亮/颜色
   return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, unknown>)(scope) : value
 }
 
@@ -148,6 +155,7 @@ export function getComponentStyle<T extends TableRecord>(component: TableCompone
 export function getComponentEvents<T extends TableRecord>(component: TableComponent<T> | undefined, scope: TableScope<T> | undefined) {
   if (!component) return {}
   const value = component.on
+  // 事件配置函数可根据当前行绑定不同处理器（如携带行 id）
   return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, (...args: unknown[]) => unknown>)(scope) : value ?? {}
 }
 
@@ -162,6 +170,7 @@ export function getComponentEvents<T extends TableRecord>(component: TableCompon
 export function getComponentSlots<T extends TableRecord>(component: TableComponent<T> | undefined, scope: TableScope<T> | undefined) {
   if (!component) return {}
   const value = component.slots
+  // 返回值可为静态对象或作用域函数，保持与组件插槽结构一致
   return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, VNodeChild>)(scope) : (value as Record<string, VNodeChild>) ?? {}
 }
 
@@ -174,6 +183,7 @@ export function getComponentSlots<T extends TableRecord>(component: TableCompone
  */
 export function getColumnSlots<T extends TableRecord>(column: TableColumn<T>) {
   const value = column.slots
+  // slots 允许懒执行函数形式，表头渲染时可动态生成 header/custom 插槽
   return typeof value === "function" ? value() : value ?? {}
 }
 
@@ -228,6 +238,7 @@ export interface RenderHelpers<T extends TableRecord = TableRecord> {
  * @returns 规范化后的事件对象
  */
 export function normalizeEventProps(events: Record<string, (...args: unknown[]) => unknown>) {
+  // 将事件名转为 Vue 期望的 onX 格式（首字母大写），便于直接透传给 h()
   return Object.fromEntries(
     Object.entries(events).map(([key, handler]) => [`on${key.charAt(0).toUpperCase()}${key.slice(1)}`, handler]),
   )

@@ -1,6 +1,6 @@
-import type { Ref, Slots, ComputedRef } from "vue"
 import type { TableInstance, PaginationProps } from "element-plus"
 import type { TableColumn, TableRecord, TableOptions } from "./type"
+import type { Ref, Slots, ComputedRef, UnwrapNestedRefs } from "vue"
 import { ref, computed, reactive } from "vue"
 
 /**
@@ -42,7 +42,7 @@ export interface TableState {
   selectedRows: Ref<TableRecord[]>
   isFullscreen: Ref<boolean>
   tableRef: Ref<TableInstance | undefined>
-  tableOptions: TableOptions<TableRecord>
+  tableOptions: UnwrapNestedRefs<TableOptions<TableRecord>>
   columnSettings: Ref<ColumnSetting[]>
   cacheKey: ComputedRef<string | undefined>
   isAllChecked: ComputedRef<boolean>
@@ -95,6 +95,7 @@ export const tableSizeOptions: Array<{ label: string, value: TableSize }> = [
  * 创建并初始化表格状态
  *
  * @param props - 组件属性
+ * @param props.name - 表格名称，用于缓存键生成
  * @param slots - 组件插槽
  * @param attrs - 组件属性
  * @param initialCrudParams - 初始 CRUD 参数
@@ -106,10 +107,12 @@ export function createTableState(
   attrs: Record<string, unknown>,
   initialCrudParams: Partial<{ page: number, size: number }> = {},
 ): TableState {
+  // 核心响应式容器：表格行、选中行、全屏状态、表实例与全局配置
   const tableRows = ref<TableRecord[]>([])
   const selectedRows = ref<TableRecord[]>([])
   const isFullscreen = ref(false)
   const tableRef = ref<TableInstance>()
+  // tableOptions 作为“源配置”，后续 use(...) 更新直接作用于此，默认启用边框、指定行主键
   const tableOptions = reactive<TableOptions<TableRecord>>({
     table: {
       border: true,
@@ -122,6 +125,7 @@ export function createTableState(
     pagination: { ...defaultPagination },
   } as TableOptions<TableRecord>)
 
+  // attrsRecord 保存外部透传属性，rootAttrs/tableAttrs 用于拆分根容器样式与表格专用属性
   const attrsRecord = computed(() => attrs as Record<string, unknown>)
   const rootAttrs = computed(() => {
     const { class: className, style } = attrsRecord.value
@@ -139,6 +143,7 @@ export function createTableState(
     pageSizes: tableOptions.pagination?.pageSizes ?? defaultPagination.pageSizes,
   })
 
+  // paginationProps 统一生成传给 el-pagination 的 props，确保受控的 total/currentPage/pageSize 同步
   const paginationProps = computed<Partial<PaginationProps>>(() => ({
     layout: tableOptions.pagination?.layout ?? defaultPagination.layout,
     background: tableOptions.pagination?.background ?? defaultPagination.background,
@@ -154,6 +159,7 @@ export function createTableState(
     const tableName = props.name ?? tableOptions.name
     return tableName ? `fd-table:${tableName}:columns` : undefined
   })
+  // 列全选/半选状态用于同步列设置弹窗中的 checkbox 状态
   const isAllChecked = computed(() => columnSettings.value.length > 0 && columnSettings.value.every(item => item.show))
   const isIndeterminate = computed(() => {
     const visible = columnSettings.value.filter(item => item.show)
@@ -161,8 +167,10 @@ export function createTableState(
   })
 
   const visibleColumns = computed<TableColumn<TableRecord>[]>(() => {
+    // 无列设置时直接返回初始列，避免不必要的 Map 构建
     if (!columnSettings.value.length) return tableOptions.columns
 
+    // 将列 id 映射到原始列配置，确保按照用户排序输出且保留其他字段
     const idToColumn = new Map<string, TableColumn<TableRecord>>()
     tableOptions.columns.forEach((column, index) => {
       const id = column.__id || column.prop || column.label || `col_${index}`
@@ -176,30 +184,41 @@ export function createTableState(
         if (!column) return undefined
         return {
           ...column,
+          // 固定列配置来自用户在列设置中的选择，覆盖原始 fixed
           fixed: state.fixed,
         }
       })
       .filter(Boolean) as TableColumn<TableRecord>[]
   })
 
+  // 过滤出用户自定义的额外具名插槽，排除系统保留插槽
   const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !["toolbar", "header", "default"].includes(key)))
 
-  const elTableProps = computed(() => {
-    const { tools, fullscreen: _fullscreen, ...rest } = tableOptions.table
-    return {
+  // 显式收窄返回类型以避免 TS 对展开后的 TableConfig 进行深度实例化导致 “类型实例化过深” 报错
+  const elTableProps = computed<Record<string, unknown>>(() => {
+    const merged: Record<string, unknown> = {
       height: "100%",
       highlightCurrentRow: true,
       headerCellClassName: "fd-table__header-cell",
       ...tableAttrs.value,
-      ...rest,
     }
+    // 使用 any 打断泛型推断深度，避免 TableProps 的递归类型导致 TS2589
+    const tableConfig: any = tableOptions.table ?? {}
+    Object.entries(tableConfig).forEach(([key, value]) => {
+      if (key === "tools" || key === "fullscreen") return
+      merged[key] = value
+    })
+    return merged
   })
 
+  // 分页起止显示值基于 total 与当前页动态计算，total 为 0 时展示 0-0
   const paginationStart = computed(() => (paginationState.total === 0 ? 0 : (paginationState.currentPage - 1) * paginationState.pageSize + 1))
   const paginationEnd = computed(() => (paginationState.total === 0 ? 0 : Math.min(paginationState.currentPage * paginationState.pageSize, paginationState.total)))
   const rowKeyProp = computed(() => tableOptions.table.rowKey)
+  // 工具栏仅在传入 toolbar 插槽或开启 tools 开关时展示
   const shouldShowToolbar = computed(() => Boolean(slots.toolbar || tableOptions.table.tools))
 
+  // 右键菜单状态存储屏幕坐标与菜单项，用于 contextmenu 触发时展示
   const contextMenuState = reactive({
     visible: false,
     x: 0,

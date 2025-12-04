@@ -32,9 +32,11 @@ export default defineComponent({
     const attrs = useAttrs()
     const vueSlots = useSlots()
     const { crud, mitt } = useCore()
+    // 初始查询参数来自 crud hook，保持分页同步
     const initialCrudParams = crud?.getParams?.() ?? crud?.params ?? {}
     const state = createTableState(props, vueSlots, attrs, initialCrudParams)
     const renderHelpers = createRenderHelpers()
+    // 将 crud 能力包装为桥接对象，方便传递到渲染层
     const crudBridge: CrudBridge = {
       refresh: params => crud.refresh(params),
       rowInfo: crud.rowInfo,
@@ -61,9 +63,11 @@ export default defineComponent({
      * @param useOptions - 要应用的选项
      */
     const use = (useOptions: TableUseOptions<TableRecord>) => {
+      // merge 支持增量配置，保留已存在的状态值（如 paginationState）
       merge(state.tableOptions, useOptions)
       applyPaginationOptions(useOptions.pagination)
       if (useOptions.columns) {
+        // 补全列的默认属性，确保后续渲染与缓存有稳定 __id
         state.tableOptions.columns = useOptions.columns.map((column, index) => ({
           __id: column.prop || column.label || `col_${index}`,
           show: column.show ?? true,
@@ -96,6 +100,7 @@ export default defineComponent({
      * @param rows - 选中的行
      */
     const onSelectionChange = (rows: TableRecord[]) => {
+      // 同步选中行到本地状态与 crud hook，便于外部复用
       state.selectedRows.value = rows
       crud.selection = rows
     }
@@ -105,6 +110,7 @@ export default defineComponent({
      * @param page - 新的页码
      */
     const onPageChange = (page: number) => {
+      // 更新本地分页并写入 crud 参数，触发刷新
       state.paginationState.currentPage = page
       crud.setParams({ page })
       crud.refresh()
@@ -115,6 +121,7 @@ export default defineComponent({
      * @param size - 新的每页数量
      */
     const onPageSizeChange = (size: number) => {
+      // 变更 pageSize 时重置页码为 1，保持刷新逻辑一致
       state.paginationState.pageSize = size
       state.paginationState.currentPage = 1
       crud.setParams({ page: 1, size })
@@ -128,6 +135,7 @@ export default defineComponent({
      */
     const getRowKeyValue = (row: TableRecord) => {
       const rowKey = state.rowKeyProp.value
+      // rowKey 支持字符串/函数，函数返回值需为字符串或数字方可用于定位
       const key = typeof rowKey === "function" ? rowKey(row) : rowKey
       if (typeof key === "string" || typeof key === "number") return key
       return undefined
@@ -139,6 +147,7 @@ export default defineComponent({
      * @returns 查找到的行
      */
     const findRowsByKey = (rowKey: string | number | Array<string | number>) => {
+      // 兼容数组批量查找，将行主键映射回行数据
       const keys = Array.isArray(rowKey) ? rowKey : [rowKey]
       return state.tableRows.value.filter((row) => {
         const keyValue = getRowKeyValue(row)
@@ -155,6 +164,7 @@ export default defineComponent({
       if (!rowKey) return
       const rows = findRowsByKey(rowKey)
       rows.forEach((row) => {
+        // 利用 el-table 原生 API 切换勾选状态
         state.tableRef.value?.toggleRowSelection(row, checked)
       })
     }
@@ -168,6 +178,7 @@ export default defineComponent({
         state.tableRef.value?.toggleAllSelection?.()
         return
       }
+      // 清空后按需重新勾选，避免状态不同步
       state.tableRef.value?.clearSelection?.()
       if (checked) {
         state.tableRows.value.forEach((row) => {
@@ -184,6 +195,7 @@ export default defineComponent({
     const expand = (rowKey: string | number | Array<string | number>, expanded = true) => {
       const rows = findRowsByKey(rowKey)
       rows.forEach((row) => {
+        // 使用 Element Plus 提供的展开控制，保持与 UI 状态一致
         state.tableRef.value?.toggleRowExpansion(row, expanded)
       })
     }
@@ -288,6 +300,7 @@ export default defineComponent({
     const tableRefreshHandler = (payload: unknown) => {
       if (!payload || typeof payload !== "object") return
       const data = payload as { list?: TableRecord[], page?: number, count?: number, pageSize?: number }
+      // 将 crud 返回的数据映射到内部状态：数据列表、分页总数、当前页与页容量
       state.tableRows.value = Array.isArray(data.list) ? data.list : []
       state.paginationState.total = data.count ?? state.tableRows.value.length
       if (data.page) state.paginationState.currentPage = data.page
@@ -303,6 +316,7 @@ export default defineComponent({
     const onCellContextmenu = (row: TableRecord, column: TableScope["column"], event: MouseEvent) => {
       event.preventDefault()
       const rowIndex = state.tableRows.value.findIndex(item => item === row)
+      // 构造作用域并基于配置生成菜单项，同时记录鼠标坐标用于弹窗定位
       const scope: TableScope<TableRecord> = { row, column, $index: rowIndex >= 0 ? rowIndex : 0 }
       state.contextMenuState.items = buildContextMenuItems(scope, state.tableOptions.columns, crudBridge, refresh)
       state.contextMenuState.x = event.clientX
@@ -313,6 +327,7 @@ export default defineComponent({
     /**
      * 处理上下文菜单操作
      * @param item - 菜单项
+     * @param item.action - 菜单项的操作函数
      */
     const handleContextAction = (item: { action: () => void }) => {
       item.action()
@@ -323,6 +338,7 @@ export default defineComponent({
       () => state.tableOptions.columns,
       (cols) => {
         if (cols && cols.length) {
+          // 当列配置变动时同步重建列设置（如新增/删除列）
           rebuildColumnSettings(state)
         }
       },
@@ -339,10 +355,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      // 注册 mitt 事件与全局点击监听，支持外部控制刷新/选择等
       registerEvents(mitt, handlers)
     })
 
     onBeforeUnmount(() => {
+      // 组件销毁时移除监听，避免内存泄漏
       unregisterEvents(mitt, handlers)
     })
 
@@ -403,10 +421,12 @@ export default defineComponent({
       )
 
     return () => {
+      // 将用户自定义插槽按名称透传给子列，确保动态 slot 解析时可用
       const extraSlots = Object.fromEntries(
         state.namedExtraSlots.value.map(slotName => [slotName, (scope: TableScope<TableRecord>) => slots[slotName]?.(scope) ?? null]),
       )
 
+      // Element Plus Loading 指令需要 withDirectives 包装，保持类型安全
       const loadingDirective: Directive = (ElLoading as { directive?: Directive }).directive ?? (ElLoading as unknown as Directive)
       const tableNode = withDirectives(
         h(

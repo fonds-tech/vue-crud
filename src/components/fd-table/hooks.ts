@@ -35,6 +35,7 @@ export interface HookHandlers {
  * @returns 规范化后的行键
  */
 function normalizeRowKey(payload: unknown): string | number | Array<string | number> | undefined {
+  // 支持传入单个主键或主键数组，其他类型一律视为无效并返回 undefined
   if (Array.isArray(payload) && payload.every(item => typeof item === "string" || typeof item === "number")) {
     return payload as Array<string | number>
   }
@@ -49,8 +50,10 @@ function normalizeRowKey(payload: unknown): string | number | Array<string | num
  * @param handlers - 事件的处理程序
  */
 export function registerEvents(mitt: MittLike | undefined, handlers: HookHandlers) {
+  // 事件监听统一入口，确保 mitt 不存在时静默跳过，避免调用方未注入事件总线导致报错
   mitt?.on?.("table.refresh", (payload: unknown) => handlers.refresh(payload))
   mitt?.on?.("table.select", (...args: unknown[]) => {
+    // select 事件可接受 payload/checked 任意数量，需解析布尔后交给处理器
     const [payload, checked] = args
     handlers.select(normalizeRowKey(payload), typeof checked === "boolean" ? checked : undefined)
   })
@@ -63,6 +66,7 @@ export function registerEvents(mitt: MittLike | undefined, handlers: HookHandler
     const [full] = args
     handlers.toggleFullscreen(typeof full === "boolean" ? full : undefined)
   })
+  // 全局监听 document click 用于关闭自定义上下文菜单
   document.addEventListener("click", handlers.closeContextMenu)
 }
 
@@ -73,6 +77,7 @@ export function registerEvents(mitt: MittLike | undefined, handlers: HookHandler
  * @param handlers - 要移除的处理程序
  */
 export function unregisterEvents(mitt: MittLike | undefined, handlers: HookHandlers) {
+  // 卸载所有表格相关事件与全局点击监听，防止组件销毁后内存泄漏
   mitt?.off?.("table.refresh")
   mitt?.off?.("table.select")
   mitt?.off?.("table.selectAll")
