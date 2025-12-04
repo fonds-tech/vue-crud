@@ -13,6 +13,9 @@ export function paramsReplace(dict: CrudRef["dict"], params: CrudParams): CrudPa
   const { pagination = {}, search = {}, sort = {} } = dict || {}
 
   const a: Record<string, any> = { ...params }
+  const originalUnderscoreKeys = new Set(
+    Object.keys(params).filter(key => typeof key === "string" && key.startsWith("_")),
+  )
   const b: Record<string, any> = { ...pagination, ...search, ...sort }
 
   for (const i in b) {
@@ -25,7 +28,7 @@ export function paramsReplace(dict: CrudRef["dict"], params: CrudParams): CrudPa
   }
 
   for (const i in a) {
-    if (i[0] === "_") {
+    if (i[0] === "_" && originalUnderscoreKeys.has(i)) {
       a[i.substring(1)] = a[i]
       delete a[i]
     }

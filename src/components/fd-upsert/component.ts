@@ -1,6 +1,6 @@
-import type { UpsertMode } from "../type"
+import type { UpsertMode } from "./type"
 import type { Ref, ComputedRef } from "vue"
-import type { FormRecord, FormComponentSlot } from "../../fd-form/types"
+import type { FormRecord, FormComponentSlot } from "../fd-form/types"
 import { isFunction } from "@fonds/utils"
 
 interface ComponentHelperContext<T extends FormRecord = FormRecord> {
@@ -9,23 +9,34 @@ interface ComponentHelperContext<T extends FormRecord = FormRecord> {
   loading: Ref<boolean>
 }
 
-function isComponentConfig(component?: FormComponentSlot): component is Record<string, any> {
-  return Boolean(component && typeof component === "object" && "is" in (component as Record<string, any>))
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
 }
 
-function resolveComponentProp<T>(component: FormComponentSlot | undefined, prop: string, formModel: ComputedRef<FormRecord>): T | undefined {
-  if (!component || typeof component !== "object")
+function isComponentConfig(component?: FormComponentSlot): component is Record<string, unknown> {
+  return Boolean(isRecord(component) && "is" in component)
+}
+
+function resolveComponentProp<T>(
+  component: FormComponentSlot | undefined,
+  prop: string,
+  formModel: ComputedRef<FormRecord>,
+): T | undefined {
+  if (!isRecord(component))
     return undefined
-  const value = (component as Record<string, any>)[prop]
+  const value = component[prop]
   if (isFunction(value))
     return value(formModel.value)
-  return value
+  return value as T | undefined
 }
 
+/**
+ * 组件/插槽解析工具，提供注入上下文。
+ */
 export function useComponentHelper<T extends FormRecord = FormRecord>(context: ComponentHelperContext<T>) {
   const { mode, formModel, loading } = context
 
-  function createSlotProps(slotScope: Record<string, any>) {
+  function createSlotProps(slotScope: Record<string, unknown>) {
     return {
       ...slotScope,
       mode: mode.value,
@@ -53,7 +64,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
   function componentProps(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return {}
-    return resolveComponentProp<Record<string, any>>(component, "props", formModel) ?? {}
+    return resolveComponentProp<Record<string, unknown>>(component, "props", formModel) ?? {}
   }
 
   function componentStyle(component?: FormComponentSlot) {
@@ -65,7 +76,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
   function componentEvents(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return {}
-    return resolveComponentProp<Record<string, any>>(component, "on", formModel) ?? {}
+    return resolveComponentProp<Record<string, unknown>>(component, "on", formModel) ?? {}
   }
 
   function componentSlots(component?: FormComponentSlot) {

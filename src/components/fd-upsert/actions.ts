@@ -1,7 +1,7 @@
 import type { CrudRef } from "@/types"
-import type { FormRecord } from "../../fd-form/types"
+import type { FormRecord } from "../fd-form/types"
 import type { Ref, ComputedRef } from "vue"
-import type { UpsertMode, UpsertAction, UpsertOptions } from "../type"
+import type { UpsertMode, UpsertAction, UpsertOptions } from "./type"
 import { isFunction } from "@fonds/utils"
 
 interface ActionHelperContext<T extends FormRecord = FormRecord> {
@@ -11,9 +11,16 @@ interface ActionHelperContext<T extends FormRecord = FormRecord> {
   mode: Ref<UpsertMode>
 }
 
+/**
+ * 动作按钮与可见性解析。
+ * @description 提供默认动作填充、文案解析、可见性判断，保持与 crud 字典文案一致。
+ */
 export function useUpsertActions<T extends FormRecord = FormRecord>(context: ActionHelperContext<T>) {
   const { options, crud, formModel } = context
 
+  /**
+   * 确保存在默认动作（含 steps 模式的 prev/next）。
+   */
   function ensureActions() {
     if (options.actions.length > 0)
       return
@@ -33,6 +40,9 @@ export function useUpsertActions<T extends FormRecord = FormRecord>(context: Act
     }
   }
 
+  /**
+   * 解析动作文案，支持函数型文本。
+   */
   function resolveActionText(action: UpsertAction<T>) {
     const text = action.text
     if (isFunction(text))
@@ -42,6 +52,9 @@ export function useUpsertActions<T extends FormRecord = FormRecord>(context: Act
     return action.type === "cancel" ? crud.dict?.label?.close ?? "取消" : crud.dict?.label?.confirm ?? "确定"
   }
 
+  /**
+   * 判断动作是否可见，支持函数型 hidden。
+   */
   function isActionVisible(action: UpsertAction<T>) {
     const maybeHidden = action.hidden
     if (isFunction(maybeHidden))

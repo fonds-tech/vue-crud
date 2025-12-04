@@ -4,17 +4,20 @@ import { createService } from "../service"
 import { createHelper, paramsReplace } from "../helper"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
-const elMessageWarning = vi.fn()
-const elMessageError = vi.fn()
-const elMessageSuccess = vi.fn()
-const elMessageBox = vi.fn((options: any) => {
-  const instance: any = { confirmButtonLoading: false }
-  if (options?.beforeClose) {
-    return new Promise((resolve) => {
-      options.beforeClose("confirm", instance, () => resolve(undefined))
-    })
-  }
-  return Promise.resolve()
+const { elMessageWarning, elMessageError, elMessageSuccess, elMessageBox } = vi.hoisted(() => {
+  const warning = vi.fn()
+  const error = vi.fn()
+  const success = vi.fn()
+  const messageBox = vi.fn((options: any) => {
+    const instance: any = { confirmButtonLoading: false }
+    if (options?.beforeClose) {
+      return new Promise((resolve) => {
+        options.beforeClose("confirm", instance, () => resolve(undefined))
+      })
+    }
+    return Promise.resolve()
+  })
+  return { elMessageWarning: warning, elMessageError: error, elMessageSuccess: success, elMessageBox: messageBox }
 })
 
 vi.mock("element-plus", () => ({

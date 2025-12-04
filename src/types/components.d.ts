@@ -10,7 +10,7 @@ declare module "vue" {
     "fd-detail": typeof import("../components/fd-detail/index.vue")["default"]
     "fd-dialog": typeof import("../components/fd-dialog/index.vue")["default"]
     "fd-form": typeof import("../components/fd-form/form")["default"]
-    "fd-upsert": typeof import("../components/fd-upsert/index.vue")["default"]
+    "fd-upsert": typeof import("../components/fd-upsert")["default"]
     "fd-select": typeof import("../components/fd-select/index.vue")["default"]
     "fd-option": typeof import("../components/fd-option/index.vue")["default"]
     "fd-cascader": typeof import("../components/fd-cascader/index.vue")["default"]

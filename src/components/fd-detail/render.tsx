@@ -200,34 +200,39 @@ export function renderDetailContent<D extends DetailData = DetailData>(ctx: Rend
 }
 
 export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<D>) {
+  const baseActions = ctx.options.actions.length
+    ? ctx.options.actions
+    : []
+  const hasOk = baseActions.some(action => action.type === "ok")
+  const actions = hasOk ? baseActions : [...baseActions, { type: "ok", text: "确认" } as DetailAction<D>]
+
   return h(
     "div",
     { class: "fd-detail__footer" },
-    () =>
-      ctx.options.actions.map((action, index) => {
-        if (!isVisible(action, ctx.data.value))
-          return null
-        if (action.type === "ok") {
-          return h(
-            ElButton,
-            {
-              key: index,
-              type: "primary",
-              onClick: ctx.onClose,
-            },
-            () => resolveActionText(action, ctx.options, ctx.data.value),
-          )
-        }
-        const slotName = slotNameOf(action.component, ctx.data.value)
-        if (slotName && ctx.userSlots[slotName]) {
-          return h(
-            "template",
-            { key: index },
-            ctx.userSlots[slotName]?.({ index, data: ctx.data.value }),
-          )
-        }
-        const comp = renderComponentSlot(action.component, ctx.data.value, { index, data: ctx.data.value }, ctx.userSlots)
-        return comp ? h("template", { key: index }, comp) : null
-      }),
+    actions.map((action, index) => {
+      if (!isVisible(action, ctx.data.value))
+        return null
+      if (action.type === "ok") {
+        return h(
+          ElButton,
+          {
+            key: index,
+            type: "primary",
+            onClick: ctx.onClose,
+          },
+          () => resolveActionText(action, ctx.options, ctx.data.value),
+        )
+      }
+      const slotName = slotNameOf(action.component, ctx.data.value)
+      if (slotName && ctx.userSlots[slotName]) {
+        return h(
+          "template",
+          { key: index },
+          ctx.userSlots[slotName]?.({ index, data: ctx.data.value }),
+        )
+      }
+      const comp = renderComponentSlot(action.component, ctx.data.value, { index, data: ctx.data.value }, ctx.userSlots)
+      return comp ? h("template", { key: index }, comp) : null
+    }),
   )
 }

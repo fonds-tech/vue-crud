@@ -60,6 +60,7 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
           if (!pageService) {
             if (shouldWarn) ElMessage.warning(dict?.label?.pageMissing ?? "未配置分页服务，跳过刷新")
             done()
+            success({})
             resolve({})
             return
           }
@@ -99,6 +100,10 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
     })
   }
 
+  const api: { refresh: typeof refresh, rowDelete?: typeof rowDelete } = {
+    refresh,
+  }
+
   // 删除请求
   function rowDelete(...selection: any[]) {
     const { service, dict } = crud
@@ -126,7 +131,7 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
                 .then((res: any) => {
                   ElMessage.success(dict.label.deleteSuccess)
 
-                  refresh()
+                  api.refresh()
                   resolve(res)
                 })
                 .catch((err: any) => {
@@ -152,10 +157,9 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
     }
   }
 
-  return {
-    refresh,
-    rowDelete,
-  }
+  api.rowDelete = rowDelete
+
+  return api
 }
 
 export type { ServiceOptions }

@@ -1,0 +1,29 @@
+.fd-upsert {
+  &__footer {
+    gap: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__skeleton {
+    width: 100%;
+    padding: 12px 4px;
+
+    &-row {
+      width: 100%;
+      height: 16px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      background-color: var(--el-color-info-light-9, #f4f4f5);
+    }
+  }
+
+  &__loading-text {
+    color: var(--el-color-info, #909399);
+    margin: 0;
+    padding: 4px 0;
+    font-size: 14px;
+    text-align: center;
+  }
+}

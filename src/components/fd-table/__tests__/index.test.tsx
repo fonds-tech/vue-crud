@@ -307,7 +307,7 @@ describe("fd-table", () => {
 
   it("工具栏刷新按钮会触发 crud.refresh", async () => {
     const wrapper = mountTable()
-    const refreshButton = wrapper.findAll(".fd-table__tools .el-button-stub")[0]
+    const refreshButton = wrapper.findAll(".fd-table__tools .fd-table__tool-btn")[0]
     await refreshButton.trigger("click")
     expect(coreStore.crud.refresh).toHaveBeenCalled()
   })

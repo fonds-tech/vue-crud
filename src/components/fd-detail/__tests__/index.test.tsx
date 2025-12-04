@@ -190,6 +190,7 @@ function mountDetail(options: { crudOverrides?: Partial<CrudStub>, mounting?: Mo
         "el-descriptions-item": ElDescriptionsItemStub,
         "el-space": ElSpaceStub,
         "el-button": ElButtonStub,
+        "ElButton": ElButtonStub,
         "el-tag": ElTagStub,
         ...(options.mounting?.global?.stubs ?? {}),
       },
