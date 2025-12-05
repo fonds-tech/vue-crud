@@ -1,15 +1,20 @@
 import ElementPlus from "element-plus"
-import DeleteButton from "../index.vue"
+import DeleteButton from ".."
 import { mount } from "@vue/test-utils"
-import { it, vi, expect, describe } from "vitest"
+import { it, vi, expect, describe, afterEach } from "vitest"
+
+const mockRowDelete = vi.fn()
+let selectionMock: Array<{ id: number }> = [{ id: 1 }]
 
 // Mock the hooks
 vi.mock("../../../hooks", () => ({
   useCore: () => ({
     crud: {
       getPermission: vi.fn(() => true),
-      rowDelete: vi.fn(),
-      selection: [{ id: 1 }], // Simulate selected rows
+      rowDelete: mockRowDelete,
+      get selection() {
+        return selectionMock
+      },
       dict: {
         label: {
           delete: "Delete",
@@ -24,6 +29,11 @@ vi.mock("../../../hooks", () => ({
   }),
 }))
 
+afterEach(() => {
+  mockRowDelete.mockReset()
+  selectionMock = [{ id: 1 }]
+})
+
 describe("deleteButton", () => {
   it("renders correctly", () => {
     const wrapper = mount(DeleteButton, {
@@ -33,6 +43,7 @@ describe("deleteButton", () => {
     })
     expect(wrapper.find(".el-button").exists()).toBe(true)
     expect(wrapper.text()).toBe("Delete")
+    expect(wrapper.find(".el-button").classes()).toContain("el-button--danger")
   })
 
   it("triggers rowDelete on click", async () => {
@@ -42,11 +53,20 @@ describe("deleteButton", () => {
       },
     })
     await wrapper.find(".el-button").trigger("click")
-    // In a real debug scenario, you can add console.log or breakpoints here
+    expect(mockRowDelete).toHaveBeenCalledTimes(1)
+    expect(mockRowDelete).toHaveBeenCalledWith({ id: 1 })
   })
 
   it("is disabled when no selection", async () => {
-    // Override mock for this specific test if needed, or create a separate describe block
-    // For simplicity in this demo, we'll just note that mocking strategies allow testing different states
+    selectionMock = []
+    const wrapper = mount(DeleteButton, {
+      global: {
+        plugins: [ElementPlus],
+      },
+    })
+    const button = wrapper.find(".el-button")
+    expect(button.attributes("disabled")).toBeDefined()
+    await button.trigger("click")
+    expect(mockRowDelete).not.toHaveBeenCalled()
   })
 })

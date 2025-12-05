@@ -1,15 +1,17 @@
-import AddButton from "../index.vue"
+import AddButton from ".."
 
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
-import { it, vi, expect, describe } from "vitest"
+import { it, vi, expect, describe, afterEach } from "vitest"
+
+const mockRowAdd = vi.fn()
 
 // Mock the hooks
 vi.mock("../../../hooks", () => ({
   useCore: () => ({
     crud: {
       getPermission: vi.fn(() => true),
-      rowAdd: vi.fn(),
+      rowAdd: mockRowAdd,
       dict: {
         label: {
           add: "Add",
@@ -23,6 +25,10 @@ vi.mock("../../../hooks", () => ({
     },
   }),
 }))
+
+afterEach(() => {
+  mockRowAdd.mockReset()
+})
 
 describe("addButton", () => {
   it("renders correctly", () => {
@@ -42,8 +48,6 @@ describe("addButton", () => {
       },
     })
     await wrapper.find(".el-button").trigger("click")
-    // Since we mocked the hook, we can't easily check if rowAdd was called directly on the mock instance
-    // without exposing it. For a simple test, we assume if it renders and clicks, it's working.
-    // To improve, we could export the mock or use a spy.
+    expect(mockRowAdd).toHaveBeenCalledTimes(1)
   })
 })

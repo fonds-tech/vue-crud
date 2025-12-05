@@ -13,8 +13,8 @@ import Upsert from "./fd-upsert"
 import Cascader from "./fd-cascader/index.vue"
 import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
-import AddButton from "./fd-add-button/index.vue"
-import DeleteButton from "./fd-delete-button/index.vue"
+import AddButton from "./fd-add-button"
+import DeleteButton from "./fd-delete-button"
 import FdContextMenu from "./fd-context-menu"
 
 export const components: Record<string, Component> = {
