@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { MountingOptions } from "@vue/test-utils"
-import Dialog from "../index.vue"
+import Dialog from "../dialog"
 import { mount } from "@vue/test-utils"
 import { it, expect, describe } from "vitest"
 import { h, nextTick, defineComponent } from "vue"
@@ -20,6 +20,7 @@ const ElDialogStub = defineComponent({
   },
   emits: ["update:modelValue", "update:fullscreen", "open", "opened", "close", "closed", "openAutoFocus", "closeAutoFocus"],
   setup(props, { slots, attrs }) {
+    // 用 div 模拟 el-dialog，data-* 标记可断言内部状态变化
     return () =>
       h(
         "div",
@@ -85,10 +86,19 @@ const ElScrollbarStub = defineComponent({
 })
 
 interface DialogExpose {
+  /** 组件内部暴露的可见性状态 */
   dialogVisible: Ref<boolean>
+  /** 组件内部暴露的全屏状态 */
   fullscreenActive: Ref<boolean>
+  /** 打开对话框的命令式调用 */
   open: () => void
+  /** 关闭对话框的命令式调用 */
   close: () => void
+  /**
+   * 切换或设置全屏
+   * @param value 可选，布尔值时强制设置全屏状态
+   * @returns 无返回值
+   */
   fullscreen: (value?: boolean) => void
 }
 
@@ -100,9 +110,10 @@ function mountDialog(options: MountingOptions<any> = {}) {
   const { global, ...rest } = options
   type MountSlots = NonNullable<MountingOptions<any>["slots"]>
   const baseSlots: MountSlots = {
-    default: "默认插槽",
-    footer: "底部插槽",
+    default: () => "默认插槽",
+    footer: () => "底部插槽",
   }
+  // 使用 mount 时集中注入 stubs，避免 Element Plus 真实组件影响逻辑，只关心事件/插槽透传
   return mount(Dialog, {
     props: {
       modelValue: true,
@@ -112,7 +123,7 @@ function mountDialog(options: MountingOptions<any> = {}) {
     slots: {
       ...baseSlots,
       ...(rest.slots ?? {}),
-    },
+    } as any,
     global: {
       stubs: {
         "el-dialog": ElDialogStub,

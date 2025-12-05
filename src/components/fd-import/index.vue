@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { UploadInstance, UploadProgressEvent, UploadRequestOptions } from "element-plus"
-import FdDialog from "../fd-dialog/index.vue"
+import FdDialog from "../fd-dialog"
 import { ElMessage } from "element-plus"
 import { useCore, useConfig } from "@/hooks"
 import { isString, isFunction } from "@fonds/utils"

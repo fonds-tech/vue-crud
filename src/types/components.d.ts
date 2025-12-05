@@ -8,7 +8,7 @@ declare module "vue" {
     "fd-search": typeof import("../components/fd-search/index.vue")["default"]
     "fd-table": typeof import("../components/fd-table/index")["default"]
     "fd-detail": typeof import("../components/fd-detail/index.vue")["default"]
-    "fd-dialog": typeof import("../components/fd-dialog/index.vue")["default"]
+    "fd-dialog": typeof import("../components/fd-dialog")["default"]
     "fd-form": typeof import("../components/fd-form/form")["default"]
     "fd-upsert": typeof import("../components/fd-upsert")["default"]
     "fd-select": typeof import("../components/fd-select/index.vue")["default"]

@@ -1,5 +1,5 @@
 import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescriptions } from "./types"
-import FdDialog from "../fd-dialog/index.vue"
+import FdDialog from "../fd-dialog"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { resolveMaybe } from "./slots"
