@@ -13,7 +13,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     FdAddButton: typeof import('./src/components/fd-add-button')['default']
-    FdCascader: typeof import('./src/components/fd-cascader/index.vue')['default']
+    FdCascader: typeof import('./src/components/fd-cascader')['default']
     FdDeleteButton: typeof import('./src/components/fd-delete-button')['default']
     FdDialog: typeof import('./src/components/fd-dialog/index.vue')['default']
     FdExport: typeof import('./src/components/fd-export/index.vue')['default']
@@ -31,7 +31,7 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const FdAddButton: typeof import('./src/components/fd-add-button')['default']
-  const FdCascader: typeof import('./src/components/fd-cascader/index.vue')['default']
+  const FdCascader: typeof import('./src/components/fd-cascader')['default']
   const FdDeleteButton: typeof import('./src/components/fd-delete-button')['default']
   const FdDialog: typeof import('./src/components/fd-dialog/index.vue')['default']
   const FdExport: typeof import('./src/components/fd-export/index.vue')['default']
