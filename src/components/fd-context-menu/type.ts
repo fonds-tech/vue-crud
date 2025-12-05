@@ -20,6 +20,7 @@ export interface ContextMenuOptions {
   class?: string
   list?: ContextMenuItem[]
   hover?: boolean | ContextMenuHoverOptions
+  document?: Document
 }
 
 export interface ContextMenuExpose {

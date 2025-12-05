@@ -10,12 +10,12 @@ import Import from "./fd-import/index.vue"
 import Search from "./fd-search/index.vue"
 import Select from "./fd-select/index.vue"
 import Upsert from "./fd-upsert"
-import Cascader from "./fd-cascader/index.vue"
+import Cascader from "./fd-cascader"
 import GridItem from "./fd-grid-item/index.vue"
 import FdOption from "./fd-option/index.vue"
 import AddButton from "./fd-add-button"
+import ContextMenu from "./fd-context-menu"
 import DeleteButton from "./fd-delete-button"
-import FdContextMenu from "./fd-context-menu"
 
 export const components: Record<string, Component> = {
   Crud,
@@ -34,7 +34,7 @@ export const components: Record<string, Component> = {
   Import,
   Export,
   Upsert,
-  FdContextMenu,
+  ContextMenu,
 }
 
 /**

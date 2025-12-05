@@ -8,6 +8,7 @@ import "./style.scss"
 
 const COMPONENT_NAME = "fd-context-menu"
 const HOVER_CLASS_NAME = "fd-context-menu__target"
+const ANIMATION_DURATION = 180
 
 function normalizeList(list?: ContextMenuItem[]): ContextMenuItem[] {
   const data = cloneDeep(list ?? [])
@@ -33,7 +34,7 @@ export const FdContextMenu = defineComponent({
   setup(props, { slots, expose }) {
     const { refs, setRefs } = useRefs<HTMLDivElement>()
     const list = ref<ContextMenuItem[]>(normalizeList(props.options?.list))
-    const ids = ref("")
+    const ids = ref<Set<string>>(new Set())
     const style = reactive({ top: "0px", left: "0px" })
     const visible = ref(false)
     const animationClass = ref("is-enter")
@@ -125,13 +126,13 @@ export const FdContextMenu = defineComponent({
       animationClass.value = "is-enter"
       extraClass.value = options.class ?? props.options?.class
       visible.value = true
-      ids.value = ""
+      ids.value = new Set()
 
       if (options.list?.length) {
         list.value = normalizeList(options.list)
       }
 
-      const doc = (event.target as HTMLElement | null)?.ownerDocument ?? document
+      const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
       registerOutsideClose(doc)
       markTarget(event, options.hover ?? props.options?.hover)
       positionMenu(event)
@@ -145,14 +146,14 @@ export const FdContextMenu = defineComponent({
       if (!visible.value)
         return
       animationClass.value = "is-leave"
-      const delay = immediate ? 0 : 180
+      const delay = immediate ? 0 : ANIMATION_DURATION
       window.setTimeout(() => {
         visible.value = false
       }, delay)
     }
 
     function toggleItem(item: ContextMenuItem, id: string) {
-      ids.value = id
+      ids.value = new Set([id])
       if (item.disabled)
         return
 
@@ -171,7 +172,7 @@ export const FdContextMenu = defineComponent({
 
     function renderList(items: ContextMenuItem[], parentId: string, level: number): JSX.Element {
       return (
-        <div class={["fd-context-menu__list", level > 1 && "is-append"]}>
+        <div class={["fd-context-menu__list", level > 1 && "is-append"]} role="menu">
           {items
             .filter(item => !item.hidden)
             .map((item, index) => {
@@ -185,9 +186,23 @@ export const FdContextMenu = defineComponent({
                   key={id}
                   class={{
                     "fd-context-menu__item": true,
-                    "is-active": ids.value.includes(id),
+                    "is-active": ids.value.has(id),
                     "is-ellipsis": item.ellipsis ?? true,
                     "is-disabled": item.disabled,
+                  }}
+                  role="menuitem"
+                  aria-disabled={item.disabled}
+                  tabindex={item.disabled ? -1 : 0}
+                  onKeydown={(event) => {
+                    if (item.disabled)
+                      return
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault()
+                      toggleItem(item, id)
+                    }
+                    if (event.key === "Escape") {
+                      close()
+                    }
                   }}
                 >
                   {prefixIcon && <span class={["fd-context-menu__icon", prefixIcon]}></span>}
@@ -270,7 +285,7 @@ export const FdContextMenu = defineComponent({
 
 export const ContextMenu = {
   open(event: MouseEvent, options: ContextMenuOptions = {}) {
-    const doc = (event.target as HTMLElement | null)?.ownerDocument ?? document
+    const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
     const host = doc.createElement("div")
     doc.body.appendChild(host)
 
@@ -291,7 +306,7 @@ export const ContextMenu = {
         setTimeout(() => {
           render(null, host)
           host.remove()
-        }, 200)
+        }, ANIMATION_DURATION)
       }
     }
 
