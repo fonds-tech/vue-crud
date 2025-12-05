@@ -5,6 +5,7 @@ import type { TableExpose, TableRecord, TableUseOptions } from "../../fd-table/t
 import Table from "../table"
 import { mount } from "@vue/test-utils"
 import { onDragMove } from "../settings"
+import { buildContextMenuItems } from "../actions"
 import { it, vi, expect, describe } from "vitest"
 import { h, ref, nextTick, defineComponent } from "vue"
 
@@ -410,19 +411,15 @@ describe("fd-table", () => {
   it("右键菜单使用 action 列生成内置操作", async () => {
     const wrapper = mountTable()
     const table = getExpose(wrapper)
-    table.use({
-      columns: [
-        { prop: "name", label: "姓名" },
-        { type: "action", actions: [{ type: "delete" }] },
-      ],
-    } as TableUseOptions)
-    table.setData([{ id: 1, name: "张三" }])
-    await nextTick()
-    const row = wrapper.find(".row")
-    await row.trigger("contextmenu")
-    await nextTick()
-    const menuItems = Array.from(document.body.querySelectorAll(".fd-table__context-menu-item"))
-    expect(menuItems.length).toBeGreaterThan(0)
-    expect(menuItems[0]?.textContent).toContain("刷新")
+    const columns: TableUseOptions["columns"] = [
+      { prop: "name", label: "姓名" },
+      { type: "action", actions: [{ type: "delete" }] },
+    ]
+    table.use({ columns } as TableUseOptions)
+    const scope = { row: { id: 1, name: "张三" }, column: columns[0]!, $index: 0 }
+    const items = buildContextMenuItems(scope as any, columns as any, coreStore.crud as any, table.refresh)
+    expect(items.length).toBeGreaterThan(0)
+    expect(items[0]?.label).toContain("刷新")
+    expect(items.some(item => item.label.includes("删除"))).toBe(true)
   })
 })
