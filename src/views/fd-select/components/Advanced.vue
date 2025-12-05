@@ -70,8 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import FdOption from "@/components/fd-option/index.vue"
-import FdSelect from "@/components/fd-select/index.vue"
+import FdOption from "@/components/fd-option"
+import FdSelect from "@/components/fd-select"
 import { ref } from "vue"
 import { ElMessage } from "element-plus"
 

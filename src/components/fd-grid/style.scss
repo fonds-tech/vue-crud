@@ -1,0 +1,10 @@
+.fd-grid {
+  width: 100%;
+  display: grid;
+  box-sizing: border-box;
+}
+
+.fd-grid-item {
+  min-width: 0;
+  box-sizing: border-box;
+}

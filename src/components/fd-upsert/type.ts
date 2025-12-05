@@ -1,4 +1,4 @@
-import type { GridProps } from "../fd-grid/type"
+import type { GridProps } from "../fd-grid"
 import type { dialogProps } from "element-plus"
 import type { ExtractPropTypes } from "vue"
 import type {

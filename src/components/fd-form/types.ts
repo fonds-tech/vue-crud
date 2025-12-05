@@ -1,5 +1,5 @@
 import type { Arrayable } from "element-plus/es/utils"
-import type { GridProps, GridItemProps } from "../fd-grid/type"
+import type { GridProps, GridItemProps } from "../fd-grid"
 import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormProps,

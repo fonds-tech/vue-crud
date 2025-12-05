@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import type { GridProps } from "../fd-grid/type"
+import type { GridProps } from "../fd-grid"
 import type { FormRecord, FormUseOptions } from "../fd-form/types"
 import type { SearchAction, SearchOptions } from "./type"
 import FdForm from "../fd-form/form"
