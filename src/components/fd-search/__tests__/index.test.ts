@@ -1,7 +1,7 @@
 import type FdFormComponent from "../../fd-form"
-import type { SearchExpose } from "../type"
+import type { SearchExpose } from "../types"
 import type { MountingOptions } from "@vue/test-utils"
-import Search from "../index.vue"
+import Search from "../search"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 import { h, nextTick, reactive, defineComponent } from "vue"
@@ -169,6 +169,22 @@ const FdGridItemStub = defineComponent({
   },
 })
 
+const FdFormStub = defineComponent({
+  name: "FdFormStub",
+  inheritAttrs: false,
+  setup(_, { slots, attrs, expose }) {
+    expose(formExpose)
+    return () => {
+      const { class: className, ...rest } = attrs as Record<string, any>
+      return h(
+        "form",
+        { ...rest, class: ["fd-form-stub", className].filter(Boolean).join(" ") },
+        slots.default?.(),
+      )
+    }
+  },
+})
+
 function mountSearch(options: MountingOptions<any> = {}) {
   const toWithArray = (slot?: any) => {
     if (slot === undefined)
@@ -192,6 +208,10 @@ function mountSearch(options: MountingOptions<any> = {}) {
         "el-col": ElColStub,
         "fd-grid": FdGridStub,
         "fd-grid-item": FdGridItemStub,
+        "fd-form": FdFormStub,
+        "FdForm": FdFormStub,
+        "FdGrid": FdGridStub,
+        "FdGridItem": FdGridItemStub,
         ...(options.global?.stubs ?? {}),
       },
       ...(options.global ?? {}),

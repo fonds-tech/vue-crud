@@ -1,5 +1,5 @@
 import type { GridProps, GridItemProps } from "../fd-grid"
-import type { FormRecord, FormUseOptions } from "../fd-form/types"
+import type { FormRef, FormRecord, FormUseOptions } from "../fd-form/types"
 import type { Ref, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
 /**
@@ -126,7 +126,7 @@ export interface SearchExpose<T extends FormRecord = FormRecord> {
   /**
    * fd-form 实例，可直接调用 form API（如 validate）
    */
-  form: Ref<InstanceType<typeof import("../fd-form/form")["default"]> | undefined>
+  form: Ref<FormRef<T> | undefined>
   /**
    * 初始化方法，外部调用时可覆盖默认配置
    */
@@ -143,4 +143,17 @@ export interface SearchExpose<T extends FormRecord = FormRecord> {
    * 控制折叠状态，传参则强制设置
    */
   collapse: (state?: boolean) => void
+}
+
+/**
+ * 搜索组件 Ref 类型
+ * @description 继承 fd-form 的 Ref，并补充 fd-search 特有方法
+ */
+export type SearchRef<T extends FormRecord = FormRecord> = FormRef<T> & {
+  readonly model: T
+  use: (options?: SearchOptions<T>) => void
+  search: (params?: Record<string, any>) => Promise<any>
+  reset: (params?: Record<string, any>) => Promise<any>
+  collapse: (state?: boolean) => void
+  form: Ref<FormRef<T> | undefined>
 }

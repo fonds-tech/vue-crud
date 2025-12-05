@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchOptions } from "@/components/fd-search/type"
+import type { SearchOptions } from "@/components/fd-search/types"
 import { computed } from "vue"
 import { Share, Download } from "@element-plus/icons-vue"
 import { SearchMockService } from "../mockService"

@@ -5,7 +5,7 @@ declare module "vue" {
     "fd-delete-button": typeof import("../components/fd-delete-button/index.vue")["default"]
     "fd-grid": typeof import("../components/fd-grid")["default"]
     "fd-grid-item": typeof import("../components/fd-grid-item")["default"]
-    "fd-search": typeof import("../components/fd-search/index.vue")["default"]
+    "fd-search": typeof import("../components/fd-search")["default"]
     "fd-table": typeof import("../components/fd-table/index")["default"]
     "fd-detail": typeof import("../components/fd-detail/index.vue")["default"]
     "fd-dialog": typeof import("../components/fd-dialog")["default"]

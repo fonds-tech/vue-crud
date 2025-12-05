@@ -1,0 +1,30 @@
+.fd-search {
+  gap: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  &__form {
+    flex: 1;
+
+    .el-form-item {
+      margin-bottom: 0;
+    }
+  }
+
+  &__action {
+    width: auto;
+  }
+
+  &__action-item {
+    display: inline-flex;
+  }
+
+  &__icon {
+    width: 1em;
+    display: inline-flex;
+    min-width: 1em;
+    align-items: center;
+    justify-content: center;
+  }
+}

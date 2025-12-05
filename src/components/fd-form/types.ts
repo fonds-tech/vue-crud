@@ -1,6 +1,6 @@
 import type { Arrayable } from "element-plus/es/utils"
 import type { GridProps, GridItemProps } from "../fd-grid"
-import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
+import type { Ref, VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormProps,
   FormInstance,
@@ -567,7 +567,7 @@ export interface FormExpose<T extends FormRecord = FormRecord> extends FormActio
    * Element Plus Form 原生实例引用
    * @description 可用于访问未被封装的原生方法
    */
-  form?: FormInstance
+  form: Ref<FormInstance | undefined>
   /**
    * 当前表单模式 ('add' | 'update')
    */
@@ -601,6 +601,7 @@ export interface FormExpose<T extends FormRecord = FormRecord> extends FormActio
 
 /**
  * 表单组件 Ref 类型
+ * @description 与 fd-form 组件实例的 ref 保持一致，等同于 FormExpose
  */
 export type FormRef<T extends FormRecord = FormRecord> = FormExpose<T>
 
