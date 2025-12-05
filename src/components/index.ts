@@ -7,12 +7,12 @@ import Detail from "./fd-detail"
 import Dialog from "./fd-dialog"
 import Export from "./fd-export/index.vue"
 import Import from "./fd-import/index.vue"
+import Option from "./fd-option"
 import Search from "./fd-search/index.vue"
-import Select from "./fd-select/index.vue"
+import Select from "./fd-select"
 import Upsert from "./fd-upsert"
 import Cascader from "./fd-cascader"
 import GridItem from "./fd-grid-item/index.vue"
-import FdOption from "./fd-option/index.vue"
 import AddButton from "./fd-add-button"
 import ContextMenu from "./fd-context-menu"
 import DeleteButton from "./fd-delete-button"
@@ -26,7 +26,7 @@ export const components: Record<string, Component> = {
   Dialog,
   Form,
   Search,
-  FdOption,
+  Option,
   Select,
   Cascader,
   Detail,

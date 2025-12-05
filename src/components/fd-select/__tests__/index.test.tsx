@@ -1,6 +1,6 @@
 import type { VueWrapper } from "@vue/test-utils"
-import Select from "../index.vue"
-import FdOption from "../../fd-option/index.vue"
+import Select from "../index"
+import FdOption from "../../fd-option/index"
 import ElementPlus from "element-plus"
 import { h, defineComponent } from "vue"
 import { mount, flushPromises } from "@vue/test-utils"
@@ -18,8 +18,18 @@ const baseOptions = [
 const ElOptionStub = defineComponent({
   name: "ElOptionStub",
   props: ["label", "value"],
-  setup(_, { slots }) {
-    return () => h("div", { class: "el-option-stub" }, slots.default?.())
+  setup(props, { slots, attrs }) {
+    return () =>
+      h(
+        "div",
+        {
+          "class": ["el-option-stub", attrs.class],
+          "data-label": props.label,
+          "data-value": props.value,
+          ...attrs,
+        },
+        slots.default?.(),
+      )
   },
 })
 
@@ -28,11 +38,16 @@ const ElSelectStub = defineComponent({
   props: {
     loading: { type: Boolean, default: false },
   },
-  setup(_, { slots }) {
-    return () => h("div", { class: "el-select-stub" }, [
-      slots.prefix?.({ loading: false, options: baseOptions }),
-      slots.default?.({ loading: false, options: baseOptions, refresh: () => {} }),
-    ])
+  setup(_, { slots, attrs }) {
+    return () =>
+      h(
+        "div",
+        { "class": ["el-select-stub", attrs.class], "data-attrs": attrs, ...attrs },
+        [
+          slots.prefix?.({ loading: false, options: baseOptions }),
+          slots.default?.({ loading: false, options: baseOptions, refresh: () => {} }),
+        ],
+      )
   },
 })
 
@@ -152,6 +167,51 @@ describe("fd-select", () => {
     expect(wrapper.emitted("search")?.[0]).toEqual(["海"]) // search事件携带关键字
 
     vi.useRealTimers()
+  })
+
+  it("字符串 api 成功拉取数据并覆盖选项", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+      ok: true,
+      json: async () => [{ label: "广州", value: "gz" }],
+    } as any)
+
+    const wrapper = mountFdSelect({ props: { api: "/mock-api/options" } })
+    await flushPromises()
+
+    expect(fetchMock).toHaveBeenCalled()
+    expect(wrapper.vm.options).toEqual([{ label: "广州", value: "gz" }])
+
+    fetchMock.mockRestore()
+  })
+
+  it("labelKey 自定义字段解析并渲染默认 option", async () => {
+    const customOptions = [{ name: "南京", value: "nj" }]
+    const wrapper = mountFdSelect({ props: { options: customOptions, labelKey: "name" } })
+
+    const optionNode = wrapper.find(".el-option-stub")
+    expect(optionNode.exists()).toBe(true)
+    expect(optionNode.attributes("data-label")).toBe("南京")
+    expect(optionNode.attributes("data-value")).toBe("nj")
+  })
+
+  it("attrs 透传与 class 合并", () => {
+    const wrapper = mountFdSelect({
+      props: { "class": "custom-class", "data-test-id": "select-1" } as any,
+    })
+    const selectComponent = wrapper.findComponent({ name: "ElSelectStub" })
+    expect(selectComponent.exists()).toBe(true)
+    expect(selectComponent.classes()).toContain("fd-select")
+    expect(selectComponent.classes()).toContain("custom-class")
+    expect(selectComponent.attributes("data-test-id")).toBe("select-1")
+  })
+
+  it("远程模式自动注入 remoteMethod 与 filterable", () => {
+    const wrapper = mountFdSelect({ props: { api: vi.fn().mockResolvedValue(baseOptions) } })
+    const selectComponent = wrapper.findComponent({ name: "ElSelectStub" })
+    const attrs = selectComponent.attributes() as unknown as Record<string, any>
+    expect(attrs.remote === "true" || attrs.remote === true || attrs.remote === "").toBe(true)
+    expect(typeof (selectComponent.vm as any).$attrs.remoteMethod).toBe("function")
+    expect(attrs.filterable === "true" || attrs.filterable === true || attrs.filterable === "").toBe(true)
   })
 })
 

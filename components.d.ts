@@ -20,9 +20,9 @@ declare module 'vue' {
     FdGrid: typeof import('./src/components/fd-grid/index.vue')['default']
     FdGridItem: typeof import('./src/components/fd-grid-item/index.vue')['default']
     FdImport: typeof import('./src/components/fd-import/index.vue')['default']
-    FdOption: typeof import('./src/components/fd-option/index.vue')['default']
+    FdOption: typeof import('./src/components/fd-option/index.tsx')['default']
     FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
-    FdSelect: typeof import('./src/components/fd-select/index.vue')['default']
+    FdSelect: typeof import('./src/components/fd-select/index.tsx')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
@@ -38,9 +38,9 @@ declare global {
   const FdGrid: typeof import('./src/components/fd-grid/index.vue')['default']
   const FdGridItem: typeof import('./src/components/fd-grid-item/index.vue')['default']
   const FdImport: typeof import('./src/components/fd-import/index.vue')['default']
-  const FdOption: typeof import('./src/components/fd-option/index.vue')['default']
+  const FdOption: typeof import('./src/components/fd-option/index.tsx')['default']
   const FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
-  const FdSelect: typeof import('./src/components/fd-select/index.vue')['default']
+  const FdSelect: typeof import('./src/components/fd-select/index.tsx')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
 }
