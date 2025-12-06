@@ -14,12 +14,10 @@ interface MethodsContext<T extends FormRecord = FormRecord> {
 }
 
 /**
- * 表单原生方法 Hook
- * @description 封装 Element Plus Form 的原生方法，并增强 submit 逻辑 (hooks 处理)
- * @param params 方法上下文对象
- * @param params.options 表单配置选项
- * @param params.form Element Plus Form 实例引用
- * @param params.model 表单数据模型
+ * 构建表单方法集合，封装并增强 Element Plus Form 原生方法（含 submit 钩子处理）。
+ * @param options 表单配置选项
+ * @param form Element Plus Form 实例引用
+ * @param model 表单数据模型
  * @returns 表单方法集合
  */
 export function useMethods<T extends FormRecord = FormRecord>({ options, form, model }: MethodsContext<T>): FormMethods<T> {

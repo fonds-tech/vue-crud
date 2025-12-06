@@ -1,6 +1,6 @@
-import type FdFormComponent from "../../fd-form"
 import type { SearchExpose } from "../types"
 import type { MountingOptions } from "@vue/test-utils"
+import type { FormRef, FormRecord } from "../../fd-form/types"
 import Search from "../search"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe, beforeEach } from "vitest"
@@ -185,21 +185,9 @@ const FdFormStub = defineComponent({
   },
 })
 
-function mountSearch(options: MountingOptions<any> = {}) {
-  const toWithArray = (slot?: any) => {
-    if (slot === undefined)
-      return undefined
-    return Array.isArray(slot) ? slot : [slot]
-  }
-
-  const mergedSlots: Record<string, any> = { ...(options.slots ?? {}) }
-  mergedSlots.default = toWithArray(options.slots?.default) ?? [() => h("div", "slot")]
-  Object.keys(mergedSlots).forEach((key) => {
-    mergedSlots[key] = toWithArray(mergedSlots[key]) ?? mergedSlots[key]
-  })
-
-  return mount(Search, {
-    slots: mergedSlots as MountingOptions<any>["slots"],
+function mountSearch(options: MountingOptions<typeof Search> = {}) {
+  const { slots: _slots, ...restOptions } = options
+  const mountOptions = {
     global: {
       stubs: {
         "el-button": ElButtonStub,
@@ -217,8 +205,12 @@ function mountSearch(options: MountingOptions<any> = {}) {
       ...(options.global ?? {}),
     },
     shallow: true,
-    ...options,
-  })
+    ...restOptions,
+    slots: undefined as MountingOptions<typeof Search>["slots"],
+  } as MountingOptions<typeof Search>
+
+  // @ts-expect-error vtue slots typing mismatch, stub slots not required here
+  return mount(Search, mountOptions)
 }
 
 function getExpose(wrapper: ReturnType<typeof mountSearch>) {
@@ -236,7 +228,7 @@ describe("fd-search", () => {
     const wrapper = mountSearch()
     const search = getExpose(wrapper)
     expect(search.form).toBeDefined()
-    search.form!.value = formExpose as unknown as FdFormInstance
+    search.form!.value = formExpose as unknown as FormRef<FormRecord>
     await nextTick()
     const options: Parameters<SearchExpose["use"]>[0] = {
       model: { keyword: "" },
@@ -261,7 +253,7 @@ describe("fd-search", () => {
     const wrapper = mountSearch()
     const search = getExpose(wrapper)
     expect(search.form).toBeDefined()
-    search.form!.value = formExpose as unknown as FdFormInstance
+    search.form!.value = formExpose as unknown as FormRef<FormRecord>
     await nextTick()
     search.use({
       action: {
@@ -284,7 +276,7 @@ describe("fd-search", () => {
     const wrapper = mountSearch()
     const search = getExpose(wrapper)
     expect(search.form).toBeDefined()
-    search.form!.value = formExpose as unknown as FdFormInstance
+    search.form!.value = formExpose as unknown as FormRef<FormRecord>
     await nextTick()
     formExpose.model.keyword = "Vue3"
     coreStore.crud.refresh = vi.fn(async () => "ok")
@@ -306,7 +298,7 @@ describe("fd-search", () => {
     const wrapper = mountSearch()
     const search = getExpose(wrapper)
     expect(search.form).toBeDefined()
-    search.form!.value = formExpose as unknown as FdFormInstance
+    search.form!.value = formExpose as unknown as FormRef<FormRecord>
     await nextTick()
     coreStore.crud.refresh = vi.fn(async () => "reset-ok")
     const result = await search.reset({ status: false })
@@ -317,4 +309,3 @@ describe("fd-search", () => {
     expect(result).toBe("reset-ok")
   })
 })
-type FdFormInstance = InstanceType<typeof FdFormComponent>

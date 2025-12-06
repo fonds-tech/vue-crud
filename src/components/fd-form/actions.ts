@@ -15,6 +15,11 @@ import formHook from "./hooks"
 import { dataset } from "../../utils/dataset"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
 
+/**
+ * 判断值是否符合 PromiseLike 约定。
+ * @param value 待检测的值
+ * @returns 是否可按 Promise then 方式处理
+ */
 const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as any).then === "function")
 
 interface ActionContext<T extends FormRecord = FormRecord> {
@@ -93,16 +98,6 @@ function setModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormIt
   }
 }
 
-/**
- * 表单操作 Hook
- * @description 提供一系列编程式操作表单配置、数据和状态的方法
- * @param params 上下文参数对象
- * @param params.options 表单配置选项
- * @param params.model 表单数据模型
- * @param params.form Element Plus Form 实例引用
- * @param params.optionState 选项状态记录 (Ref Object)
- * @returns 表单操作方法集合
- */
 export function useAction<T extends FormRecord = FormRecord>({ options, model, form, optionState }: ActionContext<T>): FormActions<T> {
   /**
    * 查找表单项配置对象

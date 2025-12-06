@@ -1,4 +1,5 @@
 import type { GridProps } from "../fd-grid"
+import type { Component, VNodeChild } from "vue"
 import type { SearchAction, SearchOptions } from "./types"
 import type { FormRef, FormRecord, FormUseOptions } from "../fd-form/types"
 import FdForm from "../fd-form/form"
@@ -19,6 +20,7 @@ import {
   reactive,
   useSlots,
   onMounted,
+
   defineComponent,
   onBeforeUnmount,
   resolveDynamicComponent,
@@ -343,14 +345,14 @@ export default defineComponent({
       const componentSlots = getComponentSlots(action)
       const entries = Object.entries(componentSlots)
       if (!entries.length) return undefined
-      const slotRender: Record<string, any> = {}
+      const slotRender: Record<string, () => VNodeChild> = {}
       entries.forEach(([name, value]) => {
         slotRender[name] = () => {
           if (typeof value === "function") {
             return (value as () => any)()
           }
-          const Dynamic = resolveDynamicComponent(value as any)
-          return h(Dynamic)
+          const Dynamic = resolveDynamicComponent(value as string | Component)
+          return h(Dynamic as Component)
         }
       })
       return slotRender
@@ -359,12 +361,12 @@ export default defineComponent({
     const renderComponent = (action: SearchAction) => {
       const componentIs = getComponentIs(action)
       if (!componentIs) return null
-      const Dynamic = resolveDynamicComponent(componentIs as any)
+      const Dynamic = resolveDynamicComponent(componentIs as string | Component)
       const componentProps = getComponentProps(action)
       const componentEvents = transformEvents(getComponentEvents(action))
       const componentSlots = renderCustomSlots(action)
       return h(
-        Dynamic,
+        Dynamic as Component,
         {
           style: getComponentStyle(action),
           ...componentProps,

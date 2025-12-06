@@ -1,6 +1,7 @@
 import type { Arrayable } from "element-plus/es/utils"
+import type { FormHelpers } from "./engine"
 import type { GridProps, GridItemProps } from "../fd-grid"
-import type { Ref, VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
+import type { Ref, VNode, VNodeChild, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
 import type {
   FormProps,
   FormInstance,
@@ -164,6 +165,34 @@ export type FormMaybeFn<T, M extends FormRecord = FormRecord> = T | ((model: M) 
  * @description 支持同步或异步返回值
  */
 export type MaybePromise<T> = T | Promise<T>
+
+/** 渲染层上下文（仅渲染消费，不含业务方法） */
+export interface FormRenderContext {
+  formRef: Ref<FormInstance | undefined>
+  options: FormOptions
+  model: FormRecord
+  step: Ref<number>
+  activeGroupName: Ref<string | number | undefined>
+  resolvedActiveGroup: ComputedRef<string | number | undefined>
+  activeStepName: ComputedRef<string | number | undefined>
+  helpers: FormHelpers
+  slots: Record<string, ((...args: any[]) => VNodeChild) | undefined>
+  attrs: Record<string, unknown>
+}
+
+/** 渲染层上下文（仅渲染消费，不含业务方法） */
+export interface FormRenderContext {
+  formRef: Ref<FormInstance | undefined>
+  options: FormOptions
+  model: FormRecord
+  step: Ref<number>
+  activeGroupName: Ref<string | number | undefined>
+  resolvedActiveGroup: ComputedRef<string | number | undefined>
+  activeStepName: ComputedRef<string | number | undefined>
+  helpers: FormHelpers
+  slots: Record<string, ((...args: any[]) => VNodeChild) | undefined>
+  attrs: Record<string, unknown>
+}
 
 /**
  * 表单组件插槽内容类型

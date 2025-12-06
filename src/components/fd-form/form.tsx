@@ -1,4 +1,4 @@
-import { renderForm } from "./render"
+import { renderForm } from "./render/form"
 import { useFormEngine } from "./engine"
 import { defineComponent } from "vue"
 import "./style.scss"
