@@ -13,12 +13,13 @@ export type FormHelpers = ReturnType<typeof createHelpers>
 
 /**
  * 创建表单辅助函数集合，负责模型读写、组件解析、分组/步骤控制与属性计算等。
- * @param options 表单配置
- * @param model 表单数据模型
- * @param resolvedActiveGroup 当前激活分组
- * @param step 步骤 Ref
- * @param loadedGroups 已加载分组集合
- * @param optionState 选项加载状态记录
+ * @param options 参数对象
+ * @param options.options 表单配置
+ * @param options.model 表单数据模型
+ * @param options.resolvedActiveGroup 当前激活分组
+ * @param options.step 步骤 Ref
+ * @param options.loadedGroups 已加载分组集合
+ * @param options.optionState 选项加载状态记录
  * @returns 辅助方法集合
  */
 export function createHelpers({

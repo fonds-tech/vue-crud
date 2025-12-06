@@ -1,6 +1,6 @@
 import type { CrudBridge } from "./actions"
 import type { TableSize, TableState } from "./state"
-import type { TableScope, TableRecord, TableEmitName } from "../type"
+import type { TableScope, TableRecord } from "../type"
 import { buildContextMenuItems } from "./actions"
 
 /**
@@ -38,7 +38,7 @@ export interface TableHandlersContext {
   crudBridge: CrudBridge
   refresh: (params?: Record<string, unknown>) => void
   /** 事件发射器 */
-  emit: (event: TableEmitName, ...args: unknown[]) => void
+  emit: (event: string, ...args: unknown[]) => void
 }
 
 /**

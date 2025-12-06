@@ -34,10 +34,11 @@ interface MergeContext {
 
 /**
  * 合并外部 use 配置到内部响应式 options，并同步模型与步骤。
- * @param options 当前表单配置
- * @param model 当前表单数据模型
- * @param step 步骤 Ref
- * @param helpers 辅助方法集合
+ * @param options 参数对象
+ * @param options.options 当前表单配置
+ * @param options.model 当前表单数据模型
+ * @param options.step 步骤 Ref
+ * @param options.helpers 辅助方法集合
  * @param useOptions 外部传入的配置
  */
 export function mergeFormOptions({ options, model, step, helpers }: MergeContext, useOptions: FormUseOptions = {}) {

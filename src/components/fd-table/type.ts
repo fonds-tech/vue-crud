@@ -1,7 +1,5 @@
-import type { TableProps, TableInstance, TableColumnCtx, PaginationProps } from "element-plus"
-import type { VNode, VNodeChild, CSSProperties, ObjectEmitsOptions, Component as VueComponent } from "vue"
-
-import { ElTable } from "element-plus"
+import type { TableProps, TableColumnCtx, PaginationProps } from "element-plus"
+import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
 /**
  * 表格数据记录类型
@@ -330,39 +328,3 @@ export interface TableExpose<T extends TableRecord = TableRecord> {
    */
   toggleFullscreen: (full?: boolean) => void
 }
-
-/**
- * 表格实例类型
- */
-export type TableInstanceExtended = InstanceType<typeof import("./table")["default"]> & TableInstance
-
-/**
- * ElTable 原生事件定义
- * @description 直接复用运行时 ElTable.emits，并做类型收窄
- */
-export const elTableEmits = (ElTable.emits || {}) as ObjectEmitsOptions
-export type ElTableEmits = typeof elTableEmits
-export type ElTableEventName = Extract<keyof ElTableEmits, string>
-export const elTableEventNames = Object.keys(elTableEmits) as ElTableEventName[]
-
-/**
- * fd-table 自定义事件定义（携带简单校验以启用 Vue 的 emits 类型推导）
- */
-export const customTableEmits = {
-  columnsChange: (cols: TableColumn<TableRecord>[]) => Array.isArray(cols),
-  fullscreenChange: (full: boolean) => typeof full === "boolean",
-  sizeChange: (size: string) => typeof size === "string",
-  pageChange: (page: number) => typeof page === "number",
-  pageSizeChange: (size: number) => typeof size === "number",
-} as const satisfies ObjectEmitsOptions
-export type CustomTableEmits = typeof customTableEmits
-export type CustomTableEventName = Extract<keyof CustomTableEmits, string>
-
-/**
- * fd-table 合并后的事件定义（原生 + 自定义）
- */
-export const tableEmitsExtended = { ...elTableEmits, ...customTableEmits } as const satisfies ObjectEmitsOptions
-export type TableEmitsExtended = typeof tableEmitsExtended
-// 原生事件名未知（来自运行时），与自定义事件组成联合；为兼容性，整体放宽为 string
-export type TableEmitName = string | CustomTableEventName
-export type TableEmitFn = (event: TableEmitName, ...args: unknown[]) => void

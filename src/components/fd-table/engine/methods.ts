@@ -1,5 +1,5 @@
 import type { TableState } from "./state"
-import type { TableRecord, TableOptions, TableEmitName, TableUseOptions } from "../type"
+import type { TableRecord, TableOptions, TableUseOptions } from "../type"
 import { merge } from "lodash-es"
 import { getColumnId, rebuildColumnSettings } from "./settings"
 
@@ -52,7 +52,7 @@ export interface TableMethodsContext {
   mitt?: {
     emit?: (event: string, payload?: unknown) => void
   }
-  emit: (event: TableEmitName, ...args: unknown[]) => void
+  emit: (event: string, ...args: unknown[]) => void
 }
 
 /**

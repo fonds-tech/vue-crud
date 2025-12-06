@@ -11,9 +11,10 @@ interface NormalizeContext {
 
 /**
  * 规范化表单项配置：补默认组件结构、应用默认值、执行 hook、注入必填规则。
- * @param options 表单配置
- * @param model 表单模型
- * @param helpers 辅助方法集合
+ * @param options 参数对象
+ * @param options.options 表单配置
+ * @param options.model 表单模型
+ * @param options.helpers 辅助方法集合
  */
 export function normalizeItems({ options, model, helpers }: NormalizeContext) {
   options.items.forEach((item) => {

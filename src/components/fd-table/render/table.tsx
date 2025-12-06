@@ -5,12 +5,35 @@ import type { Slots, VNode, Directive, CSSProperties } from "vue"
 import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { renderColumns } from "./columns"
-import { elTableEventNames } from "../type"
 import { renderContextMenu } from "./context-menu"
 import { h, withDirectives } from "vue"
 import { ElTable, ElLoading } from "element-plus"
 import { ColumnSettingsPanel } from "./settings-panel"
 import { onDragEnd, onDragMove, saveColumns, toggleFixed, resetColumns, toggleAllColumns, onColumnShowChange } from "../engine/settings"
+
+// Element Plus Table 支持的事件列表（按官方文档枚举，用于动态生成事件监听器）
+const elTableEventNames = [
+  "select",
+  "select-all",
+  "selection-change",
+  "cell-mouse-enter",
+  "cell-mouse-leave",
+  "cell-click",
+  "cell-dblclick",
+  "cell-contextmenu",
+  "row-click",
+  "row-contextmenu",
+  "row-dblclick",
+  "row-mouse-enter",
+  "row-mouse-leave",
+  "expand-change",
+  "current-change",
+  "header-click",
+  "header-contextmenu",
+  "sort-change",
+  "filter-change",
+  "header-dragend",
+] as const
 
 /**
  * 渲染表格的参数接口
@@ -35,7 +58,7 @@ export function renderTable(params: RenderTableParams): VNode {
   )
 
   // 动态生成 ElTable 事件监听器
-  const eventListeners = elTableEventNames.reduce((acc, event) => {
+  const eventListeners = elTableEventNames.reduce<Record<string, (...args: unknown[]) => void>>((acc, event) => {
     // 将 kebab-case 事件名转换为 camelCase (例如 selection-change -> selectionChange)
     const camelEvent = String(event).replace(/-([a-z])/g, (_: string, letter: string) => letter.toUpperCase())
     const propName = `on${camelEvent.charAt(0).toUpperCase()}${camelEvent.slice(1)}`
