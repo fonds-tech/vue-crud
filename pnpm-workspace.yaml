@@ -7,7 +7,7 @@ catalog:
   '@antfu/utils': ^9.3.0
   '@element-plus/icons-vue': ^2.3.2
   '@fonds/eslint-config': ^1.0.25
-  '@fonds/utils': ^1.0.6
+  '@fonds/utils': ^1.0.7
   '@iconify-json/tabler': ^1.2.23
   '@types/lodash-es': ^4.17.12
   '@types/node': ^24.10.0

@@ -19,8 +19,8 @@ catalogs:
       specifier: ^1.0.25
       version: 1.0.25
     '@fonds/utils':
-      specifier: ^1.0.6
-      version: 1.0.6
+      specifier: ^1.0.7
+      version: 1.0.7
     '@iconify-json/tabler':
       specifier: ^1.2.23
       version: 1.2.23
@@ -127,7 +127,7 @@ importers:
         version: 2.3.2(vue@3.5.25(typescript@5.9.3))
       '@fonds/utils':
         specifier: 'catalog:'
-        version: 1.0.6
+        version: 1.0.7
       element-plus:
         specifier: 'catalog:'
         version: 2.11.9(vue@3.5.25(typescript@5.9.3))
@@ -1071,8 +1071,8 @@ packages:
       svelte-eslint-parser:
         optional: true
 
-  '@fonds/utils@1.0.6':
-    resolution: {integrity: sha512-+542z3eOBL0qw3mi3lroy8U7OBDKKsI2qoc3hJ+4diPDADFa8yQS9KhcOPLvXHP/iqG+YOYc+Wd5cagzG3DUZw==}
+  '@fonds/utils@1.0.7':
+    resolution: {integrity: sha512-7EydRLIm3FFSoldTdAu70fdCOvBYRTsAn3vwRPcdBLiMTpLgvcUF04hZ4qnxo+QszZmvU4QTnCZR6wtd2hoD8Q==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -4435,7 +4435,7 @@ snapshots:
       - typescript
       - vitest
 
-  '@fonds/utils@1.0.6':
+  '@fonds/utils@1.0.7':
     dependencies:
       lodash-es: 4.17.21
 
