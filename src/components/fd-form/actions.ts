@@ -1,104 +1,25 @@
-import type { Ref } from "vue"
-import type { FormInstance, FormItemProp } from "element-plus"
+import type { Arrayable } from "element-plus/es/utils"
+import type { FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
 import type {
   FormItem,
   FormMode,
   FormRecord,
   FormActions,
   FormMaybeFn,
+  FormMethods,
   FormOptions,
   MaybePromise,
+  FormActionContext,
   FormItemRuleWithMeta,
-  FormAsyncOptionsState,
 } from "./types"
 import formHook from "./hooks"
 import { dataset } from "../../utils/dataset"
+import { toArray } from "../../utils/object"
+import { syncOptions, ensureOptionState } from "./engine/options"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
+import { propToString, getModelValue, setModelValue } from "./engine/path"
 
-/**
- * 判断值是否符合 PromiseLike 约定。
- * @param value 待检测的值
- * @returns 是否可按 Promise then 方式处理
- */
-const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as any).then === "function")
-
-interface ActionContext<T extends FormRecord = FormRecord> {
-  options: FormOptions<T>
-  model: T
-  form: Ref<FormInstance | undefined>
-  optionState: Record<string, FormAsyncOptionsState>
-}
-
-function toArray<T>(value: T | T[]): T[] {
-  return Array.isArray(value) ? value : [value]
-}
-
-/**
- * 将 FormItemProp 规范化为路径数组
- * @param prop 字段 prop (字符串或数组)
- * @returns 路径字符串数组或 undefined
- */
-function toPathArray(prop?: FormItemProp): string[] | undefined {
-  if (prop === undefined || prop === null)
-    return undefined
-  if (Array.isArray(prop))
-    return prop.map(String)
-  const path = String(prop).split(".").filter(Boolean)
-  return path.length ? path : undefined
-}
-
-/**
- * 将路径转为展示用字符串 (e.g., 'user.name')
- * @param prop 字段 prop
- * @returns 路径字符串
- */
-function propToString(prop?: FormItemProp): string {
-  const path = toPathArray(prop)
-  return path?.join(".") ?? ""
-}
-
-/**
- * 读取模型中的值，支持嵌套路径
- * @param model 表单模型对象
- * @param prop 字段 prop
- * @returns 对应的值
- */
-function getModelValue<T extends FormRecord = FormRecord>(model: T, prop?: FormItemProp) {
-  const path = toPathArray(prop)
-  if (!path?.length)
-    return model
-  let cursor: any = model
-  for (const segment of path) {
-    if (cursor == null || typeof cursor !== "object")
-      return undefined
-    cursor = cursor[segment]
-  }
-  return cursor
-}
-
-/**
- * 写入模型中的值，支持嵌套路径，自动创建中间对象
- * @param model 表单模型对象
- * @param prop 字段 prop
- * @param value 要设置的值
- */
-function setModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormItemProp, value: any) {
-  const path = toPathArray(prop)
-  if (!path?.length)
-    return
-  let cursor: any = model
-  for (let i = 0; i < path.length; i++) {
-    const key = path[i]!
-    if (i === path.length - 1) {
-      cursor[key] = value
-      return
-    }
-    cursor[key] = cursor[key] ?? {}
-    cursor = cursor[key]
-  }
-}
-
-export function useAction<T extends FormRecord = FormRecord>({ options, model, form, optionState }: ActionContext<T>): FormActions<T> {
+export function useAction<T extends FormRecord = FormRecord>({ options, model, form, optionState }: FormActionContext<T>): FormActions<T> {
   /**
    * 查找表单项配置对象
    * @param prop 表单项 prop
@@ -109,54 +30,6 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
       return undefined
     const propKey = propToString(prop)
     return options.items.find(item => propToString(item.prop) === propKey)
-  }
-
-  let optionRequestId = 0
-
-  /**
-   * 确保选项状态存在
-   * @param prop 字段 prop
-   * @returns 状态对象
-   */
-  function ensureOptionState(prop?: FormItemProp) {
-    const key = propToString(prop)
-    if (!optionState[key])
-      optionState[key] = { loading: false }
-    return optionState[key]!
-  }
-
-  /**
-   * 将同步/异步 options 同步到状态，处理竞态
-   * @param prop 字段 prop
-   * @param value 选项数据或 Promise
-   * @returns 最新状态
-   */
-  function syncOptionsState(prop: FormItemProp, value: MaybePromise<any[]>) {
-    const state = ensureOptionState(prop)
-    if (isPromiseLike(value)) {
-      const requestId = ++optionRequestId
-      state.loading = true
-      state.error = undefined
-      state.requestId = requestId
-      value
-        .then((data) => {
-          if (state.requestId === requestId) {
-            state.value = data
-            state.loading = false
-          }
-        })
-        .catch((error) => {
-          if (state.requestId === requestId) {
-            state.error = error
-            state.loading = false
-          }
-        })
-      return state
-    }
-    state.value = value
-    state.loading = false
-    state.error = undefined
-    return state
   }
 
   /**
@@ -348,7 +221,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    */
   function setOptions(prop: FormItemProp, value: MaybePromise<any[]>) {
     set({ prop, key: "options" }, value)
-    syncOptionsState(prop, value)
+    syncOptions(optionState, propToString(prop), value)
   }
 
   /**
@@ -359,11 +232,9 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
   function getOptions(prop: FormItemProp) {
     const optionValue = resolveOptionSource(prop)
     if (optionValue === undefined)
-      return ensureOptionState(prop).value
-    const state = syncOptionsState(prop, optionValue)
-    if (isPromiseLike(optionValue))
-      return state.value
-    return state.value ?? optionValue
+      return ensureOptionState(optionState, propToString(prop)).value
+    const state = syncOptions(optionState, propToString(prop), optionValue)
+    return state.value
   }
 
   /**
@@ -371,7 +242,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * @param prop 字段 prop
    */
   function getOptionsState(prop: FormItemProp) {
-    return ensureOptionState(prop)
+    return ensureOptionState(optionState, propToString(prop))
   }
 
   /**
@@ -381,8 +252,8 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
   async function reloadOptions(prop: FormItemProp) {
     const optionValue = resolveOptionSource(prop)
     if (optionValue === undefined)
-      return ensureOptionState(prop).value
-    const state = syncOptionsState(prop, optionValue)
+      return ensureOptionState(optionState, propToString(prop)).value
+    const state = syncOptions(optionState, propToString(prop), optionValue)
     try {
       const data = await Promise.resolve(optionValue)
       state.value = data
@@ -512,4 +383,148 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
   }
 
   return actions
+}
+
+/**
+ * 构建表单方法集合，封装并增强 Element Plus Form 原生方法（含 submit 钩子处理）。
+ */
+export function useMethods<T extends FormRecord = FormRecord>({ options, form, model }: { options: FormOptions<T>, form: FormActionContext<T>["form"], model: T }): FormMethods<T> {
+  const ensureFieldsArray = (field?: Arrayable<FormItemProp>): string[] | undefined => {
+    if (!field)
+      return undefined
+    const flatten = Array.isArray(field) ? field : [field]
+    return flatten.flatMap(item => (Array.isArray(item) ? item : [item]))
+  }
+
+  const methods: FormMethods<T> = {
+    validate(callback?: FormValidateCallback) {
+      if (!form.value) {
+        callback?.(true)
+        return Promise.resolve(true)
+      }
+      return form.value.validate((isValid, invalidFields) => {
+        callback?.(isValid, invalidFields)
+      })
+    },
+
+    validateField(props?: Arrayable<FormItemProp>, callback?: FormValidateCallback) {
+      if (!form.value) {
+        callback?.(true)
+        return Promise.resolve(true) as FormValidationResult
+      }
+      return form.value.validateField(props, callback)
+    },
+
+    resetFields(field?: Arrayable<FormItemProp>) {
+      form.value?.resetFields(field)
+    },
+
+    clearFields(field?: Arrayable<FormItemProp>) {
+      const targets = ensureFieldsArray(field)
+      if (!targets) {
+        Object.keys(model).forEach((key) => {
+          delete model[key]
+        })
+      }
+      else {
+        targets.forEach((key) => {
+          delete model[key]
+        })
+      }
+      form.value?.clearValidate(field)
+    },
+
+    clearValidate(field?: Arrayable<FormItemProp>) {
+      form.value?.clearValidate(field)
+    },
+
+    setFields(data: Record<string, any>) {
+      Object.keys(data).forEach((key) => {
+        model[key as keyof T] = data[key]
+      })
+    },
+
+    scrollToField(field: FormItemProp) {
+      form.value?.scrollToField(field)
+    },
+
+    submit(callback?: (model: T, errors: Record<string, any> | undefined) => void) {
+      return new Promise<{ values: T, errors: Record<string, any> | undefined }>((resolve) => {
+        methods.validate((_, invalidFields) => {
+          const values = clone(model) as T
+          const normalizedErrors = normalizeErrors(invalidFields as Record<string, any> | undefined, values)
+          const hasErrors = Boolean(normalizedErrors && Object.keys(normalizedErrors).length > 0)
+
+          if (!hasErrors) {
+            options.items.forEach((item: FormItem<T>) => {
+              const propName = propToString(item.prop)
+              if (item.hook && item.prop && isDef(values[propName as keyof T])) {
+                formHook.submit({
+                  hook: item.hook,
+                  model: values,
+                  field: propName,
+                  value: values[propName as keyof T],
+                })
+              }
+            })
+          }
+
+          if (isFunction(callback)) {
+            callback(values, normalizedErrors)
+          }
+
+          if (!hasErrors && isFunction(options.onSubmit)) {
+            options.onSubmit(values, undefined)
+          }
+
+          resolve({ values, errors: normalizedErrors })
+        })
+      })
+    },
+  }
+
+  return methods
+}
+
+function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<string, any> | undefined, values: T) {
+  if (!errors)
+    return errors
+
+  const result: Record<string, any> = {}
+  Object.keys(errors).forEach((field) => {
+    const fieldErrors = errors[field]
+    const value = (values as Record<string, any>)[field]
+
+    const isEmpty = value === undefined || value === null || value === ""
+
+    const isRequiredError = (err: any) =>
+      err?.required === true
+      || err?.type === "required"
+      || err?._inner === true
+      || (typeof err?.message === "string" && err.message.includes("必填"))
+
+    const filtered = Array.isArray(fieldErrors)
+      ? fieldErrors.filter(err => !(isRequiredError(err) && !isEmpty))
+      : fieldErrors
+
+    if (Array.isArray(filtered) && filtered.length > 0)
+      result[field] = filtered
+  })
+
+  return Object.keys(result).length ? result : undefined
+}
+
+/**
+ * 组合 actions 与 methods，提供统一入口。
+ * 返回平铺对象方便直接解构，也同时暴露分组字段便于区分。
+ */
+export function useFormApi<T extends FormRecord = FormRecord>(ctx: FormActionContext<T>) {
+  const actions = useAction(ctx)
+  const methods = useMethods(ctx as any)
+  return {
+    actions,
+    methods,
+    ...actions,
+    ...methods,
+  }
 }

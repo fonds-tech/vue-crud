@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { FormHelpers } from "./helpers"
-import type { FormItem, FormRecord, FormOptions, FormUseOptions } from "../types"
+import type { FormItem, FormRecord, FormOptions, MaybePromise, FormUseOptions, FormAsyncOptionsState } from "../types"
 import { merge } from "lodash-es"
 
 export function createInitialOptions(): FormOptions {
@@ -73,4 +73,57 @@ export function mergeFormOptions({ options, model, step, helpers }: MergeContext
     Object.assign(model, useOptions.model)
   }
   step.value = 1
+}
+
+const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as { then?: unknown }).then === "function")
+
+/**
+ * 确保选项状态存在
+ */
+export function ensureOptionState(optionState: Record<string, FormAsyncOptionsState>, key: string) {
+  if (!optionState[key])
+    optionState[key] = { loading: false }
+  return optionState[key]!
+}
+
+/**
+ * 同步 options 状态：缓存当前 Promise，避免重复请求，处理竞态。
+ */
+export function syncOptions(optionState: Record<string, FormAsyncOptionsState>, key: string, value: MaybePromise<any[] | undefined>) {
+  const state = ensureOptionState(optionState, key)
+
+  if (isPromiseLike(value)) {
+    if (state.pending === value && state.loading)
+      return state
+
+    const requestId = (state.requestId ?? 0) + 1
+    state.pending = value
+    state.requestId = requestId
+    state.loading = true
+    state.error = undefined
+
+    value
+      .then((data) => {
+        if (state.requestId === requestId) {
+          state.value = data
+          state.loading = false
+          state.pending = undefined
+        }
+      })
+      .catch((error: unknown) => {
+        if (state.requestId === requestId) {
+          state.error = error
+          state.loading = false
+          state.pending = undefined
+        }
+      })
+
+    return state
+  }
+
+  state.pending = undefined
+  state.value = value as any[] | undefined
+  state.loading = false
+  state.error = undefined
+  return state
 }

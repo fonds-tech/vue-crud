@@ -264,6 +264,16 @@ export interface FormAsyncOptionsState {
   error?: unknown
   /** 内部使用的请求标识，用于避免竞态污染状态 */
   requestId?: number
+  /** 内部缓存的 Promise，避免重复请求 */
+  pending?: Promise<any[] | undefined>
+}
+
+/** actions 内部上下文类型，集中到公共 types 便于复用与维护 */
+export interface FormActionContext<T extends FormRecord = FormRecord> {
+  options: FormOptions<T>
+  model: T
+  form: Ref<FormInstance | undefined>
+  optionState: Record<string, FormAsyncOptionsState>
 }
 
 /**

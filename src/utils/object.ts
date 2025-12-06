@@ -3,6 +3,10 @@ import { mergeWith } from "lodash-es"
 import { isFunction } from "@fonds/utils"
 import { isRef, toValue } from "vue"
 
+export function toArray<T>(value: T | T[]): T[] {
+  return Array.isArray(value) ? value : [value]
+}
+
 function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value)
 }

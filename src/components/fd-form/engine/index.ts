@@ -1,9 +1,9 @@
 import type { FormHelpers } from "./helpers"
 import type { FormInstance } from "element-plus"
 import type { Ref, ComputedRef } from "vue"
+import type { useAction, useMethods } from "../actions"
 import type { FormRecord, FormOptions, FormUseOptions, FormAsyncOptionsState } from "../types"
-import { useAction } from "../actions"
-import { useMethods } from "../methods"
+import { useFormApi } from "../actions"
 import { createHelpers } from "./helpers"
 import { normalizeItems } from "./normalize"
 import { clone, isFunction } from "@fonds/utils"
@@ -54,8 +54,7 @@ export function useFormEngine(): FormEngine {
   const loadedGroups = ref<Set<string | number>>(new Set())
   const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
   const helpers = createHelpers({ options, model, resolvedActiveGroup, step, loadedGroups, optionState })
-  const action = useAction({ options, model, form: formRef, optionState })
-  const methods = useMethods({ options, model, form: formRef })
+  const { actions: action, methods } = useFormApi({ options, model, form: formRef, optionState })
 
   watch(
     () => ({

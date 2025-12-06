@@ -2,6 +2,8 @@ import type { FormItemProp } from "element-plus"
 import type { Ref, VNode, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
 import type { FormItem, FormRecord, DeepPartial, FormOptions, MaybePromise, FormComponentSlot, FilterRuntimeContext, FormItemRuleWithMeta, FormAsyncOptionsState } from "../types"
 import { isFunction } from "@fonds/utils"
+import { syncOptions, ensureOptionState } from "./options"
+import { toPathArray, getModelValue, setModelValue } from "./path"
 import { isVNode, markRaw, computed, defineComponent } from "vue"
 import { applyFilters, filterStepItems, filterGroupItems } from "../filters"
 
@@ -34,15 +36,6 @@ export function createHelpers({
   loadedGroups: Ref<Set<string | number>>
   optionState: Record<string, FormAsyncOptionsState>
 }) {
-  function toPathArray(prop?: FormItemProp): string[] | undefined {
-    if (prop === undefined || prop === null)
-      return undefined
-    if (Array.isArray(prop))
-      return prop.map(String)
-    const path = String(prop).split(".").filter(Boolean)
-    return path.length ? path : undefined
-  }
-
   function propKey(prop?: FormItemProp, fallback?: string | number) {
     const path = toPathArray(prop)
     if (path?.length)
@@ -50,72 +43,8 @@ export function createHelpers({
     return String(fallback ?? "")
   }
 
-  function getModelValue(prop?: FormItemProp) {
-    const path = toPathArray(prop)
-    if (!path?.length)
-      return model
-    let cursor: unknown = model
-    for (const segment of path) {
-      if (cursor == null || typeof cursor !== "object")
-        return undefined
-      cursor = (cursor as Record<string, unknown>)[segment]
-    }
-    return cursor
-  }
-
-  function setModelValue(prop: FormItemProp, value: unknown) {
-    const path = toPathArray(prop)
-    if (!path?.length)
-      return
-    let cursor: Record<string, unknown> = model
-    for (let i = 0; i < path.length; i++) {
-      const key = path[i]!
-      if (i === path.length - 1) {
-        cursor[key] = value as never
-        return
-      }
-      cursor[key] = cursor[key] ?? {}
-      cursor = cursor[key] as Record<string, unknown>
-    }
-  }
-
-  const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value && typeof (value as { then?: unknown }).then === "function")
-
-  let optionRequestId = 0
-
-  function ensureOptionState(key: string) {
-    if (!optionState[key])
-      optionState[key] = { loading: false }
-    return optionState[key]!
-  }
-
-  function updateOptionState(propKey: string, value: MaybePromise<any[] | undefined>) {
-    const state = ensureOptionState(propKey)
-    if (isPromiseLike(value)) {
-      const requestId = ++optionRequestId
-      state.loading = true
-      state.error = undefined
-      state.requestId = requestId
-      value
-        .then((data: any[] | undefined) => {
-          if (state.requestId === requestId) {
-            state.value = data
-            state.loading = false
-          }
-        })
-        .catch((error: unknown) => {
-          if (state.requestId === requestId) {
-            state.error = error
-            state.loading = false
-          }
-        })
-      return state
-    }
-    state.value = value as any[] | undefined
-    state.loading = false
-    state.error = undefined
-    return state
-  }
+  const getValue = (prop?: FormItemProp) => getModelValue(model, prop)
+  const setValue = (prop: FormItemProp, value: unknown) => setModelValue(model, prop, value)
 
   function isComponentConfig(component?: FormComponentSlot): component is FormComponentSlot & Record<string, unknown> {
     if (!component || typeof component !== "object")
@@ -371,26 +300,31 @@ export function createHelpers({
 
   function optionsOf(item: FormItem) {
     const key = propKey(item.prop)
-    const source = componentOptions(item.component)
-    if (source !== undefined) {
-      updateOptionState(key, source)
+    const state = ensureOptionState(optionState, key)
+    const rawOptions = isComponentConfig(item.component) ? item.component.options : undefined
+
+    if (isFunction(rawOptions)) {
+      if (!state.loading && !state.pending)
+        syncOptions(optionState, key, rawOptions(model))
     }
-    else {
-      ensureOptionState(key)
+    else if (rawOptions !== undefined) {
+      if (state.value !== rawOptions)
+        syncOptions(optionState, key, rawOptions as MaybePromise<any[]>)
     }
-    const state = optionState[key]
+
+    const stateRef = optionState[key]
     return {
-      options: state?.value,
-      loading: state?.loading ?? false,
-      error: state?.error,
+      options: stateRef?.value,
+      loading: stateRef?.loading ?? false,
+      error: stateRef?.error,
     }
   }
 
   return {
     toPathArray,
     propKey,
-    getModelValue,
-    setModelValue,
+    getModelValue: getValue,
+    setModelValue: setValue,
     isComponentConfig,
     is,
     onListeners,
