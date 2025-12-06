@@ -41,6 +41,8 @@ export interface TableEngine {
   exposed: TableExpose
   /** 触发列变更事件 */
   emitColumnsChange: (cols: TableColumn<TableRecord>[]) => void
+  /** 通用事件发射器 */
+  emit: (event: string, ...args: unknown[]) => void
 }
 
 /**
@@ -50,7 +52,8 @@ export interface TableEngineOptions {
   props: { name?: string }
   slots: Slots
   attrs: Record<string, unknown>
-  emit: (event: "columnsChange", cols: TableColumn<TableRecord>[]) => void
+  /** 通用事件发射器，支持 ElTable 原生事件和 fd-table 自定义事件 */
+  emit: (event: string, ...args: unknown[]) => void
   crud: {
     loading: boolean
     selection: TableRecord[]
@@ -122,6 +125,7 @@ export function useTableEngine(options: TableEngineOptions): TableEngine {
     },
     crudBridge,
     refresh: methods.refresh,
+    emit,
   })
 
   // 监听列配置变化，重建列设置
@@ -195,6 +199,7 @@ export function useTableEngine(options: TableEngineOptions): TableEngine {
     sizeOptions: tableSizeOptions,
     exposed,
     emitColumnsChange,
+    emit,
   }
 }
 

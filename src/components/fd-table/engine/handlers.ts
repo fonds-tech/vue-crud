@@ -37,6 +37,8 @@ export interface TableHandlersContext {
   }
   crudBridge: CrudBridge
   refresh: (params?: Record<string, unknown>) => void
+  /** 事件发射器 */
+  emit: (event: string, ...args: unknown[]) => void
 }
 
 /**
@@ -45,13 +47,14 @@ export interface TableHandlersContext {
  * @returns 事件处理器对象
  */
 export function createTableHandlers(context: TableHandlersContext): TableHandlers {
-  const { state, crud, crudBridge, refresh } = context
+  const { state, crud, crudBridge, refresh, emit } = context
 
   /**
    * 处理表格尺寸更改
    */
   const onSizeChange = (size: TableSize) => {
     state.tableOptions.table.size = size
+    emit("sizeChange", size)
   }
 
   /**
@@ -61,6 +64,7 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
     // 同步选中行到本地状态与 crud hook，便于外部复用
     state.selectedRows.value = rows
     crud.selection = rows
+    // 注意：selection-change 由 render/table.tsx 中 ElTable 直接透传触发
   }
 
   /**
@@ -71,6 +75,7 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
     state.paginationState.currentPage = page
     crud.setParams({ page })
     crud.refresh()
+    emit("pageChange", page)
   }
 
   /**
@@ -82,6 +87,7 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
     state.paginationState.currentPage = 1
     crud.setParams({ page: 1, size })
     crud.refresh()
+    emit("pageSizeChange", size)
   }
 
   /**

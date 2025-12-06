@@ -1,6 +1,8 @@
 import type { TableProps, TableInstance, TableColumnCtx, PaginationProps } from "element-plus"
 import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 
+import { ElTable } from "element-plus"
+
 /**
  * 表格数据记录类型
  */
@@ -333,3 +335,41 @@ export interface TableExpose<T extends TableRecord = TableRecord> {
  * 表格实例类型
  */
 export type FdTableInstance = InstanceType<typeof import("./table")["default"]> & TableInstance
+
+/**
+ * ElTable 原生事件名称
+ * @description 透传 Element Plus Table 的所有原生事件
+ */
+// 强制断言为 string[] 以避免 TS 迭代器错误 (ElTable.emits 在运行时是数组)
+export const elTableEvents = (ElTable.emits || []) as string[]
+
+/**
+ * ElTable 原生事件类型
+ */
+export type ElTableEvent = string
+
+/**
+ * fd-table 自定义事件名称
+ */
+export const fdTableCustomEvents = [
+  "columnsChange",
+  "fullscreenChange",
+  "sizeChange",
+  "pageChange",
+  "pageSizeChange",
+] as const
+
+/**
+ * fd-table 自定义事件类型
+ */
+export type FdTableCustomEvent = typeof fdTableCustomEvents[number]
+
+/**
+ * fd-table 所有事件名称
+ */
+export const fdTableEmits = [...elTableEvents, ...fdTableCustomEvents] as const
+
+/**
+ * fd-table 事件类型
+ */
+export type FdTableEmit = typeof fdTableEmits[number]
