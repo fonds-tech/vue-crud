@@ -1,17 +1,17 @@
-import FdCrud from "../views/fd-crud/index.vue"
-import FdForm from "../views/fd-form/index.vue"
-import FdGrid from "../views/fd-grid/index.vue"
-import FdTable from "../views/fd-table/index.vue"
-import FdDetail from "../views/fd-detail/index.vue"
-import FdDialog from "../views/fd-dialog/index.vue"
-import FdImport from "../views/fd-import/index.vue"
-import FdSearch from "../views/fd-search/index.vue"
-import FdSelect from "../views/fd-select/index.vue"
-import FdUpsert from "../views/fd-upsert/index.vue"
-import FdCascader from "../views/fd-cascader/index.vue"
-import FdAddButton from "../views/fd-add-button/index.vue"
-import FdContextMenu from "../views/fd-context-menu/index.vue"
-import FdDeleteButton from "../views/fd-delete-button/index.vue"
+import Crud from "../views/crud/index.vue"
+import Form from "../views/form/index.vue"
+import Grid from "../views/grid/index.vue"
+import Table from "../views/table/index.vue"
+import Detail from "../views/detail/index.vue"
+import Dialog from "../views/dialog/index.vue"
+import Import from "../views/import/index.vue"
+import Search from "../views/search/index.vue"
+import Select from "../views/select/index.vue"
+import Upsert from "../views/upsert/index.vue"
+import Cascader from "../views/cascader/index.vue"
+import AddButton from "../views/add-button/index.vue"
+import ContextMenu from "../views/context-menu/index.vue"
+import DeleteButton from "../views/delete-button/index.vue"
 import { createRouter, createWebHistory } from "vue-router"
 
 const routes = [
@@ -22,97 +22,72 @@ const routes = [
   {
     path: "/crud",
     name: "crud",
-    component: FdCrud,
+    component: Crud,
   },
   {
     path: "/form",
     name: "Form",
-    component: FdForm,
-  },
-  {
-    path: "/fd-form",
-    name: "fd-form",
-    component: FdForm,
+    component: Form,
   },
   {
     path: "/search",
     name: "Search",
-    component: FdSearch,
+    component: Search,
   },
   {
-    path: "/fd-search",
-    name: "fd-search",
-    component: FdSearch,
+    path: "/table",
+    name: "Table",
+    component: Table,
   },
   {
-    path: "/fd-table",
-    name: "fd-table",
-    component: FdTable,
-  },
-  {
-    path: "/fd-detail",
-    name: "fd-detail",
-    component: FdDetail,
-  },
-  {
-    path: "/fd-dialog",
-    name: "fd-dialog",
-    component: FdDialog,
+    path: "/detail",
+    name: "Detail",
+    component: Detail,
   },
   {
     path: "/dialog",
     name: "Dialog",
-    component: FdDialog,
+    component: Dialog,
   },
   {
-    path: "/fd-grid",
-    name: "fd-grid",
-    component: FdGrid,
+    path: "/grid",
+    name: "Grid",
+    component: Grid,
   },
   {
-    path: "/fd-select",
-    name: "fd-select",
-    component: FdSelect,
+    path: "/select",
+    name: "Select",
+    component: Select,
   },
   {
-    path: "/fd-cascader",
-    name: "fd-cascader",
-    component: FdCascader,
-  },
-  {
-    path: "/fd-context-menu",
-    name: "fd-context-menu",
-    component: FdContextMenu,
+    path: "/cascader",
+    name: "Cascader",
+    component: Cascader,
   },
   {
     path: "/context-menu",
     name: "ContextMenu",
-    component: FdContextMenu,
+    component: ContextMenu,
   },
   {
-    path: "/fd-add-button",
-    name: "fd-add-button",
-    component: FdAddButton,
+    path: "/add-button",
+    name: "AddButton",
+    component: AddButton,
   },
   {
-    path: "/fd-delete-button",
-    name: "fd-delete-button",
-    component: FdDeleteButton,
+    path: "/delete-button",
+    name: "DeleteButton",
+    component: DeleteButton,
   },
   {
-    path: "/fd-import",
-    name: "fd-import",
-    component: FdImport,
+    path: "/import",
+    name: "Import",
+    component: Import,
   },
   {
-    path: "/fd-upsert",
-    name: "fd-upsert",
-    component: FdUpsert,
-  },
-  {
-    path: "/fd-crud",
-    name: "fd-crud",
-    component: FdCrud,
+    path: "/upsert",
+    name: "Upsert",
+    component: Upsert,
   },
 ]
 

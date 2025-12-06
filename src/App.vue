@@ -95,20 +95,20 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { Cpu, Edit, Grid, Delete, Search, Upload, Message, Pointer, Tickets, DataLine, Document, CirclePlus, Connection, MoreFilled } from "@element-plus/icons-vue"
 
 const navItems = [
-  { path: "/fd-crud", label: "Crud", icon: Cpu },
-  { path: "/fd-table", label: "Table", icon: DataLine },
-  { path: "/fd-grid", label: "Grid", icon: Grid },
-  { path: "/fd-detail", label: "Detail", icon: Tickets },
-  { path: "/fd-search", label: "Search", icon: Search },
-  { path: "/fd-form", label: "Form", icon: Document },
-  { path: "/fd-upsert", label: "Upsert", icon: Edit },
-  { path: "/fd-select", label: "Select", icon: Pointer },
-  { path: "/fd-cascader", label: "Cascader", icon: Connection },
-  { path: "/fd-import", label: "Import", icon: Upload },
-  { path: "/fd-dialog", label: "Dialog", icon: Message },
-  { path: "/fd-context-menu", label: "Context Menu", icon: MoreFilled },
-  { path: "/fd-add-button", label: "Add Button", icon: CirclePlus },
-  { path: "/fd-delete-button", label: "Delete Button", icon: Delete },
+  { path: "/crud", label: "Crud", icon: Cpu },
+  { path: "/table", label: "Table", icon: DataLine },
+  { path: "/grid", label: "Grid", icon: Grid },
+  { path: "/detail", label: "Detail", icon: Tickets },
+  { path: "/search", label: "Search", icon: Search },
+  { path: "/form", label: "Form", icon: Document },
+  { path: "/upsert", label: "Upsert", icon: Edit },
+  { path: "/select", label: "Select", icon: Pointer },
+  { path: "/cascader", label: "Cascader", icon: Connection },
+  { path: "/import", label: "Import", icon: Upload },
+  { path: "/dialog", label: "Dialog", icon: Message },
+  { path: "/context-menu", label: "Context Menu", icon: MoreFilled },
+  { path: "/add-button", label: "Add Button", icon: CirclePlus },
+  { path: "/delete-button", label: "Delete Button", icon: Delete },
 ]
 
 const isDark = ref(false)
