@@ -9,7 +9,7 @@ import type { TableMethods } from "./methods"
 import type { TableHandlers } from "./handlers"
 import type { RenderHelpers } from "./helpers"
 import type { Slots, ComputedRef } from "vue"
-import type { TableColumn, TableExpose, TableRecord } from "../type"
+import type { TableColumn, TableExpose, TableRecord, TableEmitName } from "../type"
 import { createTableMethods } from "./methods"
 import { createTableHandlers } from "./handlers"
 import { createRenderHelpers } from "./helpers"
@@ -42,7 +42,7 @@ export interface TableEngine {
   /** 触发列变更事件 */
   emitColumnsChange: (cols: TableColumn<TableRecord>[]) => void
   /** 通用事件发射器 */
-  emit: (event: string, ...args: unknown[]) => void
+  emit: (event: TableEmitName, ...args: unknown[]) => void
 }
 
 /**
@@ -53,7 +53,7 @@ export interface TableEngineOptions {
   slots: Slots
   attrs: Record<string, unknown>
   /** 通用事件发射器，支持 ElTable 原生事件和 fd-table 自定义事件 */
-  emit: (event: string, ...args: unknown[]) => void
+  emit: (event: TableEmitName, ...args: unknown[]) => void
   crud: {
     loading: boolean
     selection: TableRecord[]
@@ -113,6 +113,7 @@ export function useTableEngine(options: TableEngineOptions): TableEngine {
       selection: crud.selection,
     },
     mitt,
+    emit,
   })
 
   // 创建事件处理器

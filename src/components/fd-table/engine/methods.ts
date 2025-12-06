@@ -1,5 +1,5 @@
 import type { TableState } from "./state"
-import type { TableRecord, TableOptions, TableUseOptions } from "../type"
+import type { TableRecord, TableOptions, TableEmitName, TableUseOptions } from "../type"
 import { merge } from "lodash-es"
 import { getColumnId, rebuildColumnSettings } from "./settings"
 
@@ -52,6 +52,7 @@ export interface TableMethodsContext {
   mitt?: {
     emit?: (event: string, payload?: unknown) => void
   }
+  emit: (event: TableEmitName, ...args: unknown[]) => void
 }
 
 /**
@@ -108,7 +109,7 @@ function findRowsByKey(state: TableState, rowKey: string | number | Array<string
  * @returns 表格方法对象
  */
 export function createTableMethods(context: TableMethodsContext): TableMethods {
-  const { state, crud, mitt } = context
+  const { state, crud, mitt, emit } = context
 
   /**
    * 使用提供的选项配置表格
@@ -255,6 +256,7 @@ export function createTableMethods(context: TableMethodsContext): TableMethods {
   const toggleFullscreen = (full?: boolean) => {
     state.isFullscreen.value = typeof full === "boolean" ? full : !state.isFullscreen.value
     mitt?.emit?.("fullscreen", state.isFullscreen.value)
+    emit("fullscreenChange", state.isFullscreen.value)
   }
 
   return {

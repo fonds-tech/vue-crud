@@ -4,8 +4,8 @@ import type { TableScope, TableRecord } from "../type"
 import type { Slots, VNode, Directive, CSSProperties } from "vue"
 import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"
-import { elTableEvents } from "../type"
 import { renderColumns } from "./columns"
+import { elTableEventNames } from "../type"
 import { renderContextMenu } from "./context-menu"
 import { h, withDirectives } from "vue"
 import { ElTable, ElLoading } from "element-plus"
@@ -35,9 +35,9 @@ export function renderTable(params: RenderTableParams): VNode {
   )
 
   // 动态生成 ElTable 事件监听器
-  const eventListeners = elTableEvents.reduce((acc, event) => {
+  const eventListeners = elTableEventNames.reduce((acc, event) => {
     // 将 kebab-case 事件名转换为 camelCase (例如 selection-change -> selectionChange)
-    const camelEvent = event.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+    const camelEvent = String(event).replace(/-([a-z])/g, (_: string, letter: string) => letter.toUpperCase())
     const propName = `on${camelEvent.charAt(0).toUpperCase()}${camelEvent.slice(1)}`
 
     // 对于特殊事件，需要链式调用内部处理器和 emit

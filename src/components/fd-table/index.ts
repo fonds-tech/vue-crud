@@ -1,6 +1,6 @@
 /**
- * @fileoverview FdTable 组件入口文件。
- * @module FdTable
+ * @fileoverview 表格组件入口文件。
+ * @module Table
  */
 import Table from "./table"
 import "./style.scss"
