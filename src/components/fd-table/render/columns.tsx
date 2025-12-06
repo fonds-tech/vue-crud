@@ -1,12 +1,13 @@
-import type { CrudBridge } from "./actions"
+import type { CrudBridge } from "../engine/actions"
 import type { Slots, VNode } from "vue"
-import type { RenderHelpers } from "./render"
+import type { RenderHelpers } from "../engine/helpers"
 import type { TagProps, TableColumnCtx } from "element-plus"
-import type { TableScope, TableColumn, TableRecord } from "./type"
+import type { TableScope, TableColumn, TableRecord } from "../type"
 import { h } from "vue"
+import { resolveActions } from "../engine/actions"
 import { QuestionFilled } from "@element-plus/icons-vue"
-import { normalizeEventProps } from "./render"
-import { resolveActions, renderActionButtons } from "./actions"
+import { normalizeEventProps } from "../engine/helpers"
+import { renderActionButtons } from "./actions"
 import { ElTag, ElIcon, ElSpace, ElTooltip, ElTableColumn } from "element-plus"
 
 /**
