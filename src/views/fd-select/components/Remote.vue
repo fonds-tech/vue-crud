@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import FdSelect from "@/components/fd-select"
+import FdSelect from "@/components/select"
 import { ref, computed } from "vue"
 
 interface UserOption { label: string, value: string, dept: string }

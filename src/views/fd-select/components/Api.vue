@@ -89,8 +89,8 @@
 </template>
 
 <script setup lang="ts">
-import FdOption from "@/components/fd-option"
-import FdSelect from "@/components/fd-select"
+import FdOption from "@/components/option"
+import FdSelect from "@/components/select"
 import { ref, computed } from "vue"
 
 // --- Mock Data & API ---

@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Export: typeof import('./src/components/export/index.vue')['default']
     FdAddButton: typeof import('./src/components/fd-add-button')['default']
     FdCascader: typeof import('./src/components/fd-cascader')['default']
     FdDeleteButton: typeof import('./src/components/fd-delete-button')['default']
@@ -23,6 +24,7 @@ declare module 'vue' {
     FdOption: typeof import('./src/components/fd-option/index.tsx')['default']
     FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
     FdSelect: typeof import('./src/components/fd-select/index.tsx')['default']
+    Import: typeof import('./src/components/import/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
@@ -30,6 +32,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const Export: typeof import('./src/components/export/index.vue')['default']
   const FdAddButton: typeof import('./src/components/fd-add-button')['default']
   const FdCascader: typeof import('./src/components/fd-cascader')['default']
   const FdDeleteButton: typeof import('./src/components/fd-delete-button')['default']
@@ -41,6 +44,7 @@ declare global {
   const FdOption: typeof import('./src/components/fd-option/index.tsx')['default']
   const FdSearch: typeof import('./src/components/fd-search/index.vue')['default']
   const FdSelect: typeof import('./src/components/fd-select/index.tsx')['default']
+  const Import: typeof import('./src/components/import/index.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
 }

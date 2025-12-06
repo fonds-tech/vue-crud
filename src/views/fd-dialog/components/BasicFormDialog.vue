@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormUseOptions } from "@/components/fd-form/types"
+import type { FormUseOptions } from "@/components/form/types"
 import { ref } from "vue"
 import { Plus } from "@element-plus/icons-vue"
 import { clone } from "@fonds/utils"

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableAction, TableColumn } from "@/components/fd-table/type"
+import type { TableAction, TableColumn } from "@/components/table/type"
 import { ElMessage } from "element-plus"
 import { TableMockService } from "../mockService"
 import { useCrud, useTable } from "@/hooks"

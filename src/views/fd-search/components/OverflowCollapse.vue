@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchOptions } from "@/components/fd-search/types"
+import type { SearchOptions } from "@/components/search/types"
 import { computed } from "vue"
 import { SearchMockService } from "../mockService"
 import { useCrud, useSearch } from "@/hooks"

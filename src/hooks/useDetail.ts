@@ -1,5 +1,5 @@
 import type { Ref } from "vue"
-import type { DetailRef, DetailUseOptions } from "@/components/fd-detail/types"
+import type { DetailRef, DetailUseOptions } from "@/components/detail/types"
 import { useParent } from "./useParent"
 import { ref, watch } from "vue"
 

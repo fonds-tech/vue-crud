@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import FdSelect from "@/components/fd-select"
+import FdSelect from "@/components/select"
 import { ref } from "vue"
 
 // 基础数据源

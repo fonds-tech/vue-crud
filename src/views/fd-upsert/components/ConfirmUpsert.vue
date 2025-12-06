@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableDict } from "@/components/fd-table/type"
+import type { TableDict } from "@/components/table/type"
 import { ElMessageBox } from "element-plus"
 import { UpsertMockService } from "../mockService"
 import { useCrud, useTable, useUpsert } from "@/hooks"

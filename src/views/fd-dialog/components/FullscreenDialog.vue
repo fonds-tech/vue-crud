@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DialogExpose } from "@/components/fd-dialog/type"
+import type { DialogExpose } from "@/components/dialog/type"
 import { ref } from "vue"
 import { Monitor } from "@element-plus/icons-vue"
 

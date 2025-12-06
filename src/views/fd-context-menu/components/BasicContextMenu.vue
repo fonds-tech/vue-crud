@@ -25,9 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import type { ContextMenuItem } from "@/components/fd-context-menu/type"
+import type { ContextMenuItem } from "@/components/context-menu/type"
 import { ElMessage } from "element-plus"
-import { ContextMenu } from "@/components/fd-context-menu"
+import { ContextMenu } from "@/components/context-menu"
 
 const menuActions: ContextMenuItem[] = [
   {
