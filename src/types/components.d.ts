@@ -14,7 +14,7 @@ declare module "vue" {
     "fd-select": typeof import("../components/select/index.vue")["default"]
     "fd-option": typeof import("../components/option/index.vue")["default"]
     "fd-cascader": typeof import("../components/cascader/index.vue")["default"]
-    "fd-import": typeof import("../components/import/index.vue")["default"]
+    "fd-import": typeof import("../components/import")["default"]
     "fd-export": typeof import("../components/export")["default"]
     "fd-context-menu": typeof import("../components/context-menu")["default"]
     "ElDialog": typeof import("element-plus")["ElDialog"]
