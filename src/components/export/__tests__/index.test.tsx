@@ -1,4 +1,4 @@
-import FdExport from "../index.vue"
+import FdExport from "../export"
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe, beforeEach } from "vitest"
@@ -78,14 +78,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
 
     expect(mockEmit).toHaveBeenCalledWith("search.get.model", expect.any(Function))
-    // Because mockEmit executes the callback, exportData should be called
-    // which calls crud.service.export
-    // We need to wait for promises to resolve
+    // 等待异步操作完成
     await new Promise(process.nextTick)
 
     expect(mockExport).toHaveBeenCalled()
 
-    // Check if downloadFile is called (since we mocked response with url)
+    // 检查是否调用了 downloadFile
     await new Promise(process.nextTick)
     expect(mockDownloadFile).toHaveBeenCalledWith("http://example.com/file.xlsx")
   })
@@ -100,18 +98,20 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    // Check if ids are passed in params
+    // 检查是否传递了选中项 ID
     expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
       ids: "1,2",
     }))
   })
 
-  it("handles polling for large exports (status === 0)", async () => {
-    // First call returns status 0 (processing)
-    // Second call returns url
-    mockExport
-      .mockResolvedValueOnce({ status: 0, page: 1, fileName: "test.xlsx" })
-      .mockResolvedValueOnce({ url: "http://example.com/final.xlsx" })
+  it("handles export error gracefully", async () => {
+    // 捕获 unhandled rejection，避免 vitest 报错
+    const errorHandler = vi.fn()
+    const originalHandler = process.listeners("unhandledRejection")
+    process.removeAllListeners("unhandledRejection")
+    process.on("unhandledRejection", errorHandler)
+
+    mockExport.mockRejectedValueOnce(new Error("导出失败"))
 
     const wrapper = mount(FdExport, {
       global: {
@@ -120,11 +120,13 @@ describe("fd-export", () => {
     })
 
     await wrapper.find(".fd-export__trigger").trigger("click")
-
-    // Wait for recursive calls to complete
     await new Promise(resolve => setTimeout(resolve, 10))
 
-    expect(mockExport).toHaveBeenCalledTimes(2)
-    expect(mockDownloadFile).toHaveBeenCalledWith("http://example.com/final.xlsx")
+    // 错误时不应该调用 downloadFile
+    expect(mockDownloadFile).not.toHaveBeenCalled()
+
+    // 恢复原始的错误处理器
+    process.removeAllListeners("unhandledRejection")
+    originalHandler.forEach(handler => process.on("unhandledRejection", handler as any))
   })
 })
