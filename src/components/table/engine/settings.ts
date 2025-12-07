@@ -43,19 +43,83 @@ function getVersion(columns: TableColumn<TableRecord>[]) {
 }
 
 /**
+ * 列缓存数据的类型定义
+ */
+interface ColumnCacheData {
+  version: string
+  order: string[]
+  columns: Record<string, { show: boolean, pinned?: boolean, fixed?: "left" | "right" }>
+}
+
+/**
+ * 校验缓存数据结构是否有效
+ * @param data - 待校验的数据
+ * @returns 是否为有效的缓存数据
+ */
+function isValidCacheData(data: unknown): data is ColumnCacheData {
+  if (data === null || typeof data !== "object") return false
+
+  const obj = data as Record<string, unknown>
+
+  // 校验 version 字段
+  if (typeof obj.version !== "string") return false
+
+  // 校验 order 字段
+  if (!Array.isArray(obj.order)) return false
+  if (!obj.order.every(item => typeof item === "string")) return false
+
+  // 校验 columns 字段
+  if (typeof obj.columns !== "object" || obj.columns === null) return false
+  const columns = obj.columns as Record<string, unknown>
+  for (const value of Object.values(columns)) {
+    if (typeof value !== "object" || value === null) return false
+    const col = value as Record<string, unknown>
+    if (typeof col.show !== "boolean") return false
+    if (col.pinned !== undefined && typeof col.pinned !== "boolean") return false
+    if (col.fixed !== undefined && col.fixed !== "left" && col.fixed !== "right") return false
+  }
+
+  return true
+}
+
+/**
+ * 安全检查 localStorage 是否可用
+ * @returns localStorage 是否可用
+ */
+function isLocalStorageAvailable(): boolean {
+  try {
+    const testKey = "__fd_table_test__"
+    localStorage.setItem(testKey, "1")
+    localStorage.removeItem(testKey)
+    return true
+  }
+  catch {
+    // 隐私模式或 localStorage 被禁用时会抛出异常
+    return false
+  }
+}
+
+/**
  * 从本地存储读取列设置
  */
-function readCache(cacheKey: string | undefined, version: string) {
-  if (!cacheKey || typeof localStorage === "undefined") return undefined
+function readCache(cacheKey: string | undefined, version: string): ColumnCacheData | undefined {
+  if (!cacheKey || !isLocalStorageAvailable()) return undefined
   try {
     const raw = localStorage.getItem(cacheKey)
     if (!raw) return undefined
-    const parsed = JSON.parse(raw) as {
-      version: string
-      order: string[]
-      columns: Record<string, { show: boolean, pinned?: boolean, fixed?: "left" | "right" }>
+
+    const parsed: unknown = JSON.parse(raw)
+
+    // 运行时校验数据结构
+    if (!isValidCacheData(parsed)) {
+      // 缓存数据结构无效，清理并返回
+      localStorage.removeItem(cacheKey)
+      return undefined
     }
+
+    // 版本不匹配时返回 undefined（不删除，可能是临时切换列配置）
     if (parsed.version !== version) return undefined
+
     return parsed
   }
   catch {
@@ -67,7 +131,7 @@ function readCache(cacheKey: string | undefined, version: string) {
  * 将当前列设置写入本地存储
  */
 export function writeCache(state: TableState) {
-  if (!state.cacheKey.value || typeof localStorage === "undefined") return
+  if (!state.cacheKey.value || !isLocalStorageAvailable()) return
   try {
     const version = getVersion(state.tableOptions.columns)
     const order = state.columnSettings.value
@@ -77,10 +141,11 @@ export function writeCache(state: TableState) {
     const columns = Object.fromEntries(
       state.columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]),
     )
-    localStorage.setItem(state.cacheKey.value, JSON.stringify({ version, order, columns }))
+    const cacheData: ColumnCacheData = { version, order, columns }
+    localStorage.setItem(state.cacheKey.value, JSON.stringify(cacheData))
   }
   catch {
-    // 缓存失败不阻塞主流程
+    // 缓存失败不阻塞主流程（可能是存储空间不足或隐私模式）
   }
 }
 
@@ -209,8 +274,13 @@ export function toggleFixed(state: TableState, id: string, fixed: "left" | "righ
  * 将列设置重置为默认状态
  */
 export function resetColumns(state: TableState) {
-  if (state.cacheKey.value && typeof localStorage !== "undefined") {
-    localStorage.removeItem(state.cacheKey.value)
+  if (state.cacheKey.value && isLocalStorageAvailable()) {
+    try {
+      localStorage.removeItem(state.cacheKey.value)
+    }
+    catch {
+      // 移除缓存失败不阻塞重置流程
+    }
   }
   rebuildColumnSettings(state, false)
 }

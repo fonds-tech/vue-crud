@@ -22,6 +22,11 @@ function omitColumnProps(column: TableColumn<TableRecord>) {
   return rest
 }
 
+/** 操作列默认宽度 */
+const ACTION_COLUMN_WIDTH = 120
+/** 普通列默认最小宽度 */
+const COLUMN_MIN_WIDTH = 120
+
 /**
  * 渲染表格列
  *
@@ -57,7 +62,7 @@ export function renderColumns(
     }
     if (column.type === "action") {
       // 操作列采用默认宽度与居中对齐，并固定在右侧保证可见性
-      const width = column.width ?? 120
+      const width = column.width ?? ACTION_COLUMN_WIDTH
       const align = column.align ?? "center"
       return h(
         ElTableColumn,
@@ -75,7 +80,7 @@ export function renderColumns(
 
     const headerComponent = renderHelpers.getHeaderComponent(column as TableColumn<TableRecord>)
     const align = column.align ?? "center"
-    const minWidth = column.minWidth ?? 120
+    const minWidth = column.minWidth ?? COLUMN_MIN_WIDTH
     const prop = column.prop
 
     return h(

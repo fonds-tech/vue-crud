@@ -44,6 +44,22 @@ function normalizeRowKey(payload: unknown): string | number | Array<string | num
 }
 
 /**
+ * 存储已绑定的事件处理器引用，用于正确注销
+ */
+interface BoundHandlers {
+  refresh: (payload: unknown) => void
+  select: (...args: unknown[]) => void
+  selectAll: (...args: unknown[]) => void
+  clearSelection: () => void
+  toggleFullscreen: (...args: unknown[]) => void
+}
+
+/**
+ * 使用 WeakMap 存储组件实例与其绑定处理器的映射，避免闭包导致的内存泄漏
+ */
+const handlerRegistry = new WeakMap<HookHandlers, BoundHandlers>()
+
+/**
  * 注册表格的事件监听器
  *
  * @param mitt - 事件发射器实例
@@ -51,21 +67,36 @@ function normalizeRowKey(payload: unknown): string | number | Array<string | num
  */
 export function registerEvents(mitt: MittLike | undefined, handlers: HookHandlers) {
   // 事件监听统一入口，确保 mitt 不存在时静默跳过，避免调用方未注入事件总线导致报错
-  mitt?.on?.("table.refresh", (payload: unknown) => handlers.refresh(payload))
-  mitt?.on?.("table.select", (...args: unknown[]) => {
-    // select 事件可接受 payload/checked 任意数量，需解析布尔后交给处理器
-    const [payload, checked] = args
-    handlers.select(normalizeRowKey(payload), typeof checked === "boolean" ? checked : undefined)
-  })
-  mitt?.on?.("table.selectAll", (...args: unknown[]) => {
-    const [checked] = args
-    handlers.selectAll(typeof checked === "boolean" ? checked : undefined)
-  })
-  mitt?.on?.("table.clearSelection", () => handlers.clearSelection())
-  mitt?.on?.("table.toggleFullscreen", (...args: unknown[]) => {
-    const [full] = args
-    handlers.toggleFullscreen(typeof full === "boolean" ? full : undefined)
-  })
+  if (!mitt?.on) return
+
+  // 创建绑定的处理器并缓存，确保注销时使用相同的引用
+  const boundHandlers: BoundHandlers = {
+    refresh: (payload: unknown) => handlers.refresh(payload),
+    select: (...args: unknown[]) => {
+      // select 事件可接受 payload/checked 任意数量，需解析布尔后交给处理器
+      const [payload, checked] = args
+      handlers.select(normalizeRowKey(payload), typeof checked === "boolean" ? checked : undefined)
+    },
+    selectAll: (...args: unknown[]) => {
+      const [checked] = args
+      handlers.selectAll(typeof checked === "boolean" ? checked : undefined)
+    },
+    clearSelection: () => handlers.clearSelection(),
+    toggleFullscreen: (...args: unknown[]) => {
+      const [full] = args
+      handlers.toggleFullscreen(typeof full === "boolean" ? full : undefined)
+    },
+  }
+
+  // 存储到注册表以便后续注销时获取相同引用
+  handlerRegistry.set(handlers, boundHandlers)
+
+  mitt.on("table.refresh", boundHandlers.refresh)
+  mitt.on("table.select", boundHandlers.select)
+  mitt.on("table.selectAll", boundHandlers.selectAll)
+  mitt.on("table.clearSelection", boundHandlers.clearSelection)
+  mitt.on("table.toggleFullscreen", boundHandlers.toggleFullscreen)
+
   // 全局监听 document click 用于关闭自定义上下文菜单
   document.addEventListener("click", handlers.closeContextMenu)
 }
@@ -78,10 +109,23 @@ export function registerEvents(mitt: MittLike | undefined, handlers: HookHandler
  */
 export function unregisterEvents(mitt: MittLike | undefined, handlers: HookHandlers) {
   // 卸载所有表格相关事件与全局点击监听，防止组件销毁后内存泄漏
-  mitt?.off?.("table.refresh")
-  mitt?.off?.("table.select")
-  mitt?.off?.("table.selectAll")
-  mitt?.off?.("table.clearSelection")
-  mitt?.off?.("table.toggleFullscreen")
+  if (!mitt?.off) {
+    // 即使 mitt 不存在也要移除 document 监听器
+    document.removeEventListener("click", handlers.closeContextMenu)
+    return
+  }
+
+  // 从注册表获取绑定的处理器引用，确保正确移除
+  const boundHandlers = handlerRegistry.get(handlers)
+  if (boundHandlers) {
+    mitt.off("table.refresh", boundHandlers.refresh)
+    mitt.off("table.select", boundHandlers.select)
+    mitt.off("table.selectAll", boundHandlers.selectAll)
+    mitt.off("table.clearSelection", boundHandlers.clearSelection)
+    mitt.off("table.toggleFullscreen", boundHandlers.toggleFullscreen)
+    // 清理注册表
+    handlerRegistry.delete(handlers)
+  }
+
   document.removeEventListener("click", handlers.closeContextMenu)
 }

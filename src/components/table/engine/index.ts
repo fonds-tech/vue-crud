@@ -130,15 +130,20 @@ export function useTableEngine(options: TableEngineOptions): TableEngine {
   })
 
   // 监听列配置变化，重建列设置
+  // 仅监听列的关键标识（__id/prop/label）和数量变化，避免深度监听带来的性能开销
   watch(
-    () => state.tableOptions.columns,
-    (cols) => {
-      if (cols && cols.length) {
+    () => {
+      const cols = state.tableOptions.columns
+      if (!cols || !cols.length) return ""
+      // 生成列标识签名：包含数量、每列的唯一标识和显示状态
+      return cols.map((col, idx) => `${col.__id || col.prop || col.label || idx}:${col.show ?? true}`).join("|")
+    },
+    (newSignature, oldSignature) => {
+      if (newSignature && newSignature !== oldSignature) {
         // 当列配置变动时同步重建列设置（如新增/删除列）
         rebuildColumnSettings(state)
       }
     },
-    { deep: true },
   )
 
   // mitt 事件映射

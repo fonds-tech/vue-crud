@@ -3,6 +3,8 @@ import type { TableColumn, TableRecord, TableOptions } from "../type"
 import type { Ref, Slots, ComputedRef, UnwrapNestedRefs } from "vue"
 import { ref, computed, reactive } from "vue"
 
+export type TableSize = "" | "large" | "default" | "small"
+
 /**
  * 表示表格列设置的接口
  */
@@ -68,7 +70,7 @@ export interface TableState {
 }
 
 /**
- * 默认分页配置
+ * 默认分页配置（基于常量生成，保持向后兼容）
  */
 export const defaultPagination = {
   layout: "total, sizes, prev, pager, next, jumper",
@@ -78,12 +80,7 @@ export const defaultPagination = {
 }
 
 /**
- * 表格尺寸的类型定义
- */
-export type TableSize = "" | "large" | "default" | "small"
-
-/**
- * 表格尺寸选择的选项
+ * 表格尺寸选择的选项（从常量重新导出，保持向后兼容）
  */
 export const tableSizeOptions: Array<{ label: string, value: TableSize }> = [
   { label: "紧凑", value: "small" },
@@ -112,7 +109,7 @@ export function createTableState(
   const selectedRows = ref<TableRecord[]>([])
   const isFullscreen = ref(false)
   const tableRef = ref<TableInstance>()
-  // tableOptions 作为“源配置”，后续 use(...) 更新直接作用于此，默认启用边框、指定行主键
+  // tableOptions 作为"源配置"，后续 use(...) 更新直接作用于此，默认启用边框、指定行主键
   const tableOptions = reactive<TableOptions<TableRecord>>({
     table: {
       border: true,
@@ -192,9 +189,13 @@ export function createTableState(
   })
 
   // 过滤出用户自定义的额外具名插槽，排除系统保留插槽
-  const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !["toolbar", "header", "default"].includes(key)))
+  const reservedSlots = new Set<string>(["toolbar", "header", "default"])
+  const namedExtraSlots = computed(() => Object.keys(slots).filter(key => !reservedSlots.has(key)))
 
-  // 显式收窄返回类型以避免 TS 对展开后的 TableConfig 进行深度实例化导致 “类型实例化过深” 报错
+  // fd-table 专用的配置键集合，不应透传给 el-table
+  const fdTableOnlyKeys = new Set<string>(["tools", "fullscreen"])
+
+  // 显式收窄返回类型以避免 TS 对展开后的 TableConfig 进行深度实例化导致 "类型实例化过深" 报错
   const elTableProps = computed<Record<string, unknown>>(() => {
     const merged: Record<string, unknown> = {
       height: "100%",
@@ -202,12 +203,14 @@ export function createTableState(
       headerCellClassName: "fd-table__header-cell",
       ...tableAttrs.value,
     }
-    // 使用 any 打断泛型推断深度，避免 TableProps 的递归类型导致 TS2589
-    const tableConfig: any = tableOptions.table ?? {}
-    Object.entries(tableConfig).forEach(([key, value]) => {
-      if (key === "tools" || key === "fullscreen") return
-      merged[key] = value
-    })
+    // 通过遍历过滤掉 fd-table 专用配置，剩余属性透传给 el-table
+    // 使用 Object.keys 避免 TableProps 深度类型推断导致 TS2589
+    const tableConfig = tableOptions.table ?? {}
+    for (const key of Object.keys(tableConfig)) {
+      if (!fdTableOnlyKeys.has(key)) {
+        merged[key] = (tableConfig as Record<string, unknown>)[key]
+      }
+    }
     return merged
   })
 
