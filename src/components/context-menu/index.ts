@@ -1,5 +1,5 @@
-import ContextMenu from "./context-menu"
+import FdContextMenu, { ContextMenu } from "./context-menu"
 
-export { ContextMenu }
+export { ContextMenu, FdContextMenu }
 export * from "./context-menu"
-export default ContextMenu
+export default FdContextMenu

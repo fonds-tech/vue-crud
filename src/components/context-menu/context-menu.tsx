@@ -1,7 +1,6 @@
 import type { PropType } from "vue"
 import type { ContextMenuItem, ContextMenuExpose, ContextMenuOptions } from "./type"
 import { useRefs } from "@/hooks"
-import { isString } from "@fonds/utils"
 import { cloneDeep } from "lodash-es"
 import { h, ref, watch, render, nextTick, reactive, defineComponent, onBeforeUnmount } from "vue"
 import "./style.scss"
@@ -43,6 +42,9 @@ export const FdContextMenu = defineComponent({
     const hoverClassName = ref(HOVER_CLASS_NAME)
     const cleanupFns: Array<() => void> = []
 
+    // 定时器引用，用于清理
+    let closeTimer: ReturnType<typeof setTimeout> | null = null
+
     function cleanup() {
       cleanupFns.splice(0).forEach(fn => fn())
     }
@@ -77,13 +79,15 @@ export const FdContextMenu = defineComponent({
       hoverClassName.value = className
 
       let target = event.target as HTMLElement | null
+
+      // 使用 classList.contains 替代 className.includes，兼容 SVG 元素
       if (config.target) {
-        while (target && !(isString(target.className) && target.className.includes(config.target))) {
+        while (target && !target.classList?.contains(config.target)) {
           target = target.parentElement
         }
       }
 
-      if (target && isString(target.className)) {
+      if (target) {
         target.classList?.add(className)
         hoverTarget.value = target
       }
@@ -123,6 +127,12 @@ export const FdContextMenu = defineComponent({
       event.preventDefault?.()
       event.stopPropagation?.()
 
+      // 清理之前的定时器
+      if (closeTimer) {
+        clearTimeout(closeTimer)
+        closeTimer = null
+      }
+
       animationClass.value = "is-enter"
       extraClass.value = options.class ?? props.options?.class
       visible.value = true
@@ -145,10 +155,18 @@ export const FdContextMenu = defineComponent({
       cleanup()
       if (!visible.value)
         return
+
+      // 清理之前的定时器
+      if (closeTimer) {
+        clearTimeout(closeTimer)
+        closeTimer = null
+      }
+
       animationClass.value = "is-leave"
       const delay = immediate ? 0 : ANIMATION_DURATION
-      window.setTimeout(() => {
+      closeTimer = setTimeout(() => {
         visible.value = false
+        closeTimer = null
       }, delay)
     }
 
@@ -193,6 +211,11 @@ export const FdContextMenu = defineComponent({
                   role="menuitem"
                   aria-disabled={item.disabled}
                   tabindex={item.disabled ? -1 : 0}
+                  onClick={() => {
+                    if (!item.disabled) {
+                      toggleItem(item, id)
+                    }
+                  }}
                   onKeydown={(event) => {
                     if (item.disabled)
                       return
@@ -203,16 +226,21 @@ export const FdContextMenu = defineComponent({
                     if (event.key === "Escape") {
                       close()
                     }
+                    // 键盘导航：上下箭头
+                    if (event.key === "ArrowDown") {
+                      event.preventDefault()
+                      const next = (event.currentTarget as HTMLElement).nextElementSibling as HTMLElement | null
+                      next?.focus()
+                    }
+                    if (event.key === "ArrowUp") {
+                      event.preventDefault()
+                      const prev = (event.currentTarget as HTMLElement).previousElementSibling as HTMLElement | null
+                      prev?.focus()
+                    }
                   }}
                 >
                   {prefixIcon && <span class={["fd-context-menu__icon", prefixIcon]}></span>}
-                  <span
-                    onClick={() => {
-                      toggleItem(item, id)
-                    }}
-                  >
-                    {item.label}
-                  </span>
+                  <span class="fd-context-menu__label">{item.label}</span>
                   {suffixIcon && <span class={["fd-context-menu__icon", suffixIcon]}></span>}
                   {hasChildren && item.showChildren && renderList(item.children!, id, level + 1)}
                 </div>
@@ -252,6 +280,11 @@ export const FdContextMenu = defineComponent({
     )
 
     onBeforeUnmount(() => {
+      // 清理定时器
+      if (closeTimer) {
+        clearTimeout(closeTimer)
+        closeTimer = null
+      }
       cleanup()
       removeHoverHighlight()
     })
