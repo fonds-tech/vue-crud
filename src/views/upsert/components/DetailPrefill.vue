@@ -92,7 +92,7 @@ const upsert = useUpsert({
   onDetail: async (row, ctx) => {
     // 自定义详情预取：调用 service.detail，然后补充备注，账号设为只读
     const service = crud.value?.service as UpsertMockService
-    const detail = await service.detail({ id: row.id })
+    const detail = await service.detail({ id: row.id }) as Record<string, any>
     ctx.done({
       ...detail,
       remark: `【详情预填】${detail.remark ?? ""}`,

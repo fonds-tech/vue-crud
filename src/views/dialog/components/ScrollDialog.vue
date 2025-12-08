@@ -56,7 +56,7 @@ function shuffleLogs() {
 }
 
 function generateLogs(): TimelineLog[] {
-  const templates = [
+  const templates: Omit<TimelineLog, "id" | "time">[] = [
     { title: "文档站点发布", desc: "docs:build 产物已推送到 CDN", type: "primary" },
     { title: "版本号提升", desc: "bumpp 自动生成 tag v1.5.2", type: "success" },
     { title: "影像服务扩容", desc: "新增 3 台 GPU 节点以支持高峰时段", type: "warning" },

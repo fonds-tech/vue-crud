@@ -26,6 +26,13 @@ export default defineConfig({
     }),
     dts({
       include: ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+      exclude: [
+        "src/**/__tests__/**",
+        "src/views/**",
+        "src/App.vue",
+        "src/main.ts",
+        "src/router/**",
+      ],
       outDir: "dist/types",
     }),
   ],

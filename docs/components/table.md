@@ -6,8 +6,9 @@
 
 - **内置工具栏**：支持刷新、尺寸切换、列显示开关与一键全屏。
 - **列配置驱动**：`columns` 数组描述所有列，支持字典渲染、插槽、动态组件与操作列。
+- **列缓存与拖拽**：传入 `name` 时，列显示/顺序/固定会缓存到 `localStorage`；固定列不可跨区拖拽，`action/selection` 默认固定、不可排序。
 - **与 CRUD 联动**：自动接收 `crud.refresh` 推送的数据，`crud.selection` 与表格勾选状态保持一致。
-- **上下文菜单**：右键可挂载操作列表，在复杂业务场景中替代操作列。
+- **上下文菜单**：右键可挂载操作列表，在复杂业务场景中替代操作列，与动作列共用隐藏/权限规则。
 
 ## 基本示例
 
@@ -93,14 +94,26 @@ useTable(
 - `table.setData(rows)`：自定义数据源（离线场景）。
 - `table.clearSelection()`、`table.resetFilters()`、`table.toggleFullscreen()` 等与 Element Plus 保持一致。
 
+### 列缓存与拖拽
+
+- **缓存键**：`fd-table:${name}:columns`，`name` 来自 `TableOptions.name` 或组件 `name` prop。未传 `name` 时不做缓存。
+- **内容**：列显示状态、顺序、固定方向，按列 id（`__id/prop/label/col_{idx}`）进行版本校验，不同列版本自动弃用旧缓存。
+- **拖拽限制**：固定列（含默认固定的 `action/selection`）不可跨固定区移动；标记 `pinned` 或 `sort: false` 的列不可拖拽排序。
+- **重置与保存**：列设置面板中的“重置”会清空缓存并回到初始列；保存后立即写入缓存。
+
+### 上下文菜单映射
+
+- 行右键菜单与动作列共用 `actions` 配置及 `hidden/disabled` 规则；内置 `detail/update/delete` 会复用 CRUD 钩子与权限。
+- 可在表格行的 `onContextmenu` 事件中调用 `ContextMenu.open(event, { list })`，或使用 `fd-context-menu` 组件自定义样式。
+
 ## API
 
 ### Props
 
-| 名称      | 说明                                                      | 类型                  | 默认值                                           |
-| --------- | --------------------------------------------------------- | --------------------- | ------------------------------------------------ |
-| `table`   | 继承自 `ElTable` 的 props，额外支持 `tools`、`fullscreen` | `Partial<TableProps>` | `{ border: true, size: 'default', tools: true }` |
-| `columns` | 列描述数组                                                | `TableColumn[]`       | `[]`                                             |
+| 名称      | 说明                                                                                      | 类型                  | 默认值                                           |
+| --------- | ----------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------ |
+| `table`   | 继承自 `ElTable` 的 props，额外支持 `tools/fullscreen/name`（`name` 用于列缓存 key 生成） | `Partial<TableProps>` | `{ border: true, size: 'default', tools: true }` |
+| `columns` | 列描述数组                                                                                | `TableColumn[]`       | `[]`                                             |
 
 ### 插槽
 

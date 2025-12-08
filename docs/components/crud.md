@@ -75,6 +75,8 @@ useCrud(
 - `events`：注册全局事件处理，等价于在 `crud.mitt` 上监听。
 - `onRefresh`：接管分页刷新流程，手动控制 `ctx.next / ctx.render`。
 - `onDelete`：自定义批量删除行为，例如需要再弹出审批确认。
+- `api 约定`：推荐命名 `page/add/update/delete/detail/export/import`，供 `fd-table` 列表、`fd-upsert` 详情/保存、`fd-export/fd-import` 调用，缺失时相关组件会提示错误。
+- `权限联动`：`getPermission('add'|'update'|'delete'|'detail'|'export'|'import')` 会被动作列、`fd-add-button`、`fd-delete-button`、`fd-export`、`fd-import` 等组件读取决定显隐。
 
 ## CRUD 实例能力
 
@@ -97,5 +99,7 @@ useCrud(
 - **何时调用 `app.refresh()`？** 建议在 `useCrud` 回调中等待 service 注入完成后调用，确保请求函数已就绪。
 - **如何自定义删除弹窗？** 通过 `onDelete(selection, { next })` 接管内部逻辑，可结合自定义校验后再执行 `next(params)`。
 - **能否同时存在多个 CRUD？** 可以，`useCrud` 默认绑定最近的 `<fd-crud>`。如果需要区分多个实例，请使用 `name` prop 并结合 `useParent`/`ref` 精确引用。
+- **导入/导出不起作用？** 检查是否设置 `dict.api.import/export` 且在 `service` 中提供对应方法，同时确保权限 `permission.import/export` 为真。
+- **详情/保存报主键缺失？** `fd-upsert` 的更新场景依赖 `dict.primaryId` 与 `dict.api.detail/update`，需要保证后端返回主键字段。
 
 > `fd-crud` 本身只负责上下文与生命周期，所有可视内容都由插槽交给 `fd-search`、`fd-table`、`fd-detail` 等组件完成。

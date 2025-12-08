@@ -8,6 +8,7 @@
 - **动作区域即栅格**：`action.grid` 继承 `fd-grid`，可控制按钮在不同分辨率下的分布。
 - **内置动作类型**：search/reset/collapse 三种行为即刻可用，亦可通过 `component/slot` 注入自定义按钮。
 - **钩子机制**：`onSearch / onReset` 允许在触发请求前后补充自定义逻辑。
+- **事件桥接**：通过 `mitt` 广播 `search.search/reset/get.model/model`，供导出、外部刷新或联动控件读取当前模型。
 
 ## 基本示例
 
@@ -83,6 +84,15 @@ useSearch<SearchExpose["model"]>({
 | `default`      | 直接透传到内部 `fd-form`，可自定义表单项                                |
 | 自定义动作插槽 | `action.component.slot` 或 `action.slot` 指向的插槽，需要在父组件里实现 |
 
+### 事件
+
+| 事件               | 说明                                                          |
+| ------------------ | ------------------------------------------------------------- |
+| `search.search`    | 触发搜索，负载为附加参数；内部会调用 `onSearch` 并刷新 CRUD。 |
+| `search.reset`     | 触发重置，负载为附加参数；内部会调用 `onReset`。              |
+| `search.get.model` | 请求当前搜索模型，回调函数会收到 model 引用。                 |
+| `search.model`     | 模型变化广播，监听可获取实时搜索条件。                        |
+
 ### 暴露
 
 `ref<SearchExpose>` 可访问：
@@ -98,5 +108,6 @@ useSearch<SearchExpose["model"]>({
 - **如何和分页联动？** `search()` 默认会调用 `crud.refresh`，自动根据 `dict.pagination` 将模型字段映射到请求参数。
 - **按钮太多如何排版？** 利用 `action.grid` 控制列数与折叠行数，再合理设置 `action.items[].col`。
 - **需要监听表单值变化？** 订阅 `mitt.on('search.model', handler)` 或直接 `watch(searchRef.value?.model)` 即可。
+- **如何与导出联动？** `fd-export` 默认通过 `search.get.model` 回调拿到查询条件，无需重复传参；也可手动 `mitt.emit('search.get.model', cb)` 获取模型。
 
 > 当 `fd-search` 和 `fd-table` 同时存在时，推荐把它们包裹在同一个 `<fd-crud>` 内，保证事件与参数同步。

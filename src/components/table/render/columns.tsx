@@ -115,7 +115,7 @@ export function renderColumns(
           }
           return h(
             ElSpace,
-            { size: 4, align: "center" },
+            { size: 4, alignment: "center" },
             () => [
               h("span", null, column.label),
               column.help

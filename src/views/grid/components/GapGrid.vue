@@ -4,14 +4,14 @@
       <div class="control-group">
         <span class="label">Row Gap (行距)</span>
         <div class="slider-wrapper">
-          <el-slider v-model="rowGap" :min="0" :max="50" :format-tooltip="(val) => `${val}px`" />
+          <el-slider v-model="rowGap" :min="0" :max="50" :format-tooltip="(val: number) => `${val}px`" />
         </div>
         <span class="value-tag">{{ rowGap }}px</span>
       </div>
       <div class="control-group">
         <span class="label">Column Gap (列距)</span>
         <div class="slider-wrapper">
-          <el-slider v-model="colGap" :min="0" :max="50" :format-tooltip="(val) => `${val}px`" />
+          <el-slider v-model="colGap" :min="0" :max="50" :format-tooltip="(val: number) => `${val}px`" />
         </div>
         <span class="value-tag">{{ colGap }}px</span>
       </div>

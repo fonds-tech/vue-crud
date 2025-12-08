@@ -11,19 +11,49 @@ interface ContextOptions {
 }
 
 export function createCrudContext({ id, dict, permission, mitt }: ContextOptions) {
+  // 规范化字典与权限，填充必需字段避免类型缺失
+  const apiDefaults: Dict["api"] = {
+    add: "",
+    page: "",
+    list: "",
+    update: "",
+    delete: "",
+    detail: undefined,
+  }
+
+  const labelDefaults: Dict["label"] = {
+    add: "",
+    list: "",
+    update: "",
+    delete: "",
+    detail: undefined,
+    title: undefined,
+  }
+
+  const normalizedDict: Dict = {
+    primaryId: dict?.primaryId ?? "id",
+    api: { ...apiDefaults, ...(dict?.api ?? {}) },
+    pagination: dict?.pagination,
+    search: dict?.search,
+    sort: dict?.sort,
+    label: { ...labelDefaults, ...(dict?.label ?? {}) },
+  }
+
+  const normalizedPermission: Permission = { ...permission }
+
   // 注入全局配置，设置基础默认值保证类型完整
   const defaultConfig: CrudOptions = {
-    dict,
-    permission,
+    dict: normalizedDict,
+    permission: normalizedPermission,
     style: { size: "default" },
     events: {},
     service: {},
   }
 
-  const injectedOptions = reactive<CrudOptions>(inject("__crud_options__", defaultConfig))
+  const injectedOptions = reactive<CrudOptions>(inject<CrudOptions>("__crud_options__", defaultConfig))
 
   // 配置对象与 CRUD 状态保持独立但可同步
-  const config = reactive<CrudOptions>(merge({}, defaultConfig, injectedOptions))
+  const config = reactive<CrudOptions>(merge({}, defaultConfig, injectedOptions) as CrudOptions)
 
   const crud = reactive<CrudRef>(
     merge(
@@ -48,12 +78,12 @@ export function createCrudContext({ id, dict, permission, mitt }: ContextOptions
         rowClose: () => {},
         refresh: async () => ({}),
         getPermission: () => true,
-        paramsReplace: params => params,
+        paramsReplace: (params: Record<string, any>) => params,
         getParams: () => ({}),
         setParams: () => {},
       },
-      clone({ dict, permission }),
-    ),
+      clone({ dict: normalizedDict, permission: normalizedPermission }),
+    ) as unknown as CrudRef,
   )
 
   function useCrudOptions(useOptions: Partial<CrudOptions> = {}) {

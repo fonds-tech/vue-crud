@@ -219,7 +219,9 @@
   &__help {
     color: var(--el-text-color-secondary);
     cursor: pointer;
+    display: flex;
     transition: color 0.15s ease;
+    align-items: center;
 
     &:hover {
       color: var(--el-color-primary);
