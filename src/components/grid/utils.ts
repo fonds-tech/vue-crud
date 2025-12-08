@@ -53,8 +53,10 @@ function clamp(val: number, min: number, max: number) {
 export function resolveItemData(cols: number, data: GridItemData): GridItemData {
   const originSpan = typeof data.span === "number" ? data.span : 1
   const originOffset = typeof data.offset === "number" ? data.offset : 0
-  const offset = clamp(originOffset, 0, Math.max(cols, 1))
-  const span = clamp(offset > 0 ? originSpan + offset : originSpan, 0, Math.max(cols, 1))
+  // offset 仅影响视觉偏移（marginLeft），不增加 gridColumn 的 span 值
+  const offset = clamp(originOffset, 0, Math.max(cols - 1, 0))
+  // span 保持独立，仅限制在合法范围内
+  const span = clamp(originSpan, 1, Math.max(cols, 1))
 
   return {
     span,
