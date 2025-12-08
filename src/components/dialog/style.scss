@@ -1,15 +1,18 @@
 .fd-dialog {
   padding: 0 !important;
+
   .el-dialog__header {
     display: flex;
     padding: var(--el-dialog-padding-primary);
     align-items: center;
     border-bottom: 1px solid var(--el-border-color);
   }
+
   &__scrollbar {
     flex: 1;
     padding: var(--el-dialog-padding-primary);
   }
+
   .el-dialog__footer {
     padding: var(--el-dialog-padding-primary);
     border-top: 1px solid var(--el-border-color);
