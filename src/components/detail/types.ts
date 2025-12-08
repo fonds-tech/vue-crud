@@ -1,4 +1,4 @@
-import type { TableDict } from "../table/type"
+import type { TableDict } from "../table/types"
 import type { dialogProps } from "element-plus"
 import type { DescriptionProps } from "element-plus/es/components/descriptions/src/description"
 import type { VNodeChild, CSSProperties, ExtractPropTypes, Component as VueComponent } from "vue"

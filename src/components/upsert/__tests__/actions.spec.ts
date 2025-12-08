@@ -1,4 +1,4 @@
-import type { UpsertAction, UpsertOptions } from "../type"
+import type { UpsertAction, UpsertOptions } from "../types"
 import { useUpsertActions } from "../actions"
 import { it, expect, describe } from "vitest"
 import { ref, computed, reactive } from "vue"

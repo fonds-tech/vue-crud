@@ -1,7 +1,7 @@
 import type { ColumnSetting } from "../engine/state"
 import type { PropType, VNodeChild } from "vue"
 import type { ComponentMountingOptions } from "@vue/test-utils"
-import type { TableExpose, TableRecord, TableUseOptions } from "../../table/type"
+import type { TableExpose, TableRecord, TableUseOptions } from "../../table/types"
 import Table from "../table"
 import { mount } from "@vue/test-utils"
 import { onDragMove } from "../engine/settings"

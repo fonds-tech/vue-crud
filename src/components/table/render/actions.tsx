@@ -5,7 +5,7 @@
 import type { Slots } from "vue"
 import type { CrudBridge } from "../engine/actions"
 import type { RenderHelpers } from "../engine/helpers"
-import type { TableScope, TableAction, TableRecord } from "../type"
+import type { TableScope, TableAction, TableRecord } from "../types"
 import { h } from "vue"
 import { ElLink } from "element-plus"
 import { normalizeEventProps } from "../engine/helpers"

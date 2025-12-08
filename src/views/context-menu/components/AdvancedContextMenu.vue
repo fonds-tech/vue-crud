@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ContextMenuOptions } from "@/components/context-menu/type"
+import type { ContextMenuOptions } from "@/components/context-menu/types"
 import { ElMessage } from "element-plus"
 import { watch, reactive } from "vue"
 

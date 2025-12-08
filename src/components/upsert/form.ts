@@ -1,4 +1,4 @@
-import type { UpsertMode, UpsertOptions } from "./type"
+import type { UpsertMode, UpsertOptions } from "./types"
 import type { FormRef, FormRecord, FormUseOptions } from "../form/types"
 import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"

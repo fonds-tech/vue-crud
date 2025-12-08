@@ -1,5 +1,5 @@
 import type { Ref } from "vue"
-import type { TableExpose, TableUseOptions } from "@/components/table/type"
+import type { TableExpose, TableUseOptions } from "@/components/table/types"
 import { useParent } from "./useParent"
 import { ref, watch } from "vue"
 

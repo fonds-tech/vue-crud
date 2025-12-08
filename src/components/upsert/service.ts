@@ -1,6 +1,6 @@
 import type { CrudRef } from "@/types"
 import type { UpsertState } from "./state"
-import type { UpsertCloseAction } from "./type"
+import type { UpsertCloseAction } from "./types"
 import { ElMessage } from "element-plus"
 import { clone, isFunction } from "@fonds/utils"
 

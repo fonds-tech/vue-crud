@@ -5,5 +5,5 @@ import FdExport from "./export"
 
 export { FdExport }
 export type { ExportProps } from "./export"
-export type { ExportInstance } from "./type"
+export type { ExportInstance } from "./types"
 export default FdExport

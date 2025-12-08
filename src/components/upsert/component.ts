@@ -1,4 +1,4 @@
-import type { UpsertMode } from "./type"
+import type { UpsertMode } from "./types"
 import type { Ref, ComputedRef } from "vue"
 import type { FormRecord, FormComponentSlot } from "../form/types"
 import { isFunction } from "@fonds/utils"

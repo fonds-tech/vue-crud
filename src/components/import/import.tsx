@@ -1,4 +1,4 @@
-import type { ImportResult } from "./type"
+import type { ImportResult } from "./types"
 import type { VNode, PropType, ExtractPropTypes } from "vue"
 
 import { useCore } from "@/hooks"

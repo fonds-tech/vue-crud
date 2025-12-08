@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableDict } from "@/components/table/type"
+import type { TableDict } from "@/components/table/types"
 import { h, ref } from "vue"
 import { UpsertMockService } from "../mockService"
 import { useCrud, useTable, useUpsert } from "@/hooks"

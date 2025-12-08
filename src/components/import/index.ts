@@ -5,5 +5,5 @@ import FdImport from "./import"
 
 export { FdImport }
 export type { ImportProps } from "./import"
-export type { ImportInstance, ImportResult } from "./type"
+export type { ImportInstance, ImportResult } from "./types"
 export default FdImport

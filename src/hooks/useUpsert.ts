@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { FormRecord } from "@/components/form/types"
-import type { UpsertRef, UpsertUseOptions } from "@/components/upsert/type"
+import type { UpsertRef, UpsertUseOptions } from "@/components/upsert/types"
 import { useParent } from "./useParent"
 import { ref, watch } from "vue"
 

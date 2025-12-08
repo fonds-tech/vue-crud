@@ -1,6 +1,6 @@
 import type { TableSize } from "../engine/state"
 import type { TableEngine } from "../engine"
-import type { TableScope, TableRecord } from "../type"
+import type { TableScope, TableRecord } from "../types"
 import type { Slots, VNode, Directive, CSSProperties } from "vue"
 import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"

@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DialogExpose } from "@/components/dialog/type"
+import type { DialogExpose } from "@/components/dialog/types"
 import { Cpu } from "@element-plus/icons-vue"
 import { ref, computed } from "vue"
 

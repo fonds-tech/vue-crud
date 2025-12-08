@@ -1,7 +1,7 @@
 import type { CrudRef } from "@/types"
 import type { FormRecord } from "../form/types"
 import type { Ref, ComputedRef } from "vue"
-import type { UpsertMode, UpsertAction, UpsertOptions } from "./type"
+import type { UpsertMode, UpsertAction, UpsertOptions } from "./types"
 import { isFunction } from "@fonds/utils"
 
 interface ActionHelperContext<T extends FormRecord = FormRecord> {

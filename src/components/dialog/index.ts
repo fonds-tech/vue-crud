@@ -1,2 +1,2 @@
 export { default } from "./dialog"
-export * from "./type"
+export * from "./types"

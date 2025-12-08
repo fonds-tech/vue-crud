@@ -1,5 +1,5 @@
 import type { TableInstance, PaginationProps } from "element-plus"
-import type { TableColumn, TableRecord, TableOptions } from "../type"
+import type { TableColumn, TableRecord, TableOptions } from "../types"
 import type { Ref, Slots, ComputedRef, UnwrapNestedRefs } from "vue"
 import { ref, computed, reactive } from "vue"
 
