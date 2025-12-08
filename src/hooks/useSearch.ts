@@ -1,5 +1,5 @@
 import type { Ref } from "vue"
-import type { SearchExpose, SearchOptions } from "@/components/search/types"
+import type { SearchExpose, SearchOptions } from "@/components/search/interface"
 import { useParent } from "./useParent"
 import { ref, watch } from "vue"
 

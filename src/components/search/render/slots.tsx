@@ -1,7 +1,6 @@
-import type { SearchEngine } from "../engine"
-import type { SearchAction } from "../types"
+import type { SearchCore, SearchAction } from "../interface"
 import type { Slots, Component, VNodeChild } from "vue"
-import { transformEvents } from "../engine"
+import { transformEvents } from "../core"
 import { h, resolveDynamicComponent } from "vue"
 
 /**
@@ -11,7 +10,7 @@ import { h, resolveDynamicComponent } from "vue"
  * @param slots 组件插槽
  */
 export function renderActionSlots(
-  engine: SearchEngine,
+  engine: SearchCore,
   action: SearchAction,
   slots: Slots,
 ): VNodeChild | null {
@@ -28,7 +27,7 @@ export function renderActionSlots(
  * @param action 动作配置
  */
 export function renderCustomSlots(
-  engine: SearchEngine,
+  engine: SearchCore,
   action: SearchAction,
 ): Record<string, () => VNodeChild> | undefined {
   const componentSlots = engine.getComponentSlots(action)
@@ -54,7 +53,7 @@ export function renderCustomSlots(
  * @param action 动作配置
  */
 export function renderComponent(
-  engine: SearchEngine,
+  engine: SearchCore,
   action: SearchAction,
 ): VNodeChild | null {
   const componentIs = engine.getComponentIs(action)

@@ -1,25 +1,6 @@
 import type { Ref } from "vue"
+import type { SearchLifecycleParams } from "../interface"
 import { onMounted, onBeforeUnmount } from "vue"
-
-/**
- * 搜索组件生命周期管理参数
- */
-export interface SearchLifecycleParams {
-  /** 视口宽度 */
-  viewportWidth: Ref<number>
-  /** 搜索处理器 */
-  searchHandler: (params?: any) => void
-  /** 重置处理器 */
-  resetHandler: (params?: any) => void
-  /** 获取模型处理器 */
-  getModelHandler: (callback?: any) => void
-  /** 事件总线 */
-  mitt: {
-    on: (event: string, handler: (...args: any[]) => void) => void
-    off: (event: string, handler: (...args: any[]) => void) => void
-    emit: (event: string, ...args: any[]) => void
-  }
-}
 
 /**
  * 注册事件监听

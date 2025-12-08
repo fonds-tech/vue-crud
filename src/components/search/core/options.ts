@@ -1,36 +1,7 @@
-import type { GridProps } from "../../grid"
 import type { FormRecord, FormUseOptions } from "../../form/types"
-import type { SearchAction, SearchOptions } from "../types"
+import type { SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"
-
-/**
- * 内部动作配置
- */
-export interface InternalActionOptions<T extends FormRecord = FormRecord> {
-  items: SearchAction<T>[]
-  grid?: GridProps
-}
-
-/**
- * 内部完整配置
- */
-export interface InternalOptions<T extends FormRecord = FormRecord> {
-  form: FormUseOptions<T>
-  action: InternalActionOptions<T>
-  onSearch?: SearchOptions<T>["onSearch"]
-  onReset?: SearchOptions<T>["onReset"]
-}
-
-/**
- * 默认动作按钮
- */
-export const defaultActions: SearchAction[] = [{ type: "search" }, { type: "reset" }]
-
-/**
- * 默认动作区域间距
- */
-export const defaultActionGap = 12
 
 /**
  * 创建默认配置
@@ -52,7 +23,10 @@ export function createDefaultOptions<T extends FormRecord = FormRecord>(): Inter
       },
     },
     action: {
-      items: clone(defaultActions) as SearchAction<T>[],
+      items: clone([
+        { type: "search" },
+        { type: "reset" },
+      ]) as SearchAction<T>[],
       grid: {
         cols: 2,
         colGap: 12,

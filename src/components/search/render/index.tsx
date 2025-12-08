@@ -1,18 +1,8 @@
-import type { SearchEngine } from "../engine"
-import type { Slots, VNodeChild } from "vue"
+import type { VNodeChild } from "vue"
+import type { SearchRenderContext } from "../interface"
 import FdForm from "../../form/form"
 import FdGrid from "../../grid"
 import { renderActions } from "./action"
-
-/**
- * 搜索组件渲染上下文
- */
-export interface SearchRenderContext {
-  /** 搜索引擎 */
-  engine: SearchEngine
-  /** 组件插槽 */
-  slots: Slots
-}
 
 /**
  * 渲染搜索组件

@@ -1,5 +1,5 @@
 import { renderSearch } from "./render"
-import { useSearchEngine } from "./engine"
+import { useSearchCore } from "./core"
 import { useSlots, defineComponent } from "vue"
 import "./style.scss"
 
@@ -8,8 +8,7 @@ export default defineComponent({
   inheritAttrs: false,
   setup(_, { slots: setupSlots, expose }) {
     const slots = useSlots()
-
-    const engine = useSearchEngine(setupSlots)
+    const engine = useSearchCore(setupSlots)
 
     expose({
       get model() {

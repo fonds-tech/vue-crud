@@ -1,4 +1,4 @@
-import type { SearchExpose } from "../types"
+import type { SearchExpose } from "../interface"
 import type { MountingOptions } from "@vue/test-utils"
 import type { FormRef, FormRecord } from "../../form/types"
 import Search from "../search"

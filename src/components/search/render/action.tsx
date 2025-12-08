@@ -1,6 +1,5 @@
-import type { SearchEngine } from "../engine"
-import type { SearchAction } from "../types"
 import type { Slots, VNodeChild } from "vue"
+import type { SearchCore, SearchAction } from "../interface"
 import FdGridItem from "../../grid-item"
 import { ElIcon, ElButton } from "element-plus"
 import { renderComponent, renderActionSlots } from "./slots"
@@ -14,7 +13,7 @@ import { Search as IconSearch, ArrowUp as IconArrowUp, Loading as IconLoading, R
  * @param slots 组件插槽
  */
 export function renderAction(
-  engine: SearchEngine,
+  engine: SearchCore,
   action: SearchAction,
   index: number,
   slots: Slots,
@@ -63,7 +62,7 @@ export function renderAction(
  * @param engine 搜索引擎
  * @param slots 组件插槽
  */
-export function renderActions(engine: SearchEngine, slots: Slots): VNodeChild[] {
+export function renderActions(engine: SearchCore, slots: Slots): VNodeChild[] {
   return engine.resolvedActions.value.map((action, index) =>
     renderAction(engine, action, index, slots),
   )

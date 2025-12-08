@@ -1,6 +1,6 @@
 import type { GridProps, GridItemProps } from "../grid"
 import type { FormRef, FormRecord, FormUseOptions } from "../form/types"
-import type { Ref, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
+import type { Ref, Slots, VNodeChild, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
 
 /**
  * fd-search use 方法的配置项
@@ -156,4 +156,125 @@ export type SearchRef<T extends FormRecord = FormRecord> = FormRef<T> & {
   reset: (params?: Record<string, any>) => Promise<any>
   collapse: (state?: boolean) => void
   form: Ref<FormRef<T> | undefined>
+}
+
+// ============================================================
+// 核心类型定义（内部使用）
+// ============================================================
+
+/**
+ * 内部动作配置
+ */
+export interface InternalActionOptions<T extends FormRecord = FormRecord> {
+  /** 动作项 */
+  items: SearchAction<T>[]
+  /** 动作区域栅格配置 */
+  grid?: GridProps
+}
+
+/**
+ * 内部完整配置
+ */
+export interface InternalOptions<T extends FormRecord = FormRecord> {
+  /** 表单配置 */
+  form: FormUseOptions<T>
+  /** 动作配置 */
+  action: InternalActionOptions<T>
+  /** 搜索钩子 */
+  onSearch?: SearchOptions<T>["onSearch"]
+  /** 重置钩子 */
+  onReset?: SearchOptions<T>["onReset"]
+}
+
+/**
+ * 搜索核心接口
+ */
+export interface SearchCore {
+  /** 表单引用 */
+  formRef: Ref<FormRef<FormRecord> | undefined>
+  /** 加载状态 */
+  loading: Ref<boolean>
+  /** 折叠状态 */
+  collapsed: Ref<boolean>
+  /** 视口宽度 */
+  viewportWidth: Ref<number>
+  /** 配置项 */
+  options: InternalOptions
+  /** 表单模型 */
+  formModel: ComputedRef<FormRecord>
+  /** 解析后的动作列表 */
+  resolvedActions: ComputedRef<SearchAction[]>
+  /** 动作栅格属性 */
+  actionGridProps: ComputedRef<{
+    cols: number
+    colGap: number
+    rowGap: number
+    collapsed: boolean
+    collapsedRows: number
+  }>
+  /** 折叠标签 */
+  collapseLabel: ComputedRef<string>
+  /** 表单插槽 */
+  formSlots: ComputedRef<Record<string, any>>
+  /** crud 实例 */
+  crud: any
+  /** 事件总线 */
+  mitt: any
+
+  // 方法
+  /** 解析动作列配置 */
+  resolveActionCol: (action: SearchAction) => { span: number, offset: number }
+  /** 获取动作项属性 */
+  getActionItemProps: (action: SearchAction) => { span: number, offset: number }
+  /** 获取动作插槽名 */
+  getActionSlot: (action: SearchAction) => string | undefined
+  /** 获取组件 is */
+  getComponentIs: (action: SearchAction) => any
+  /** 获取组件属性 */
+  getComponentProps: (action: SearchAction) => Record<string, any>
+  /** 获取组件事件 */
+  getComponentEvents: (action: SearchAction) => Record<string, (...args: any[]) => void>
+  /** 获取组件样式 */
+  getComponentStyle: (action: SearchAction) => any
+  /** 获取组件插槽 */
+  getComponentSlots: (action: SearchAction) => Record<string, any>
+
+  /** 初始化 */
+  use: (options?: SearchOptions) => void
+  /** 搜索 */
+  search: (extra?: Record<string, any>) => Promise<any>
+  /** 重置 */
+  reset: (extra?: Record<string, any>) => Promise<any>
+  /** 折叠切换 */
+  collapse: (state?: boolean) => void
+}
+
+/**
+ * 搜索组件生命周期管理参数
+ */
+export interface SearchLifecycleParams {
+  /** 视口宽度 */
+  viewportWidth: Ref<number>
+  /** 搜索处理器 */
+  searchHandler: (params?: any) => void
+  /** 重置处理器 */
+  resetHandler: (params?: any) => void
+  /** 获取模型处理器 */
+  getModelHandler: (callback?: any) => void
+  /** 事件总线 */
+  mitt: {
+    on: (event: string, handler: (...args: any[]) => void) => void
+    off: (event: string, handler: (...args: any[]) => void) => void
+    emit: (event: string, ...args: any[]) => void
+  }
+}
+
+/**
+ * 搜索组件渲染上下文
+ */
+export interface SearchRenderContext {
+  /** 搜索核心 */
+  engine: SearchCore
+  /** 组件插槽 */
+  slots: Slots
 }

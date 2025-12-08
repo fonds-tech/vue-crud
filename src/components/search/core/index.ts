@@ -1,7 +1,6 @@
-import type { InternalOptions } from "./options"
+import type { Slots } from "vue"
 import type { FormRef, FormRecord } from "../../form/types"
-import type { Ref, Slots, ComputedRef } from "vue"
-import type { SearchAction, SearchOptions } from "../types"
+import type { SearchCore, SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { clone, isDef } from "@fonds/utils"
@@ -10,75 +9,12 @@ import { isEmpty, isFunction } from "@/utils/check"
 import { resolveResponsiveValue } from "../../grid/utils"
 import { resolveMaybe, resolveComponent } from "./helpers"
 import { ref, watch, computed, reactive } from "vue"
-import { defaultActions, defaultActionGap, mergeSearchOptions, createDefaultOptions } from "./options"
+import { mergeSearchOptions, createDefaultOptions } from "./options"
 
 /**
- * 搜索引擎接口
+ * 搜索核心 Composable
  */
-export interface SearchEngine {
-  /** 表单引用 */
-  formRef: Ref<FormRef<FormRecord> | undefined>
-  /** 加载状态 */
-  loading: Ref<boolean>
-  /** 折叠状态 */
-  collapsed: Ref<boolean>
-  /** 视口宽度 */
-  viewportWidth: Ref<number>
-  /** 配置项 */
-  options: InternalOptions
-  /** 表单模型 */
-  formModel: ComputedRef<FormRecord>
-  /** 解析后的动作列表 */
-  resolvedActions: ComputedRef<SearchAction[]>
-  /** 动作栅格属性 */
-  actionGridProps: ComputedRef<{
-    cols: number
-    colGap: number
-    rowGap: number
-    collapsed: boolean
-    collapsedRows: number
-  }>
-  /** 折叠标签 */
-  collapseLabel: ComputedRef<string>
-  /** 表单插槽 */
-  formSlots: ComputedRef<Record<string, any>>
-  /** crud 实例 */
-  crud: ReturnType<typeof useCore>["crud"]
-  /** 事件总线 */
-  mitt: ReturnType<typeof useCore>["mitt"]
-
-  // 方法
-  /** 解析动作列配置 */
-  resolveActionCol: (action: SearchAction) => { span: number, offset: number }
-  /** 获取动作项属性 */
-  getActionItemProps: (action: SearchAction) => { span: number, offset: number }
-  /** 获取动作插槽名 */
-  getActionSlot: (action: SearchAction) => string | undefined
-  /** 获取组件 is */
-  getComponentIs: (action: SearchAction) => any
-  /** 获取组件属性 */
-  getComponentProps: (action: SearchAction) => Record<string, any>
-  /** 获取组件事件 */
-  getComponentEvents: (action: SearchAction) => Record<string, (...args: any[]) => void>
-  /** 获取组件样式 */
-  getComponentStyle: (action: SearchAction) => any
-  /** 获取组件插槽 */
-  getComponentSlots: (action: SearchAction) => Record<string, any>
-
-  /** 初始化 */
-  use: (options?: SearchOptions) => void
-  /** 搜索 */
-  search: (extra?: Record<string, any>) => Promise<any>
-  /** 重置 */
-  reset: (extra?: Record<string, any>) => Promise<any>
-  /** 折叠切换 */
-  collapse: (state?: boolean) => void
-}
-
-/**
- * 搜索引擎 Composable
- */
-export function useSearchEngine(setupSlots: Slots): SearchEngine {
+export function useSearchCore(setupSlots: Slots): SearchCore {
   const { crud, mitt } = useCore()
 
   const formRef = ref<FormRef<FormRecord>>()
@@ -89,12 +25,12 @@ export function useSearchEngine(setupSlots: Slots): SearchEngine {
   const options = reactive<InternalOptions>(createDefaultOptions())
 
   const formModel = computed<FormRecord>(() => formRef.value?.model ?? (options.form.model as FormRecord) ?? {})
-  const resolvedActions = computed(() => (options.action.items.length ? options.action.items : defaultActions))
+  const resolvedActions = computed(() => (options.action.items.length ? options.action.items : [{ type: "search" }, { type: "reset" }] as SearchAction[]))
 
   const actionGridProps = computed(() => {
     const grid = options.action.grid ?? {}
-    const colGap = Math.max(0, resolveResponsiveValue(grid.colGap ?? defaultActionGap, viewportWidth.value, defaultActionGap))
-    const rowGap = Math.max(0, resolveResponsiveValue(grid.rowGap ?? defaultActionGap, viewportWidth.value, defaultActionGap))
+    const colGap = Math.max(0, resolveResponsiveValue(grid.colGap ?? 12, viewportWidth.value, 12))
+    const rowGap = Math.max(0, resolveResponsiveValue(grid.rowGap ?? 12, viewportWidth.value, 12))
     const cols = Math.max(1, resolveResponsiveValue(grid.cols ?? 24, viewportWidth.value, 24))
     const collapsedState = grid.collapsed ?? false
     const collapsedRows = Math.max(1, grid.collapsedRows ?? 1)
@@ -311,4 +247,3 @@ export function useSearchEngine(setupSlots: Slots): SearchEngine {
 }
 
 export { resolveComponent, resolveMaybe, transformEvents } from "./helpers"
-export type { InternalActionOptions, InternalOptions } from "./options"
