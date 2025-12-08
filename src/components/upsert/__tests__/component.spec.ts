@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import { useComponentHelper } from "../engine/helpers"
+import { useComponentHelper } from "../core/helpers"
 import { it, expect, describe } from "vitest"
 
 describe("useComponentHelper", () => {

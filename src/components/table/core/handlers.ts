@@ -1,6 +1,6 @@
 import type { CrudBridge } from "./actions"
 import type { TableSize, TableState } from "./state"
-import type { TableScope, TableRecord } from "../types"
+import type { TableScope, TableRecord } from "../interface"
 import { buildContextMenuItems } from "./actions"
 
 /**

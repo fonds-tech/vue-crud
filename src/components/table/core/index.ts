@@ -9,7 +9,7 @@ import type { TableMethods } from "./methods"
 import type { TableHandlers } from "./handlers"
 import type { RenderHelpers } from "./helpers"
 import type { Slots, ComputedRef } from "vue"
-import type { TableColumn, TableExpose, TableRecord } from "../types"
+import type { TableColumn, TableExpose, TableRecord } from "../interface"
 import { createTableMethods } from "./methods"
 import { createTableHandlers } from "./handlers"
 import { createRenderHelpers } from "./helpers"
@@ -22,7 +22,7 @@ import { watch, computed, onMounted, onBeforeUnmount } from "vue"
  * 表格引擎实例接口
  * 对外暴露的完整引擎上下文
  */
-export interface TableEngine {
+export interface TableCore {
   /** 表格状态 */
   state: TableState
   /** 核心方法 */
@@ -48,7 +48,7 @@ export interface TableEngine {
 /**
  * 表格引擎初始化选项
  */
-export interface TableEngineOptions {
+export interface TableCoreOptions {
   props: { name?: string }
   slots: Slots
   attrs: Record<string, unknown>
@@ -76,7 +76,7 @@ export interface TableEngineOptions {
  * @param options - 引擎初始化选项
  * @returns 表格引擎实例
  */
-export function useTableEngine(options: TableEngineOptions): TableEngine {
+export function useTableCore(options: TableCoreOptions): TableCore {
   const { props, slots, attrs, emit, crud, mitt } = options
 
   // 初始查询参数来自 crud hook，保持分页同步

@@ -3,7 +3,7 @@
  * 包含 CrudBridge 定义和操作相关的逻辑函数
  */
 import type { ContextMenuItem } from "./state"
-import type { TableScope, TableAction, TableColumn, TableRecord } from "../types"
+import type { TableScope, TableAction, TableColumn, TableRecord } from "../interface"
 
 /**
  * 定义 CRUD 操作桥接的接口

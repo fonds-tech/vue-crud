@@ -177,16 +177,6 @@ describe("fd-dialog", () => {
     expect(exposed.fullscreenActive.value).toBe(true)
   })
 
-  it("能响应 el-dialog 的 update:fullscreen 事件并向外透传", async () => {
-    const wrapper = mountDialog({ props: { fullscreen: false } })
-    const dialogStub = wrapper.findComponent(ElDialogStub)
-    const exposed = getExpose(wrapper)
-    dialogStub.vm.$emit("update:fullscreen", true)
-    await nextTick()
-    expect(wrapper.emitted("update:fullscreen")?.[0]).toEqual([true])
-    expect(exposed.fullscreenActive.value).toBe(true)
-  })
-
   it("响应 Element Plus 的生命周期事件", () => {
     const wrapper = mountDialog()
     const dialogStub = wrapper.findComponent(ElDialogStub)

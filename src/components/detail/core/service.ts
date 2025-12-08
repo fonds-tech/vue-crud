@@ -1,4 +1,4 @@
-import type { DetailData, DetailOptions } from "../types"
+import type { DetailData, DetailOptions } from "../interface"
 import { clone } from "@fonds/utils"
 import { ElMessage } from "element-plus"
 import { isFunction } from "@/utils/check"

@@ -1,5 +1,5 @@
 import type { MountingOptions } from "@vue/test-utils"
-import type { DetailRef, DetailUseOptions } from "../types"
+import type { DetailRef, DetailUseOptions } from "../interface"
 import Detail from "../index"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"

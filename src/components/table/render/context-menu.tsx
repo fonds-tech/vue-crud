@@ -1,7 +1,7 @@
 /**
  * @fileoverview 表格渲染层 - 右键菜单渲染
  */
-import type { TableEngine } from "../engine"
+import type { TableCore } from "../core"
 import { h, Teleport } from "vue"
 
 /**
@@ -9,7 +9,7 @@ import { h, Teleport } from "vue"
  * @param engine - 表格引擎实例
  * @returns 右键菜单的 VNode
  */
-export function renderContextMenu(engine: TableEngine) {
+export function renderContextMenu(engine: TableCore) {
   const { state, handlers } = engine
 
   return h(

@@ -1,4 +1,4 @@
 import Detail from "./detail"
 
-export * from "./types"
+export * from "./interface"
 export default Detail

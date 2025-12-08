@@ -1,8 +1,8 @@
-import type { OptionRecord, FdSelectProps } from "./types"
+import type { OptionRecord, FdSelectProps } from "./interface"
 import type { SelectProps as ElSelectProps } from "element-plus/es/components/select/src/select"
 import { clone } from "@fonds/utils"
 import { merge, isEqual } from "lodash-es"
-import { fdSelectEmits, fdSelectPropOptions } from "./types"
+import { fdSelectEmits, fdSelectPropOptions } from "./interface"
 import { ref, watch, computed, defineComponent, resolveDynamicComponent } from "vue"
 
 // 扩展出来的增强属性，承担远程获取与交互控制职责

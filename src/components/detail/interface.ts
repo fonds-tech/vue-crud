@@ -1,4 +1,4 @@
-import type { TableDict } from "../table/types"
+import type { TableDict } from "../table/interface"
 import type { dialogProps } from "element-plus"
 import type { DescriptionProps } from "element-plus/es/components/descriptions/src/description"
 import type { VNodeChild, CSSProperties, ExtractPropTypes, Component as VueComponent } from "vue"
@@ -278,7 +278,7 @@ export interface DetailOptions<D extends DetailData = DetailData> {
  * @description 支持 DeepPartial 深度部分合并，允许在运行时更新 Options 的部分配置。
  * @template D 详情数据对象的类型
  */
-export type DetailUseOptions<D extends DetailData = DetailData> = import("../form/types").DeepPartial<DetailOptions<D>> & Record<string, any>
+export type DetailUseOptions<D extends DetailData = DetailData> = import("../form/interface").DeepPartial<DetailOptions<D>> & Record<string, any>
 
 /**
  * 详情组件暴露的实例方法接口 (Expose)。

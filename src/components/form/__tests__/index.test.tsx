@@ -1,4 +1,4 @@
-import type { FormRef } from "@/components/form/types"
+import type { FormRef } from "@/components/form/interface"
 import FdForm from "../form.jsx"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe } from "vitest"

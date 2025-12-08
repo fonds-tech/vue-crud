@@ -1,7 +1,7 @@
-import type { CrudRef } from "@/types"
-import type { FormRecord } from "../../form/types"
+import type { CrudRef } from "../../crud/interface"
+import type { FormRecord } from "../../form/interface"
 import type { Ref, ComputedRef } from "vue"
-import type { UpsertMode, UpsertAction, UpsertOptions } from "../types"
+import type { UpsertMode, UpsertAction, UpsertOptions } from "../interface"
 import { isFunction } from "@fonds/utils"
 
 /**

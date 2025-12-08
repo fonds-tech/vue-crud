@@ -1,4 +1,4 @@
 import Upsert from "./upsert"
 
-export * from "./types"
+export * from "./interface"
 export default Upsert

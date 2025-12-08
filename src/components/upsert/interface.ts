@@ -12,7 +12,7 @@ import type {
   FormMethods,
   FormUseOptions,
   FormComponentSlot,
-} from "../form/types"
+} from "../form/interface"
 
 /**
  * 排除 modelValue 的原生 Dialog 属性
@@ -272,4 +272,4 @@ export interface UpsertExpose<T extends FormRecord = FormRecord> extends FormAct
 
 export type UpsertRef<T extends FormRecord = FormRecord> = UpsertExpose<T>
 
-export type { FormComponent as UpsertComponent, FormComponentSlot as UpsertComponentSlot, FormGroup as UpsertGroup, FormItem as UpsertItem } from "../form/types"
+export type { FormComponent as UpsertComponent, FormComponentSlot as UpsertComponentSlot, FormGroup as UpsertGroup, FormItem as UpsertItem } from "../form/interface"

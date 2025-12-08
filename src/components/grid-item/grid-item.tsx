@@ -1,6 +1,6 @@
 import type { CSSProperties } from "vue"
-import type { GridCollector, GridItemProps, GridContextState } from "../grid/types"
-import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "../grid/types"
+import type { GridCollector, GridItemProps, GridContextState } from "../grid/interface"
+import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "../grid/interface"
 import { resolveItemData, resolveResponsiveValue } from "../grid/utils"
 import { inject, computed, watchEffect, defineComponent, onBeforeUnmount } from "vue"
 

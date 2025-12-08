@@ -1,4 +1,4 @@
-import type { FormRenderContext } from "../types"
+import type { FormRenderContext } from "../interface"
 import { ElForm, ElSpace } from "element-plus"
 import { renderGrid, renderTabs, renderSteps } from "./layout"
 

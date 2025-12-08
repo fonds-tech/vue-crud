@@ -2,7 +2,7 @@
  * @fileoverview 列设置逻辑模块
  * 包含列设置的类型定义、缓存操作和状态管理
  */
-import type { TableColumn, TableRecord } from "../types"
+import type { TableColumn, TableRecord } from "../interface"
 import type { TableState, ColumnSetting } from "./state"
 
 /**

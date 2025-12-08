@@ -1,6 +1,6 @@
-import type { TableSize } from "../engine/state"
-import type { TableEngine } from "../engine"
-import type { TableScope, TableRecord } from "../types"
+import type { TableCore } from "../core"
+import type { TableSize } from "../core/state"
+import type { TableScope, TableRecord } from "../interface"
 import type { Slots, VNode, Directive, CSSProperties } from "vue"
 import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"
@@ -9,7 +9,7 @@ import { renderContextMenu } from "./context-menu"
 import { h, withDirectives } from "vue"
 import { ElTable, ElLoading } from "element-plus"
 import { ColumnSettingsPanel } from "./settings-panel"
-import { onDragEnd, onDragMove, saveColumns, toggleFixed, resetColumns, toggleAllColumns, onColumnShowChange } from "../engine/settings"
+import { onDragEnd, onDragMove, saveColumns, toggleFixed, resetColumns, toggleAllColumns, onColumnShowChange } from "../core/settings"
 
 // Element Plus Table 支持的事件列表（按官方文档枚举，用于动态生成事件监听器）
 const elTableEventNames = [
@@ -40,7 +40,7 @@ const elTableEventNames = [
  */
 export interface RenderTableParams {
   slots: Slots
-  engine: TableEngine
+  engine: TableCore
 }
 
 /**

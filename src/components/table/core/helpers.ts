@@ -1,5 +1,5 @@
 import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
-import type { TableDict, TableScope, TableColumn, TableRecord, TableComponent } from "../types"
+import type { TableDict, TableScope, TableColumn, TableRecord, TableComponent } from "../interface"
 import { isFunction } from "@/utils/check"
 
 /**

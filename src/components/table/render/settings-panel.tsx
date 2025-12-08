@@ -3,8 +3,8 @@
  * 负责 ColumnSettingsPanel 的 UI 渲染
  */
 import type { VNode } from "vue"
-import type { ColumnSetting } from "../engine/state"
-import type { DragMoveEvent, ColumnSettingsPanelProps } from "../engine/settings"
+import type { ColumnSetting } from "../core/state"
+import type { DragMoveEvent, ColumnSettingsPanelProps } from "../core/settings"
 import Draggable from "vuedraggable"
 import { h } from "vue"
 import { Setting } from "@element-plus/icons-vue"

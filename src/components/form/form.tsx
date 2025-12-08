@@ -1,5 +1,5 @@
 import { renderForm } from "./render/form"
-import { useFormEngine } from "./engine"
+import { useFormCore } from "./core"
 import { defineComponent } from "vue"
 import "./style.scss"
 
@@ -8,7 +8,7 @@ export default defineComponent({
   inheritAttrs: false,
   setup(_, { attrs, slots, expose }) {
     // 初始化表单引擎，获取状态与方法
-    const { id, formRef, options, model, step, activeGroupName, resolvedActiveGroup, activeStepName, action, methods, use, next, prev, helpers } = useFormEngine()
+    const { id, formRef, options, model, step, activeGroupName, resolvedActiveGroup, activeStepName, action, methods, use, next, prev, helpers } = useFormCore()
 
     // 暴露给父组件的实例属性和方法
     expose({

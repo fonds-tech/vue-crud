@@ -1,4 +1,4 @@
-import type { FilterFn, FormItem, FilterOptions, FilterRuntimeContext } from "./types"
+import type { FilterFn, FormItem, FilterOptions, FilterRuntimeContext } from "./interface"
 
 const registry = new Map<string, FilterFn>()
 

@@ -1,5 +1,5 @@
 import type { Arrayable } from "element-plus/es/utils"
-import type { FormHelpers } from "./engine"
+import type { FormHelpers } from "./core"
 import type { GridProps, GridItemProps } from "../grid"
 import type { Ref, VNode, VNodeChild, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
 import type {

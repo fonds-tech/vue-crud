@@ -1,6 +1,6 @@
 import type { FormItemProp } from "element-plus"
 import type { Ref, VNode, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
-import type { FormItem, FormRecord, DeepPartial, FormOptions, MaybePromise, FormComponentSlot, FilterRuntimeContext, FormItemRuleWithMeta, FormAsyncOptionsState } from "../types"
+import type { FormItem, FormRecord, DeepPartial, FormOptions, MaybePromise, FormComponentSlot, FilterRuntimeContext, FormItemRuleWithMeta, FormAsyncOptionsState } from "../interface"
 import { isFunction } from "@fonds/utils"
 import { syncOptions, ensureOptionState } from "./options"
 import { toPathArray, getModelValue, setModelValue } from "./path"

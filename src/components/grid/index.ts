@@ -4,6 +4,6 @@
 import Grid from "./grid"
 import "./style.scss"
 
-export * from "./types"
+export * from "./interface"
 export * from "./utils"
 export default Grid

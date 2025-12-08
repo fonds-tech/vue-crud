@@ -1,6 +1,6 @@
 import { useCore } from "@/hooks"
 import { renderTable } from "./render/table"
-import { useTableEngine } from "./engine"
+import { useTableCore } from "./core"
 import { useAttrs, defineComponent } from "vue"
 import "./style.scss"
 
@@ -12,7 +12,7 @@ export default defineComponent({
     const attrs = useAttrs()
     const { crud, mitt } = useCore()
 
-    const engine = useTableEngine({ emit, props, slots, attrs, crud, mitt })
+    const engine = useTableCore({ emit, props, slots, attrs, crud, mitt })
 
     expose(engine.exposed)
 

@@ -1,9 +1,9 @@
-import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescriptions } from "./types"
+import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescriptions } from "./interface"
 import FdDialog from "../dialog"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
 import { renderActions, renderDetailContent } from "./render"
-import { resolveMaybe, createDetailState, createDetailService } from "./engine"
+import { resolveMaybe, createDetailState, createDetailService } from "./core"
 import {
   h,
   watch,

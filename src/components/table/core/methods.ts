@@ -1,5 +1,5 @@
 import type { TableState } from "./state"
-import type { TableRecord, TableOptions, TableUseOptions } from "../types"
+import type { TableRecord, TableOptions, TableUseOptions } from "../interface"
 import { merge } from "lodash-es"
 import { getColumnId, rebuildColumnSettings } from "./settings"
 

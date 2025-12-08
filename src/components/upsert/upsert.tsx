@@ -1,6 +1,6 @@
 import type { FormItemProp } from "element-plus"
-import type { UpsertUseOptions } from "./types"
-import type { FormRef, FormRecord } from "../form/types"
+import type { UpsertUseOptions } from "./interface"
+import type { FormRef, FormRecord } from "../form/interface"
 import FdDialog from "../dialog"
 import { clone } from "@fonds/utils"
 import { useCore, useConfig } from "@/hooks"
@@ -11,7 +11,7 @@ import {
   createUpsertState,
   useComponentHelper,
   createUpsertService,
-} from "./engine"
+} from "./core"
 import {
   h,
   watch,

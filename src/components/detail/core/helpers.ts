@@ -1,4 +1,4 @@
-import type { DetailData, DetailSlots, DetailMaybeFn, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../types"
+import type { DetailData, DetailSlots, DetailMaybeFn, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
 import { markRaw } from "vue"
 import { isFunction } from "@/utils/check"
 

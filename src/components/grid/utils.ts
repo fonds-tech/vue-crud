@@ -1,4 +1,4 @@
-import type { GridItemData, ResponsiveValue } from "./types"
+import type { GridItemData, ResponsiveValue } from "./interface"
 
 /** 默认响应式断点（同 Arco/常见布局约定） */
 export const responsiveBreakpoints = {

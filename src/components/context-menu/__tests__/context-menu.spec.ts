@@ -1,4 +1,4 @@
-import type { ContextMenuExpose } from "../types"
+import type { ContextMenuExpose } from "../interface"
 import { mount } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { it, vi, expect, describe } from "vitest"

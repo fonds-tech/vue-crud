@@ -1,4 +1,4 @@
-import type { CrudRef, CrudOptions } from "../types"
+import type { CrudRef, CrudOptions } from "../interface"
 import { reactive } from "vue"
 import { createService } from "../service"
 import { createHelper, paramsReplace } from "../helper"

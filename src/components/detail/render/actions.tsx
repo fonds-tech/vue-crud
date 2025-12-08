@@ -1,8 +1,8 @@
 import type { RenderCtx } from "./content"
-import type { DetailData, DetailAction, DetailOptions } from "../types"
+import type { DetailData, DetailAction, DetailOptions } from "../interface"
 import { h } from "vue"
 import { ElButton } from "element-plus"
-import { slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../engine/helpers"
+import { slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
 
 /** 判断显隐，支持布尔与函数隐藏条件。 */
 function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolean) | boolean }, data: D) {

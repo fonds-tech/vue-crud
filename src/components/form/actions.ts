@@ -11,13 +11,13 @@ import type {
   MaybePromise,
   FormActionContext,
   FormItemRuleWithMeta,
-} from "./types"
+} from "./interface"
 import formHook from "./hooks"
 import { dataset } from "../../utils/dataset"
 import { toArray } from "../../utils/object"
-import { syncOptions, ensureOptionState } from "./engine/options"
+import { syncOptions, ensureOptionState } from "./core/options"
 import { clone, isDef, isNoEmpty, isFunction } from "@fonds/utils"
-import { propToString, getModelValue, setModelValue } from "./engine/path"
+import { propToString, getModelValue, setModelValue } from "./core/path"
 
 export function useAction<T extends FormRecord = FormRecord>({ options, model, form, optionState }: FormActionContext<T>): FormActions<T> {
   /**

@@ -1,5 +1,5 @@
 import type { PropType } from "vue"
-import type { ContextMenuItem, ContextMenuExpose, ContextMenuOptions } from "./types"
+import type { ContextMenuItem, ContextMenuExpose, ContextMenuOptions } from "./interface"
 import { useRefs } from "@/hooks"
 import { cloneDeep } from "lodash-es"
 import { h, ref, watch, render, nextTick, reactive, defineComponent, onBeforeUnmount } from "vue"

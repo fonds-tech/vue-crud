@@ -1,4 +1,4 @@
-import type { FormRecord } from "../types"
+import type { FormRecord } from "../interface"
 import type { FormItemProp } from "element-plus"
 
 /**

@@ -1,4 +1,4 @@
-import type { FormRecord } from "../../form/types"
+import type { FormRecord } from "../../form/interface"
 import type { Component, VNodeChild } from "vue"
 import type { SearchAction, SearchMaybeFn } from "../interface"
 import { h, resolveDynamicComponent } from "vue"

@@ -1,7 +1,7 @@
-import type { DetailData, DetailItem, DetailGroup, DetailMaybeFn, DetailOptions } from "../types"
+import type { DetailData, DetailItem, DetailGroup, DetailMaybeFn, DetailOptions } from "../interface"
 import { h, withDirectives, resolveDirective } from "vue"
 import { ElTag, ElSpace, ElDescriptions, ElDescriptionsItem } from "element-plus"
-import { slotsOf, slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../engine/helpers"
+import { slotsOf, slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
 
 interface RenderCtx<D extends DetailData = DetailData> {
   options: DetailOptions<D>

@@ -2,7 +2,7 @@ import type { FormHelpers } from "./helpers"
 import type { FormInstance } from "element-plus"
 import type { Ref, ComputedRef } from "vue"
 import type { useAction, useMethods } from "../actions"
-import type { FormRecord, FormOptions, FormUseOptions, FormAsyncOptionsState } from "../types"
+import type { FormRecord, FormOptions, FormUseOptions, FormAsyncOptionsState } from "../interface"
 import { useFormApi } from "../actions"
 import { createHelpers } from "./helpers"
 import { normalizeItems } from "./normalize"
@@ -10,7 +10,7 @@ import { clone, isFunction } from "@fonds/utils"
 import { ref, useId, watch, computed, reactive } from "vue"
 import { mergeFormOptions, createInitialOptions } from "./options"
 
-export interface FormEngine {
+export interface FormCore {
   id: string
   formRef: Ref<FormInstance | undefined>
   options: FormOptions
@@ -34,7 +34,7 @@ export { createHelpers } from "./helpers"
  * 初始化并组装表单引擎，输出渲染与对外暴露所需的完整上下文。
  * @returns 表单引擎实例，包含状态、动作、方法及辅助工具
  */
-export function useFormEngine(): FormEngine {
+export function useFormCore(): FormCore {
   const id = typeof useId === "function" ? useId() : `fd-form-${Math.random().toString(36).slice(2)}`
   const formRef = ref<FormInstance>()
 

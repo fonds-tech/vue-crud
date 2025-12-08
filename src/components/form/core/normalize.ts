@@ -1,5 +1,5 @@
 import type { FormHelpers } from "./helpers"
-import type { FormRecord, FormOptions, InternalRule } from "../types"
+import type { FormRecord, FormOptions, InternalRule } from "../interface"
 import formHook from "../hooks"
 import { clone, isDef, isNoEmpty } from "@fonds/utils"
 

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "vue"
-import type { GridProps, GridItemData, GridCollector } from "./types"
-import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "./types"
+import type { GridProps, GridItemData, GridCollector } from "./interface"
+import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "./interface"
 import { calculateDisplayInfo, resolveResponsiveValue } from "./utils"
 import { ref, provide, computed, reactive, onMounted, defineComponent, onBeforeUnmount } from "vue"
 

@@ -1,4 +1,4 @@
-import type { TableSize } from "../engine/state"
+import type { TableSize } from "../core/state"
 import type { Slots, VNodeChild } from "vue"
 import { h } from "vue"
 import { Operation, FullScreen, Refresh as RefreshIcon } from "@element-plus/icons-vue"

@@ -18,7 +18,6 @@ const dialogExtraProps = {
 }
 
 type DialogProps = ExtractPropTypes<typeof dialogProps> & ExtractPropTypes<typeof dialogExtraProps>
-
 export default defineComponent({
   name: "fd-dialog",
   inheritAttrs: false,
@@ -31,7 +30,6 @@ export default defineComponent({
     "update:modelValue": (value: boolean) => typeof value === "boolean",
     "openAutoFocus": () => true,
     "closeAutoFocus": () => true,
-    "update:fullscreen": (value: boolean) => typeof value === "boolean",
   },
 
   setup(props, { emit, expose }) {

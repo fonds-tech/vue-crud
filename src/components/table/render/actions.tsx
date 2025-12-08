@@ -3,13 +3,13 @@
  * 负责表格行操作按钮的 UI 渲染
  */
 import type { Slots } from "vue"
-import type { CrudBridge } from "../engine/actions"
-import type { RenderHelpers } from "../engine/helpers"
-import type { TableScope, TableAction, TableRecord } from "../types"
+import type { CrudBridge } from "../core/actions"
+import type { RenderHelpers } from "../core/helpers"
+import type { TableScope, TableAction, TableRecord } from "../interface"
 import { h } from "vue"
 import { ElLink } from "element-plus"
-import { normalizeEventProps } from "../engine/helpers"
-import { isHidden, getActionType, isBuiltinAction, handleBuiltinAction } from "../engine/actions"
+import { normalizeEventProps } from "../core/helpers"
+import { isHidden, getActionType, isBuiltinAction, handleBuiltinAction } from "../core/actions"
 
 /**
  * 渲染表格行的操作按钮
@@ -75,4 +75,4 @@ export function renderActionButtons(
 }
 
 // 重新导出逻辑函数供外部使用
-export { resolveActions } from "../engine/actions"
+export { resolveActions } from "../core/actions"

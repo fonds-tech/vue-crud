@@ -1,4 +1,4 @@
 import Table from "./table"
 
-export * from "./types"
+export * from "./interface"
 export default Table

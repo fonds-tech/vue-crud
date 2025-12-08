@@ -1,5 +1,5 @@
 import type Mitt from "../../utils/mitt"
-import type { CrudRef, CrudParams, CrudOptions } from "./types"
+import type { CrudRef, CrudParams, CrudOptions } from "./interface"
 import { ref } from "vue"
 import { assign } from "lodash-es"
 import { isArray } from "@fonds/utils"
