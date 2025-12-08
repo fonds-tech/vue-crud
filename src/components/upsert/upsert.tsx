@@ -1,37 +1,28 @@
 import type { FormItemProp } from "element-plus"
 import type { UpsertUseOptions } from "./types"
 import type { FormRef, FormRecord } from "../form/types"
-import FdForm from "../form/form"
 import FdDialog from "../dialog"
 import { clone } from "@fonds/utils"
-import { ElButton } from "element-plus"
-import { useUpsertActions } from "./actions"
-import { createFormBuilder } from "./form"
-import { createUpsertState } from "./state"
-import { useComponentHelper } from "./component"
 import { useCore, useConfig } from "@/hooks"
-import { createUpsertService } from "./service"
+import { renderForm, renderFooter } from "./render"
+import {
+  useUpsertActions,
+  createFormBuilder,
+  createUpsertState,
+  useComponentHelper,
+  createUpsertService,
+} from "./engine"
 import {
   h,
   watch,
   computed,
   useAttrs,
   useSlots,
-  withDirectives,
   defineComponent,
   onBeforeUnmount,
   resolveDirective,
 } from "vue"
 import "./style.scss"
-
-/**
- * FormRef 类型守卫，避免使用断言设置 ref。
- */
-function isFormRef(value: unknown): value is FormRef<FormRecord> {
-  if (!value || typeof value !== "object")
-    return false
-  return "submit" in value && "use" in value
-}
 
 export default defineComponent({
   name: "fd-upsert",
@@ -45,6 +36,7 @@ export default defineComponent({
     const { crud, mitt } = useCore()
     const { style } = useConfig()
 
+    // Engine 层：状态、服务、表单构建
     const state = createUpsertState({ style })
     const builder = createFormBuilder({
       options: state.options,
@@ -59,6 +51,12 @@ export default defineComponent({
       mode: state.mode,
     })
     ensureActions()
+
+    /**
+     * 应用配置选项
+     *
+     * 合并 props 和 use 方法传入的配置，并触发动作初始化
+     */
     function useOptions(options?: UpsertUseOptions<FormRecord>) {
       state.useUpsert(options)
       ensureActions()
@@ -70,12 +68,9 @@ export default defineComponent({
       loading: state.loading,
     })
 
-    const service = createUpsertService({
-      crud,
-      state,
-      builder,
-    })
+    const service = createUpsertService({ crud, state, builder })
 
+    // Dialog 相关计算属性
     const dialogNativeAttrs = computed(() => {
       const result: Record<string, unknown> = {}
       Object.keys(attrs).forEach((key) => {
@@ -86,7 +81,9 @@ export default defineComponent({
       return result
     })
 
-    const defaultTitle = computed(() => (state.mode.value === "add" ? crud.dict?.label?.add ?? "新增" : crud.dict?.label?.update ?? "编辑"))
+    const defaultTitle = computed(() =>
+      state.mode.value === "add" ? crud.dict?.label?.add ?? "新增" : crud.dict?.label?.update ?? "编辑",
+    )
 
     const dialogClass = computed(() => {
       const extra = attrs.class
@@ -102,6 +99,7 @@ export default defineComponent({
       }
     })
 
+    // 生命周期事件
     watch(
       () => state.visible.value,
       (current, previous) => {
@@ -141,6 +139,12 @@ export default defineComponent({
       }
     }
 
+    // 插槽处理
+    /**
+     * 处理插槽
+     *
+     * 将用户插槽转换为带上下文的插槽函数
+     */
     function handleFormSlots() {
       const namedSlots: Record<string, (slotScope: Record<string, unknown>) => unknown> = {}
       Object.keys(userSlots).forEach((name) => {
@@ -152,99 +156,7 @@ export default defineComponent({
       return namedSlots
     }
 
-    function renderActions() {
-      return state.options.actions.map((action, index) => {
-        if (!isActionVisible(action))
-          return null
-        if (action.type === "cancel") {
-          return (
-            <ElButton key={index} onClick={() => service.close("cancel")}>
-              {resolveActionText(action)}
-            </ElButton>
-          )
-        }
-        if (action.type === "next") {
-          return (
-            <ElButton key={index} type="primary" onClick={service.handleNext}>
-              {resolveActionText(action)}
-            </ElButton>
-          )
-        }
-        if (action.type === "prev") {
-          return (
-            <ElButton key={index} type="primary" onClick={service.handlePrev}>
-              {resolveActionText(action)}
-            </ElButton>
-          )
-        }
-        if (action.type === "ok") {
-          return (
-            <ElButton key={index} type="primary" loading={state.loading.value} onClick={() => service.submit()}>
-              {resolveActionText(action)}
-            </ElButton>
-          )
-        }
-        const slotName = componentHelper.slotNameOf(action.component)
-        if (slotName) {
-          return exposeSlots[slotName]?.({
-            index,
-            mode: state.mode.value,
-            model: state.formModel.value,
-          })
-        }
-        const component = componentHelper.componentOf(action.component)
-        if (component) {
-          const childSlots = componentHelper.componentSlots(action.component)
-          const renderedSlots: Record<string, () => unknown> = {}
-          Object.keys(childSlots).forEach((childSlot) => {
-            const value = childSlots[childSlot]
-            if (value) {
-              renderedSlots[childSlot] = () =>
-                h(value, {
-                  mode: state.mode.value,
-                  model: state.formModel.value,
-                  loading: state.loading.value,
-                  index,
-                })
-            }
-          })
-          return h(
-            component,
-            {
-              key: index,
-              style: componentHelper.componentStyle(action.component),
-              ...componentHelper.componentProps(action.component),
-              ...componentHelper.componentEvents(action.component),
-            },
-            renderedSlots,
-          )
-        }
-        return null
-      })
-    }
-
-    function renderFooter() {
-      return <div class="fd-upsert__footer">{renderActions()}</div>
-    }
-
-    function renderForm() {
-      const formVNode = h(
-        FdForm,
-        {
-          "ref": (instanceRef: unknown) => {
-            if (isFormRef(instanceRef)) {
-              state.formRef.value = instanceRef
-            }
-          },
-          "element-loading-text": state.options.dialog.loadingText,
-        },
-        handleFormSlots(),
-      )
-      if (!loadingDirective)
-        return formVNode
-      return withDirectives(formVNode, [[loadingDirective, state.loading.value]])
-    }
-
+    // Proxy 事件处理
     function handleProxyEvent(payload: unknown) {
       service.handleProxyEvent(payload)
     }
@@ -255,6 +167,8 @@ export default defineComponent({
       mitt?.off?.("crud.proxy", handleProxyEvent)
     })
 
+    // Expose API
+    // 暴露给模板引用或父组件的方法和属性
     expose({
       get form() {
         return state.formRef.value
@@ -293,6 +207,27 @@ export default defineComponent({
       scrollToField: (prop: FormItemProp) => state.formRef.value?.scrollToField(prop),
     })
 
+    // 渲染上下文
+    // 传递给纯函数渲染组件的数据包
+    const renderContext = {
+      options: state.options,
+      state: {
+        mode: state.mode,
+        loading: state.loading,
+        formModel: state.formModel,
+        formRef: state.formRef,
+      },
+      service,
+      actionHelpers: { resolveActionText, isActionVisible },
+      componentHelper,
+      exposeSlots,
+      loadingDirective,
+      handleFormSlots,
+      setFormRef: (ref: unknown) => {
+        state.formRef.value = ref as FormRef<FormRecord>
+      },
+    }
+
     return () =>
       h(
         FdDialog,
@@ -307,8 +242,8 @@ export default defineComponent({
           "onClose": handleClose,
         },
         {
-          default: () => renderForm(),
-          footer: () => renderFooter(),
+          default: () => renderForm(renderContext),
+          footer: () => renderFooter(renderContext),
         },
       )
   },

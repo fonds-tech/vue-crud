@@ -1,8 +1,11 @@
-import type { UpsertMode } from "./types"
+import type { UpsertMode } from "../types"
 import type { Ref, ComputedRef } from "vue"
-import type { FormRecord, FormComponentSlot } from "../form/types"
+import type { FormRecord, FormComponentSlot } from "../../form/types"
 import { isFunction } from "@fonds/utils"
 
+/**
+ * 组件辅助上下文
+ */
 interface ComponentHelperContext<T extends FormRecord = FormRecord> {
   mode: Ref<UpsertMode>
   formModel: ComputedRef<T>
@@ -32,10 +35,19 @@ function resolveComponentProp<T>(
 
 /**
  * 组件/插槽解析工具，提供注入上下文。
+ *
+ * @param context 组件辅助上下文
+ * @returns 组件辅助工具对象
  */
 export function useComponentHelper<T extends FormRecord = FormRecord>(context: ComponentHelperContext<T>) {
   const { mode, formModel, loading } = context
 
+  /**
+   * 创建插槽作用域 props
+   *
+   * @param slotScope 原始插槽作用域
+   * @returns 注入了 mode, model, loading 的新作用域
+   */
   function createSlotProps(slotScope: Record<string, unknown>) {
     return {
       ...slotScope,
@@ -45,12 +57,24 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
     }
   }
 
+  /**
+   * 获取组件插槽名称
+   *
+   * @param component 组件配置
+   * @returns 插槽名称 或 undefined
+   */
   function slotNameOf(component?: FormComponentSlot) {
     if (!isComponentConfig(component))
       return undefined
     return resolveComponentProp<string | undefined>(component, "slot", formModel)
   }
 
+  /**
+   * 获取组件实际对象
+   *
+   * @param component 组件配置
+   * @returns 组件对象/字符串 或 undefined
+   */
   function componentOf(component?: FormComponentSlot) {
     if (!component)
       return undefined
@@ -61,24 +85,48 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
     return undefined
   }
 
+  /**
+   * 获取组件 props
+   *
+   * @param component 组件配置
+   * @returns 组件 props 对象
+   */
   function componentProps(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return {}
     return resolveComponentProp<Record<string, unknown>>(component, "props", formModel) ?? {}
   }
 
+  /**
+   * 获取组件样式
+   *
+   * @param component 组件配置
+   * @returns 样式对象
+   */
   function componentStyle(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return undefined
     return resolveComponentProp(component, "style", formModel)
   }
 
+  /**
+   * 获取组件事件监听器
+   *
+   * @param component 组件配置
+   * @returns 事件对象
+   */
   function componentEvents(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return {}
     return resolveComponentProp<Record<string, unknown>>(component, "on", formModel) ?? {}
   }
 
+  /**
+   * 获取组件内部插槽
+   *
+   * @param component 组件配置
+   * @returns 内部插槽对象
+   */
   function componentSlots(component?: FormComponentSlot) {
     if (!component || !isComponentConfig(component))
       return {}
