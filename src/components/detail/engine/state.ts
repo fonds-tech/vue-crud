@@ -1,4 +1,4 @@
-import type { DetailData, DetailOptions, DetailUseOptions } from "./types"
+import type { DetailData, DetailOptions, DetailUseOptions } from "../types"
 import { clone } from "@fonds/utils"
 import { mergeWith } from "lodash-es"
 import { ref, reactive } from "vue"

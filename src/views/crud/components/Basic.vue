@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableDict } from "@/components/table/type"
+import type { TableDict } from "@/components/table/types"
 import { CrudMockService } from "../mockService"
 import { useCrud, useTable, useDetail, useSearch, useUpsert } from "@/hooks"
 
@@ -23,10 +23,7 @@ defineOptions({ name: "basic-crud" })
 
 const service = new CrudMockService()
 
-const crud = useCrud({
-  service,
-  permission: { add: true, update: true, delete: true, detail: true, import: true, export: true }, // 启用所有权限
-}, crud => crud.refresh())
+const crud = useCrud({ service }, app => app.refresh())
 
 // 字典定义
 const occupationDict: TableDict[] = [
@@ -105,7 +102,14 @@ const table = useTable({
     { prop: "account", label: "账号", minWidth: 120 },
     { prop: "phone", label: "手机号", minWidth: 140 },
     { prop: "occupation", label: "岗位", dict: occupationDict, width: 100 },
-    { prop: "wages", label: "薪资", help: "这是薪资", sortable: "custom", minWidth: 100, formatter: (row: any) => row.wages != null ? `¥${Number(row.wages).toLocaleString()}` : "-" },
+    {
+      prop: "wages",
+      label: "薪资",
+      help: "这是薪资",
+      sortable: "custom",
+      minWidth: 100,
+      formatter: (row: any) => (row.wages != null ? `¥${Number(row.wages).toLocaleString()}` : "-"),
+    },
     { prop: "status", label: "状态", dict: statusDict, width: 80 },
     { prop: "createTime", label: "入职时间", minWidth: 120 },
     {

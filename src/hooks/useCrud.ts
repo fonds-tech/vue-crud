@@ -6,7 +6,6 @@ import { ref, watch } from "vue"
 export function useCrud(options?: Partial<CrudOptions>, callback?: (app: CrudRef) => void): Ref<CrudRef | undefined> {
   const crud = ref<CrudRef>()
   useParent("fd-crud", crud)
-
   watch(
     () => crud.value,
     (val) => {

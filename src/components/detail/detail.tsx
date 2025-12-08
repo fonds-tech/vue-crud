@@ -2,10 +2,8 @@ import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescript
 import FdDialog from "../dialog"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
-import { resolveMaybe } from "./slots"
-import { createDetailState } from "./state"
-import { createDetailService } from "./service"
 import { renderActions, renderDetailContent } from "./render"
+import { resolveMaybe, createDetailState, createDetailService } from "./engine"
 import {
   h,
   watch,
