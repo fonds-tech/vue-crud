@@ -4,7 +4,7 @@ import { mergeSearchOptions, createDefaultOptions } from "../core/options"
 describe("createDefaultOptions", () => {
   it("返回默认配置结构", () => {
     const options = createDefaultOptions()
-    expect(options.form.grid.cols).toBe(3)
+    expect(options.form.grid?.cols).toBe(3)
     expect(options.action.items).toHaveLength(2)
     expect(options.action.items[0].type).toBe("search")
     expect(options.action.items[1].type).toBe("reset")
@@ -30,9 +30,9 @@ describe("mergeSearchOptions", () => {
       form: { labelWidth: "100px" },
     } as any)
 
-    expect(options.form.form.labelWidth).toBe("100px")
+    expect(options.form.form?.labelWidth).toBe("100px")
     // 保留默认值
-    expect(options.form.grid.cols).toBe(3)
+    expect(options.form.grid?.cols).toBe(3)
   })
 
   it("合并 action.grid 配置", () => {
