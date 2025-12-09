@@ -3,8 +3,8 @@ import { mergeConfig, defineConfig } from "vitest/config"
 
 export default mergeConfig(viteConfig, defineConfig({
   test: {
-    environment: "happy-dom",
     watch: false,
+    environment: "happy-dom",
     reporters: ["verbose"],
     coverage: { enabled: true },
     setupFiles: ["./test/setupTests.ts"],
