@@ -180,20 +180,6 @@ export interface FormRenderContext {
   attrs: Record<string, unknown>
 }
 
-/** 渲染层上下文（仅渲染消费，不含业务方法） */
-export interface FormRenderContext {
-  formRef: Ref<FormInstance | undefined>
-  options: FormOptions
-  model: FormRecord
-  step: Ref<number>
-  activeGroupName: Ref<string | number | undefined>
-  resolvedActiveGroup: ComputedRef<string | number | undefined>
-  activeStepName: ComputedRef<string | number | undefined>
-  helpers: FormHelpers
-  slots: Record<string, ((...args: any[]) => VNodeChild) | undefined>
-  attrs: Record<string, unknown>
-}
-
 /**
  * 表单组件插槽内容类型
  * @description 支持多种形式的组件渲染内容

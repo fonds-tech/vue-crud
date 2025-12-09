@@ -71,6 +71,12 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
       return
     }
 
+    // 根据修改目标类型分发处理：
+    // - options: 组件选项数据（Select 的下拉项等）
+    // - props: 组件属性（placeholder, disabled 等）
+    // - hidden: 控制显隐
+    // - style: 组件样式
+    // - default: 直接合并到表单项配置（如 label, span 等）
     switch (key) {
       case "options":
         // 设置组件选项 (如 Select 的 options)

@@ -183,56 +183,68 @@ export function createHelpers({
     return fieldRules
   }
 
+  // ==================== formatProps 辅助函数 ====================
+
+  /** 输入类组件：需要"请输入"提示 */
+  const INPUT_COMPONENTS = new Set(["el-input", "el-input-number", "el-input-password"])
+  /** 选择类组件：需要"请选择"提示和 options */
+  const SELECT_COMPONENTS = new Set(["el-select", "el-cascader", "el-tree-select", "el-time-picker"])
+  /** 支持 options 属性的组件 */
+  const OPTION_COMPONENTS = new Set(["el-select", "el-cascader", "el-radio-group", "el-checkbox-group"])
+
+  /**
+   * 根据组件类型生成默认 placeholder
+   */
+  function resolvePlaceholder(componentName: string | undefined, label?: string): string | undefined {
+    if (!componentName) return undefined
+    if (INPUT_COMPONENTS.has(componentName)) return `请输入${label ?? ""}`
+    if (SELECT_COMPONENTS.has(componentName)) return `请选择${label ?? ""}`
+    if (componentName === "el-date-picker") return "请选择日期"
+    return undefined
+  }
+
+  /**
+   * 根据组件类型确定选项数据的属性名
+   * - el-tree-select 使用 data
+   * - 其他选择类组件使用 options
+   */
+  function resolveOptionsPropName(componentName: string | undefined): "options" | "data" | null {
+    if (componentName === "el-tree-select") return "data"
+    if (OPTION_COMPONENTS.has(componentName ?? "")) return "options"
+    return null
+  }
+
+  // ==================== formatProps 主函数 ====================
+
   const formatProps = computed(() => (item: FormItem) => {
     const componentName = is(item.component)
-    const baseProps = {
+    const baseProps: Record<string, unknown> = {
       ...componentBaseProps(item.component),
     }
     const optionInfo = optionsOf(item)
     const optionValues = optionInfo.options ?? componentOptions(item.component)
 
+    // 状态属性
     if (disabled(item)) {
       baseProps.disabled = true
     }
-
     if (optionInfo.loading) {
       baseProps.loading = true
     }
 
-    switch (componentName) {
-      case "el-input":
-      case "el-input-number":
-      case "el-input-password":
-        baseProps.placeholder = baseProps.placeholder ?? `请输入${item.label ?? ""}`
-        break
-      case "el-select":
-      case "el-cascader":
-        baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
-        if (optionValues)
-          baseProps.options = optionValues
-        break
-      case "el-tree-select": {
-        baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
-        if (optionValues)
-          baseProps.data = optionValues
-        break
+    // placeholder（仅当未显式设置时应用默认值）
+    if (!baseProps.placeholder) {
+      const defaultPlaceholder = resolvePlaceholder(componentName as string, item.label)
+      if (defaultPlaceholder) {
+        baseProps.placeholder = defaultPlaceholder
       }
-      case "el-radio-group":
-      case "el-checkbox-group": {
-        if (optionValues)
-          baseProps.options = optionValues
-        break
-      }
-      case "el-date-picker":
-        baseProps.placeholder = baseProps.placeholder ?? "请选择日期"
-        break
-      case "el-time-picker":
-        baseProps.placeholder = baseProps.placeholder ?? `请选择${item.label ?? ""}`
-        break
-      default: {
-        if (optionValues)
-          baseProps.options = optionValues
-        break
+    }
+
+    // 选项数据绑定（根据组件类型绑定到不同属性）
+    if (optionValues) {
+      const optionKey = resolveOptionsPropName(componentName as string)
+      if (optionKey) {
+        baseProps[optionKey] = optionValues
       }
     }
 

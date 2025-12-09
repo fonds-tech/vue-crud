@@ -40,6 +40,26 @@ export function applyFilters(item: FormItem, ctx: FilterRuntimeContext, options:
   return current
 }
 
+// ==================== 分组解析辅助函数 ====================
+
+/**
+ * 获取默认分组名（第一个子分组）
+ */
+function getDefaultGroupName(ctx: FilterRuntimeContext): string | number | undefined {
+  return ctx.options.group?.children?.[0]?.name
+}
+
+/**
+ * 解析表单项所属分组
+ * 如果未指定则使用默认分组
+ */
+function resolveItemGroup(item: FormItem, ctx: FilterRuntimeContext): string | number | undefined {
+  const defaultGroup = getDefaultGroupName(ctx)
+  return ctx.resolveProp<string | number | undefined>(item, "group") ?? defaultGroup
+}
+
+// ==================== 可见性判断函数 ====================
+
 /**
  * 判断表单项是否显示（Tabs 背景下结合分组）
  * @param item 表单项配置
@@ -47,16 +67,20 @@ export function applyFilters(item: FormItem, ctx: FilterRuntimeContext, options:
  * @returns 是否可见
  */
 export function shouldShowItem(item: FormItem, ctx: FilterRuntimeContext) {
-  if (ctx.resolveProp<boolean>(item, "hidden"))
+  // 1. 明确隐藏的项不显示
+  if (ctx.resolveProp<boolean>(item, "hidden")) {
     return false
-
-  if (ctx.options.group?.type === "tabs" && ctx.options.group.children?.length) {
-    const fallback = ctx.options.group.children[0]?.name
-    const itemGroup = ctx.resolveProp<string | number | undefined>(item, "group") ?? fallback
-    const active = ctx.resolvedActiveGroup
-    if (itemGroup && active && itemGroup !== active)
-      return false
   }
+
+  // 2. Tabs 模式下，只显示当前激活分组的项
+  if (ctx.options.group?.type === "tabs" && ctx.options.group.children?.length) {
+    const itemGroup = resolveItemGroup(item, ctx)
+    const activeGroup = ctx.resolvedActiveGroup
+    if (itemGroup && activeGroup && itemGroup !== activeGroup) {
+      return false
+    }
+  }
+
   return true
 }
 
@@ -64,32 +88,32 @@ export function shouldShowItem(item: FormItem, ctx: FilterRuntimeContext) {
  * Tabs 内部渲染时的显隐判断（第二重校验）
  */
 export function shouldShowInGroup(item: FormItem, ctx: FilterRuntimeContext, groupName: string | number) {
-  if (ctx.resolveProp<boolean>(item, "hidden"))
+  if (ctx.resolveProp<boolean>(item, "hidden")) {
     return false
-  const fallback = ctx.options.group?.children?.[0]?.name
-  const itemGroup = ctx.resolveProp<string | number | undefined>(item, "group") ?? fallback
-  if (itemGroup && itemGroup !== groupName)
-    return false
-  return true
+  }
+  const itemGroup = resolveItemGroup(item, ctx)
+  return !itemGroup || itemGroup === groupName
 }
+
+// ==================== 分组筛选函数 ====================
 
 /**
  * 获取指定 Tabs 分组的表单项
  */
 export function filterGroupItems(items: FormItem[], ctx: FilterRuntimeContext, groupName: string | number) {
-  const fallback = ctx.options.group?.children?.[0]?.name
-  return items.filter(item => (ctx.resolveProp<string | number | undefined>(item, "group") ?? fallback) === groupName)
+  return items.filter(item => resolveItemGroup(item, ctx) === groupName)
 }
 
 /**
  * 获取 Steps 场景下的表单项
  */
 export function filterStepItems(items: FormItem[], ctx: FilterRuntimeContext, groupName?: string | number) {
-  if (ctx.options.group?.type !== "steps" || !ctx.options.group.children?.length)
+  if (ctx.options.group?.type !== "steps" || !ctx.options.group.children?.length) {
     return items
-  const target = groupName ?? ctx.activeStepName ?? ctx.options.group.children[0]?.name
-  const fallback = ctx.options.group.children[0]?.name
-  return items.filter(item => (ctx.resolveProp<string | number | undefined>(item, "group") ?? fallback) === target)
+  }
+  // 确定目标步骤：优先使用传入的 groupName，其次当前步骤，最后默认分组
+  const targetGroup = groupName ?? ctx.activeStepName ?? getDefaultGroupName(ctx)
+  return items.filter(item => resolveItemGroup(item, ctx) === targetGroup)
 }
 
 // 默认规则：可见性（含 Tabs/Steps 分组）

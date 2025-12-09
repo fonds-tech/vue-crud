@@ -56,3 +56,25 @@ export function setModelValue<T extends FormRecord = FormRecord>(model: T, prop:
     cursor = cursor[key] as Record<string, unknown>
   }
 }
+
+/**
+ * 删除模型字段，支持嵌套路径
+ */
+export function deleteModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormItemProp) {
+  const path = toPathArray(prop)
+  if (!path?.length)
+    return
+
+  let cursor: Record<string, unknown> = model
+
+  // 遍历到目标字段的父级
+  for (let i = 0; i < path.length - 1; i++) {
+    const next = cursor[path[i]!]
+    if (!next || typeof next !== "object")
+      return
+    cursor = next as Record<string, unknown>
+  }
+
+  // 删除目标字段
+  delete cursor[path[path.length - 1]!]
+}

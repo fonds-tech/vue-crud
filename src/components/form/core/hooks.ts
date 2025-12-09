@@ -169,77 +169,103 @@ function deleteField<T extends FormModel>(model: T, field?: FormField) {
   delete cursor[path[path.length - 1]]
 }
 
+// ==================== 钩子解析与执行 ====================
+
+type HookPhase = "bind" | "submit"
+
+/**
+ * 步骤1：将 hook 配置规范化为执行管道数组
+ * 支持多种配置形式：字符串、函数、数组、对象
+ */
+function normalizeToPipes(hook: FormHook, phase: HookPhase): Array<string | FormHookFn> {
+  // 单个字符串或函数 -> 包装为数组
+  if (isString(hook) || isFunction(hook)) {
+    return [hook]
+  }
+
+  // 数组 -> 直接使用
+  if (isArray(hook)) {
+    return hook
+  }
+
+  // 对象配置 { bind: ..., submit: ... } -> 提取对应阶段的配置
+  if (isObject(hook)) {
+    const config = hook as {
+      bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
+      submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
+    }
+    const phaseConfig = config[phase]
+    if (!phaseConfig) return []
+    return isArray(phaseConfig) ? phaseConfig : [phaseConfig]
+  }
+
+  return []
+}
+
+/**
+ * 步骤2：依次执行管道中的处理函数
+ * 每个处理函数的输出作为下一个的输入
+ */
+function executePipes<T extends FormModel>(
+  pipes: Array<string | FormHookFn>,
+  value: any,
+  context: { model: T, field: FormField | undefined, phase: HookPhase },
+): any {
+  return pipes.reduce((current, pipe) => {
+    // 解析处理函数：字符串 -> 内置格式化器，函数 -> 直接使用
+    const handler: FormHookFn | undefined = isString(pipe)
+      ? formatters[pipe]
+      : isFunction(pipe) ? pipe : undefined
+
+    if (!handler) return current
+    return handler(current, { model: context.model as FormModel, field: context.field ?? "", method: context.phase })
+  }, value)
+}
+
+/**
+ * 步骤3：将处理结果写入 model
+ * - 无字段名：仅执行副作用，不更新
+ * - submit 阶段返回 undefined：删除字段
+ * - 其他情况：设置字段值
+ */
+function updateModelField<T extends FormModel>(
+  model: T,
+  field: FormField | undefined,
+  value: any,
+  phase: HookPhase,
+): void {
+  // 无字段名，仅用于副作用处理
+  if (field === undefined) return
+
+  // submit 阶段返回 undefined 表示需要删除该字段
+  if (phase === "submit" && value === undefined) {
+    deleteField(model, field)
+    return
+  }
+
+  // 正常设置字段值
+  normalizeField(model, field, value)
+}
+
 /**
  * 解析并执行钩子函数管道
- * @param phase 当前阶段 ('bind' 或 'submit')
- * @param payload 上下文参数
+ * 流程：规范化配置 -> 执行管道 -> 更新 model
  */
 function parse<T extends FormModel, K extends keyof HookTree<T>>(
   phase: K,
   payload: HookTree<T>[K],
 ) {
   const { value, model, field, hook } = payload
+  if (!hook) return
 
-  if (!hook) {
-    return
-  }
+  // 1. 规范化 hook 配置为执行管道
+  const pipes = normalizeToPipes(hook, phase as HookPhase)
 
-  const stack: Array<string | FormHookFn> = []
+  // 2. 执行管道处理
+  const result = executePipes(pipes, value, { model, field, phase: phase as HookPhase })
 
-  // 规范化 hook 配置为执行栈
-  if (isString(hook)) {
-    stack.push(hook)
-  }
-  else if (isArray(hook)) {
-    stack.push(...hook)
-  }
-  else if (isFunction(hook)) {
-    stack.push(hook)
-  }
-  else if (isObject(hook)) {
-    // 处理对象配置形式 { bind: ..., submit: ... }
-    const config = hook as {
-      bind?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
-      submit?: FormHookKey | FormHookFn | Array<FormHookKey | FormHookFn>
-    }
-    const pipes = config[phase]
-    if (pipes) {
-      const normalized = (isArray(pipes) ? pipes : [pipes]) as Array<FormHookKey | FormHookFn>
-      stack.push(...normalized)
-    }
-  }
-
-  let nextValue = value
-
-  // 依次执行管道中的处理函数
-  stack.forEach((pipe) => {
-    let handler: FormHookFn | undefined
-
-    if (isString(pipe)) {
-      handler = formatters[pipe]
-    }
-    else if (isFunction(pipe)) {
-      handler = pipe
-    }
-
-    if (handler) {
-      nextValue = handler(nextValue, { model: model as FormModel, field, method: phase as "bind" | "submit" })
-    }
-  })
-
-  // 如果没有字段名，说明仅用于副作用处理，不更新 model
-  if (field === undefined) {
-    return
-  }
-
-  // submit 阶段如果结果为 undefined，则从 model 中移除该字段
-  if (phase === "submit" && nextValue === undefined) {
-    deleteField(model, field)
-    return
-  }
-
-  // 更新 model 值
-  normalizeField(model, field, nextValue)
+  // 3. 更新 model
+  updateModelField(model, field, result, phase as HookPhase)
 }
 
 const formHook = {
