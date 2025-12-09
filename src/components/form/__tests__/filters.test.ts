@@ -161,4 +161,111 @@ describe("fd-form filters", () => {
       expect(applyFilters(skipItem, ctx)).toBeNull()
     })
   })
+
+  describe("shouldShowItem 边缘情况", () => {
+    it("未设置 hidden 时显示", () => {
+      const ctx = createFilterContext()
+      const item: FormItem = { ...baseItemDefaults, prop: "name", component: { is: "el-input" } }
+      expect(shouldShowItem(item, ctx)).toBe(true)
+    })
+
+    it("tabs 模式下未指定分组的项使用默认分组", () => {
+      const options: FormOptions = {
+        key: 0,
+        mode: "add",
+        model: {},
+        items: [],
+        group: { type: "tabs", children: [{ name: "tab1" }, { name: "tab2" }] },
+        form: {},
+      }
+      const ctx = createFilterContext({ options, resolvedActiveGroup: "tab1" })
+      // 未指定 group 的项默认属于第一个分组
+      const item: FormItem = { ...baseItemDefaults, prop: "field", component: { is: "el-input" } }
+      expect(shouldShowItem(item, ctx)).toBe(true)
+    })
+
+    it("非 tabs/steps 模式下所有项都显示", () => {
+      const options: FormOptions = {
+        key: 0,
+        mode: "add",
+        model: {},
+        items: [],
+        group: {}, // 无分组类型
+        form: {},
+      }
+      const ctx = createFilterContext({ options })
+      const item: FormItem = { ...baseItemDefaults, prop: "field", group: "anyGroup", component: { is: "el-input" } }
+      expect(shouldShowItem(item, ctx)).toBe(true)
+    })
+  })
+
+  describe("shouldShowInGroup 边缘情况", () => {
+    it("未指定 group 的项在任何分组中都显示", () => {
+      const ctx = createFilterContext()
+      const item: FormItem = { ...baseItemDefaults, prop: "name", component: { is: "el-input" } }
+      expect(shouldShowInGroup(item, ctx, "anyGroup")).toBe(true)
+    })
+  })
+
+  describe("filterStepItems 边缘情况", () => {
+    it("使用传入的 groupName 筛选", () => {
+      const options: FormOptions = {
+        key: 0,
+        mode: "add",
+        model: {},
+        items: [],
+        group: { type: "steps", children: [{ name: "step1" }, { name: "step2" }] },
+        form: {},
+      }
+      const ctx = createFilterContext({ options, activeStepName: "step1" })
+      const items: FormItem[] = [
+        { ...baseItemDefaults, prop: "a", group: "step1", component: { is: "el-input" } },
+        { ...baseItemDefaults, prop: "b", group: "step2", component: { is: "el-input" } },
+      ]
+      // 明确传入 step2 来筛选
+      const result = filterStepItems(items, ctx, "step2")
+      expect(result.map(i => i.prop)).toEqual(["b"])
+    })
+
+    it("无 children 配置时返回所有项", () => {
+      const options: FormOptions = {
+        key: 0,
+        mode: "add",
+        model: {},
+        items: [],
+        group: { type: "steps", children: [] },
+        form: {},
+      }
+      const ctx = createFilterContext({ options })
+      const items: FormItem[] = [
+        { ...baseItemDefaults, prop: "a", component: { is: "el-input" } },
+      ]
+      const result = filterStepItems(items, ctx)
+      expect(result.map(i => i.prop)).toEqual(["a"])
+    })
+  })
+
+  describe("applyFilters 边缘情况", () => {
+    it("过滤器返回 undefined 时保持原 item", () => {
+      registerFilter("returnUndefined", () => undefined as any)
+
+      const ctx = createFilterContext()
+      const item: FormItem = { ...baseItemDefaults, prop: "test", component: { is: "el-input" } }
+      // undefined 被处理为保持原项
+      const result = applyFilters(item, ctx)
+      expect(result).not.toBeNull()
+    })
+
+    it("过滤器抛出异常时返回 null", () => {
+      registerFilter("throwError", () => {
+        throw new Error("测试异常")
+      })
+
+      const ctx = createFilterContext()
+      const item: FormItem = { ...baseItemDefaults, prop: "throwTest", component: { is: "el-input" } }
+      const result = applyFilters(item, ctx)
+      // 过滤器抛出异常时应返回 null
+      expect(result).toBeNull()
+    })
+  })
 })

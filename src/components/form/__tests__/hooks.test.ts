@@ -193,4 +193,101 @@ describe("fd-form hooks 格式化器", () => {
       expect(model.tags).toBe("a,b")
     })
   })
+
+  describe("datetimeRange 边缘情况", () => {
+    it("field 为空时不修改 model", () => {
+      const model = createModel({ time: ["2024-01-01", "2024-12-31"] })
+      formHook.submit({ hook: "datetimeRange", model, field: "", value: model.time })
+      // field 为空不做任何操作
+      expect(model.time).toEqual(["2024-01-01", "2024-12-31"])
+    })
+
+    it("数组长度不足时返回 undefined", () => {
+      const model = createModel({ time: ["2024-01-01"] as unknown })
+      formHook.submit({ hook: "datetimeRange", model, field: "time", value: model.time })
+      expect(model.time).toBeUndefined()
+    })
+
+    it("bind 阶段 start/end 都为 undefined 时返回空数组", () => {
+      const model = createModel({ time: undefined as unknown, startTime: undefined, endTime: undefined })
+      formHook.bind({ hook: "datetimeRange", model, field: "time", value: model.time })
+      expect(model.time).toEqual([])
+    })
+  })
+
+  describe("number/string 边缘情况", () => {
+    it("number: undefined/null 保持不变", () => {
+      const model = createModel({ count: undefined as unknown })
+      formHook.bind({ hook: "number", model, field: "count", value: model.count })
+      expect(model.count).toBeUndefined()
+
+      const model2 = createModel({ count: null as unknown })
+      formHook.bind({ hook: "number", model: model2, field: "count", value: model2.count })
+      expect(model2.count).toBeNull()
+    })
+
+    it("string: undefined/null 保持不变", () => {
+      const model = createModel({ code: undefined as unknown })
+      formHook.bind({ hook: "string", model, field: "code", value: model.code })
+      expect(model.code).toBeUndefined()
+    })
+  })
+
+  describe("split 边缘情况", () => {
+    it("非字符串非数组返回空数组", () => {
+      const model = createModel({ tags: 123 as unknown })
+      formHook.bind({ hook: "split", model, field: "tags", value: model.tags })
+      expect(model.tags).toEqual([])
+    })
+  })
+
+  describe("splitJoin 边缘情况", () => {
+    it("bind 阶段非字符串保持不变", () => {
+      const model = createModel({ tags: ["a", "b"] })
+      formHook.bind({ hook: "splitJoin", model, field: "tags", value: model.tags })
+      expect(model.tags).toEqual(["a", "b"])
+    })
+
+    it("submit 阶段非数组保持不变", () => {
+      const model = createModel({ tags: "abc" })
+      formHook.submit({ hook: "splitJoin", model, field: "tags", value: model.tags })
+      expect(model.tags).toBe("abc")
+    })
+  })
+
+  describe("json 边缘情况", () => {
+    it("bind 阶段非字符串保持不变", () => {
+      const model = createModel({ config: { a: 1 } })
+      formHook.bind({ hook: "json", model, field: "config", value: model.config })
+      expect(model.config).toEqual({ a: 1 })
+    })
+  })
+
+  describe("empty 边缘情况", () => {
+    it("非字符串非数组保持不变", () => {
+      const model = createModel({ value: 123 })
+      formHook.submit({ hook: "empty", model, field: "value", value: model.value })
+      expect(model.value).toBe(123)
+    })
+
+    it("非空数组保持不变", () => {
+      const model = createModel({ items: ["a", "b"] })
+      formHook.submit({ hook: "empty", model, field: "items", value: model.items })
+      expect(model.items).toEqual(["a", "b"])
+    })
+  })
+
+  describe("无效 hook 处理", () => {
+    it("无 hook 配置时不修改 model", () => {
+      const model = createModel({ value: "test" })
+      formHook.bind({ hook: undefined as any, model, field: "value", value: model.value })
+      expect(model.value).toBe("test")
+    })
+
+    it("无效的 hook 名称被忽略", () => {
+      const model = createModel({ value: "test" })
+      formHook.bind({ hook: "nonExistentHook" as any, model, field: "value", value: model.value })
+      expect(model.value).toBe("test")
+    })
+  })
 })

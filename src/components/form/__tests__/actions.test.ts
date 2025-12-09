@@ -178,4 +178,77 @@ describe("fd-form actions", () => {
       expect(ctx.model.price).toBe(50)
     })
   })
+
+  describe("reloadOptions", () => {
+    it("重新加载选项数据", async () => {
+      const item = ctx.options.items.find(i => i.prop === "tags")!
+      item.component!.options = Promise.resolve([{ label: "X", value: "x" }])
+
+      const result = await actions.reloadOptions("tags")
+      expect(result).toEqual([{ label: "X", value: "x" }])
+    })
+
+    it("promise 拒绝时返回 undefined 并记录错误", async () => {
+      const item = ctx.options.items.find(i => i.prop === "tags")!
+      item.component!.options = Promise.reject(new Error("加载失败"))
+
+      const result = await actions.reloadOptions("tags")
+      expect(result).toBeUndefined()
+      expect(actions.getOptionsState("tags")?.error).toBeDefined()
+    })
+
+    it("无 options 配置时返回当前状态值", async () => {
+      const result = await actions.reloadOptions("tags")
+      expect(result).toBeUndefined()
+    })
+  })
+
+  describe("setRequired 边缘情况", () => {
+    it("对不存在的字段不抛出错误", () => {
+      expect(() => actions.setRequired("nonExistent", true)).not.toThrow()
+    })
+
+    it("对有现存规则的字段正确合并规则", () => {
+      const item = ctx.options.items.find(i => i.prop === "name")!
+      item.rules = [{ pattern: /\w+/, message: "格式错误" }]
+
+      actions.setRequired("name", true)
+
+      const rules = item.rules as Array<{ required?: boolean, _inner?: boolean, pattern?: RegExp }>
+      expect(rules.length).toBe(2)
+      expect(rules[0]._inner).toBe(true)
+      expect(rules[1].pattern).toBeDefined()
+    })
+
+    it("更新已存在的 _inner 规则而非添加新规则", () => {
+      actions.setRequired("name", true)
+      actions.setRequired("name", true) // 再次设置
+
+      const item = ctx.options.items.find(i => i.prop === "name")!
+      const rules = item.rules as Array<{ _inner?: boolean }>
+      const innerRules = rules.filter(r => r._inner)
+      expect(innerRules.length).toBe(1)
+    })
+  })
+
+  describe("collapse 边缘情况", () => {
+    it("options.grid 为 undefined 时自动初始化", () => {
+      delete (ctx.options as any).grid
+      actions.collapse(true)
+      expect(ctx.options.grid?.collapsed).toBe(true)
+    })
+  })
+
+  describe("setItem 边缘情况", () => {
+    it("对不存在的字段不抛出错误", () => {
+      expect(() => actions.setItem("nonExistent", { label: "测试" })).not.toThrow()
+    })
+  })
+
+  describe("setData 嵌套路径", () => {
+    it("设置深层嵌套配置", () => {
+      actions.setData("grid.cols", 3)
+      expect((ctx.options.grid as any)?.cols).toBe(3)
+    })
+  })
 })
