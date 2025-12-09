@@ -1,4 +1,4 @@
-import type { FormRecord } from "../../form/interface"
+import type { FormRecord } from "../../form/types"
 import type { SearchAction } from "../interface"
 import type { Component, VNodeChild } from "vue"
 import { resolve } from "@/utils"

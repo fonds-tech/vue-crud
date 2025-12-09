@@ -1,5 +1,5 @@
 import type { UpsertMode, UpsertOptions } from "../interface"
-import type { FormRef, FormRecord, FormUseOptions } from "../../form/interface"
+import type { FormRef, FormRecord, FormUseOptions } from "../../form/types"
 import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"
 import { nextTick } from "vue"

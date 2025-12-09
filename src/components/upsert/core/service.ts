@@ -1,6 +1,7 @@
 import type { CrudRef } from "../../crud/interface"
 import type { UpsertState } from "./state"
 import type { UpsertCloseAction } from "../interface"
+import type { createFormBuilder } from "./form"
 import { ElMessage } from "element-plus"
 import { clone, isFunction } from "@fonds/utils"
 
@@ -10,7 +11,7 @@ import { clone, isFunction } from "@fonds/utils"
 interface UpsertServiceContext {
   crud: CrudRef
   state: UpsertState
-  builder: ReturnType<typeof import("./form").createFormBuilder>
+  builder: ReturnType<typeof createFormBuilder>
 }
 
 /**

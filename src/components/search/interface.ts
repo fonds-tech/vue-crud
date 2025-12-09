@@ -1,5 +1,5 @@
 import type { GridProps, GridItemProps } from "../grid"
-import type { FormRef, FormRecord, FormUseOptions } from "../form/interface"
+import type { FormRef, FormRecord, FormUseOptions } from "../form/types"
 import type { Ref, Slots, VNodeChild, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
 
 /**

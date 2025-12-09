@@ -1,5 +1,5 @@
 import type { Ref, Slots, ComputedRef } from "vue"
-import type { FormRecord, FormComponentSlot } from "../../form/interface"
+import type { FormRecord, FormComponentSlot } from "../../form/types"
 import type { UpsertMode, UpsertAction, UpsertCloseAction } from "../interface"
 import { h } from "vue"
 import { ElButton } from "element-plus"

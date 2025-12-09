@@ -1,5 +1,5 @@
 import type { Slots } from "vue"
-import type { FormRef, FormRecord } from "../../form/interface"
+import type { FormRef, FormRecord } from "../../form/types"
 import type { SearchCore, SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"

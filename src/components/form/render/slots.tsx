@@ -1,5 +1,5 @@
 import type { Component as VueComponent } from "vue"
-import type { FormComponentSlot, FormRenderContext } from "../interface"
+import type { FormComponentSlot, FormRenderContext } from "../types"
 import { h, resolveDynamicComponent } from "vue"
 
 function resolveComponent(type: string | VueComponent | undefined) {

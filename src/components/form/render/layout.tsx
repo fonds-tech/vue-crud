@@ -1,4 +1,4 @@
-import type { FormItem, FormRenderContext } from "../interface"
+import type { FormItem, FormRenderContext } from "../types"
 import Grid from "../../grid"
 import { renderFormItem } from "./item"
 import { renderSlotOrComponent, renderComponentSlotMap } from "./slots"

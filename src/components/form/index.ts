@@ -1,2 +1,2 @@
 export { default } from "./form"
-export * from "./interface"
+export * from "./types"
