@@ -5,6 +5,8 @@ export default mergeConfig(viteConfig, defineConfig({
   test: {
     environment: "happy-dom",
     watch: false,
+    reporters: ["verbose"],
+    coverage: { enabled: true },
     setupFiles: ["./test/setupTests.ts"],
     server: {
       deps: {
