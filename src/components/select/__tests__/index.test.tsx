@@ -284,6 +284,157 @@ describe("fd-select", () => {
     wrapper.findComponent({ name: "ElSelectStub" }).vm.$emit("update:modelValue", "new-val")
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["new-val"])
   })
+
+  it("handleFocus 在存在搜索词时触发刷新", async () => {
+    const apiMock = vi.fn().mockResolvedValue(baseOptions)
+    const wrapper = mountFdSelect({ props: { api: apiMock } })
+
+    await flushPromises() // 等待初始化
+    apiMock.mockClear() // 清除初始化调用记录
+
+    // 设置搜索词
+    wrapper.vm.handleFilterInput("test")
+    await flushPromises()
+
+    // 触发 focus 事件
+    wrapper.findComponent({ name: "ElSelectStub" }).vm.$emit("focus")
+    await flushPromises()
+
+    expect(apiMock).toHaveBeenCalled()
+  })
+
+  it("handleBlur 在存在搜索词时触发刷新", async () => {
+    const apiMock = vi.fn().mockResolvedValue(baseOptions)
+    const wrapper = mountFdSelect({ props: { api: apiMock } })
+
+    await flushPromises() // 等待初始化
+    apiMock.mockClear() // 清除初始化调用记录
+
+    // 设置搜索词
+    wrapper.vm.handleFilterInput("test")
+    await flushPromises()
+
+    // 触发 blur 事件
+    wrapper.findComponent({ name: "ElSelectStub" }).vm.$emit("blur")
+    await flushPromises()
+
+    expect(apiMock).toHaveBeenCalled()
+  })
+
+  it("字符串 API 请求失败时处理错误", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+    const fetchMock = vi.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+      ok: false,
+      status: 404,
+    } as any)
+
+    const wrapper = mountFdSelect({ props: { api: "/mock-api/error", options: [] } })
+    await flushPromises()
+
+    expect(wrapper.vm.options).toEqual([])
+    expect(wrapper.vm.loading).toBe(false)
+    expect(consoleSpy).toHaveBeenCalled()
+
+    fetchMock.mockRestore()
+    consoleSpy.mockRestore()
+  })
+
+  it("字符串 API 返回非数组时处理为空数组", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({ error: "invalid format" }),
+    } as any)
+
+    // 传入空 options 以避免回退到默认的 baseOptions
+    const wrapper = mountFdSelect({ props: { api: "/mock-api/invalid", options: [] } })
+    await flushPromises()
+
+    expect(wrapper.vm.options).toEqual([])
+
+    fetchMock.mockRestore()
+  })
+
+  it("字符串 API 正确处理 undefined 和 null 参数值", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+      ok: true,
+      json: async () => baseOptions,
+    } as any)
+
+    const wrapper = mountFdSelect({
+      props: {
+        api: "/mock-api/params",
+        params: { valid: "value", nullParam: null, undefinedParam: undefined },
+      },
+    })
+    await flushPromises()
+
+    // 验证 fetch 被调用，且 URL 不包含 null 或 undefined
+    expect(fetchMock).toHaveBeenCalled()
+    const calledUrl = fetchMock.mock.calls[0][0] as string
+    expect(calledUrl).toContain("valid=value")
+    expect(calledUrl).not.toContain("null")
+    expect(calledUrl).not.toContain("undefined")
+
+    // 验证数据正确加载
+    expect(wrapper.vm.options).toEqual(baseOptions)
+
+    fetchMock.mockRestore()
+  })
+
+  it("resolveOptionField 处理空选项和空 key", () => {
+    const wrapper = mountFdSelect()
+
+    // 通过公开的 handleChange 来间接测试 resolveOptionField 的边界情况
+    wrapper.vm.handleChange(null)
+
+    const emitted = wrapper.emitted("change")
+    expect(emitted).toBeTruthy()
+    expect(emitted?.[0]).toEqual([null, undefined])
+  })
+
+  it("handleClear 在有 API 时调用刷新", async () => {
+    const apiMock = vi.fn().mockResolvedValue(baseOptions)
+    const wrapper = mountFdSelect({ props: { api: apiMock } })
+
+    await flushPromises()
+    apiMock.mockClear()
+
+    wrapper.findComponent({ name: "ElSelectStub" }).vm.$emit("clear")
+    await flushPromises()
+
+    expect(wrapper.emitted("clear")).toBeTruthy()
+    expect(apiMock).toHaveBeenCalled()
+  })
+
+  it("默认插槽未自定义时渲染默认 el-option 列表", () => {
+    const wrapper = mountFdSelect()
+
+    // 验证默认渲染了选项
+    const options = wrapper.findAllComponents({ name: "ElOptionStub" })
+    expect(options).toHaveLength(baseOptions.length)
+  })
+
+  it("命名插槽为 undefined 时不会渲染", () => {
+    const wrapper = mountFdSelect({
+      slots: {
+        default: () => h("div", { class: "custom-default" }, "custom"),
+        // prefix 插槽存在但返回 undefined 的情况会在 ElSelectStub 中处理
+      },
+    })
+
+    expect(wrapper.find(".custom-default").exists()).toBe(true)
+  })
+
+  it("valueKey 计算属性始终返回 'value'", () => {
+    const wrapper = mountFdSelect()
+
+    // 通过 change 事件验证使用了正确的 valueKey
+    wrapper.vm.handleChange("bj")
+    const emitted = wrapper.emitted("change")
+
+    expect(emitted).toBeTruthy()
+    expect(emitted?.[0][1]).toEqual(baseOptions[1])
+  })
 })
 
 describe("fd-option", () => {

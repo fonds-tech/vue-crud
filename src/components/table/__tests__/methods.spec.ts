@@ -97,4 +97,56 @@ describe("createTableMethods", () => {
     methods.clearData()
     expect(state.tableRows.value).toHaveLength(0)
   })
+
+  it("expandAll 展开所有行", () => {
+    state.tableRows.value = [{ id: 1 }, { id: 2 }, { id: 3 }] as any
+    methods.expandAll(true)
+    expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalledTimes(3)
+  })
+
+  it("expandAll 收起所有行", () => {
+    state.tableRows.value = [{ id: 1 }, { id: 2 }] as any
+    methods.expandAll(false)
+    expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalledWith(
+      state.tableRows.value[0],
+      false,
+    )
+  })
+
+  it("setTable 设置表格属性", () => {
+    methods.setTable({ height: "500px", border: false })
+    expect(state.tableOptions.table.height).toBe("500px")
+    expect(state.tableOptions.table.border).toBe(false)
+  })
+
+  it("resetFilters 不带参数时清空所有过滤", () => {
+    methods.resetFilters()
+    expect(state.tableRef.value?.clearFilter).toHaveBeenCalledWith()
+  })
+
+  it("resetFilters 带单个字段参数", () => {
+    methods.resetFilters("status")
+    expect(state.tableRef.value?.clearFilter).toHaveBeenCalledWith("status")
+  })
+
+  it("resetFilters 带多个字段参数", () => {
+    const fields = ["status", "type"]
+    methods.resetFilters(fields)
+    expect(state.tableRef.value?.clearFilter).toHaveBeenCalledWith(fields)
+  })
+
+  it("clearFilters 是 resetFilters 的别名", () => {
+    methods.clearFilters("name")
+    expect(state.tableRef.value?.clearFilter).toHaveBeenCalledWith("name")
+  })
+
+  it("resetSorters 清空排序", () => {
+    methods.resetSorters()
+    expect(state.tableRef.value?.clearSort).toHaveBeenCalled()
+  })
+
+  it("clearSorters 是 resetSorters 的别名", () => {
+    methods.clearSorters()
+    expect(state.tableRef.value?.clearSort).toHaveBeenCalled()
+  })
 })
