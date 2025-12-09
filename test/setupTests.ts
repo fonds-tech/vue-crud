@@ -1,8 +1,2 @@
-import { vi } from "vitest"
-
-// 提供统一的图标空实现，避免 vitest 缺少 unplugin-icons 导致解析失败
-const iconStub = { default: () => null }
-
-vi.mock("~icons/tabler/x", () => iconStub)
-vi.mock("~icons/tabler/maximize", () => iconStub)
-vi.mock("~icons/tabler/minimize", () => iconStub)
+// 测试全局配置
+// 如需添加全局 mock 或 setup，在此文件中配置

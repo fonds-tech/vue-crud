@@ -1,4 +1,5 @@
 import type { FormItem, FormRenderContext } from "../interface"
+import Grid from "../../grid"
 import { renderFormItem } from "./item"
 import { renderSlotOrComponent, renderComponentSlotMap } from "./slots"
 
@@ -10,9 +11,9 @@ import { renderSlotOrComponent, renderComponentSlotMap } from "./slots"
  */
 export function renderGrid(ctx: FormRenderContext, items: FormItem[], groupName?: string | number) {
   return (
-    <fd-grid {...ctx.options.grid}>
+    <Grid {...ctx.options.grid}>
       {items.map((item, index) => renderFormItem(ctx, item, index, groupName))}
-    </fd-grid>
+    </Grid>
   )
 }
 

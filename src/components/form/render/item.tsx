@@ -1,4 +1,5 @@
 import type { FormItem, FormRenderContext } from "../interface"
+import GridItem from "../../grid-item"
 import { renderControl } from "./control"
 import { renderSlotOrComponent } from "./slots"
 
@@ -39,7 +40,7 @@ export function renderFormItem(ctx: FormRenderContext, item: FormItem, index: nu
     : renderControl(ctx, item)
 
   return (
-    <fd-grid-item key={key} v-show={visible} span={helpers.resolveSpan(item)} offset={helpers.resolveOffset(item)}>
+    <GridItem key={key} v-show={visible} span={helpers.resolveSpan(item)} offset={helpers.resolveOffset(item)}>
       <el-form-item
         {...item}
         prop={item.prop}
@@ -55,6 +56,6 @@ export function renderFormItem(ctx: FormRenderContext, item: FormItem, index: nu
           ),
         }}
       />
-    </fd-grid-item>
+    </GridItem>
   )
 }
