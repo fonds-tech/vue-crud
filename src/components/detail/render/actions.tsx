@@ -3,7 +3,7 @@ import type { DetailData, DetailAction, DetailOptions } from "../interface"
 import { h } from "vue"
 import { resolve } from "@/utils"
 import { ElButton } from "element-plus"
-import { slotNameOf, componentOf, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
+import { slotNameOf, renderComponentSlot } from "../core/helpers"
 
 /** 判断显隐，支持布尔与函数隐藏条件。 */
 function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolean) | boolean }, data: D) {
@@ -15,40 +15,6 @@ function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolea
 
 function resolveActionText<D extends DetailData>(action: DetailAction<D>, options: DetailOptions<D>, data: D) {
   return resolve(action.text, data) ?? options.dialog.title ?? "确定"
-}
-
-function renderComponentSlot<D extends DetailData>(componentSlot: any, data: D, extra: Record<string, any> = {}, userSlots?: Record<string, ((props: any) => any) | undefined>) {
-  const slotName = slotNameOf(componentSlot, data)
-  if (slotName && userSlots?.[slotName]) {
-    return userSlots[slotName]?.(extra)
-  }
-  const component = componentOf(componentSlot, data)
-  if (component) {
-    const childrenSlots = componentSlots(componentSlot, data)
-    const vSlots = Object.fromEntries(
-      Object.entries(childrenSlots).map(([childSlot, value]) => [
-        childSlot,
-        () => renderSlotValue(value),
-      ]),
-    )
-    return h(
-      component as any,
-      {
-        ...componentProps(componentSlot, data),
-        style: componentStyle(componentSlot, data),
-        ...componentEvents(componentSlot, data),
-        ...extra,
-      },
-      vSlots,
-    )
-  }
-  return null
-}
-
-function renderSlotValue(value: any) {
-  if (typeof value === "function")
-    return value()
-  return h(value as any, { "data-detail-slot": true })
 }
 
 export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<D>) {

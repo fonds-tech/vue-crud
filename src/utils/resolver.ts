@@ -1,11 +1,5 @@
 import type { MaybeFn } from "../types/shared"
-
-/**
- * 判断值是否为函数
- */
-function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
-  return typeof value === "function"
-}
+import { isFunction } from "@fonds/utils"
 
 /**
  * 解析动态值

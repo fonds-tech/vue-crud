@@ -1,8 +1,8 @@
 import type { DetailData, DetailItem, DetailGroup, DetailMaybeFn, DetailOptions } from "../interface"
 import { resolve } from "@/utils"
 import { h, withDirectives, resolveDirective } from "vue"
+import { slotsOf, slotNameOf, renderComponentSlot } from "../core/helpers"
 import { ElTag, ElSpace, ElDescriptions, ElDescriptionsItem } from "element-plus"
-import { slotsOf, slotNameOf, componentOf, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
 
 interface RenderCtx<D extends DetailData = DetailData> {
   options: DetailOptions<D>
@@ -62,40 +62,6 @@ function formatValue<D extends DetailData>(item: DetailItem<D>, data: D) {
   if (typeof item.formatter === "function")
     return item.formatter(value, data)
   return value ?? ""
-}
-
-function renderComponentSlot<D extends DetailData>(componentSlot: any, data: D, extra: Record<string, any> = {}, userSlots?: Record<string, ((props: any) => any) | undefined>) {
-  const slotName = slotNameOf(componentSlot, data)
-  if (slotName && userSlots?.[slotName]) {
-    return userSlots[slotName]?.(extra)
-  }
-  const component = componentOf(componentSlot, data)
-  if (component) {
-    const childrenSlots = componentSlots(componentSlot, data)
-    const vSlots = Object.fromEntries(
-      Object.entries(childrenSlots).map(([childSlot, value]) => [
-        childSlot,
-        () => renderSlotValue(value),
-      ]),
-    )
-    return h(
-      component as any,
-      {
-        ...componentProps(componentSlot, data),
-        style: componentStyle(componentSlot, data),
-        ...componentEvents(componentSlot, data),
-        ...extra,
-      },
-      vSlots,
-    )
-  }
-  return null
-}
-
-function renderSlotValue(value: any) {
-  if (typeof value === "function")
-    return value()
-  return h(value as any, { "data-detail-slot": true })
 }
 
 function renderItemContent<D extends DetailData>(item: DetailItem<D>, data: D, userSlots: Record<string, ((props: any) => any) | undefined>, index: number) {

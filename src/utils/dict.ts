@@ -66,31 +66,3 @@ export function color(dict: DictItem[] | undefined, value: unknown): string | un
 export function type(dict: DictItem[] | undefined, value: unknown): DictItem["type"] | undefined {
   return match(dict, value)?.type
 }
-
-/**
- * 创建字典工具对象
- *
- * 绑定特定字典数组，返回便捷操作方法。
- * 适用于在组件中频繁操作同一字典的场景。
- *
- * @param dict 字典数组
- * @returns 绑定了字典的工具对象
- *
- * @example
- * ```ts
- * const statusHelper = create(statusDict)
- *
- * statusHelper.match(1) // => { value: 1, label: "启用" }
- * statusHelper.label(1) // => "启用"
- * statusHelper.has(999) // => false
- * ```
- */
-export function create(dict: DictItem[] | undefined) {
-  return {
-    match: (value: unknown) => match(dict, value),
-    has: (value: unknown) => has(dict, value),
-    label: (value: unknown) => label(dict, value),
-    color: (value: unknown) => color(dict, value),
-    type: (value: unknown) => type(dict, value),
-  }
-}

@@ -1,7 +1,7 @@
 import type { DetailData, DetailSlots, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
 import { resolve } from "@/utils"
-import { markRaw } from "vue"
 import { isFunction } from "@fonds/utils"
+import { h, markRaw } from "vue"
 
 /** 判断是否为组件配置对象，避免将插槽名误判为组件。 */
 export function isDetailComponent(target?: DetailComponentSlot): target is DetailComponent {
@@ -78,4 +78,45 @@ export function slotsOf<D extends DetailData = DetailData>(target: { slots?: Det
   if (typeof resolved === "object" && resolved !== null)
     return markRaw(resolved as Record<string, DetailComponentSlot>)
   return {} as Record<string, DetailComponentSlot>
+}
+
+/** 渲染插槽值，如果是函数则调用，否则作为组件渲染。 */
+export function renderSlotValue(value: any) {
+  if (typeof value === "function")
+    return value()
+  return h(value as any, { "data-detail-slot": true })
+}
+
+/** 渲染组件插槽，优先使用用户插槽，其次渲染配置的组件。 */
+export function renderComponentSlot<D extends DetailData>(
+  componentSlot: any,
+  data: D,
+  extra: Record<string, any> = {},
+  userSlots?: Record<string, ((props: any) => any) | undefined>,
+) {
+  const slotName = slotNameOf(componentSlot, data)
+  if (slotName && userSlots?.[slotName]) {
+    return userSlots[slotName]?.(extra)
+  }
+  const component = componentOf(componentSlot, data)
+  if (component) {
+    const childrenSlots = componentSlots(componentSlot, data)
+    const vSlots = Object.fromEntries(
+      Object.entries(childrenSlots).map(([childSlot, value]) => [
+        childSlot,
+        () => renderSlotValue(value),
+      ]),
+    )
+    return h(
+      component as any,
+      {
+        ...componentProps(componentSlot, data),
+        style: componentStyle(componentSlot, data),
+        ...componentEvents(componentSlot, data),
+        ...extra,
+      },
+      vSlots,
+    )
+  }
+  return null
 }
