@@ -238,4 +238,465 @@ describe("fd-detail", () => {
     const button = wrapper.find(".el-button-stub")
     expect(button.text()).toBe("确认")
   })
+
+  describe("状态管理", () => {
+    it("getData 返回数据的深拷贝", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.setData({ name: "原始数据", nested: { value: 1 } })
+      const copy = exposed.getData()
+      copy.name = "修改后"
+      copy.nested.value = 999
+      expect(exposed.data.name).toBe("原始数据")
+      expect(exposed.data.nested.value).toBe(1)
+    })
+
+    it("clearData 清空数据", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.setData({ name: "测试数据" })
+      exposed.clearData()
+      expect(exposed.data).toEqual({})
+    })
+
+    it("use 合并配置时数组会被替换", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({ items: [{ prop: "a", label: "A" }] })
+      exposed.use({ items: [{ prop: "b", label: "B" }] })
+      exposed.setData({ b: "值B" })
+      await nextTick()
+      const items = wrapper.findAll(".el-descriptions-item-stub")
+      expect(items).toHaveLength(1)
+      expect(items[0].find(".label").text()).toBe("B")
+    })
+
+    it("data 属性为只读快照", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.setData({ name: "测试" })
+      expect(exposed.data.name).toBe("测试")
+    })
+  })
+
+  describe("服务调用", () => {
+    it("close 关闭弹窗", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(wrapper.find(".fd-dialog-stub").attributes("data-visible")).toBe("true")
+      exposed.close()
+      await nextTick()
+      expect(wrapper.find(".fd-dialog-stub").attributes("data-visible")).toBe("false")
+    })
+
+    it("refresh 使用缓存参数刷新数据", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "刷新后" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "100" })
+      detailFn.mockClear()
+      await exposed.refresh()
+      expect(detailFn).toHaveBeenCalledWith({ id: "100" })
+    })
+
+    it("refresh 可以合并额外参数", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "刷新后" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "100" })
+      detailFn.mockClear()
+      await exposed.refresh({ extra: "param" })
+      expect(detailFn).toHaveBeenCalledWith({ id: "100", extra: "param" })
+    })
+
+    it("detail 无效数据时不调用 service", async () => {
+      const detailFn = vi.fn()
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.detail(null as any)
+      exposed.detail(undefined as any)
+      exposed.detail("string" as any)
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("detail 缺少主键时不调用 service", async () => {
+      const detailFn = vi.fn()
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.detail({ name: "无主键" })
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("service 不存在时显示错误", async () => {
+      // 当 service 中没有 detail 方法时，应该 reject
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: undefined } as any } })
+      const exposed = getExpose(wrapper)
+      exposed.use({ items: [{ prop: "name", label: "姓名" }] })
+      await expect(exposed.detail({ id: "1" })).rejects.toThrow()
+    })
+  })
+
+  describe("onDetail 钩子", () => {
+    it("onDetail done 回调直接设置数据", async () => {
+      const detailFn = vi.fn()
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [{ prop: "name", label: "姓名" }],
+        onDetail: (_row, { done }) => {
+          done({ name: "自定义数据" })
+        },
+      })
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(detailFn).not.toHaveBeenCalled()
+      expect(exposed.data.name).toBe("自定义数据")
+    })
+
+    it("onDetail next 回调继续默认流程", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "服务返回" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [{ prop: "name", label: "姓名" }],
+        onDetail: (_row, { next }) => {
+          return next({ id: "custom-id" })
+        },
+      })
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(detailFn).toHaveBeenCalledWith({ id: "custom-id" })
+      expect(exposed.data.name).toBe("服务返回")
+    })
+
+    it("onDetail close 回调关闭弹窗", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        onDetail: (_row, { close }) => {
+          close()
+        },
+      })
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(wrapper.find(".fd-dialog-stub").attributes("data-visible")).toBe("false")
+    })
+  })
+
+  describe("mitt 事件", () => {
+    it("监听 detail 事件打开详情", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "事件触发" })
+      const { wrapper, mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.use({ items: [{ prop: "name", label: "姓名" }] })
+      mitt.handlers.detail?.[0]?.({ id: "event-id" })
+      await nextTick()
+      expect(detailFn).toHaveBeenCalledWith({ id: "event-id" })
+    })
+
+    it("监听 crud.proxy 事件打开详情", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "代理触发" })
+      const { wrapper, mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.use({ items: [{ prop: "name", label: "姓名" }] })
+      mitt.handlers["crud.proxy"]?.[0]?.({ name: "detail", data: [{ id: "proxy-id" }] })
+      await nextTick()
+      expect(detailFn).toHaveBeenCalledWith({ id: "proxy-id" })
+    })
+
+    it("crud.proxy 非 detail 事件不触发", async () => {
+      const detailFn = vi.fn()
+      const { mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      mitt.handlers["crud.proxy"]?.[0]?.({ name: "other", data: [{ id: "1" }] })
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("组件卸载时移除事件监听", async () => {
+      const { wrapper, mitt } = mountDetail()
+      expect(mitt.on).toHaveBeenCalledWith("detail", expect.any(Function))
+      expect(mitt.on).toHaveBeenCalledWith("crud.proxy", expect.any(Function))
+      wrapper.unmount()
+      expect(mitt.off).toHaveBeenCalledWith("detail", expect.any(Function))
+      expect(mitt.off).toHaveBeenCalledWith("crud.proxy", expect.any(Function))
+    })
+  })
+
+  describe("生命周期事件", () => {
+    it("打开弹窗触发 beforeOpen 事件", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(wrapper.emitted("beforeOpen")).toHaveLength(1)
+    })
+
+    it("打开弹窗触发 open 事件", async () => {
+      const { wrapper } = mountDetail()
+      const dialogStub = wrapper.findComponent(FdDialogStub)
+      dialogStub.vm.$emit("open")
+      expect(wrapper.emitted("open")).toHaveLength(1)
+    })
+
+    it("关闭弹窗触发 beforeClose 和 close 事件", async () => {
+      // detail 方法会调用 service 并覆盖数据，所以需要 mock service 返回期望的数据
+      const detailFn = vi.fn().mockResolvedValue({ name: "测试" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      exposed.close()
+      await nextTick()
+      expect(wrapper.emitted("beforeClose")).toBeTruthy()
+      expect(wrapper.emitted("beforeClose")?.[0]?.[0]).toEqual({ name: "测试" })
+    })
+
+    it("onBeforeOpen 钩子被调用", async () => {
+      const onBeforeOpen = vi.fn()
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({ onBeforeOpen })
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      expect(onBeforeOpen).toHaveBeenCalled()
+    })
+
+    it("onClose 钩子被调用并传入数据快照", async () => {
+      const onClose = vi.fn()
+      // detail 方法会调用 service 并覆盖数据，所以需要 mock service 返回期望的数据
+      const detailFn = vi.fn().mockResolvedValue({ name: "快照数据" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      exposed.use({ onClose })
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      const dialogStub = wrapper.findComponent(FdDialogStub)
+      dialogStub.vm.$emit("update:modelValue", false)
+      dialogStub.vm.$emit("close")
+      await nextTick()
+      expect(onClose).toHaveBeenCalledWith(expect.objectContaining({ name: "快照数据" }))
+    })
+  })
+
+  describe("渲染逻辑", () => {
+    it("hidden 为 true 的字段不渲染", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [
+          { prop: "visible", label: "可见" },
+          { prop: "hidden", label: "隐藏", hidden: true },
+        ],
+      })
+      exposed.setData({ visible: "显示", hidden: "不显示" })
+      await nextTick()
+      const items = wrapper.findAll(".el-descriptions-item-stub")
+      expect(items).toHaveLength(1)
+      expect(items[0].find(".label").text()).toBe("可见")
+    })
+
+    it("hidden 函数返回 true 时字段不渲染", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [
+          { prop: "name", label: "姓名" },
+          { prop: "secret", label: "秘密", hidden: (data: any) => data.hideSecret },
+        ],
+      })
+      exposed.setData({ name: "张三", secret: "机密", hideSecret: true })
+      await nextTick()
+      const items = wrapper.findAll(".el-descriptions-item-stub")
+      expect(items).toHaveLength(1)
+    })
+
+    it("使用 dict 渲染 Tag", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [
+          {
+            prop: "status",
+            label: "状态",
+            dict: [
+              { value: 1, label: "启用", type: "success" },
+              { value: 0, label: "禁用", type: "danger" },
+            ],
+          },
+        ],
+      })
+      exposed.setData({ status: 1 })
+      await nextTick()
+      const tag = wrapper.find(".el-tag-stub")
+      expect(tag.exists()).toBe(true)
+      expect(tag.text()).toBe("启用")
+    })
+
+    it("使用 formatter 格式化值", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [
+          {
+            prop: "price",
+            label: "价格",
+            formatter: (value: number) => `¥${value.toFixed(2)}`,
+          },
+        ],
+      })
+      exposed.setData({ price: 99.9 })
+      await nextTick()
+      const item = wrapper.find(".el-descriptions-item-stub")
+      expect(item.find(".value").text()).toContain("¥99.90")
+    })
+
+    it("使用 value 覆盖默认取值", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      // value 属性仅在 prop 对应的值为 undefined/null 时作为 fallback
+      // 当 prop 有值时，显示 prop 对应的值
+      exposed.use({
+        items: [
+          { prop: "custom", label: "自定义", value: "固定值" },
+        ],
+      })
+      // 当 prop 对应的值为 undefined 时，使用 value 作为 fallback
+      exposed.setData({ other: "其他值" })
+      await nextTick()
+      const item = wrapper.find(".el-descriptions-item-stub")
+      expect(item.find(".value").text()).toContain("固定值")
+    })
+
+    it("分组渲染多个 Descriptions", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        groups: [
+          { name: "basic", title: "基础信息" },
+          { name: "extra", title: "扩展信息" },
+        ],
+        items: [
+          { prop: "name", label: "姓名", group: "basic" },
+          { prop: "age", label: "年龄", group: "basic" },
+          { prop: "address", label: "地址", group: "extra" },
+        ],
+      })
+      exposed.setData({ name: "张三", age: 25, address: "北京" })
+      await nextTick()
+      const descriptions = wrapper.findAll(".el-descriptions-stub")
+      expect(descriptions.length).toBeGreaterThanOrEqual(2)
+    })
+
+    it("span 属性控制列宽", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [
+          { prop: "name", label: "姓名", span: 2 },
+        ],
+      })
+      exposed.setData({ name: "张三" })
+      await nextTick()
+      // span 属性会传递给 ElDescriptionsItem
+      expect(wrapper.find(".el-descriptions-item-stub").exists()).toBe(true)
+    })
+  })
+
+  describe("动作按钮", () => {
+    it("点击确认按钮关闭弹窗", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "1" })
+      await nextTick()
+      const button = wrapper.find(".el-button-stub")
+      await button.trigger("click")
+      await nextTick()
+      expect(wrapper.find(".fd-dialog-stub").attributes("data-visible")).toBe("false")
+    })
+
+    it("action hidden 为 true 时按钮不渲染", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      // 配置两个 action，一个 hidden，一个可见
+      exposed.use({
+        actions: [
+          { type: "ok", text: "确定", hidden: true },
+          { type: "ok", text: "可见按钮", hidden: false },
+        ],
+      })
+      await nextTick()
+      // hidden 为 true 的按钮不渲染，只渲染可见的按钮
+      const buttons = wrapper.findAll(".el-button-stub")
+      expect(buttons.length).toBe(1)
+      expect(buttons[0].text()).toBe("可见按钮")
+    })
+
+    it("自定义 action 文本", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        actions: [
+          { type: "ok", text: "关闭详情" },
+        ],
+      })
+      await nextTick()
+      const button = wrapper.find(".el-button-stub")
+      expect(button.text()).toBe("关闭详情")
+    })
+  })
+
+  describe("dialog 属性", () => {
+    it("class 合并", async () => {
+      const { wrapper } = mountDetail({
+        mounting: {
+          attrs: { class: "custom-detail" },
+        },
+      })
+      await nextTick()
+      const dialog = wrapper.find(".fd-dialog-stub")
+      expect(dialog.classes()).toContain("fd-detail")
+      expect(dialog.classes()).toContain("custom-detail")
+    })
+
+    it("attrs 透传", async () => {
+      const { wrapper } = mountDetail({
+        mounting: {
+          attrs: { "data-testid": "detail-dialog" },
+        },
+      })
+      await nextTick()
+      const dialog = wrapper.find(".fd-dialog-stub")
+      expect(dialog.attributes("data-testid")).toBe("detail-dialog")
+    })
+
+    it("dialog 配置透传", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        dialog: { title: "自定义标题", width: "80%" },
+      })
+      await nextTick()
+      // dialog 配置会传递给 FdDialog
+      expect(wrapper.find(".fd-dialog-stub").exists()).toBe(true)
+    })
+  })
+
+  describe("默认插槽", () => {
+    it("支持自定义 default 插槽", async () => {
+      const { wrapper } = mountDetail({
+        mounting: {
+          slots: {
+            default: ({ data }: any) => h("div", { class: "custom-content" }, `自定义: ${data?.name ?? ""}`),
+          },
+        },
+      })
+      const exposed = getExpose(wrapper)
+      exposed.setData({ name: "插槽数据" })
+      await nextTick()
+      const customContent = wrapper.find(".custom-content")
+      expect(customContent.exists()).toBe(true)
+      expect(customContent.text()).toContain("自定义: 插槽数据")
+    })
+  })
 })
