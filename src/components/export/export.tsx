@@ -1,6 +1,6 @@
 import type { VNode, PropType, ExtractPropTypes } from "vue"
 import { useCore } from "@/hooks"
-import { isFunction } from "@/utils/check"
+import { isFunction } from "@fonds/utils"
 import { downloadFile } from "@/utils/file"
 import { ElButton, ElMessage } from "element-plus"
 import { ref, watch, defineComponent } from "vue"

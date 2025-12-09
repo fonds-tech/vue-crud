@@ -1,8 +1,7 @@
 import type { DetailData, DetailOptions } from "../interface"
-import { clone } from "@fonds/utils"
 import { ElMessage } from "element-plus"
-import { isFunction } from "@/utils/check"
 import { pick, merge } from "lodash-es"
+import { clone, isFunction } from "@fonds/utils"
 
 interface ServiceParams<D extends DetailData = DetailData> {
   crud: {

@@ -1,6 +1,6 @@
 import type { VNode, VNodeChild, CSSProperties, Component as VueComponent } from "vue"
 import type { TableDict, TableScope, TableColumn, TableRecord, TableComponent } from "../interface"
-import { isFunction } from "@/utils/check"
+import { isFunction } from "@fonds/utils"
 
 /**
  * 解析给定列和作用域的字典

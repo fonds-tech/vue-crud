@@ -1,7 +1,7 @@
 import type { DetailData, DetailSlots, DetailMaybeFn, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
 import { resolve } from "@/utils"
 import { markRaw } from "vue"
-import { isFunction } from "@/utils/check"
+import { isFunction } from "@fonds/utils"
 
 /** 解析静态值或动态函数返回值；依赖当前详情数据进行求值。 */
 export function resolveMaybe<T, D extends DetailData = DetailData>(value: DetailMaybeFn<T, D> | undefined, data: D) {

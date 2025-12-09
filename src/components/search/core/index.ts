@@ -3,12 +3,11 @@ import type { FormRef, FormRecord } from "../../form/interface"
 import type { SearchCore, SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
-import { clone, isDef } from "@fonds/utils"
 import { useSearchLifecycle } from "./lifecycle"
-import { isEmpty, isFunction } from "@/utils/check"
 import { resolveResponsiveValue } from "../../grid/utils"
 import { resolveMaybe, resolveComponent } from "./helpers"
 import { ref, watch, computed, reactive } from "vue"
+import { clone, isDef, isEmpty, isFunction } from "@fonds/utils"
 import { mergeSearchOptions, createDefaultOptions } from "./options"
 
 /**
