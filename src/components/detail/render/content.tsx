@@ -1,7 +1,8 @@
 import type { DetailData, DetailItem, DetailGroup, DetailMaybeFn, DetailOptions } from "../interface"
+import { resolve } from "@/utils"
 import { h, withDirectives, resolveDirective } from "vue"
 import { ElTag, ElSpace, ElDescriptions, ElDescriptionsItem } from "element-plus"
-import { slotsOf, slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
+import { slotsOf, slotNameOf, componentOf, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
 
 interface RenderCtx<D extends DetailData = DetailData> {
   options: DetailOptions<D>
@@ -23,22 +24,22 @@ function isVisible<D extends DetailData>(target: { hidden?: DetailMaybeFn<boolea
 
 /** 解析字段标题。 */
 function resolveLabel<D extends DetailData>(item: DetailItem<D>, data: D) {
-  return resolveMaybe(item.label, data) ?? ""
+  return resolve(item.label, data) ?? ""
 }
 
 /** 获取字段值，兼容默认值。 */
 function getFieldValue<D extends DetailData>(item: DetailItem<D>, data: D) {
   const prop = (item as DetailItem & { field?: string }).prop ?? (item as { field?: string }).field
   if (!prop)
-    return resolveMaybe(item.value, data)
+    return resolve(item.value, data)
   const current = (data ?? {})[prop as any]
   if (current === undefined || current === null)
-    return resolveMaybe(item.value, data)
+    return resolve(item.value, data)
   return current
 }
 
 function resolveDict<D extends DetailData>(item: DetailItem<D>, data: D) {
-  return resolveMaybe(item.dict, data)
+  return resolve(item.dict, data)
 }
 
 function getDictMatch<D extends DetailData>(item: DetailItem<D>, data: D) {
@@ -161,7 +162,7 @@ export function renderDetailContent<D extends DetailData = DetailData>(ctx: Rend
           ElDescriptions,
           {
             key: group.name ?? groupIndex,
-            title: resolveMaybe(group.title, ctx.data.value),
+            title: resolve(group.title, ctx.data.value),
             ...group.descriptions,
           },
           () => [

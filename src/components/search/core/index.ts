@@ -3,9 +3,10 @@ import type { FormRef, FormRecord } from "../../form/interface"
 import type { SearchCore, SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
+import { resolve } from "@/utils"
+import { resolveComponent } from "./helpers"
 import { useSearchLifecycle } from "./lifecycle"
 import { resolveResponsiveValue } from "../../grid/utils"
-import { resolveMaybe, resolveComponent } from "./helpers"
 import { ref, watch, computed, reactive } from "vue"
 import { clone, isDef, isEmpty, isFunction } from "@fonds/utils"
 import { mergeSearchOptions, createDefaultOptions } from "./options"
@@ -61,7 +62,7 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
   }
 
   const getActionSlot = (action: SearchAction): string | undefined =>
-    resolveMaybe(action.slot, formModel.value) ?? resolveComponent(action, "slot", formModel.value)
+    resolve(action.slot, formModel.value) ?? resolveComponent(action, "slot", formModel.value)
 
   const getComponentIs = (action: SearchAction) => resolveComponent(action, "is", formModel.value)
   const getComponentProps = (action: SearchAction) => resolveComponent(action, "props", formModel.value) ?? {}
@@ -245,4 +246,4 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
   }
 }
 
-export { resolveComponent, resolveMaybe } from "./helpers"
+export { resolveComponent } from "./helpers"

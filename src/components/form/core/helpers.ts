@@ -281,22 +281,21 @@ export function createHelpers({
     return Boolean(value && value.prop && value.component)
   }
 
+  /**
+   * 规范化事件处理器对象
+   * 过滤无效的事件处理器，返回有效事件的副本。
+   * 调用方应确保事件名已使用 `onXxx` 格式。
+   */
   function normalizeListeners(listeners?: Record<string, (...args: unknown[]) => void>) {
-    const normalized: Record<string, (...args: unknown[]) => void> = {}
     if (!listeners)
-      return normalized
-    Object.entries(listeners).forEach(([eventName, handler]) => {
-      if (!handler)
-        return
-      if (eventName.startsWith("on") && /[A-Z]/.test(eventName.charAt(2))) {
-        normalized[eventName] = handler
-      }
-      else {
-        const capitalized = eventName.charAt(0).toUpperCase() + eventName.slice(1)
-        normalized[`on${capitalized}`] = handler
+      return {}
+    const result: Record<string, (...args: unknown[]) => void> = {}
+    Object.entries(listeners).forEach(([key, handler]) => {
+      if (handler) {
+        result[key] = handler
       }
     })
-    return normalized
+    return result
   }
 
   function optionsOf(item: FormItem) {

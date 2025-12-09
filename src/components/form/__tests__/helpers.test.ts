@@ -92,12 +92,12 @@ describe("fd-form helpers", () => {
     expect(helpers.itemsOfStep().map(i => i.prop)).toEqual(["b"])
   })
 
-  it("normalizeListeners 将事件名转为 onX", () => {
+  it("normalizeListeners 过滤无效 handler 并保持 key 不变", () => {
     const { helpers } = createCtx()
     const handler = vi.fn()
-    const mapped = helpers.normalizeListeners({ click: handler, change: handler })
+    const mapped = helpers.normalizeListeners({ onClick: handler, onChange: undefined as any })
     expect(mapped.onClick).toBe(handler)
-    expect(mapped.onChange).toBe(handler)
+    expect(mapped.onChange).toBeUndefined()
   })
 
   it("slotsOf 支持对象与函数形式", () => {

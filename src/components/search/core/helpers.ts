@@ -1,21 +1,8 @@
 import type { FormRecord } from "../../form/interface"
+import type { SearchAction } from "../interface"
 import type { Component, VNodeChild } from "vue"
-import type { SearchAction, SearchMaybeFn } from "../interface"
 import { resolve } from "@/utils"
 import { h, resolveDynamicComponent } from "vue"
-
-/**
- * 解析可能为函数的值
- * @param value 静态值或函数
- * @param model 表单模型
- * @returns 解析后的值
- */
-export function resolveMaybe<T>(
-  value: SearchMaybeFn<T, FormRecord> | undefined,
-  model: FormRecord,
-): T | undefined {
-  return resolve(value, model)
-}
 
 /**
  * 解析 SearchAction 的组件属性
@@ -31,7 +18,7 @@ export function resolveComponent(
   const component = action.component
   if (!component) return undefined
   const value = component[key]
-  return resolveMaybe(value as any, model)
+  return resolve(value as any, model)
 }
 
 /**

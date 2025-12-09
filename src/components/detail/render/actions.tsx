@@ -1,8 +1,9 @@
 import type { RenderCtx } from "./content"
 import type { DetailData, DetailAction, DetailOptions } from "../interface"
 import { h } from "vue"
+import { resolve } from "@/utils"
 import { ElButton } from "element-plus"
-import { slotNameOf, componentOf, resolveMaybe, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
+import { slotNameOf, componentOf, componentProps, componentSlots, componentStyle, componentEvents } from "../core/helpers"
 
 /** 判断显隐，支持布尔与函数隐藏条件。 */
 function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolean) | boolean }, data: D) {
@@ -13,7 +14,7 @@ function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolea
 }
 
 function resolveActionText<D extends DetailData>(action: DetailAction<D>, options: DetailOptions<D>, data: D) {
-  return resolveMaybe(action.text, data) ?? options.dialog.title ?? "确定"
+  return resolve(action.text, data) ?? options.dialog.title ?? "确定"
 }
 
 function renderComponentSlot<D extends DetailData>(componentSlot: any, data: D, extra: Record<string, any> = {}, userSlots?: Record<string, ((props: any) => any) | undefined>) {

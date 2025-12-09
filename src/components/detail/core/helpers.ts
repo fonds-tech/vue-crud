@@ -1,12 +1,7 @@
-import type { DetailData, DetailSlots, DetailMaybeFn, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
+import type { DetailData, DetailSlots, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
 import { resolve } from "@/utils"
 import { markRaw } from "vue"
 import { isFunction } from "@fonds/utils"
-
-/** 解析静态值或动态函数返回值；依赖当前详情数据进行求值。 */
-export function resolveMaybe<T, D extends DetailData = DetailData>(value: DetailMaybeFn<T, D> | undefined, data: D) {
-  return resolve(value, data)
-}
 
 /** 判断是否为组件配置对象，避免将插槽名误判为组件。 */
 export function isDetailComponent(target?: DetailComponentSlot): target is DetailComponent {
@@ -20,10 +15,10 @@ export function slotNameOf<D extends DetailData = DetailData>(value: DetailCompo
   if (typeof value === "string")
     return value
   if (typeof value === "object" && "slot" in (value as Record<string, any>))
-    return resolveMaybe((value as DetailComponent).slot, data)
+    return resolve((value as DetailComponent).slot, data)
   if (!isDetailComponent(value))
     return undefined
-  return resolveMaybe(value.slot, data)
+  return resolve(value.slot, data)
 }
 
 /** 获取组件引用，排除纯字符串/slot 占位，确保返回可渲染的组件定义。 */
@@ -35,7 +30,7 @@ export function componentOf<D extends DetailData = DetailData>(value: DetailComp
   if (typeof value === "object" && "slot" in (value as Record<string, any>))
     return undefined
   if (isDetailComponent(value))
-    return resolveMaybe(value.is, data)
+    return resolve(value.is, data)
   const resolved = value
   return typeof resolved === "object" && resolved !== null ? markRaw(resolved) : resolved
 }
@@ -44,28 +39,28 @@ export function componentOf<D extends DetailData = DetailData>(value: DetailComp
 export function componentEvents<D extends DetailData = DetailData>(value: DetailComponentSlot | undefined, data: D) {
   if (!value || !isDetailComponent(value))
     return {}
-  return (resolveMaybe(value.on, data) ?? {}) as Record<string, (...args: unknown[]) => unknown>
+  return (resolve(value.on, data) ?? {}) as Record<string, (...args: unknown[]) => unknown>
 }
 
 /** 获取组件 props，默认返回空对象，便于 v-bind 展开。 */
 export function componentProps<D extends DetailData = DetailData>(value: DetailComponentSlot | undefined, data: D) {
   if (!value || !isDetailComponent(value))
     return {}
-  return resolveMaybe(value.props, data) ?? {}
+  return resolve(value.props, data) ?? {}
 }
 
 /** 获取组件 style，未配置时返回 undefined 以避免覆盖默认样式。 */
 export function componentStyle<D extends DetailData = DetailData>(value: DetailComponentSlot | undefined, data: D) {
   if (!value || !isDetailComponent(value))
     return undefined
-  return resolveMaybe(value.style, data)
+  return resolve(value.style, data)
 }
 
 /** 获取组件具名插槽，防御性处理非对象输入。 */
 export function componentSlots<D extends DetailData = DetailData>(value: DetailComponentSlot | undefined, data: D): Record<string, DetailComponentSlot> {
   if (!value || !isDetailComponent(value))
     return {} as Record<string, DetailComponentSlot>
-  const slotsValue = resolveMaybe(value.slots, data)
+  const slotsValue = resolve(value.slots, data)
   const resolved = slotsValue ?? {}
   if (typeof resolved === "object" && resolved !== null)
     return markRaw(resolved as Record<string, DetailComponentSlot>)

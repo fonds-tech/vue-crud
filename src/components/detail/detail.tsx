@@ -2,8 +2,9 @@ import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescript
 import FdDialog from "../dialog"
 import { merge } from "lodash-es"
 import { useCore } from "@/hooks"
+import { resolve } from "@/utils"
 import { renderActions, renderDetailContent } from "./render"
-import { resolveMaybe, createDetailState, createDetailService } from "./core"
+import { createDetailState, createDetailService } from "./core"
 import {
   h,
   watch,
@@ -208,7 +209,7 @@ function buildGroups<D extends DetailData = DetailData>(options: DetailOptions<D
     }
   })
   options.items.forEach((item) => {
-    const groupName = resolveMaybe(item.group, data)
+    const groupName = resolve(item.group, data)
     if (groupName !== undefined && map.has(groupName)) {
       map.get(groupName)!.push(item)
     }
@@ -227,7 +228,7 @@ function buildGroups<D extends DetailData = DetailData>(options: DetailOptions<D
       return {
         name,
         items,
-        title: meta ? resolveMaybe(meta.title, data) : descriptions.title,
+        title: meta ? resolve(meta.title, data) : descriptions.title,
         descriptions: normalizedDescriptions,
       } as DetailGroup<D> & { items: DetailItem<D>[], descriptions: DetailDescriptions }
     })
