@@ -8,7 +8,6 @@ import type { RenderHelpers } from "../core/helpers"
 import type { TableScope, TableAction, TableRecord } from "../interface"
 import { h } from "vue"
 import { ElLink } from "element-plus"
-import { normalizeEventProps } from "../core/helpers"
 import { isHidden, getActionType, isBuiltinAction, handleBuiltinAction } from "../core/actions"
 
 /**
@@ -65,7 +64,7 @@ export function renderActionButtons(
           key: actionIndex,
           ...renderHelpers.getComponentProps(action.component, scope),
           style: renderHelpers.getComponentStyle(action.component, scope),
-          ...normalizeEventProps(renderHelpers.getComponentEvents(action.component, scope)),
+          ...renderHelpers.getComponentEvents(action.component, scope),
         },
         normalizedSlots,
       )

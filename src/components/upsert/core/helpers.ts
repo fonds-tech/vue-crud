@@ -1,7 +1,7 @@
 import type { UpsertMode } from "../interface"
 import type { Ref, ComputedRef } from "vue"
 import type { FormRecord, FormComponentSlot } from "../../form/interface"
-import { isFunction } from "@fonds/utils"
+import { resolveProp } from "@/utils"
 
 /**
  * 组件辅助上下文
@@ -27,10 +27,7 @@ function resolveComponentProp<T>(
 ): T | undefined {
   if (!isRecord(component))
     return undefined
-  const value = component[prop]
-  if (isFunction(value))
-    return value(formModel.value)
-  return value as T | undefined
+  return resolveProp<T>(component, prop, formModel.value)
 }
 
 /**

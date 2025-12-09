@@ -232,19 +232,6 @@ export interface RenderHelpers<T extends TableRecord = TableRecord> {
 }
 
 /**
- * 将事件属性规范化为 'on' 前缀和 CamelCase
- *
- * @param events - 事件对象
- * @returns 规范化后的事件对象
- */
-export function normalizeEventProps(events: Record<string, (...args: unknown[]) => unknown>) {
-  // 将事件名转为 Vue 期望的 onX 格式（首字母大写），便于直接透传给 h()
-  return Object.fromEntries(
-    Object.entries(events).map(([key, handler]) => [`on${key.charAt(0).toUpperCase()}${key.slice(1)}`, handler]),
-  )
-}
-
-/**
  * 创建 RenderHelpers 实例
  *
  * @template T

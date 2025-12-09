@@ -1,12 +1,11 @@
 import type { DetailData, DetailSlots, DetailMaybeFn, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
+import { resolve } from "@/utils"
 import { markRaw } from "vue"
 import { isFunction } from "@/utils/check"
 
 /** 解析静态值或动态函数返回值；依赖当前详情数据进行求值。 */
 export function resolveMaybe<T, D extends DetailData = DetailData>(value: DetailMaybeFn<T, D> | undefined, data: D) {
-  if (isFunction(value))
-    return value(data)
-  return value
+  return resolve(value, data)
 }
 
 /** 判断是否为组件配置对象，避免将插槽名误判为组件。 */
@@ -45,10 +44,7 @@ export function componentOf<D extends DetailData = DetailData>(value: DetailComp
 export function componentEvents<D extends DetailData = DetailData>(value: DetailComponentSlot | undefined, data: D) {
   if (!value || !isDetailComponent(value))
     return {}
-  const raw = resolveMaybe(value.on, data) ?? {}
-  return Object.fromEntries(
-    Object.entries(raw).map(([key, handler]) => [`on${key.charAt(0).toUpperCase()}${key.slice(1)}`, handler]),
-  )
+  return (resolveMaybe(value.on, data) ?? {}) as Record<string, (...args: unknown[]) => unknown>
 }
 
 /** 获取组件 props，默认返回空对象，便于 v-bind 展开。 */

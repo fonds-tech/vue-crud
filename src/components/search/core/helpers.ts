@@ -1,24 +1,8 @@
 import type { FormRecord } from "../../form/interface"
 import type { Component, VNodeChild } from "vue"
 import type { SearchAction, SearchMaybeFn } from "../interface"
+import { resolve } from "@/utils"
 import { h, resolveDynamicComponent } from "vue"
-
-/**
- * 将事件对象的 key 转换为 onXxx 格式
- * @param events 事件对象 { click: handler }
- * @returns 转换后的事件对象 { onClick: handler }
- */
-export function transformEvents(events: Record<string, (...args: any[]) => void> = {}) {
-  const mapped: Record<string, (...args: any[]) => void> = {}
-  Object.keys(events).forEach((key) => {
-    const handler = events[key]
-    if (handler) {
-      const camel = `on${key[0].toUpperCase()}${key.slice(1)}`
-      mapped[camel] = handler
-    }
-  })
-  return mapped
-}
 
 /**
  * 解析可能为函数的值
@@ -30,10 +14,7 @@ export function resolveMaybe<T>(
   value: SearchMaybeFn<T, FormRecord> | undefined,
   model: FormRecord,
 ): T | undefined {
-  if (typeof value === "function") {
-    return (value as (model: FormRecord) => T)(model)
-  }
-  return value as T | undefined
+  return resolve(value, model)
 }
 
 /**
@@ -69,13 +50,12 @@ export function renderDynamicComponent(
   slots?: Record<string, () => VNodeChild>,
 ) {
   const Dynamic = resolveDynamicComponent(componentIs)
-  const transformedEvents = transformEvents(events)
   return h(
     Dynamic as Component,
     {
       style,
       ...props,
-      ...transformedEvents,
+      ...events,
     },
     slots,
   )

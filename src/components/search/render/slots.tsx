@@ -1,6 +1,6 @@
 import type { SearchCore, SearchAction } from "../interface"
 import type { Slots, Component, VNodeChild } from "vue"
-import { transformEvents } from "../core"
+
 import { h, resolveDynamicComponent } from "vue"
 
 /**
@@ -61,7 +61,7 @@ export function renderComponent(
 
   const Dynamic = resolveDynamicComponent(componentIs as string | Component)
   const componentProps = engine.getComponentProps(action)
-  const componentEvents = transformEvents(engine.getComponentEvents(action))
+  const componentEvents = engine.getComponentEvents(action)
   const componentSlots = renderCustomSlots(engine, action)
 
   return h(

@@ -6,7 +6,6 @@ import type { TableScope, TableColumn, TableRecord } from "../interface"
 import { h } from "vue"
 import { resolveActions } from "../core/actions"
 import { QuestionFilled } from "@element-plus/icons-vue"
-import { normalizeEventProps } from "../core/helpers"
 import { renderActionButtons } from "./actions"
 import { ElTag, ElIcon, ElSpace, ElTooltip, ElTableColumn } from "element-plus"
 
@@ -99,7 +98,7 @@ export function renderColumns(
                   {
                     ...renderHelpers.getComponentProps(headerComponent, scope),
                     style: renderHelpers.getComponentStyle(headerComponent, scope),
-                    ...normalizeEventProps(renderHelpers.getComponentEvents(headerComponent, scope)),
+                    ...renderHelpers.getComponentEvents(headerComponent, scope),
                   },
                   Object.fromEntries(
                     // 将配置化的 slot 映射为 VNode 插槽函数，并剔除未定义的槽避免无效渲染
@@ -164,7 +163,7 @@ export function renderColumns(
                 // 动态组件渲染：统一收集 props、样式与事件，并规范事件命名以匹配 Vue onX 格式
                 ...renderHelpers.getComponentProps(column.component, scope),
                 style: renderHelpers.getComponentStyle(column.component, scope),
-                ...normalizeEventProps(renderHelpers.getComponentEvents(column.component, scope)),
+                ...renderHelpers.getComponentEvents(column.component, scope),
               },
               Object.fromEntries(
                 Object.entries(componentSlots)

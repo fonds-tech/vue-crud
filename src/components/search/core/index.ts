@@ -246,4 +246,4 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
   }
 }
 
-export { resolveComponent, resolveMaybe, transformEvents } from "./helpers"
+export { resolveComponent, resolveMaybe } from "./helpers"
