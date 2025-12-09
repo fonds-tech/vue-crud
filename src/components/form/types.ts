@@ -12,6 +12,8 @@ import type {
   FormValidationResult,
 } from "element-plus"
 
+export type { FormInstance }
+
 /**
  * 表单配置对象接口
  * @description 定义整个动态表单的结构、行为和数据模型

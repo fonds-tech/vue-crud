@@ -5,7 +5,7 @@ import { h, nextTick } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
 // Mocks
-const { mockExport, mockGetPermission, mockEmit, mockDownloadFile, mockSelection, mockDict } = vi.hoisted(() => {
+const { mockExport, mockGetPermission, mockEmit, mockDownloadFile, mockSelection, mockDict, mockServiceOverride } = vi.hoisted(() => {
   return {
     mockExport: vi.fn(),
     mockGetPermission: vi.fn(),
@@ -13,6 +13,7 @@ const { mockExport, mockGetPermission, mockEmit, mockDownloadFile, mockSelection
     mockDownloadFile: vi.fn(),
     mockSelection: { value: [{ id: "1" }, { id: "2" }] as Record<string, string>[] },
     mockDict: { value: { primaryId: "id" } as Record<string, string> },
+    mockServiceOverride: { value: null as any },
   }
 })
 
@@ -21,7 +22,7 @@ vi.mock("../../../hooks", () => ({
     crud: {
       getPermission: mockGetPermission,
       service: {
-        get export() { return mockExport },
+        get export() { return mockServiceOverride.value !== undefined ? mockServiceOverride.value : mockExport },
       },
       get selection() { return mockSelection.value },
       get dict() { return mockDict.value },
@@ -43,6 +44,7 @@ describe("fd-export", () => {
     mockExport.mockResolvedValue({ url: "http://example.com/file.xlsx" })
     mockSelection.value = [{ id: "1" }, { id: "2" }]
     mockDict.value = { primaryId: "id" }
+    mockServiceOverride.value = undefined
     mockEmit.mockImplementation((event, cb) => {
       if (event === "search.get.model" && cb) {
         cb({})
@@ -50,7 +52,7 @@ describe("fd-export", () => {
     })
   })
 
-  it("renders correctly when permission is granted", () => {
+  it("有权限时正确渲染组件", () => {
     const wrapper = mount(FdExport, {
       global: {
         plugins: [ElementPlus],
@@ -61,7 +63,7 @@ describe("fd-export", () => {
     expect(wrapper.text()).toContain("导出")
   })
 
-  it("does not render when permission is denied", () => {
+  it("无权限时不渲染组件", () => {
     mockGetPermission.mockReturnValue(false)
     const wrapper = mount(FdExport, {
       global: {
@@ -71,7 +73,7 @@ describe("fd-export", () => {
     expect(wrapper.find(".fd-export").exists()).toBe(false)
   })
 
-  it("triggers export on click", async () => {
+  it("点击触发导出", async () => {
     const wrapper = mount(FdExport, {
       global: {
         plugins: [ElementPlus],
@@ -81,17 +83,15 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
 
     expect(mockEmit).toHaveBeenCalledWith("search.get.model", expect.any(Function))
-    // 等待异步操作完成
     await new Promise(process.nextTick)
 
     expect(mockExport).toHaveBeenCalled()
 
-    // 检查是否调用了 downloadFile
     await new Promise(process.nextTick)
     expect(mockDownloadFile).toHaveBeenCalledWith("http://example.com/file.xlsx")
   })
 
-  it("handles selection correctly", async () => {
+  it("正确处理选中项", async () => {
     const wrapper = mount(FdExport, {
       global: {
         plugins: [ElementPlus],
@@ -101,14 +101,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    // 检查是否传递了选中项 ID
     expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
       ids: "1,2",
     }))
   })
 
-  it("handles export error gracefully", async () => {
-    // 捕获 unhandled rejection，避免 vitest 报错
+  it("优雅处理导出错误", async () => {
     const errorHandler = vi.fn()
     const originalHandler = process.listeners("unhandledRejection")
     process.removeAllListeners("unhandledRejection")
@@ -125,16 +123,40 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(resolve => setTimeout(resolve, 10))
 
-    // 错误时不应该调用 downloadFile
     expect(mockDownloadFile).not.toHaveBeenCalled()
 
-    // 恢复原始的错误处理器
+    process.removeAllListeners("unhandledRejection")
+    originalHandler.forEach(handler => process.on("unhandledRejection", handler as any))
+  })
+
+  it("当 export 方法未配置时抛出错误", async () => {
+    mockServiceOverride.value = null
+
+    // 捕获未处理的 promise rejection
+    const errorHandler = vi.fn()
+    const originalHandler = process.listeners("unhandledRejection")
+    process.removeAllListeners("unhandledRejection")
+    process.on("unhandledRejection", errorHandler)
+
+    const wrapper = mount(FdExport, {
+      global: { plugins: [ElementPlus] },
+    })
+
+    await wrapper.find(".fd-export__trigger").trigger("click")
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    // 验证错误被捕获 (因为 click handler 没有 await，所以会作为 unhandled rejection 抛出)
+    expect(errorHandler).toHaveBeenCalled()
+    const error = errorHandler.mock.calls[0][0]
+    expect(error.message).toContain("Crud 未配置 export 方法")
+
+    // 恢复监听器
     process.removeAllListeners("unhandledRejection")
     originalHandler.forEach(handler => process.on("unhandledRejection", handler as any))
   })
 
   // Props 相关测试
-  it("merges params prop with export request", async () => {
+  it("合并 params prop 到导出请求", async () => {
     const wrapper = mount(FdExport, {
       props: {
         params: { customParam: "value", extra: 123 },
@@ -153,8 +175,8 @@ describe("fd-export", () => {
     }))
   })
 
-  // Slots 相关测试
-  it("renders trigger slot when provided", () => {
+  // 插槽相关测试
+  it("渲染 trigger 插槽", () => {
     const wrapper = mount(FdExport, {
       slots: {
         trigger: () => h("button", { class: "custom-trigger" }, "自定义触发器"),
@@ -168,7 +190,7 @@ describe("fd-export", () => {
     expect(wrapper.text()).toContain("自定义触发器")
   })
 
-  it("renders default slot content as button text", () => {
+  it("渲染 default 插槽内容作为按钮文本", () => {
     const wrapper = mount(FdExport, {
       slots: {
         default: () => "自定义按钮文本",
@@ -181,10 +203,8 @@ describe("fd-export", () => {
     expect(wrapper.find(".el-button").text()).toBe("自定义按钮文本")
   })
 
-  // 边界情况测试 - 此测试仅验证组件挂载正常
-  it("shows error when export method is not configured", () => {
-    // 注意：由于 mock 的限制，无法在运行时动态改变 export 为非函数
-    // 此测试验证组件在正常情况下能正确挂载
+  // 边界情况测试
+  it("组件正常挂载", () => {
     const wrapper = mount(FdExport, {
       global: {
         plugins: [ElementPlus],
@@ -194,7 +214,7 @@ describe("fd-export", () => {
     expect(wrapper.find(".fd-export").exists()).toBe(true)
   })
 
-  it("does not call downloadFile when response has no url", async () => {
+  it("响应无 url 时不调用 downloadFile", async () => {
     mockExport.mockResolvedValueOnce({ data: "some data" })
 
     const wrapper = mount(FdExport, {
@@ -210,7 +230,7 @@ describe("fd-export", () => {
     expect(mockDownloadFile).not.toHaveBeenCalled()
   })
 
-  it("handles empty selection correctly", async () => {
+  it("正确处理空选中项", async () => {
     mockSelection.value = []
 
     const wrapper = mount(FdExport, {
@@ -228,7 +248,7 @@ describe("fd-export", () => {
     }))
   })
 
-  it("handles null selection correctly", async () => {
+  it("正确处理 null 选中项", async () => {
     mockSelection.value = null as any
 
     const wrapper = mount(FdExport, {
@@ -246,7 +266,7 @@ describe("fd-export", () => {
     }))
   })
 
-  it("uses custom primaryKey from dict", async () => {
+  it("使用自定义 primaryKey", async () => {
     mockDict.value = { primaryId: "customId" }
     mockSelection.value = [{ customId: "a1" }, { customId: "b2" }]
 
@@ -266,7 +286,7 @@ describe("fd-export", () => {
     }))
   })
 
-  it("uses default primaryKey when dict.primaryId is not set", async () => {
+  it("未设置 dict.primaryId 时使用默认值", async () => {
     mockDict.value = {} as any
     mockSelection.value = [{ id: "x1" }, { id: "y2" }]
 
@@ -286,7 +306,7 @@ describe("fd-export", () => {
   })
 
   // Expose 方法测试
-  it("exposes export method that can be called directly", async () => {
+  it("暴露可直接调用的 export 方法", async () => {
     const wrapper = mount(FdExport, {
       global: {
         plugins: [ElementPlus],
@@ -303,7 +323,7 @@ describe("fd-export", () => {
   })
 
   // Loading 状态测试
-  it("shows loading state during export", async () => {
+  it("导出过程中显示 loading 状态", async () => {
     let resolveExport: (value: any) => void
     mockExport.mockImplementationOnce(() => new Promise((resolve) => {
       resolveExport = resolve
@@ -318,20 +338,17 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await nextTick()
 
-    // 导出进行中，按钮应该显示 loading
     expect(wrapper.find(".el-button").attributes("class")).toContain("is-loading")
 
-    // 完成导出
     resolveExport!({ url: "http://example.com/file.xlsx" })
     await new Promise(process.nextTick)
     await nextTick()
 
-    // loading 状态应该结束
     expect(wrapper.find(".el-button").attributes("class")).not.toContain("is-loading")
   })
 
   // 搜索参数合并测试
-  it("merges search model params with export request", async () => {
+  it("合并搜索参数到导出请求", async () => {
     mockEmit.mockImplementation((event, cb) => {
       if (event === "search.get.model" && cb) {
         cb({ searchField: "searchValue", page: 1 })
@@ -359,7 +376,7 @@ describe("fd-export", () => {
   })
 
   // props.params 覆盖搜索参数测试
-  it("props.params overrides search model params", async () => {
+  it("props.params 覆盖搜索参数", async () => {
     mockEmit.mockImplementation((event, cb) => {
       if (event === "search.get.model" && cb) {
         cb({ field: "fromSearch" })
