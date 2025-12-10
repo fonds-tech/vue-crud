@@ -42,8 +42,10 @@
     "release": "bumpp",
     "start": "tsx src/index.ts",
     "test": "vitest",
-    "typecheck": "tsc",
-    "typecheck:test": "tsc -p tsconfig.test.json",
+    "typecheck": "tsgo",
+    "typecheck:tsc": "tsc",
+    "typecheck:test": "tsgo -p tsconfig.test.json",
+    "typecheck:test:tsc": "tsc -p tsconfig.test.json",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
@@ -64,6 +66,7 @@
     "@iconify-json/tabler": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native-preview": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "@vitest/coverage-v8": "catalog:",
