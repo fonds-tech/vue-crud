@@ -1,8 +1,8 @@
-import type { ContextMenuExpose } from "../interface"
+import type { ContextMenuExpose } from "../types"
 import { mount } from "@vue/test-utils"
 import { nextTick } from "vue"
+import ContextMenu, { contextMenu } from "../index"
 import { it, vi, expect, describe } from "vitest"
-import { ContextMenu, FdContextMenu } from "../context-menu"
 
 function createEvent(target?: HTMLElement, x = 10, y = 10) {
   const event = new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: x, clientY: y })
@@ -20,7 +20,7 @@ describe("contextMenu", () => {
   it("open 渲染菜单并忽略隐藏项", async () => {
     const target = document.createElement("div")
     const event = createEvent(target)
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         show: true,
         event,
@@ -38,7 +38,7 @@ describe("contextMenu", () => {
   })
 
   it("点击父项可展开子菜单并标记激活态", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: {
           list: [{ label: "父级", children: [{ label: "子级" }] }],
@@ -60,7 +60,7 @@ describe("contextMenu", () => {
   it("回调项可触发关闭", async () => {
     vi.useFakeTimers()
     const callback = vi.fn((close: () => void) => close())
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "回调", callback }] },
       },
@@ -82,7 +82,7 @@ describe("contextMenu", () => {
     const target = document.createElement("div")
     target.className = "cell"
     const event = createEvent(target)
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { hover: { target: "cell", className: "hovered" }, list: [{ label: "A" }] },
       },
@@ -103,7 +103,7 @@ describe("contextMenu.open", () => {
     vi.useFakeTimers()
     const target = document.createElement("div")
     const event = createEvent(target)
-    const exposed = ContextMenu.open(event, { list: [{ label: "动态" }] })
+    const exposed = contextMenu.open(event, { list: [{ label: "动态" }] })
     await nextTick()
     expect(document.body.querySelector(".fd-context-menu")).not.toBeNull()
 
@@ -118,7 +118,7 @@ describe("contextMenu.open", () => {
 describe("contextMenu 边缘情况", () => {
   it("禁用项点击无响应", async () => {
     const callback = vi.fn()
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: {
           list: [{ label: "禁用项", disabled: true, callback }],
@@ -138,7 +138,7 @@ describe("contextMenu 边缘情况", () => {
 
   it("按 Escape 键关闭菜单", async () => {
     vi.useFakeTimers()
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "项目" }] },
       },
@@ -157,7 +157,7 @@ describe("contextMenu 边缘情况", () => {
 
   it("按 Enter 键触发项目", async () => {
     const callback = vi.fn()
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "回调", callback }] },
       },
@@ -173,7 +173,7 @@ describe("contextMenu 边缘情况", () => {
 
   it("按空格键触发项目", async () => {
     const callback = vi.fn()
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "回调", callback }] },
       },
@@ -188,7 +188,7 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("渲染 prefixIcon 和 suffixIcon", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: {
           list: [{ label: "带图标", prefixIcon: "icon-add", suffixIcon: "icon-arrow" }],
@@ -207,7 +207,7 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("无 event 时 open 不渲染菜单", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "项目" }] },
       },
@@ -221,7 +221,7 @@ describe("contextMenu 边缘情况", () => {
   it("hover 为 true 时使用默认高亮类名", async () => {
     const target = document.createElement("div")
     const event = createEvent(target)
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { hover: true, list: [{ label: "A" }] },
       },
@@ -234,7 +234,7 @@ describe("contextMenu 边缘情况", () => {
 
   it("点击无子菜单的叶子节点关闭菜单", async () => {
     vi.useFakeTimers()
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "叶子节点" }] },
       },
@@ -252,7 +252,7 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("ellipsis 默认为 true", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "长文本" }] },
       },
@@ -266,7 +266,7 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("ellipsis 为 false 时不添加省略类名", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "不省略", ellipsis: false }] },
       },
@@ -280,7 +280,7 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("使用自定义插槽内容", async () => {
-    const wrapper = mount(FdContextMenu, {
+    const wrapper = mount(ContextMenu, {
       props: {
         options: { list: [{ label: "默认" }] },
       },

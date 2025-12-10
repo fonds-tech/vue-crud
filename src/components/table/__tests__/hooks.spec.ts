@@ -60,6 +60,19 @@ describe("table hooks", () => {
       const mittWithoutOn = { off: vi.fn(), emit: vi.fn() }
       expect(() => registerEvents(mittWithoutOn as any, handlers)).not.toThrow()
     })
+
+    it("normalizeRowKey 能处理数组、单值与非法输入", () => {
+      registerEvents(mitt, handlers)
+      const bound = mitt.on.mock.calls.find(call => call[0] === "table.select")?.[1] as any
+      bound?.([1, 2, "a"], true)
+      bound?.(123, false)
+      bound?.({ not: "valid" }, true)
+      expect(handlers.select).toHaveBeenCalledWith([1, 2, "a"], true)
+      expect(handlers.select).toHaveBeenCalledWith(123, false)
+      // 非法输入转为 undefined
+      const invalidCall = handlers.select.mock.calls.find(call => call[0] === undefined)
+      expect(invalidCall).toBeDefined()
+    })
   })
 
   describe("unregisterEvents", () => {

@@ -60,6 +60,19 @@ describe("createTableMethods", () => {
     expect(state.tableRef.value?.toggleRowSelection).toHaveBeenCalledWith(row, true)
   })
 
+  it("select 支持 rowKey 为函数的情况", () => {
+    state.tableOptions.table.rowKey = (row: any) => `key-${row.id}`
+    const row = { id: 2 }
+    state.tableRows.value = [row]
+    methods.select("key-2", false)
+    expect(state.tableRef.value?.toggleRowSelection).toHaveBeenCalledWith(row, false)
+  })
+
+  it("select 无 rowKey 时安全退出", () => {
+    methods.select(undefined as any, true)
+    expect(state.tableRef.value?.toggleRowSelection).not.toHaveBeenCalled()
+  })
+
   it("selectAll 操作", () => {
     methods.selectAll(true)
     // 先清空
@@ -75,6 +88,12 @@ describe("createTableMethods", () => {
     state.tableRows.value = [{ id: 1 }] as any
     methods.expand(1, true)
     expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalled()
+  })
+
+  it("expandAll 默认展开所有行", () => {
+    state.tableRows.value = [{ id: 1 }, { id: 2 }] as any
+    methods.expandAll()
+    expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalledTimes(2)
   })
 
   it("toggleFullscreen 切换全屏并触发事件", () => {

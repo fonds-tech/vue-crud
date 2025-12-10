@@ -1,5 +1,5 @@
-import { buildContextMenuItems } from "../core/actions"
 import { it, vi, expect, describe } from "vitest"
+import { isHidden, getActionType, handleBuiltinAction, buildContextMenuItems } from "../core/actions"
 
 describe("buildContextMenuItems", () => {
   const scope = { row: { id: 1 }, column: { prop: "name" }, $index: 0 } as any
@@ -58,5 +58,32 @@ describe("buildContextMenuItems", () => {
     expect(labels).toContain("Show")
     expect(labels).not.toContain("Hide")
     expect(labels).not.toContain("FnHide")
+  })
+
+  it("getActionType 能区分 delete 类型", () => {
+    expect(getActionType({ type: "delete" } as any)).toBe("danger")
+    expect(getActionType({ type: "detail" } as any)).toBe("primary")
+  })
+
+  it("handleBuiltinAction 能调用 crud 内置方法", () => {
+    const scope = { row: { id: 1 } } as any
+    const crudCalls = {
+      rowInfo: vi.fn(),
+      rowEdit: vi.fn(),
+      rowDelete: vi.fn(),
+    }
+    handleBuiltinAction({ type: "detail" } as any, scope, crudCalls as any)
+    handleBuiltinAction({ type: "update" } as any, scope, crudCalls as any)
+    handleBuiltinAction({ type: "delete" } as any, scope, crudCalls as any)
+    expect(crudCalls.rowInfo).toHaveBeenCalledWith(scope.row)
+    expect(crudCalls.rowEdit).toHaveBeenCalledWith(scope.row)
+    expect(crudCalls.rowDelete).toHaveBeenCalledWith(scope.row)
+  })
+
+  it("isHidden 支持布尔与函数形式", () => {
+    const scope = { row: {} } as any
+    expect(isHidden({ hidden: true } as any, scope)).toBe(true)
+    expect(isHidden({ hidden: false } as any, scope)).toBe(false)
+    expect(isHidden({ hidden: () => true } as any, scope)).toBe(true)
   })
 })
