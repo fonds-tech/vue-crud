@@ -1,9 +1,9 @@
 import type { CascaderValue } from "element-plus"
 import type { CascaderOption } from "./interface"
 import type { ExtractPropTypes } from "vue"
+import { isEqual } from "lodash-es"
+import { isFunction } from "@fonds/utils"
 import { ElCascader } from "element-plus"
-import { merge, isEqual } from "lodash-es"
-import { clone, isFunction } from "@fonds/utils"
 import { cascaderEmits, cascaderProps } from "./cascader"
 import { ref, watch, computed, defineComponent } from "vue"
 
@@ -15,21 +15,9 @@ export default defineComponent({
   props: cascaderProps,
   emits: cascaderEmits,
   setup(props: ExtractPropTypes<typeof cascaderProps>, { slots, attrs, emit, expose }) {
-    const modelValue = computed<CascaderValue | undefined>({
-      get: () => props.modelValue as CascaderValue | undefined,
-      set: value => emit("update:modelValue", value as CascaderValue),
-    })
-
-    // 处理组件 class 合并：确保外部 class 不会覆盖内部前缀，而是以数组方式追加
-    const cascaderClass = computed(() => {
-      const extra = attrs.class
-      return extra ? ["fd-cascader", extra] : ["fd-cascader"]
-    })
-
-    // 过滤 attrs 中的 class，保留其余透传给原生 Cascader（如 data-*、style），避免 class 被重复注入
-    const cascaderNativeAttrs = computed(() => {
-      const { class: _class, ...rest } = attrs
-      return rest
+    const modelValue = computed({
+      get: () => props.modelValue,
+      set: value => emit("update:modelValue", value),
     })
 
     const remoteOptionList = ref<CascaderOption[]>([])
@@ -61,28 +49,15 @@ export default defineComponent({
     )
 
     /**
-     * 解析请求参数：函数形态允许按需动态生成，静态对象则克隆后再 merge 以避免外部引用被修改。
-     * @param {Record<string, unknown>} [extra] - 触发刷新时附带的临时参数
-     * @returns 合并后的新对象
-     */
-    function resolveParams(extra: Record<string, unknown> = {}) {
-      const base = isFunction(props.params) ? props.params(extra) : props.params ?? {}
-      return merge({}, clone(base), extra)
-    }
-
-    /**
      * 远程刷新：防止接口异常时残留旧数据；结果非数组时自动回退为空数组。
-     * @param {Record<string, unknown>} [extra] - 附加的请求参数
-     * @returns Promise，用于等待拉取完成
      */
-    async function refresh(extra: Record<string, unknown> = {}) {
+    async function refresh() {
       if (!isFunction(props.api)) {
         remoteOptionList.value = []
         return
       }
       try {
-        const payload = resolveParams(extra)
-        const result = await props.api(payload)
+        const result = await props.api((props.params || {}) as Record<string, unknown>)
         remoteOptionList.value = Array.isArray(result) ? result : []
       }
       catch {
@@ -90,27 +65,20 @@ export default defineComponent({
       }
     }
 
-    // 将 slots 转换为 JSX 期望的函数签名，保持 slot 名称与作用域一致
-    const cascaderSlots = Object.fromEntries(
-      Object.entries(slots).map(([name, slot]) => [name, (scope: Record<string, unknown>) => slot?.(scope)]),
-    )
-
     expose({ refresh, options: availableOptions })
 
     return () => {
-      const { api: _api, params: _params, immediate: _immediate, ...nativeProps } = props
-
-      // 仅透传 Element Plus 支持的原生 props/attrs，过滤自定义扩展，避免无意义属性落到 DOM
+      // 透传所有原生 props 和 attrs
       const cascaderBindings: NativeCascaderProps = {
-        ...(nativeProps as NativeCascaderProps),
-        ...(cascaderNativeAttrs.value as NativeCascaderProps),
-        "class": cascaderClass.value,
+        ...props,
+        ...attrs,
+        "class": ["fd-cascader", attrs.class].filter(Boolean),
         "options": availableOptions.value,
         "modelValue": modelValue.value,
         "onUpdate:modelValue": value => (modelValue.value = value as CascaderValue),
       }
 
-      return <ElCascader {...cascaderBindings} v-slots={cascaderSlots} />
+      return <ElCascader {...cascaderBindings} v-slots={slots} />
     }
   },
 })

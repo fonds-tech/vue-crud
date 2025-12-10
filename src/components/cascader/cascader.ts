@@ -5,7 +5,7 @@ import { cascaderEmits as elCascaderEmits, cascaderProps as elCascaderProps } fr
 export const cascaderProps = {
   ...elCascaderProps,
   api: { type: Function as PropType<(params: Record<string, unknown>) => Promise<CascaderOption[]>> },
-  params: { type: [Object, Function] as PropType<Record<string, unknown> | ((payload: Record<string, unknown>) => Record<string, unknown>)>, default: () => ({}) },
+  params: { type: Object as PropType<Record<string, unknown>>, default: () => ({}) },
   immediate: { type: Boolean, default: true },
   options: { ...elCascaderProps.options, default: () => [] },
 } as const

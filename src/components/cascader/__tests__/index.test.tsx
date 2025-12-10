@@ -161,22 +161,6 @@ describe("cascader", () => {
     expect(cascader.classes()).toContain("custom-class")
   })
 
-  it("params 为函数时动态计算参数", async () => {
-    const paramsFn = vi.fn(extra => ({ dynamic: true, ...extra }))
-    const apiMock = vi.fn().mockResolvedValue([{ label: "动态", value: "d" }])
-
-    mountCascader({
-      props: {
-        api: apiMock,
-        params: paramsFn,
-      },
-    })
-
-    await flushPromises()
-    expect(paramsFn).toHaveBeenCalled()
-    expect(apiMock).toHaveBeenCalledWith(expect.objectContaining({ dynamic: true }))
-  })
-
   it("immediate 为 false 时不自动调用 api", async () => {
     const apiMock = vi.fn().mockResolvedValue([])
 
