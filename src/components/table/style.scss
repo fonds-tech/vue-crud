@@ -169,22 +169,18 @@
     width: 100%;
   }
 
-  &__drag-ghost,
-  &__drag-chosen {
-    opacity: 0.9;
+  &__drag-ghost {
     position: relative;
-    border-radius: 6px;
-  }
 
-  &__drag-ghost::after,
-  &__drag-chosen::after {
-    inset: 0;
-    border: 1px dashed var(--el-color-primary);
-    content: "";
-    position: absolute;
-    box-sizing: border-box;
-    border-radius: 6px;
-    pointer-events: none;
+    &::after {
+      inset: 0;
+      border: 1px dashed var(--el-color-primary);
+      content: "";
+      position: absolute;
+      box-sizing: border-box;
+      border-radius: 6px;
+      pointer-events: none;
+    }
   }
 
   &__fixed-actions {

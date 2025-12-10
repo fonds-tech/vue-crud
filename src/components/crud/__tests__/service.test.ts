@@ -1,171 +1,309 @@
-import type { CrudRef, CrudOptions } from "../interface"
-import { reactive } from "vue"
-import { createHelper } from "../core/helper"
+import type { CrudRef, CrudParams, CrudOptions } from "../interface"
+import Mitt from "../../../utils/mitt"
 import { createService } from "../core/service"
+import { ElMessage, ElMessageBox } from "element-plus"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
-const { elMessageWarning, elMessageError, elMessageSuccess, elMessageBox } = vi.hoisted(() => {
-  const warning = vi.fn()
-  const error = vi.fn()
-  const success = vi.fn()
-  const messageBox = vi.fn((options: any) => {
-    const instance: any = { confirmButtonLoading: false }
-    if (options?.beforeClose) {
-      return new Promise((resolve) => {
-        options.beforeClose("confirm", instance, () => resolve(undefined))
-      })
-    }
-    return Promise.resolve()
-  })
-  return { elMessageWarning: warning, elMessageError: error, elMessageSuccess: success, elMessageBox: messageBox }
-})
-
+// Mock Element Plus 消息与确认框
 vi.mock("element-plus", () => ({
   ElMessage: {
-    warning: elMessageWarning,
-    error: elMessageError,
-    success: elMessageSuccess,
+    warning: vi.fn(),
+    error: vi.fn(),
+    success: vi.fn(),
   },
-  ElMessageBox: elMessageBox,
+  ElMessageBox: vi.fn(),
 }))
 
-function createCrud() {
-  const config = reactive<CrudOptions>({
+function createConfig(): CrudOptions {
+  return {
     dict: {
-      api: { page: "page", delete: "remove" } as any,
-      label: {
-        tips: "tips",
-        deleteConfirm: "deleteConfirm",
-        deleteSuccess: "deleteSuccess",
-        confirm: "confirm",
-        close: "close",
-        pageMissing: "pageMissing",
-      } as any,
+      api: { add: "add", page: "page", list: "list", update: "update", delete: "delete" },
       primaryId: "id",
-      pagination: { page: "p", size: "s" } as any,
-      search: {},
-      sort: {},
-    } as any,
-    permission: { page: true } as any,
-    style: { size: "default" },
-    events: {},
-  })
-
-  const crud = reactive<CrudRef>({
-    id: "test",
-    loading: false,
-    selection: [],
-    params: { page: 1, size: 20 },
-    service: {},
-    dict: config.dict,
+      label: {
+        add: "新增",
+        list: "列表",
+        update: "更新",
+        delete: "删除",
+        detail: "详情",
+      },
+    },
     permission: {},
-    mitt: {
-      emit: vi.fn(),
-      on: vi.fn(),
-    } as any,
-    config,
-    proxy: () => {},
-    set: () => {},
-    on: () => {},
-    rowInfo: () => {},
-    rowAdd: () => {},
-    rowEdit: () => {},
-    rowAppend: () => {},
-    rowDelete: async () => {},
-    rowClose: () => {},
-    refresh: async () => ({}),
-    getPermission: () => true,
-    paramsReplace: () => ({}),
-    getParams: () => ({}),
-    setParams: () => {},
-  })
-
-  return { crud, config }
+    style: { size: "default" },
+  }
 }
 
-beforeEach(() => {
-  elMessageWarning.mockClear()
-  elMessageError.mockClear()
-  elMessageSuccess.mockClear()
-  elMessageBox.mockClear()
-})
+let mitt: Mitt
+let emitSpy: ReturnType<typeof vi.spyOn>
+function setupConfirmMock() {
+  ;(ElMessageBox as any).mockImplementation(async (options: any) => {
+    const instance: any = { confirmButtonLoading: false }
+    await options.beforeClose("confirm", instance, () => {})
+    return null
+  })
+}
+describe("createService", () => {
+  let crud: CrudRef
+  let config: CrudOptions
+  const paramsReplace = vi.fn((params: CrudParams) => params)
 
-describe("fd-crud service logic", () => {
-  it("refresh 成功时发送事件并清理 loading，缺省数组结果转换", async () => {
-    const { crud, config } = createCrud()
-    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
-    const service = createService({
-      crud,
-      config,
-      mitt: crud.mitt as any,
-      paramsReplace: helper.paramsReplace,
-    })
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mitt = new Mitt()
+    emitSpy = vi.spyOn(mitt, "emit")
+    crud = {
+      dict: {
+        api: { page: "page", delete: "delete" },
+        label: {
+          pageMissing: "缺少分页服务",
+          tips: "提示",
+          deleteConfirm: "确定删除？",
+          confirm: "确定",
+          close: "关闭",
+          deleteSuccess: "删除成功",
+        },
+        primaryId: "id",
+      },
+      service: {
+        page: vi.fn().mockResolvedValue({ list: [] }),
+        delete: vi.fn(),
+      },
+      params: { page: 1 },
+      permission: { page: true },
+      loading: false,
+    } as unknown as CrudRef
+    config = createConfig()
+  })
 
-    crud.service.page = vi.fn(async () => [{ id: 1 }, { id: 2 }])
+  it("page 服务缺失时给出警告并返回空对象", async () => {
+    crud.service = {} as any
+    const service = createService({ config, crud, mitt, paramsReplace })
 
-    const res = await service.refresh({ extra: 1 })
+    const res = await service.refresh({ extra: true })
 
-    expect(res).toEqual({ list: [{ id: 1 }, { id: 2 }], pagination: { total: 2 } })
-    expect(crud.mitt.emit).toHaveBeenCalledWith("crud.refresh", expect.anything())
-    expect(crud.mitt.emit).toHaveBeenCalledWith("table.refresh", expect.objectContaining({ count: 2, pageSize: undefined, list: expect.any(Array) }))
+    expect(paramsReplace).toHaveBeenCalledWith({ page: 1, extra: true })
+    expect((ElMessage as any).warning).toHaveBeenCalledWith("缺少分页服务")
+    expect(res).toEqual({})
     expect(crud.loading).toBe(false)
   })
 
-  it("refresh 无服务时给出警告并结束 loading", async () => {
-    const { crud, config } = createCrud()
-    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
-    const service = createService({
-      crud,
-      config,
-      mitt: crud.mitt as any,
-      paramsReplace: helper.paramsReplace,
+  it("调用分页服务并将数组响应转换为列表与分页信息", async () => {
+    const rows = [{ id: 1 }, { id: 2 }]
+    crud.service.page = vi.fn().mockResolvedValue(rows)
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    const res = await service.refresh({ size: 10 })
+
+    expect(crud.loading).toBe(false)
+    expect(res).toEqual({ list: rows, pagination: { total: 2 } })
+    expect(emitSpy).toHaveBeenCalledWith("crud.refresh", res)
+    expect(emitSpy).toHaveBeenCalledWith("table.refresh", {
+      list: rows,
+      page: undefined,
+      count: 2,
+      pageSize: undefined,
     })
+  })
+
+  it("分页服务返回非数组对象时使用 count 兜底", async () => {
+    crud.service.page = vi.fn().mockResolvedValue({ count: 5 })
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    const res = await service.refresh()
+
+    expect(res).toEqual({ count: 5 })
+    expect(emitSpy).toHaveBeenCalledWith("table.refresh", {
+      list: [],
+      page: undefined,
+      count: 5,
+      pageSize: undefined,
+    })
+  })
+
+  it("分页服务返回空对象时 table.refresh count 回退为 0", async () => {
+    crud.service.page = vi.fn().mockResolvedValue({})
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    await service.refresh()
+
+    expect(emitSpy).toHaveBeenCalledWith("table.refresh", {
+      list: [],
+      page: undefined,
+      count: 0,
+      pageSize: undefined,
+    })
+  })
+
+  it("分页服务返回列表对象且缺少 total 时回退到列表长度", async () => {
+    crud.service.page = vi.fn().mockResolvedValue({ list: [{ id: 1 }, { id: 2 }] })
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    await service.refresh()
+
+    expect(emitSpy).toHaveBeenCalledWith("table.refresh", {
+      list: [{ id: 1 }, { id: 2 }],
+      page: undefined,
+      count: 2,
+      pageSize: undefined,
+    })
+  })
+
+  it("分页服务报错时提示错误并抛出异常", async () => {
+    const error = new Error("page failed")
+    crud.service.page = vi.fn().mockRejectedValue(error)
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    await service.refresh().catch((err) => {
+      expect(err).toBe(error)
+    })
+    expect((ElMessage as any).error).toHaveBeenCalledWith("page failed")
+    expect(crud.loading).toBe(false)
+  })
+
+  it("并发刷新时旧请求结果被跳过但仍完成 Promise", async () => {
+    const firstResolve: any = {}
+    const secondResolve: any = {}
+    crud.service.page = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((res) => {
+            firstResolve.res = res
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((res) => {
+            secondResolve.res = res
+          }),
+      )
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    const first = service.refresh({ page: 1 })
+    const second = service.refresh({ page: 2 })
+
+    secondResolve.res([{ id: 2 }])
+    await second
+    firstResolve.res([{ id: 1 }])
+    await first
+
+    expect(emitSpy).toHaveBeenCalledWith("crud.refresh", { list: [{ id: 2 }], pagination: { total: 1 } })
+    expect(emitSpy).not.toHaveBeenCalledWith("crud.refresh", { list: [{ id: 1 }], pagination: { total: 1 } })
+  })
+
+  it("onRefresh 钩子可自定义渲染并跳过默认服务调用", async () => {
+    const onRefresh = vi.fn()
+    const service = createService({ config: { ...config, onRefresh }, crud, mitt, paramsReplace })
+    const renderPayload = { list: [{ id: 3 }], pagination: { total: 1 } }
+    onRefresh.mockImplementation((_params, { render }) => render(renderPayload))
+
+    const res = await service.refresh()
+
+    expect(crud.service.page).not.toHaveBeenCalled()
+    expect(res).toEqual(renderPayload)
+    expect(emitSpy).toHaveBeenCalledWith("crud.refresh", renderPayload)
+  })
+
+  it("删除成功时调用删除接口、提示成功并触发刷新", async () => {
+    const service = createService({ config, crud, mitt, paramsReplace })
+    const refreshSpy = vi.spyOn(service, "refresh").mockResolvedValue({})
+    crud.service.delete = vi.fn().mockResolvedValue({ ok: true })
+    setupConfirmMock()
+
+    await service.rowDelete({ id: 10 })
+
+    expect(crud.service.delete).toHaveBeenCalledWith({ ids: [10] })
+    expect((ElMessage as any).success).toHaveBeenCalledWith("删除成功")
+    expect(refreshSpy).toHaveBeenCalled()
+  })
+
+  it("缺少 service 或无分页权限时跳过警告提示", async () => {
+    crud.service = undefined as any
+    crud.permission = { page: false } as any
+    const service = createService({ config, crud, mitt, paramsReplace })
 
     const res = await service.refresh()
 
     expect(res).toEqual({})
-    expect(elMessageWarning).toHaveBeenCalled()
-    expect(crud.loading).toBe(false)
+    expect((ElMessage as any).warning).not.toHaveBeenCalled()
   })
 
-  it("refresh 使用 onRefresh 钩子", async () => {
-    const onRefresh = vi.fn((_params, { render }) => {
-      render([{ id: 99 }], { total: 1 })
-    })
-    const { crud, config } = createCrud()
-    config.onRefresh = onRefresh
-    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
-    const service = createService({
-      crud,
-      config,
-      mitt: crud.mitt as any,
-      paramsReplace: helper.paramsReplace,
-    })
+  it("存在 service 但分页权限关闭时也跳过缺失警告", async () => {
+    crud.service = {} as any
+    crud.permission = { page: false } as any
+    const service = createService({ config, crud, mitt, paramsReplace })
 
     const res = await service.refresh()
 
-    expect(onRefresh).toHaveBeenCalled()
-    expect(res).toEqual({ list: [{ id: 99 }], pagination: { total: 1 } })
+    expect(res).toEqual({})
+    expect((ElMessage as any).warning).not.toHaveBeenCalled()
   })
 
-  it("rowDelete 默认流程调用删除接口并触发 refresh 与提示", async () => {
-    const { crud, config } = createCrud()
-    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
-    const service = createService({
-      crud,
-      config,
-      mitt: crud.mitt as any,
-      paramsReplace: helper.paramsReplace,
+  it("缺少 service 且权限未配置时仍给出警告", async () => {
+    crud.service = {} as any
+    crud.permission = undefined as any
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    await service.refresh()
+
+    expect((ElMessage as any).warning).toHaveBeenCalled()
+  })
+
+  it("缺少 pageMissing 文案时使用默认提示", async () => {
+    crud.service = {} as any
+    crud.dict.label = {} as any
+    const service = createService({ config, crud, mitt, paramsReplace })
+
+    await service.refresh()
+
+    expect((ElMessage as any).warning).toHaveBeenCalledWith("未配置分页服务，跳过刷新")
+  })
+
+  it("删除确认取消时不调用接口且返回 null", async () => {
+    const service = createService({ config, crud, mitt, paramsReplace })
+    crud.service.delete = vi.fn()
+    ;(ElMessageBox as any).mockImplementation(() => Promise.reject(new Error("cancel")))
+
+    const res = await service.rowDelete({ id: 9 })
+
+    expect(res).toBeNull()
+    expect(crud.service.delete).not.toHaveBeenCalled()
+    expect((ElMessage as any).success).not.toHaveBeenCalled()
+  })
+
+  it("删除弹窗点击取消时走 beforeClose 分支并直接 resolve", async () => {
+    const service = createService({ config, crud, mitt, paramsReplace })
+    crud.service.delete = vi.fn()
+    ;(ElMessageBox as any).mockImplementation(async (options: any) => {
+      const instance: any = { confirmButtonLoading: false }
+      await options.beforeClose("cancel", instance, () => {})
+      return null
     })
 
-    const refreshSpy = vi.spyOn(service, "refresh").mockResolvedValue({})
-    crud.service.remove = vi.fn(async () => ({}))
+    const res = await service.rowDelete({ id: 3 })
 
-    expect(service.rowDelete).toBeDefined()
-    await service.rowDelete?.({ id: 1 })
+    expect(res).toBeNull()
+    expect(crud.service.delete).not.toHaveBeenCalled()
+  })
 
-    expect(crud.service.remove).toHaveBeenCalled()
-    expect(elMessageSuccess).toHaveBeenCalled()
-    expect(refreshSpy).toHaveBeenCalled()
+  it("删除钩子可拦截并传递附加数据", async () => {
+    config.onDelete = vi.fn((_selection, { next }) => next({ force: true }))
+    const service = createService({ config, crud, mitt, paramsReplace })
+    crud.service.delete = vi.fn().mockResolvedValue({})
+    setupConfirmMock()
+
+    await service.rowDelete({ id: 1 })
+
+    expect(crud.service.delete).toHaveBeenCalledWith({ ids: [1], force: true })
+    expect(config.onDelete).toHaveBeenCalled()
+  })
+
+  it("删除接口报错时提示错误并抛出", async () => {
+    const service = createService({ config, crud, mitt, paramsReplace })
+    const error = new Error("delete failed")
+    crud.service.delete = vi.fn().mockRejectedValue(error)
+    setupConfirmMock()
+
+    await expect(service.rowDelete({ id: 2 })).rejects.toThrow("delete failed")
+    expect((ElMessage as any).error).toHaveBeenCalledWith("delete failed")
   })
 })
