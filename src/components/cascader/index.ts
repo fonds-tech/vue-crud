@@ -1,6 +1,6 @@
-import type { CascaderProps } from "./cascader"
-import Cascader from "./cascader"
+import Cascader from "./cascader.tsx"
+
+export * from "./interface"
 
 export { Cascader }
-export type { CascaderProps }
 export default Cascader
