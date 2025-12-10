@@ -108,7 +108,7 @@ describe("detail actions", () => {
 
     it("优先渲染用户插槽动作", () => {
       const slot = vi.fn(() => "slot action")
-      const ctx = createCtx([{ type: "ok", component: { slot: "action-slot" } as any }])
+      const ctx = createCtx([{ component: { slot: "action-slot" } as any }])
       ctx.userSlots = { "action-slot": slot } as any
 
       renderActions(ctx)
@@ -118,7 +118,6 @@ describe("detail actions", () => {
     it("在无用户插槽时渲染组件动作", () => {
       const ctx = createCtx([
         {
-          type: "ok",
           component: { is: "span", props: { class: "fallback-action" } } as any,
         },
       ])
