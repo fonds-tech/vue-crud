@@ -397,4 +397,64 @@ describe("fd-form hooks 格式化器", () => {
       expect(model.test).toBe("value")
     })
   })
+
+  // 新增覆盖测试：deleteField 中嵌套路径中间节点不存在或非对象
+  describe("deleteField 边缘情况", () => {
+    it("删除嵌套路径时中间节点为非对象不报错", () => {
+      const model = createModel<Record<string, any>>({ user: "not-an-object" })
+      // 尝试删除 user.profile.name，但 user 是字符串而非对象
+      expect(() => {
+        formHook.submit({ hook: "empty", model, field: "user.profile.name", value: "" })
+      }).not.toThrow()
+      // user 应保持不变
+      expect(model.user).toBe("not-an-object")
+    })
+
+    it("删除嵌套路径时中间节点为 null 不报错", () => {
+      const model = createModel<Record<string, any>>({ data: { nested: null } })
+      expect(() => {
+        formHook.submit({ hook: "empty", model, field: "data.nested.deep", value: "" })
+      }).not.toThrow()
+    })
+
+    it("删除嵌套路径时中间节点为 undefined 不报错", () => {
+      const model = createModel<Record<string, any>>({ data: {} })
+      expect(() => {
+        formHook.submit({ hook: "empty", model, field: "data.missing.deep", value: "" })
+      }).not.toThrow()
+    })
+  })
+
+  // 新增覆盖测试：normalizeToPipes 传入非预期类型
+  describe("normalizeToPipes 边缘情况", () => {
+    it("hook 为数字时被忽略", () => {
+      const model = createModel({ value: "test" })
+      formHook.bind({ hook: 123 as any, model, field: "value", value: model.value })
+      // 值应保持不变（因为 123 不是有效的 hook 类型，会返回空管道）
+      expect(model.value).toBe("test")
+    })
+
+    it("hook 为布尔值时被忽略", () => {
+      const model = createModel({ value: "test" })
+      formHook.bind({ hook: true as any, model, field: "value", value: model.value })
+      expect(model.value).toBe("test")
+    })
+
+    it("hook 为 null 时被忽略", () => {
+      const model = createModel({ value: "test" })
+      formHook.bind({ hook: null as any, model, field: "value", value: model.value })
+      expect(model.value).toBe("test")
+    })
+  })
+
+  // 新增覆盖测试：executePipes 中 pipe 既不是字符串也不是函数
+  describe("executePipes 边缘情况", () => {
+    it("管道中包含非字符串非函数元素时被跳过", () => {
+      const model = createModel({ value: "test" })
+      // 传入数组包含非法类型
+      formHook.bind({ hook: ["string", 123, null, undefined] as any, model, field: "value", value: 456 })
+      // 只有 "string" 会被执行
+      expect(model.value).toBe("456")
+    })
+  })
 })

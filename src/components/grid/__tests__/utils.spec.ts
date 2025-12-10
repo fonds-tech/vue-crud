@@ -28,7 +28,7 @@ describe("grid utils", () => {
     })
 
     it("在缺省输入时提供默认值", () => {
-      expect(resolveItemData(0, {})).toEqual({ span: 1, offset: 0, suffix: false })
+      expect(resolveItemData(0, {} as any)).toEqual({ span: 1, offset: 0, suffix: false })
     })
   })
 
@@ -38,7 +38,10 @@ describe("grid utils", () => {
         cols: 2,
         collapsed: false,
         collapsedRows: 1,
-        items: [{ span: 1 }, { span: 2 }],
+        items: [
+          { span: 1, offset: 0 },
+          { span: 2, offset: 0 },
+        ],
       })
       expect(result).toEqual({ overflow: false, displayIndexList: [0, 1] })
     })
@@ -48,7 +51,11 @@ describe("grid utils", () => {
         cols: 2,
         collapsed: true,
         collapsedRows: 1,
-        items: [{ span: 2 }, { span: 2 }, { span: 1, suffix: true }],
+        items: [
+          { span: 2, offset: 0 },
+          { span: 2, offset: 0 },
+          { span: 1, offset: 0, suffix: true },
+        ],
       })
       expect(result.displayIndexList).toEqual([2])
       expect(result.overflow).toBe(true)
@@ -59,7 +66,11 @@ describe("grid utils", () => {
         cols: 3,
         collapsed: true,
         collapsedRows: 1,
-        items: [{ span: 1 }, { span: 1 }, { span: 1 }],
+        items: [
+          { span: 1, offset: 0 },
+          { span: 1, offset: 0 },
+          { span: 1, offset: 0 },
+        ],
       })
       expect(result.displayIndexList).toEqual([0, 1, 2])
       expect(result.overflow).toBe(false)

@@ -1,7 +1,7 @@
 import type { FormItem, FormRecord, FormOptions, FormAsyncOptionsState } from "../types"
 import { createHelpers } from "../core"
-import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe } from "vitest"
+import { h, ref, computed, reactive, defineComponent } from "vue"
 
 const baseItemDefaults = { labelPosition: "", labelWidth: "", showMessage: true } as const
 
@@ -435,5 +435,343 @@ describe("fd-form helpers", () => {
     expect(helpers.isFormItemConfig({ prop: "name", component: { is: "el-input" } })).toBe(true)
     expect(helpers.isFormItemConfig({ prop: "name" })).toBe(false)
     expect(helpers.isFormItemConfig(undefined)).toBe(false)
+  })
+
+  // 新增覆盖测试：activeStepName 边界情况 - 步骤索引越界时使用默认值
+  it("activeStepName 步骤索引越界时使用默认值", () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [],
+      group: {
+        type: "steps",
+        children: [{ name: "s1", title: "步骤1" }],
+      },
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(0) // 索引为 0 时，idx = Math.max(0, 0-1) = 0，但如果 children[0]?.name 不存在会使用 idx + 1
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+      optionState,
+    })
+    // step = 0 时，idx = Math.max(0, 0-1) = 0，应该返回 children[0].name = "s1"
+    expect(helpers.activeStepName.value).toBe("s1")
+  })
+
+  // 新增覆盖测试：activeStepName 步骤有 name 时返回 name
+  it("activeStepName 步骤有 name 时返回 name", () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [],
+      group: {
+        type: "steps",
+        children: [{ name: "step1", title: "步骤1" }],
+      },
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(1)
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+      optionState,
+    })
+    // children[0].name 为 "step1"
+    expect(helpers.activeStepName.value).toBe("step1")
+  })
+
+  // 新增覆盖测试：formatProps 中 optionValues 存在但组件不支持 options 属性
+  it("formatProps optionValues 存在但组件不支持 options", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      label: "名称",
+      component: {
+        is: "el-input", // el-input 不支持 options
+        options: [{ label: "A", value: "a" }], // 手动设置 options
+      },
+    }
+    const props = helpers.formatProps.value(item)
+    // el-input 不在 OPTION_COMPONENTS 中，所以不应添加 options 属性
+    expect(props.options).toBeUndefined()
+    expect(props.data).toBeUndefined()
+  })
+
+  // 新增覆盖测试：formatProps 中 el-tree-select 使用 data 属性
+  it("formatProps el-tree-select 使用 data 属性", () => {
+    const { helpers } = createCtx()
+    const treeData = [{ label: "Node", value: 1 }]
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "tree",
+      label: "树选择",
+      component: {
+        is: "el-tree-select",
+        options: treeData,
+      },
+    }
+    const props = helpers.formatProps.value(item)
+    // el-tree-select 应使用 data 而非 options
+    expect(props.data).toEqual(treeData)
+    expect(props.options).toBeUndefined()
+  })
+
+  // 新增覆盖测试：ensureComponentDefaults 完整分支覆盖
+  it("ensureComponentDefaults 无 component 时创建完整默认对象", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      label: "名称",
+    } as FormItem // 强制类型，模拟无 component 的情况
+    // 删除 component 属性
+    delete (item as any).component
+    helpers.ensureComponentDefaults(item)
+    expect(item.component).toBeDefined()
+    expect(item.component!.props).toEqual({})
+    expect(item.component!.on).toEqual({})
+    expect(item.component!.style).toEqual({})
+  })
+
+  // 新增覆盖测试：optionsOf 同步更新选项
+  it("optionsOf 同步选项数组更新", () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [],
+      group: {},
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(1)
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({})
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+      optionState,
+    })
+
+    const initialOpts = [{ label: "A", value: "a" }]
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "status",
+      component: { is: "el-select", options: initialOpts },
+    }
+
+    // 第一次调用
+    const result1 = helpers.optionsOf(item)
+    expect(result1.options).toEqual(initialOpts)
+
+    // 更新选项
+    const newOpts = [{ label: "B", value: "b" }]
+    item.component!.options = newOpts
+
+    // 第二次调用应触发同步更新
+    const result2 = helpers.optionsOf(item)
+    expect(result2.options).toEqual(newOpts)
+  })
+
+  // 新增覆盖测试：rules 单个规则对象（非数组）且有 _inner 标记
+  it("rules 单个规则对象带 _inner 标记时过滤", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      required: false, // 非必填
+      rules: { _inner: true, required: true } as any, // 单个规则对象
+      component: { is: "el-input" },
+    }
+    const rules = helpers.rules(item)
+    // 非必填且规则有 _inner 标记，应返回空数组
+    expect(rules).toEqual([])
+  })
+
+  // 新增覆盖测试：propKey 无效 prop 使用 fallback
+  it("propKey 无效 prop 使用 fallback", () => {
+    const { helpers } = createCtx()
+    expect(helpers.propKey(undefined, 5)).toBe("5")
+    expect(helpers.propKey(null as any, "default")).toBe("default")
+    expect(helpers.propKey(undefined, undefined)).toBe("")
+  })
+
+  // 新增覆盖测试：formatProps 已有 placeholder 时不覆盖
+  it("formatProps 已有 placeholder 时不覆盖", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      label: "名称",
+      component: {
+        is: "el-input",
+        props: { placeholder: "自定义提示" },
+      },
+    }
+    const props = helpers.formatProps.value(item)
+    expect(props.placeholder).toBe("自定义提示")
+  })
+
+  // 新增覆盖测试：formatProps loading 状态
+  it("formatProps loading 状态添加 loading 属性", async () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [],
+      group: {},
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(1)
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({
+      status: { value: [], loading: true, pending: Promise.resolve([]) },
+    })
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+      optionState,
+    })
+
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "status",
+      label: "状态",
+      component: { is: "el-select" },
+    }
+    const props = helpers.formatProps.value(item)
+    expect(props.loading).toBe(true)
+  })
+
+  // 新增覆盖测试：componentProps 返回基础 props
+  it("componentProps 返回组件基础 props", () => {
+    const { helpers } = createCtx()
+    const props = helpers.componentProps({ is: "el-input", props: { maxlength: 100 } })
+    expect(props.maxlength).toBe(100)
+  })
+
+  // 新增覆盖测试：toPathArray 直接调用
+  it("toPathArray 转换路径格式", () => {
+    const { helpers } = createCtx()
+    expect(helpers.toPathArray("a.b.c")).toEqual(["a", "b", "c"])
+    expect(helpers.toPathArray(["x", "y"])).toEqual(["x", "y"])
+  })
+
+  // 新增覆盖测试：extra 隐藏项返回空字符串
+  it("extra 隐藏项返回空字符串", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      hidden: true,
+      extra: "提示文本",
+      component: { is: "el-input" },
+    }
+    expect(helpers.extra(item)).toBe("")
+  })
+
+  // 新增覆盖测试：required 隐藏项返回 false
+  it("required 隐藏项返回 false", () => {
+    const { helpers } = createCtx()
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "name",
+      hidden: true,
+      required: true,
+      component: { is: "el-input" },
+    }
+    expect(helpers.required(item)).toBe(false)
+  })
+
+  // 新增覆盖测试：is 函数传入 VNode 时包装为组件
+  it("is 函数传入 VNode 时包装为组件", () => {
+    const { helpers } = createCtx()
+    const vnode = h("div", null, "内容")
+    const result = helpers.is({ is: vnode })
+    // 返回的应该是一个组件（对象）
+    expect(result).toBeDefined()
+    expect(typeof result).toBe("object")
+  })
+
+  // 新增覆盖测试：is 函数传入函数组件时返回 markRaw 包装
+  it("is 函数传入函数组件时返回组件", () => {
+    const { helpers } = createCtx()
+    const FnComponent = defineComponent({
+      setup() {
+        return () => null
+      },
+    })
+    const result = helpers.is({ is: FnComponent })
+    // markRaw 包装后不完全等于原组件，但应定义
+    expect(result).toBeDefined()
+  })
+
+  // 新增覆盖测试：optionsOf 函数形式选项已在加载中
+  it("optionsOf 函数形式选项已在加载中时不重复触发", () => {
+    const options = reactive<FormOptions>({
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [],
+      group: {},
+      form: {},
+    })
+    const model = reactive<FormRecord>({})
+    const step = ref(1)
+    // 预设 loading 状态
+    const optionState = reactive<Record<string, FormAsyncOptionsState>>({
+      status: { value: [], loading: true, pending: Promise.resolve([]) },
+    })
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups: ref(new Set<string | number>()),
+      optionState,
+    })
+
+    const optionsFn = vi.fn(() => [{ label: "A", value: "a" }])
+    const item: FormItem = {
+      ...baseItemDefaults,
+      prop: "status",
+      component: { is: "el-select", options: optionsFn },
+    }
+
+    // 调用 optionsOf，由于已在 loading 状态，不应再次触发 optionsFn
+    helpers.optionsOf(item)
+    expect(optionsFn).not.toHaveBeenCalled()
+  })
+
+  // 新增覆盖测试：is 传入对象组件时返回 markRaw 包装
+  it("is 传入对象组件定义时返回组件", () => {
+    const { helpers } = createCtx()
+    const ObjComponent = defineComponent({
+      name: "TestComponent",
+      setup() {
+        return () => null
+      },
+    })
+    const result = helpers.is({ is: ObjComponent })
+    expect(result).toBeDefined()
   })
 })

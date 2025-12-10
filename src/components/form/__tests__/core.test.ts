@@ -321,5 +321,123 @@ describe("fd-form core", () => {
       await nextTick()
       expect(core.helpers.isGroupLoaded("tab2")).toBe(true)
     })
+
+    // 新增覆盖测试：tabs watch 中 activeGroupName 不在候选列表时重置为第一个
+    it("tabs 配置变更时 activeGroupName 不在候选列表中自动重置", async () => {
+      const core = useFormCore()
+      core.use({
+        group: {
+          type: "tabs",
+          children: [
+            { name: "tab1", title: "标签1" },
+            { name: "tab2", title: "标签2" },
+          ],
+        },
+      })
+
+      await nextTick()
+      expect(core.activeGroupName.value).toBe("tab1")
+
+      // 手动设置 activeGroupName 为 tab2
+      core.activeGroupName.value = "tab2"
+      await nextTick()
+      expect(core.activeGroupName.value).toBe("tab2")
+
+      // 更新 children，移除 tab2，此时 tab2 不在候选列表中
+      core.options.group!.children = [
+        { name: "tab3", title: "标签3" },
+        { name: "tab4", title: "标签4" },
+      ]
+      await nextTick()
+      // 应该重置为第一个候选 tab3
+      expect(core.activeGroupName.value).toBe("tab3")
+    })
+
+    // 新增覆盖测试：tabs 模式下 children 为空时 activeGroupName 设为 undefined
+    it("tabs 模式下 children 为空时 activeGroupName 设为 undefined", async () => {
+      const core = useFormCore()
+      core.use({
+        group: {
+          type: "tabs",
+          children: [{ name: "tab1", title: "标签1" }],
+        },
+      })
+
+      await nextTick()
+      expect(core.activeGroupName.value).toBe("tab1")
+
+      // 清空 children
+      core.options.group!.children = []
+      await nextTick()
+      expect(core.activeGroupName.value).toBeUndefined()
+    })
+
+    // 新增覆盖测试：非 tabs 类型时 activeGroupName 设为 undefined
+    it("从 tabs 切换到 steps 时 activeGroupName 设为 undefined", async () => {
+      const core = useFormCore()
+      core.use({
+        group: {
+          type: "tabs",
+          children: [{ name: "tab1", title: "标签1" }],
+        },
+      })
+
+      await nextTick()
+      expect(core.activeGroupName.value).toBe("tab1")
+
+      // 切换为 steps 模式
+      core.options.group!.type = "steps"
+      await nextTick()
+      expect(core.activeGroupName.value).toBeUndefined()
+    })
+
+    // 新增覆盖测试：steps 模式下 step 变化触发 loadedGroups 标记
+    it("steps 模式下 step 变化标记 loadedGroups", async () => {
+      const core = useFormCore()
+      core.use({
+        group: {
+          type: "steps",
+          children: [
+            { name: "step1", title: "步骤1" },
+            { name: "step2", title: "步骤2" },
+          ],
+        },
+      })
+
+      await nextTick()
+      expect(core.helpers.isGroupLoaded("step1")).toBe(true)
+      expect(core.helpers.isGroupLoaded("step2")).toBe(false)
+
+      core.step.value = 2
+      await nextTick()
+      expect(core.helpers.isGroupLoaded("step2")).toBe(true)
+    })
+
+    // 新增覆盖测试：验证失败时 next() 不递增 step
+    it("验证失败时 next() 不递增 step", async () => {
+      const core = useFormCore()
+      core.formRef.value = {
+        validate: (callback: any) => {
+          callback?.(false, { name: [{ message: "必填" }] })
+          return Promise.resolve(false)
+        },
+      } as any
+
+      core.use({
+        group: {
+          type: "steps",
+          children: [
+            { name: "step1", title: "步骤1" },
+            { name: "step2", title: "步骤2" },
+          ],
+        },
+      })
+
+      expect(core.step.value).toBe(1)
+      core.next()
+      await nextTick()
+      // 验证失败，step 不应递增
+      expect(core.step.value).toBe(1)
+    })
   })
 })

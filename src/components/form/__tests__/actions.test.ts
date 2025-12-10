@@ -254,4 +254,79 @@ describe("fd-form actions", () => {
       expect((ctx.options.grid as any)?.cols).toBe(3)
     })
   })
+
+  // 新增覆盖测试：bindFields 中传入数据覆盖默认值
+  describe("bindFields 默认值与传入数据处理", () => {
+    it("传入数据覆盖表单项的默认值", () => {
+      // 设置表单项有默认值
+      ctx.options.items = [
+        { ...baseItemDefaults, prop: "name", label: "名称", value: "默认名称", component: { is: "el-input" } },
+        { ...baseItemDefaults, prop: "status", label: "状态", value: "active", component: { is: "el-select" } },
+      ]
+      actions = useAction(ctx)
+
+      // bindFields 传入 name 字段，但不传入 status
+      actions.bindFields({ name: "覆盖的名称" })
+
+      // name 应该使用传入的值
+      expect(ctx.model.name).toBe("覆盖的名称")
+      // status 应该使用默认值
+      expect((ctx.model as any).status).toBe("active")
+    })
+
+    it("传入 undefined 不会使用默认值", () => {
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", value: "默认名称", component: { is: "el-input" } }]
+      actions = useAction(ctx)
+
+      // 传入空对象，触发默认值逻辑
+      actions.bindFields({})
+
+      // 应该使用默认值
+      expect(ctx.model.name).toBe("默认名称")
+    })
+
+    it("默认值为 undefined 时不设置到 model", () => {
+      ctx.options.items = [
+        { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }, // 无默认值
+      ]
+      actions = useAction(ctx)
+
+      actions.bindFields({})
+
+      // name 不应存在于 model 中（未设置默认值）
+      expect(ctx.model.name).toBeUndefined()
+    })
+
+    it("带 hook 的字段触发 bind 阶段钩子", () => {
+      ctx.options.items = [{ ...baseItemDefaults, prop: "tags", label: "标签", hook: "split", component: { is: "el-select" } }]
+      actions = useAction(ctx)
+
+      actions.bindFields({ tags: "a,b,c" })
+
+      // split hook 应该将字符串分割为数组
+      expect(ctx.model.tags).toEqual(["a", "b", "c"])
+    })
+  })
+
+  // 新增覆盖测试：getOptions 从配置中解析函数形式的 options
+  describe("getOptions 边缘情况", () => {
+    it("从函数形式的 options 配置获取数据", () => {
+      const optionsFn = vi.fn(() => [{ label: "A", value: "a" }])
+      ctx.options.items = [{ ...baseItemDefaults, prop: "type", label: "类型", component: { is: "el-select", options: optionsFn } }]
+      actions = useAction(ctx)
+
+      const result = actions.getOptions("type")
+      expect(optionsFn).toHaveBeenCalled()
+      expect(result).toEqual([{ label: "A", value: "a" }])
+    })
+
+    it("无 component.options 时返回状态中的值", () => {
+      ctx.options.items = [{ ...baseItemDefaults, prop: "type", label: "类型", component: { is: "el-select" } }]
+      ctx.optionState.type = { value: [{ label: "B", value: "b" }], loading: false }
+      actions = useAction(ctx)
+
+      const result = actions.getOptions("type")
+      expect(result).toEqual([{ label: "B", value: "b" }])
+    })
+  })
 })
