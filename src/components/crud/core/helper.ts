@@ -1,5 +1,5 @@
 import type Mitt from "../../../utils/mitt"
-import type { CrudRef, CrudParams, CrudOptions } from "../interface"
+import type { CrudRef, CrudParams, CrudOptions, CrudService } from "../interface"
 import { merge } from "lodash-es"
 import { isFunction } from "@fonds/utils"
 
@@ -71,8 +71,10 @@ export function createHelper({ config, crud, mitt }: HelperOptions) {
       case "service": {
         Object.assign(crud.service, value)
         Object.setPrototypeOf(crud.service, Object.getPrototypeOf(value))
+        // 使用类型守卫检查 _permission 属性
         if (value && typeof value === "object" && "_permission" in value) {
-          const permissions = (value as { _permission?: Record<string, any> })._permission
+          const serviceValue = value as CrudService
+          const permissions = serviceValue._permission
           if (permissions) {
             Object.keys(permissions).forEach((name) => {
               crud.permission[name] = permissions[name]
@@ -92,7 +94,10 @@ export function createHelper({ config, crud, mitt }: HelperOptions) {
         break
 
       default:
-        merge((crud as any)[key], value)
+        // 动态属性访问：利用 CrudRef 的索引签名 [key: string]: any
+        if (key in crud) {
+          merge(crud[key], value)
+        }
         break
     }
   }
@@ -140,7 +145,7 @@ export function createHelper({ config, crud, mitt }: HelperOptions) {
     rowAdd,
     rowEdit,
     rowAppend,
-    rowDelete: undefined as unknown as CrudRef["rowDelete"], // 由 service.ts 覆盖
+    rowDelete: async (..._selection: any[]) => { /* 由 service.ts 覆盖 */ },
     rowClose,
     getPermission,
     paramsReplace: (params: CrudParams) => paramsReplace(crud.dict, params),

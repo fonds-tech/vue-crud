@@ -190,7 +190,11 @@ export type CrudParams = Record<string, any>
 /**
  * CRUD 服务层接口
  */
-export type CrudService = Record<string, any>
+export interface CrudService {
+  /** 权限配置（由服务层注入） */
+  _permission?: Partial<Permission>
+  [key: string]: any
+}
 
 /**
  * CRUD 初始化选项 (继承 Config)
@@ -297,5 +301,61 @@ export interface CrudRef {
    * @param options 配置项
    */
   use?: (options: Partial<CrudOptions>) => void
+  [key: string]: any
+}
+
+/**
+ * CrudRef 初始化阶段类型（方法均为可选）
+ * @description 用于 context.ts 中初始化 crud 对象时的类型定义
+ */
+export interface CrudRefInit {
+  /** 当前选中的 ID */
+  id: string | number | undefined
+  /** 加载状态 */
+  loading: boolean
+  /** 当前选中的行数据 */
+  selection: any[]
+  /** 当前查询参数 */
+  params: CrudParams
+  /** 服务层实例 */
+  service: CrudService
+  /** 字典配置 */
+  dict: Dict
+  /** 权限配置 */
+  permission: Permission
+  /** 事件总线 */
+  mitt: Mitt
+  /** 完整配置项 */
+  config: CrudOptions
+  /** 代理调用 */
+  proxy?: CrudRef["proxy"]
+  /** 设置属性 */
+  set?: CrudRef["set"]
+  /** 监听事件 */
+  on?: CrudRef["on"]
+  /** 查看详情 */
+  rowInfo?: CrudRef["rowInfo"]
+  /** 打开新增弹窗 */
+  rowAdd?: CrudRef["rowAdd"]
+  /** 打开编辑弹窗 */
+  rowEdit?: CrudRef["rowEdit"]
+  /** 追加数据 */
+  rowAppend?: CrudRef["rowAppend"]
+  /** 删除数据 */
+  rowDelete?: CrudRef["rowDelete"]
+  /** 关闭弹窗/重置状态 */
+  rowClose?: CrudRef["rowClose"]
+  /** 刷新列表 */
+  refresh?: CrudRef["refresh"]
+  /** 获取权限状态 */
+  getPermission?: CrudRef["getPermission"]
+  /** 参数替换处理 */
+  paramsReplace?: CrudRef["paramsReplace"]
+  /** 获取当前参数 */
+  getParams?: CrudRef["getParams"]
+  /** 设置当前参数 */
+  setParams?: CrudRef["setParams"]
+  /** 动态应用配置 */
+  use?: CrudRef["use"]
   [key: string]: any
 }

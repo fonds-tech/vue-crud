@@ -1,6 +1,6 @@
 import type Mitt from "../../../utils/mitt"
-import type { Dict, CrudRef, Permission, CrudOptions } from "../interface"
-import { clone, merge } from "@fonds/utils"
+import type { Dict, CrudRef, Permission, CrudOptions, CrudRefInit } from "../interface"
+import { merge } from "@fonds/utils"
 import { inject, reactive } from "vue"
 
 interface ContextOptions {
@@ -53,38 +53,28 @@ export function createCrudContext({ id, dict, permission, mitt }: ContextOptions
   const injectedOptions = reactive<CrudOptions>(inject<CrudOptions>("__crud_options__", defaultConfig))
 
   // 配置对象与 CRUD 状态保持独立但可同步
-  const config = reactive<CrudOptions>(merge({}, defaultConfig, injectedOptions) as CrudOptions)
+  const config = reactive<CrudOptions>({
+    ...defaultConfig,
+    ...injectedOptions,
+    dict: { ...defaultConfig.dict, ...injectedOptions.dict },
+    permission: { ...defaultConfig.permission, ...injectedOptions.permission },
+    style: { ...defaultConfig.style, ...injectedOptions.style },
+    events: { ...defaultConfig.events, ...injectedOptions.events },
+  })
 
-  const crud = reactive<CrudRef>(
-    merge(
-      {
-        id,
-        loading: false,
-        selection: [],
-        params: { page: 1, size: 20 },
-        service: {},
-        dict: defaultConfig.dict,
-        permission: defaultConfig.permission,
-        mitt,
-        config,
-        proxy: () => {},
-        set: () => {},
-        on: () => {},
-        rowInfo: () => {},
-        rowAdd: () => {},
-        rowEdit: () => {},
-        rowAppend: () => {},
-        rowDelete: async () => {},
-        rowClose: () => {},
-        refresh: async () => ({}),
-        getPermission: () => true,
-        paramsReplace: (params: Record<string, any>) => params,
-        getParams: () => ({}),
-        setParams: () => {},
-      },
-      clone({ dict: normalizedDict, permission: normalizedPermission }),
-    ) as unknown as CrudRef,
-  )
+  // 使用 CrudRefInit 初始化，后续通过 merge 注入方法
+  const crudInit: CrudRefInit = {
+    id,
+    loading: false,
+    selection: [],
+    params: { page: 1, size: 20 },
+    service: {},
+    dict: { ...defaultConfig.dict, ...normalizedDict },
+    permission: { ...defaultConfig.permission, ...normalizedPermission },
+    mitt,
+    config,
+  }
+  const crud = reactive(crudInit) as CrudRef
 
   function useCrudOptions(useOptions: Partial<CrudOptions> = {}) {
     merge(config, useOptions)
