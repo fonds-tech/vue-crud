@@ -118,9 +118,17 @@ describe("table hooks", () => {
 
     it("未注册过事件时也应静默，仅移除 document 监听", () => {
       const freshMitt = { on: vi.fn(), off: vi.fn() }
-      unregisterEvents(freshMitt as any, handlers)
+      const freshHandlers = {
+        refresh: vi.fn(),
+        select: vi.fn(),
+        selectAll: vi.fn(),
+        clearSelection: vi.fn(),
+        toggleFullscreen: vi.fn(),
+        closeContextMenu: vi.fn(),
+      }
+      unregisterEvents(freshMitt as any, freshHandlers)
       expect(freshMitt.off).not.toHaveBeenCalled()
-      expect(removeEventListenerSpy).toHaveBeenCalledWith("click", handlers.closeContextMenu)
+      expect(removeEventListenerSpy).toHaveBeenCalledWith("click", freshHandlers.closeContextMenu)
     })
   })
 

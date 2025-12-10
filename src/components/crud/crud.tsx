@@ -1,9 +1,4 @@
-import Mitt from "../../utils/mitt"
-import { merge } from "@fonds/utils"
-import { useConfig } from "../../hooks"
-import { createHelper } from "./helper"
-import { createService } from "./service"
-import { createCrudContext } from "./context"
+import { useCrudCore } from "./core"
 import { h, provide, defineComponent, getCurrentInstance } from "vue"
 import "./style.scss"
 
@@ -17,27 +12,10 @@ export default defineComponent({
   },
   setup(props, { slots, expose }) {
     const ins = getCurrentInstance()
-    const mitt = new Mitt()
-    const { dict, permission } = useConfig()
 
-    const { crud, config, useCrudOptions } = createCrudContext({
+    const { crud, mitt } = useCrudCore({
       id: props.name || ins?.uid,
-      dict,
-      permission,
-      mitt,
     })
-
-    const helper = createHelper({ config, crud, mitt })
-    const service = createService({
-      config,
-      crud,
-      mitt,
-      paramsReplace: helper.paramsReplace,
-    })
-
-    merge(crud, helper, service)
-
-    crud.use = useCrudOptions
 
     provide("crud", crud)
     provide("mitt", mitt)

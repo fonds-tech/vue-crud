@@ -1,7 +1,7 @@
 import type { CrudRef, CrudOptions } from "../interface"
 import { reactive } from "vue"
 import { it, vi, expect, describe } from "vitest"
-import { createHelper, paramsReplace } from "../helper"
+import { createHelper, paramsReplace } from "../core/helper"
 
 function createCrud() {
   const config = reactive<CrudOptions>({

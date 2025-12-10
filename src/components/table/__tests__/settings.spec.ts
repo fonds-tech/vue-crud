@@ -20,7 +20,7 @@ describe("table settings", () => {
   describe("cache", () => {
     it("writeCache 写入缓存", () => {
       const state = createTableState({ name: "test-write" }, {}, {})
-      state.columnSettings.value = [
+      ;(state.columnSettings as any).value = [
         { id: "col1", label: "Col1", show: false, order: 0, sort: true, pinned: false },
       ]
 
@@ -54,7 +54,6 @@ describe("table settings", () => {
         clear: vi.fn(),
       } as any
       try {
-        // @ts-expect-error 模拟不可用场景
         globalThis.localStorage = brokenStorage
 
         const state = createTableState({ name: "unavailable" }, {}, {})
@@ -101,10 +100,9 @@ describe("table settings", () => {
         clear: vi.fn(),
       } as any
       try {
-        // @ts-expect-error 覆盖全局存储用于触发 writeCache 捕获分支
         globalThis.localStorage = throwingStorage
         const state = createTableState({ name: "write-cache-err" }, {}, {})
-        state.columnSettings.value = [{ id: "a", label: "A", show: true, order: 0, sort: true, pinned: false }]
+        ;(state.columnSettings as any).value = [{ id: "a", label: "A", show: true, order: 0, sort: true, pinned: false }]
         expect(() => saveColumns(state, vi.fn())).not.toThrow()
       }
       finally {
@@ -114,7 +112,7 @@ describe("table settings", () => {
 
     it("saveColumns 会触发列变更回调", () => {
       const state = createTableState({ name: "emit" }, {}, {})
-      state.visibleColumns.value = [{ id: "c1" }] as any
+      ;(state.visibleColumns as any).value = [{ id: "c1" }] as any
       const emit = vi.fn()
       saveColumns(state, emit)
       expect(emit).toHaveBeenCalledWith(state.visibleColumns.value)
@@ -192,13 +190,13 @@ describe("table settings", () => {
     it("resetColumns 会清理缓存并重建", () => {
       const state = createTableState({ name: "reset" }, {}, {})
       state.tableOptions.columns = [{ __id: "x", label: "X" }] as any
-      state.columnSettings.value = [{ id: "x", label: "X", show: false, order: 0, sort: true, pinned: false }]
+      ;(state.columnSettings as any).value = [{ id: "x", label: "X", show: false, order: 0, sort: true, pinned: false }]
       writeCache(state)
       rebuildColumnSettings(state)
       // 缓存存在
       expect(localStorage.getItem("fd-table:reset:columns")).not.toBeNull()
       // 重置
-      state.columnSettings.value[0].show = false
+      ;(state.columnSettings as any).value[0].show = false
       rebuildColumnSettings(state, false)
       expect(state.columnSettings.value[0].show).toBe(true)
     })
@@ -228,7 +226,7 @@ describe("table settings", () => {
   describe("列设置操作", () => {
     it("onColumnShowChange 更新指定列可见性", () => {
       const state = createTableState({}, {}, {})
-      state.columnSettings.value = [
+      ;(state.columnSettings as any).value = [
         { id: "a", label: "A", show: true, order: 0, sort: true, pinned: false },
         { id: "b", label: "B", show: true, order: 1, sort: true, pinned: false },
       ]
@@ -238,7 +236,7 @@ describe("table settings", () => {
 
     it("toggleAllColumns 批量切换可见性", () => {
       const state = createTableState({}, {}, {})
-      state.columnSettings.value = [
+      ;(state.columnSettings as any).value = [
         { id: "a", label: "A", show: true, order: 0, sort: true, pinned: false },
         { id: "b", label: "B", show: false, order: 1, sort: true, pinned: false },
       ]
@@ -248,7 +246,7 @@ describe("table settings", () => {
 
     it("toggleFixed 切换固定列并重新排序", () => {
       const state = createTableState({}, {}, {})
-      state.columnSettings.value = [
+      ;(state.columnSettings as any).value = [
         { id: "a", label: "A", show: true, order: 0, sort: true, pinned: false, fixed: undefined },
         { id: "b", label: "B", show: true, order: 1, sort: true, pinned: false, fixed: undefined },
       ]
@@ -260,7 +258,7 @@ describe("table settings", () => {
 
     it("syncOrderFromList 和 sortColumnSettings 维护顺序", () => {
       const state = createTableState({}, {}, {})
-      state.columnSettings.value = [
+      ;(state.columnSettings as any).value = [
         { id: "a", label: "A", show: true, order: 1, sort: true, pinned: false, fixed: "right" },
         { id: "b", label: "B", show: true, order: 0, sort: true, pinned: false, fixed: undefined },
       ]

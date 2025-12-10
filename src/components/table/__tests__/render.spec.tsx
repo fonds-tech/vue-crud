@@ -107,6 +107,7 @@ const crudBridge = {
 
 const baseScope = { row: { id: 1 }, column: { prop: "name" }, $index: 0 } as any
 const mountVNode = (vnode: any) => mount(defineComponent({ render: () => vnode }))
+const toVNodeArray = (node: any) => (Array.isArray(node) ? node : [node]).filter(Boolean)
 
 describe("table render layer", () => {
   beforeEach(() => {
@@ -119,10 +120,12 @@ describe("table render layer", () => {
     renderHelpers.getSlotName.mockReturnValue("custom")
     renderHelpers.getComponentIs.mockImplementation(component => (component as any)?.is)
 
-    const nodes = renderActionButtons(baseScope, [{ hidden: true } as any], {}, renderHelpers as any, crudBridge as any)
+    const nodes = toVNodeArray(renderActionButtons(baseScope, [{ hidden: true } as any], {}, renderHelpers as any, crudBridge as any))
     expect(nodes[0]).toBeNull()
 
-    const builtins = renderActionButtons(baseScope, [{ type: "delete" } as any], {}, renderHelpers as any, crudBridge as any)
+    const builtins = toVNodeArray(
+      renderActionButtons(baseScope, [{ type: "delete" } as any], {}, renderHelpers as any, crudBridge as any),
+    )
     builtins[0]?.props?.onClick?.()
     expect(crudBridge.rowDelete).toHaveBeenCalledWith(baseScope.row)
 
@@ -134,12 +137,14 @@ describe("table render layer", () => {
     renderHelpers.getComponentEvents.mockReturnValueOnce({ onClick: vi.fn() })
     renderHelpers.getComponentSlots.mockReturnValueOnce({ default: "content", extra: undefined })
 
-    const dynamic = renderActionButtons(
-      baseScope,
-      [{ component: { is: "button" } } as any],
-      {},
-      renderHelpers as any,
-      crudBridge as any,
+    const dynamic = toVNodeArray(
+      renderActionButtons(
+        baseScope,
+        [{ component: { is: "button" } } as any],
+        {},
+        renderHelpers as any,
+        crudBridge as any,
+      ),
     )
     expect(dynamic[0]?.type).toBe("button")
     expect(renderHelpers.getComponentSlots).toHaveBeenCalled()
@@ -181,20 +186,26 @@ describe("table render layer", () => {
     expect(actionColumn?.props?.width).toBe(120)
     expect(actionColumn?.props?.fixed).toBe("right")
     expect(actionColumn?.props?.align).toBe("center")
-    const dictColumn = columns.find(col => (col as any).props?.prop === "status")
-    const dictVNode = dictColumn?.children?.default?.(baseScope as any)
+    const dictColumn = columns.find(col => (col as any).props?.prop === "status") as any
+    const dictChildren = dictColumn?.children as any
+    const dictVNode = dictChildren?.default?.(baseScope as any)
     expect(dictVNode?.props?.type).toBe("success")
-    const slotColumn = columns.find(col => (col as any).props?.prop === "slot")
-    expect(slotColumn?.children?.default?.(baseScope as any)).toBe("cell-slot")
-    const dynColumn = columns.find(col => (col as any).props?.prop === "dyn")
-    expect(dynColumn?.children?.default?.(baseScope as any)?.type).toBe("DynComp")
-    const headerColumn = columns.find(col => (col as any).props?.prop === "header")
-    const headerVNode = headerColumn?.children?.header?.()
+    const slotColumn = columns.find(col => (col as any).props?.prop === "slot") as any
+    const slotChildren = slotColumn?.children as any
+    expect(slotChildren?.default?.(baseScope as any)).toBe("cell-slot")
+    const dynColumn = columns.find(col => (col as any).props?.prop === "dyn") as any
+    const dynChildren = dynColumn?.children as any
+    expect(dynChildren?.default?.(baseScope as any)?.type).toBe("DynComp")
+    const headerColumn = columns.find(col => (col as any).props?.prop === "header") as any
+    const headerChildren = headerColumn?.children as any
+    const headerVNode = headerChildren?.header?.()
     expect(headerVNode?.type).toBe("HeaderComp")
-    const expandColumn = columns.find(col => (col as any).props?.type === "expand")
-    expect(expandColumn?.children?.default?.(baseScope as any)).toBe("expand-slot")
-    const textColumn = columns.find(col => (col as any).props?.prop === "text")
-    textColumn?.children?.default?.(baseScope as any)
+    const expandColumn = columns.find(col => (col as any).props?.type === "expand") as any
+    const expandChildren = expandColumn?.children as any
+    expect(expandChildren?.default?.(baseScope as any)).toBe("expand-slot")
+    const textColumn = columns.find(col => (col as any).props?.prop === "text") as any
+    const textChildren = textColumn?.children as any
+    textChildren?.default?.(baseScope as any)
     expect(renderHelpers.formatCell).toHaveBeenCalled()
   })
 
@@ -205,9 +216,9 @@ describe("table render layer", () => {
       handlers,
     } as unknown as TableCore
     const vnode = renderContextMenu(engine)
-    const menuVNode = (vnode.children as any).default?.()
+    const menuVNode = (vnode.children as any)?.default?.()
     expect(menuVNode?.children?.length).toBeGreaterThan(0)
-    menuVNode.children[0].props.onClick()
+    menuVNode.children?.[0]?.props?.onClick?.()
     expect(handlers.handleContextAction).toHaveBeenCalled()
   })
 
@@ -223,12 +234,13 @@ describe("table render layer", () => {
       onPageSizeChange: onSizeChange,
     })
     const wrapper = mountVNode(vnode as any)
-    const paginationVNode = (wrapper.vm.$.subTree.children as any[])[1]
-    paginationVNode.props.onCurrentChange(3)
-    paginationVNode.props.onSizeChange(20)
+    const subTreeChildren = wrapper.vm.$.subTree.children as any[] | undefined
+    const paginationVNode = subTreeChildren?.[1]
+    paginationVNode?.props?.onCurrentChange?.(3)
+    paginationVNode?.props?.onSizeChange?.(20)
     expect(onPageChange).toHaveBeenCalledWith(3)
     expect(onSizeChange).toHaveBeenCalledWith(20)
-    expect(vnode.children[0].children[0]).not.toBeNull()
+    expect((vnode.children as any)?.[0]?.children?.[0]).not.toBeNull()
     wrapper.unmount()
   })
 
@@ -257,12 +269,12 @@ describe("table render layer", () => {
       saveColumns,
     })
 
-    const panel = (vnode.children as any).default?.()
+    const panel = (vnode.children as any)?.default?.()
     const panelChildren = Array.isArray(panel?.children) ? panel.children : []
-    const header = panelChildren[0]
-    header.children[0].props.onChange(true)
+    const header = panelChildren[0] as any
+    header.children?.[0]?.props?.onChange(true)
     expect(toggleAllColumns).toHaveBeenCalledWith(true)
-    header.children[1].props.onClick()
+    header.children?.[1]?.props?.onClick?.()
     expect(resetColumns).toHaveBeenCalled()
 
     const scrollVNode = panelChildren[1] as any
@@ -275,16 +287,16 @@ describe("table render layer", () => {
     expect(state.columnSettings.value[0].id).toBe("b")
 
     const itemVNode = (draggableVNode?.children as any)?.item?.({ element: state.columnSettings.value[0] })
-    const itemRow = itemVNode.children[0]
-    itemRow.children[1].props.onChange(false)
+    const itemRow = itemVNode.children?.[0]
+    itemRow.children?.[1]?.props?.onChange(false)
     expect(onColumnShowChange).toHaveBeenCalledWith("b", false)
-    itemRow.children[3].children[0].props.onClick()
+    itemRow.children?.[3]?.children?.[0]?.props?.onClick?.()
     expect(toggleFixed).toHaveBeenCalledWith("b", "left")
-    itemRow.children[3].children[1].props.onClick()
+    itemRow.children?.[3]?.children?.[1]?.props?.onClick?.()
     expect(toggleFixed).toHaveBeenCalledWith("b", "right")
 
-    const footerBtn = panel.children[2].children[0]
-    footerBtn.props.onClick()
+    const footerBtn = (panel as any)?.children?.[2]?.children?.[0]
+    footerBtn?.props?.onClick?.()
     expect(saveColumns).toHaveBeenCalled()
     expect(ElMessageSuccess).toHaveBeenCalled()
   })
@@ -310,17 +322,18 @@ describe("table render layer", () => {
       isFullscreen: false,
     })
     const wrapper = mountVNode(toolbarVNode as any)
-    const tools = (wrapper.vm.$.subTree.children as any[]).find(node => String(node?.props?.class).includes("fd-table__tools"))
+    const subTreeChildren = wrapper.vm.$.subTree.children as any[] | undefined
+    const tools = subTreeChildren?.find(node => String(node?.props?.class).includes("fd-table__tools"))
     expect(tools).toBeTruthy()
     const buttons = wrapper.findAll(".fd-table__tool-btn")
     await buttons[0].trigger("click")
-    const dropdown = (tools?.children as any[]).find((child: any) => child?.props?.onCommand)
-    dropdown.props.onCommand("large")
+    const dropdown = (tools?.children as any[])?.find((child: any) => child?.props?.onCommand)
+    dropdown?.props?.onCommand?.("large")
     await buttons[buttons.length - 1].trigger("click")
     expect(onRefresh).toHaveBeenCalled()
     expect(onSizeChange).toHaveBeenCalledWith("large")
     expect(onToggleFullscreen).toHaveBeenCalled()
-    expect(tools.children[2].props.class).toBe("column-settings")
+    expect((tools?.children as any[])?.[2]?.props?.class).toBe("column-settings")
     wrapper.unmount()
   })
 
@@ -380,24 +393,25 @@ describe("table render layer", () => {
 
     const vnode = renderTable({ engine, slots: {} as any })
     const wrapper = mountVNode(vnode as any)
-    const tableVNode = (wrapper.vm.$.subTree.children as any[])[2].children[0]
-    const tableProps = tableVNode.props
-    tableProps.onSelectionChange?.(["row1"])
+    const subTreeChildren = wrapper.vm.$.subTree.children as any[] | undefined
+    const tableVNode = subTreeChildren?.[2]?.children?.[0] as any
+    const tableProps = tableVNode?.props
+    tableProps?.onSelectionChange?.(["row1"])
     expect(handlers.onSelectionChange).toHaveBeenCalledWith(["row1"])
     expect(emit).toHaveBeenCalledWith("selection-change", ["row1"])
 
-    tableProps.onRowContextmenu?.({ id: 1 }, {}, { preventDefault: vi.fn() } as any)
+    tableProps?.onRowContextmenu?.({ id: 1 }, {}, { preventDefault: vi.fn() } as any)
     expect(handlers.onCellContextmenu).toHaveBeenCalled()
 
-    const footerVNode = (wrapper.vm.$.subTree.children as any[])[3].children[1]
-    footerVNode.props.onCurrentChange?.(2)
-    footerVNode.props.onSizeChange?.(30)
+    const footerVNode = subTreeChildren?.[3]?.children?.[1] as any
+    footerVNode?.props?.onCurrentChange?.(2)
+    footerVNode?.props?.onSizeChange?.(30)
     expect(handlers.onPageChange).toHaveBeenCalledWith(2)
     expect(handlers.onPageSizeChange).toHaveBeenCalledWith(30)
 
-    expect(vnode.children[0].props.class).toContain("fd-table")
-    expect(vnode.children[0].props.class).not.toContain("is-fullscreen")
-    expect(tableVNode.children).toBeDefined()
+    expect((vnode.children as any)?.[0]?.props?.class).toContain("fd-table")
+    expect((vnode.children as any)?.[0]?.props?.class).not.toContain("is-fullscreen")
+    expect(tableVNode?.children).toBeDefined()
     wrapper.unmount()
   })
 
@@ -459,14 +473,15 @@ describe("table render layer", () => {
     const slots = { extra: vi.fn().mockReturnValue("extra-slot") } as any
     const vnode = renderTable({ engine, slots })
     const wrapper = mountVNode(vnode as any)
-    const rootDiv = wrapper.vm.$.subTree
-    expect(rootDiv.props.class).toContain("is-fullscreen")
-    const tableVNode = (wrapper.vm.$.subTree.children as any[])[2].children[0]
+    const rootDiv = wrapper.vm.$.subTree as any
+    expect(rootDiv.props?.class ?? "").toContain("is-fullscreen")
+    const subTreeChildren = rootDiv.children as any[] | undefined
+    const tableVNode = subTreeChildren?.[2]?.children?.[0]
     expect(tableVNode).toBeTruthy()
-    const tableProps = tableVNode.props
-    tableProps.onCellContextmenu?.({ id: 1 }, {}, { preventDefault: vi.fn() } as any)
+    const tableProps = (tableVNode as any)?.props
+    tableProps?.onCellContextmenu?.({ id: 1 }, {}, { preventDefault: vi.fn() } as any)
     expect(emit).toHaveBeenCalledWith("cell-contextmenu", { id: 1 }, {}, expect.anything())
-    tableProps.onHeaderClick?.("col", "evt")
+    tableProps?.onHeaderClick?.("col", "evt")
     expect(emit).toHaveBeenCalledWith("header-click", "col", "evt")
     wrapper.unmount()
   })

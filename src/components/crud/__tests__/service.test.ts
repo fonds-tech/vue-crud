@@ -1,7 +1,7 @@
 import type { CrudRef, CrudOptions } from "../interface"
 import { reactive } from "vue"
-import { createHelper } from "../helper"
-import { createService } from "../service"
+import { createHelper } from "../core/helper"
+import { createService } from "../core/service"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
 const { elMessageWarning, elMessageError, elMessageSuccess, elMessageBox } = vi.hoisted(() => {

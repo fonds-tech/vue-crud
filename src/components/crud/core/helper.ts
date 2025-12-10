@@ -1,5 +1,5 @@
-import type Mitt from "../../utils/mitt"
-import type { CrudRef, CrudParams, CrudOptions } from "./interface"
+import type Mitt from "../../../utils/mitt"
+import type { CrudRef, CrudParams, CrudOptions } from "../interface"
 import { merge } from "lodash-es"
 import { isFunction } from "@fonds/utils"
 
