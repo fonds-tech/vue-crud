@@ -1,6 +1,5 @@
 import type { TableSize } from "../core/state"
 import type { Slots, VNodeChild } from "vue"
-import { h } from "vue"
 import { Operation, FullScreen, Refresh as RefreshIcon } from "@element-plus/icons-vue"
 import { ElIcon, ElTooltip, ElDropdown, ElDropdownItem, ElDropdownMenu } from "element-plus"
 
@@ -32,6 +31,68 @@ interface ToolbarProps {
 }
 
 /**
+ * 渲染刷新按钮
+ */
+function renderRefreshButton(onRefresh: () => void) {
+  return (
+    <ElTooltip content="刷新" placement="top">
+      <div class="fd-table__tool-btn" role="button" tabindex={0} onClick={() => onRefresh()}>
+        <ElIcon>
+          <RefreshIcon />
+        </ElIcon>
+      </div>
+    </ElTooltip>
+  )
+}
+
+/**
+ * 渲染尺寸选择下拉菜单
+ */
+function renderSizeDropdown(props: ToolbarProps) {
+  return (
+    <ElDropdown trigger="click" onCommand={(size: TableSize) => props.onSizeChange(size)}>
+      {{
+        default: () => (
+          <span class="fd-table__tool-trigger">
+            <ElTooltip content="尺寸" placement="top">
+              <div class="fd-table__tool-btn" role="button" tabindex={0}>
+                <ElIcon>
+                  <Operation />
+                </ElIcon>
+              </div>
+            </ElTooltip>
+          </span>
+        ),
+        dropdown: () => (
+          <ElDropdownMenu>
+            {props.sizeOptions.map(size => (
+              <ElDropdownItem key={size.value} command={size.value} class={{ "is-active": size.value === props.currentSize }}>
+                {size.label}
+              </ElDropdownItem>
+            ))}
+          </ElDropdownMenu>
+        ),
+      }}
+    </ElDropdown>
+  )
+}
+
+/**
+ * 渲染全屏按钮
+ */
+function renderFullscreenButton(onToggle: () => void) {
+  return (
+    <ElTooltip content="全屏" placement="top">
+      <div class="fd-table__tool-btn" role="button" tabindex={0} onClick={() => onToggle()}>
+        <ElIcon>
+          <FullScreen />
+        </ElIcon>
+      </div>
+    </ElTooltip>
+  )
+}
+
+/**
  * 表格工具栏组件的渲染函数。
  * 根据 `show` 控制是否显示，同时提供刷新、尺寸切换、列设置与全屏等操作入口。
  *
@@ -41,55 +102,19 @@ interface ToolbarProps {
 export function TableToolbar(props: ToolbarProps) {
   // show 为 false 时直接返回 null，避免渲染空容器
   if (!props.show) return null
+
   // 工具区：左侧透传自定义 toolbar 插槽，右侧提供刷新/尺寸/列设置/全屏四个入口
-  return h("div", { class: "fd-table__toolbar" }, [
-    props.slots.toolbar?.(),
-    props.toolsEnabled
-      ? h("div", { class: "fd-table__tools" }, [
-          h(ElTooltip, { content: "刷新", placement: "top" }, () =>
-            h(
-              "div",
-              { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onRefresh() },
-              h(ElIcon, null, () => h(RefreshIcon)),
-            )),
-          h(
-            ElDropdown,
-            { trigger: "click", onCommand: (size: TableSize) => props.onSizeChange(size) },
-            {
-              default: () =>
-                h(
-                  "span",
-                  { class: "fd-table__tool-trigger" },
-                  h(ElTooltip, { content: "尺寸", placement: "top" }, () =>
-                    h(
-                      "div",
-                      { class: "fd-table__tool-btn", role: "button", tabindex: 0 },
-                      h(ElIcon, null, () => h(Operation)),
-                    )),
-                ),
-              dropdown: () =>
-                h(ElDropdownMenu, null, () =>
-                  props.sizeOptions.map(size =>
-                    h(
-                      ElDropdownItem,
-                      {
-                        key: size.value,
-                        command: size.value,
-                        class: { "is-active": size.value === props.currentSize },
-                      },
-                      () => size.label,
-                    ),
-                  )),
-            },
-          ),
-          props.columnSettings,
-          h(ElTooltip, { content: "全屏", placement: "top" }, () =>
-            h(
-              "div",
-              { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onToggleFullscreen() },
-              h(ElIcon, null, () => h(FullScreen)),
-            )),
-        ])
-      : null,
-  ])
+  return (
+    <div class="fd-table__toolbar">
+      {props.slots.toolbar?.()}
+      {props.toolsEnabled && (
+        <div class="fd-table__tools">
+          {renderRefreshButton(props.onRefresh)}
+          {renderSizeDropdown(props)}
+          {props.columnSettings}
+          {renderFullscreenButton(props.onToggleFullscreen)}
+        </div>
+      )}
+    </div>
+  )
 }

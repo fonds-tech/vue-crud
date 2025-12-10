@@ -1,4 +1,3 @@
-import { h } from "vue"
 import { ElPagination } from "element-plus"
 
 /**
@@ -26,15 +25,16 @@ interface PaginationProps {
  */
 export function TableFooter(props: PaginationProps) {
   // 左侧显示当前选择条数与分页范围，右侧复用 Element Plus 分页器，事件回调向上抛出
-  return h("div", { class: "fd-table__footer" }, [
-    h("div", { class: "fd-table__tips" }, [
-      props.selectedCount > 0 ? h("span", null, `已选择 ${props.selectedCount} 条`) : null,
-      h("span", null, `第 ${props.paginationStart}-${props.paginationEnd} 条`),
-    ]),
-    h(ElPagination, {
-      ...props.paginationProps,
-      onCurrentChange: (page: number) => props.onPageChange(page),
-      onSizeChange: (size: number) => props.onPageSizeChange(size),
-    }),
-  ])
+  const selectedTip = props.selectedCount > 0 ? `已选择 ${props.selectedCount} 条` : null
+  const rangeTip = `第 ${props.paginationStart}-${props.paginationEnd} 条`
+
+  return (
+    <div class="fd-table__footer">
+      <div class="fd-table__tips">
+        {selectedTip && <span>{selectedTip}</span>}
+        <span>{rangeTip}</span>
+      </div>
+      <ElPagination {...props.paginationProps} onCurrent-change={(page: number) => props.onPageChange(page)} onSize-change={(size: number) => props.onPageSizeChange(size)} />
+    </div>
+  )
 }

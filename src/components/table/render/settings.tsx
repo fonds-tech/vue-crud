@@ -15,7 +15,9 @@ function renderTriggerButton(): VNode {
     <span class="fd-table__tool-trigger">
       <ElTooltip content="列设置" placement="top">
         <div class="fd-table__tool-btn" role="button" tabindex={0}>
-          <ElIcon><Setting /></ElIcon>
+          <ElIcon>
+            <Setting />
+          </ElIcon>
         </div>
       </ElTooltip>
     </span>
@@ -46,42 +48,28 @@ function renderPanelHeader(props: ColumnSettingsPanelProps): VNode {
  * 渲染单个列设置项
  */
 function renderColumnItem(element: ColumnSetting, props: ColumnSettingsPanelProps): VNode {
-  const itemClass = [
-    "fd-table__column-item",
-    { "is-locked": element.pinned, "is-disabled": !element.sort },
-  ]
+  const itemClass = ["fd-table__column-item", { "is-locked": element.pinned, "is-disabled": !element.sort }]
   const dragClass = ["fd-table__drag", { "is-disabled": !element.sort }]
 
   return (
     <div class="fd-table__column-wrapper">
       <div class={itemClass}>
         {/* 拖拽手柄 */}
-        <span class={dragClass} aria-hidden="true">⋮⋮</span>
+        <span class={dragClass} aria-hidden="true">
+          ⋮⋮
+        </span>
         {/* 显示/隐藏复选框 */}
-        <ElCheckbox
-          modelValue={element.show}
-          onChange={(val: unknown) => props.onColumnShowChange(element.id, Boolean(val))}
-        />
+        <ElCheckbox modelValue={element.show} onChange={(val: unknown) => props.onColumnShowChange(element.id, Boolean(val))} />
         {/* 列标签 */}
         <span class="fd-table__column-label">{element.label}</span>
         {/* 固定列操作按钮 */}
         <div class="fd-table__fixed-actions">
-          <ElButton
-            link
-            size="small"
-            class={{ "is-active": element.fixed === "left" }}
-            onClick={() => props.toggleFixed(element.id, "left")}
-          >
+          <ElButton link size="small" class={{ "is-active": element.fixed === "left" }} onClick={() => props.toggleFixed(element.id, "left")}>
             <ElIcon class="fd-table__pin-icon fd-table__icon-rotate-left">
               <IconTablerPinFilled />
             </ElIcon>
           </ElButton>
-          <ElButton
-            link
-            size="small"
-            class={{ "is-active": element.fixed === "right" }}
-            onClick={() => props.toggleFixed(element.id, "right")}
-          >
+          <ElButton link size="small" class={{ "is-active": element.fixed === "right" }} onClick={() => props.toggleFixed(element.id, "right")}>
             <ElIcon class="fd-table__pin-icon fd-table__icon-rotate-right">
               <IconTablerPinFilled />
             </ElIcon>
@@ -160,14 +148,7 @@ function renderPanelContent(props: ColumnSettingsPanelProps): VNode {
  */
 export function ColumnSettings(props: ColumnSettingsPanelProps): VNode {
   return (
-    <ElPopover
-      width="220px"
-      placement="bottom-start"
-      trigger="click"
-      teleported={false}
-      hide-after={0}
-      popperClass="fd-table__column-popover"
-    >
+    <ElPopover width="220px" placement="bottom-start" trigger="click" teleported={false} hide-after={0} popperClass="fd-table__column-popover">
       {{
         reference: () => renderTriggerButton(),
         default: () => renderPanelContent(props),
