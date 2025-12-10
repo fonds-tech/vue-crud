@@ -1,8 +1,9 @@
 import { createTableState } from "../core/state"
-import { it, expect, describe, beforeEach } from "vitest"
+import { it, vi, expect, describe, beforeEach } from "vitest"
 import {
   onDragMove,
   writeCache,
+  saveColumns,
   toggleFixed,
   toggleAllColumns,
   syncOrderFromList,
@@ -27,6 +28,96 @@ describe("table settings", () => {
 
       const saved = JSON.parse(localStorage.getItem("fd-table:test-write:columns") || "{}")
       expect(saved.columns.col1.show).toBe(false)
+    })
+
+    it("无效的缓存结构会被清理并回退默认值", () => {
+      localStorage.setItem("fd-table:bad:columns", JSON.stringify({ version: 123 }))
+      const state = createTableState({ name: "bad" }, {}, {})
+      state.tableOptions.columns = [{ __id: "x", label: "X" }] as any
+
+      rebuildColumnSettings(state)
+
+      expect(localStorage.getItem("fd-table:bad:columns")).toBeNull()
+      expect(state.columnSettings.value[0].show).toBe(true)
+    })
+
+    it("localStorage 不可用时应安全跳过缓存", () => {
+      const original = globalThis.localStorage
+      const brokenStorage = {
+        setItem: () => {
+          throw new Error("forbidden")
+        },
+        getItem: () => {
+          throw new Error("forbidden")
+        },
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      } as any
+      try {
+        // @ts-expect-error 模拟不可用场景
+        globalThis.localStorage = brokenStorage
+
+        const state = createTableState({ name: "unavailable" }, {}, {})
+        state.tableOptions.columns = [{ __id: "a", label: "A" }] as any
+        expect(() => rebuildColumnSettings(state)).not.toThrow()
+        expect(state.columnSettings.value[0].id).toBe("a")
+        expect(() => saveColumns(state, vi.fn())).not.toThrow()
+      }
+      finally {
+        globalThis.localStorage = original
+      }
+    })
+
+    it("缓存版本不匹配时返回 undefined 但不删除缓存", () => {
+      const cacheKey = "fd-table:version-mismatch:columns"
+      const cacheData = {
+        version: "old-version",
+        order: ["a"],
+        columns: { a: { show: false } },
+      }
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData))
+      const state = createTableState({ name: "version-mismatch" }, {}, {})
+      state.tableOptions.columns = [{ __id: "a", label: "A" }] as any
+
+      rebuildColumnSettings(state)
+
+      expect(state.columnSettings.value[0].show).toBe(true)
+      expect(localStorage.getItem(cacheKey)).not.toBeNull()
+    })
+
+    it("writeCache 在存储异常时不会抛错", () => {
+      const original = globalThis.localStorage
+      const storageData: Record<string, string> = {}
+      const throwingStorage = {
+        setItem: (key: string, value: string) => {
+          if (key === "__fd_table_test__") {
+            storageData[key] = value
+            return
+          }
+          throw new Error("quota exceeded")
+        },
+        getItem: (key: string) => storageData[key],
+        removeItem: (key: string) => delete storageData[key],
+        clear: vi.fn(),
+      } as any
+      try {
+        // @ts-expect-error 覆盖全局存储用于触发 writeCache 捕获分支
+        globalThis.localStorage = throwingStorage
+        const state = createTableState({ name: "write-cache-err" }, {}, {})
+        state.columnSettings.value = [{ id: "a", label: "A", show: true, order: 0, sort: true, pinned: false }]
+        expect(() => saveColumns(state, vi.fn())).not.toThrow()
+      }
+      finally {
+        globalThis.localStorage = original
+      }
+    })
+
+    it("saveColumns 会触发列变更回调", () => {
+      const state = createTableState({ name: "emit" }, {}, {})
+      state.visibleColumns.value = [{ id: "c1" }] as any
+      const emit = vi.fn()
+      saveColumns(state, emit)
+      expect(emit).toHaveBeenCalledWith(state.visibleColumns.value)
     })
   })
 

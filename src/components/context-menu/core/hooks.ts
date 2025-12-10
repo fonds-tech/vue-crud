@@ -1,6 +1,6 @@
 import type { ContextMenuItem, ContextMenuOptions } from "../types"
 import { useRefs } from "@/hooks"
-import { ref, watch, reactive, onBeforeUnmount } from "vue"
+import { ref, watch, nextTick, reactive, onBeforeUnmount } from "vue"
 import {
   markTarget,
   positionMenu,
@@ -80,12 +80,17 @@ export function useContextMenuCore(props: {
     }
 
     const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
-    const menuElement = refs["fd-context-menu"]
 
-    cleanup()
-    registerOutsideClose(doc, menuElement, close, cleanupFns)
-    markTarget(event, options.hover ?? props.options?.hover, hoverTarget, hoverClassName)
-    positionMenu(event, menuElement, style)
+    nextTick(() => {
+      if (!visible.value) return
+
+      const menuElement = refs["fd-context-menu"]
+
+      cleanup()
+      registerOutsideClose(doc, menuElement, close, cleanupFns)
+      markTarget(event, options.hover ?? props.options?.hover, hoverTarget, hoverClassName)
+      positionMenu(event, menuElement, style)
+    })
 
     return { close }
   }

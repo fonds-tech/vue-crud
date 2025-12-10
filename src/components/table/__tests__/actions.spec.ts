@@ -43,6 +43,17 @@ describe("buildContextMenuItems", () => {
     expect(items.map(i => i.label)).toEqual(["刷新", "Detail", "Update", "Delete"])
   })
 
+  it("action 文本缺省时应回退到 crud 字典并触发执行", () => {
+    const columns = [{
+      type: "action",
+      actions: [{ type: "detail" }],
+    }] as any
+    const items = buildContextMenuItems(scope, columns, crud, refresh)
+    expect(items[1].label).toBe("Detail")
+    items[1].action()
+    expect(crud.rowInfo).toHaveBeenCalledWith(scope.row)
+  })
+
   it("处理 action 的 hidden 属性", () => {
     const columns = [{
       type: "action",

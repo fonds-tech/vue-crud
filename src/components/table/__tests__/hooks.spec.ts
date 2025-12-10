@@ -63,15 +63,25 @@ describe("table hooks", () => {
 
     it("normalizeRowKey 能处理数组、单值与非法输入", () => {
       registerEvents(mitt, handlers)
-      const bound = mitt.on.mock.calls.find(call => call[0] === "table.select")?.[1] as any
+      const bound = mitt.on.mock.calls.find((call: any[]) => call[0] === "table.select")?.[1] as any
       bound?.([1, 2, "a"], true)
       bound?.(123, false)
       bound?.({ not: "valid" }, true)
       expect(handlers.select).toHaveBeenCalledWith([1, 2, "a"], true)
       expect(handlers.select).toHaveBeenCalledWith(123, false)
       // 非法输入转为 undefined
-      const invalidCall = handlers.select.mock.calls.find(call => call[0] === undefined)
+      const invalidCall = (handlers.select as any).mock.calls.find((call: any[]) => call[0] === undefined)
       expect(invalidCall).toBeDefined()
+    })
+
+    it("selectAll/toggleFullscreen 参数非布尔时会被归一化为 undefined", () => {
+      registerEvents(mitt, handlers)
+      const selectAllHandler = mitt.on.mock.calls.find((call: any[]) => call[0] === "table.selectAll")?.[1] as any
+      const toggleHandler = mitt.on.mock.calls.find((call: any[]) => call[0] === "table.toggleFullscreen")?.[1] as any
+      selectAllHandler?.("not-bool")
+      toggleHandler?.("yes")
+      expect(handlers.selectAll).toHaveBeenCalledWith(undefined)
+      expect(handlers.toggleFullscreen).toHaveBeenCalledWith(undefined)
     })
   })
 
@@ -103,6 +113,13 @@ describe("table hooks", () => {
     it("mitt 不存在时也应该移除 document 监听器", () => {
       unregisterEvents(undefined, handlers)
 
+      expect(removeEventListenerSpy).toHaveBeenCalledWith("click", handlers.closeContextMenu)
+    })
+
+    it("未注册过事件时也应静默，仅移除 document 监听", () => {
+      const freshMitt = { on: vi.fn(), off: vi.fn() }
+      unregisterEvents(freshMitt as any, handlers)
+      expect(freshMitt.off).not.toHaveBeenCalled()
       expect(removeEventListenerSpy).toHaveBeenCalledWith("click", handlers.closeContextMenu)
     })
   })
