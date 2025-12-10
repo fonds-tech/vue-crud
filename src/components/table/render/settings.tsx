@@ -1,7 +1,3 @@
-/**
- * @fileoverview 列设置面板渲染组件
- * 负责 ColumnSettingsPanel 的 UI 渲染
- */
 import type { VNode } from "vue"
 import type { ColumnSetting } from "../core/state"
 import type { DragMoveEvent, ColumnSettingsPanelProps } from "../core/settings"
@@ -17,7 +13,7 @@ import { ElIcon, ElButton, ElMessage, ElPopover, ElTooltip, ElCheckbox, ElScroll
  * @param props - 面板的属性
  * @returns 代表列设置面板的 VNode
  */
-export function ColumnSettingsPanel(props: ColumnSettingsPanelProps): VNode {
+export function ColumnSettings(props: ColumnSettingsPanelProps): VNode {
   const { state } = props
   return h(
     ElPopover,

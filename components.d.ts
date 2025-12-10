@@ -16,6 +16,7 @@ declare module 'vue' {
     Import: typeof import('./src/components/import/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SettingsPanel: typeof import('./src/components/table/render/settings-panel.vue')['default']
   }
 }
 
@@ -25,4 +26,5 @@ declare global {
   const Import: typeof import('./src/components/import/index.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
+  const SettingsPanel: typeof import('./src/components/table/render/settings-panel.vue')['default']
 }

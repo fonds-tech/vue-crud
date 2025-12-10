@@ -5,10 +5,10 @@ import type { Slots, VNode, Directive, CSSProperties } from "vue"
 import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { renderColumns } from "./columns"
+import { ColumnSettings } from "./settings"
 import { renderContextMenu } from "./context-menu"
 import { h, withDirectives } from "vue"
 import { ElTable, ElLoading } from "element-plus"
-import { ColumnSettingsPanel } from "./settings-panel"
 import { onDragEnd, onDragMove, saveColumns, toggleFixed, resetColumns, toggleAllColumns, onColumnShowChange } from "../core/settings"
 
 // Element Plus Table 支持的事件列表（按官方文档枚举，用于动态生成事件监听器）
@@ -112,7 +112,7 @@ export function renderTable(params: RenderTableParams): VNode {
     [[loadingDirective, isLoading.value]],
   )
 
-  const columnSettingsNode = ColumnSettingsPanel({
+  const columnSettingsNode = ColumnSettings({
     state,
     onColumnShowChange: (id, val) => onColumnShowChange(state, id, val),
     toggleAllColumns: val => toggleAllColumns(state, val),

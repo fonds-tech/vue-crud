@@ -5,10 +5,10 @@ import { TableFooter } from "../render/pagination"
 import { renderTable } from "../render/table"
 import { TableToolbar } from "../render/toolbar"
 import { renderColumns } from "../render/columns"
+import { ColumnSettings } from "../render/settings"
 import { renderContextMenu } from "../render/context-menu"
 import { h, defineComponent } from "vue"
 import { renderActionButtons } from "../render/actions"
-import { ColumnSettingsPanel } from "../render/settings-panel"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
 // 统一 mock Element Plus 组件与指令，记录渲染入参便于断言（使用全局存储避免 hoist 引发的 TDZ）
@@ -248,7 +248,7 @@ describe("table render layer", () => {
       columnSettings: { value: [{ id: "a", label: "A", show: true, sort: true }] },
     }
 
-    const vnode = ColumnSettingsPanel({
+    const vnode = ColumnSettings({
       state,
       toggleAllColumns,
       resetColumns,
