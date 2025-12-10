@@ -1,7 +1,8 @@
 import type { FormAsyncOptionsState } from "../types"
-import { reactive } from "vue"
-import { syncOptions, ensureOptionState } from "../core/options"
+import { createHelpers } from "../core"
+import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe, afterEach, beforeEach } from "vitest"
+import { syncOptions, mergeFormOptions, ensureOptionState, createInitialOptions } from "../core/options"
 
 describe("fd-form options 异步加载", () => {
   let optionState: Record<string, FormAsyncOptionsState>
@@ -101,5 +102,114 @@ describe("fd-form options 异步加载", () => {
       await vi.runAllTimersAsync()
       expect(optionState.race?.value).toEqual([2]) // 仍然是快请求的结果
     })
+  })
+})
+
+describe("fd-form mergeFormOptions", () => {
+  function createMergeContext() {
+    const options = reactive(createInitialOptions())
+    const model = reactive<Record<string, unknown>>({})
+    const step = ref(1)
+    const loadedGroups = ref(new Set<string | number>())
+    const optState = reactive<Record<string, FormAsyncOptionsState>>({})
+    const helpers = createHelpers({
+      options,
+      model,
+      resolvedActiveGroup: computed(() => undefined),
+      step,
+      loadedGroups,
+      optionState: optState,
+    })
+    return { options, model, step, helpers }
+  }
+
+  it("合并 key 配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, { key: 123 })
+    expect(ctx.options.key).toBe(123)
+  })
+
+  it("合并 mode 配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, { mode: "update" })
+    expect(ctx.options.mode).toBe("update")
+  })
+
+  it("合并 form 配置（深度合并）", () => {
+    const ctx = createMergeContext()
+    ctx.options.form = { labelWidth: "100px", scrollToError: true }
+    mergeFormOptions(ctx, { form: { labelWidth: "150px" } })
+    expect(ctx.options.form?.labelWidth).toBe("150px")
+    expect(ctx.options.form?.scrollToError).toBe(true)
+  })
+
+  it("合并 grid 配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, { grid: { cols: 3, colGap: 16 } })
+    expect(ctx.options.grid?.cols).toBe(3)
+    expect(ctx.options.grid?.colGap).toBe(16)
+  })
+
+  it("合并 group 配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, {
+      group: { type: "tabs", children: [{ name: "tab1" }] },
+    })
+    expect(ctx.options.group?.type).toBe("tabs")
+    expect(ctx.options.group?.children?.length).toBe(1)
+  })
+
+  it("合并 items 配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, {
+      items: [
+        { prop: "name", component: { is: "el-input" } },
+        { prop: "age", component: { is: "el-input-number" } },
+      ],
+    })
+    expect(ctx.options.items.length).toBe(2)
+    expect(ctx.options.items[0].prop).toBe("name")
+  })
+
+  it("合并 onNext 回调", () => {
+    const ctx = createMergeContext()
+    const onNext = vi.fn()
+    mergeFormOptions(ctx, { onNext })
+    expect(ctx.options.onNext).toBe(onNext)
+  })
+
+  it("合并 onSubmit 回调", () => {
+    const ctx = createMergeContext()
+    const onSubmit = vi.fn()
+    mergeFormOptions(ctx, { onSubmit })
+    expect(ctx.options.onSubmit).toBe(onSubmit)
+  })
+
+  it("合并 model 配置（替换而非合并）", () => {
+    const ctx = createMergeContext()
+    ctx.model.existingField = "old"
+    mergeFormOptions(ctx, { model: { newField: "new" } })
+    expect(ctx.model.existingField).toBeUndefined()
+    expect(ctx.model.newField).toBe("new")
+  })
+
+  it("合并后 step 重置为 1", () => {
+    const ctx = createMergeContext()
+    ctx.step.value = 5
+    mergeFormOptions(ctx, { mode: "add" })
+    expect(ctx.step.value).toBe(1)
+  })
+
+  it("items 过滤无效配置", () => {
+    const ctx = createMergeContext()
+    mergeFormOptions(ctx, {
+      items: [
+        { prop: "valid", component: { is: "el-input" } },
+        { prop: "invalid" } as any, // 缺少 component
+        undefined as any,
+      ],
+    })
+    expect(ctx.options.items.length).toBe(1)
+    expect(ctx.options.items[0].prop).toBe("valid")
   })
 })

@@ -267,3 +267,289 @@ describe("fd-form filters", () => {
     })
   })
 })
+
+describe("fd-form normalizeItems", () => {
+  const baseItemDefaults = { labelPosition: "", labelWidth: "", showMessage: true } as const
+
+  function createMockHelpers(model: Record<string, unknown> = {}) {
+    return {
+      propKey: (prop?: string | string[]) => (Array.isArray(prop) ? prop.join(".") : prop ?? ""),
+      getModelValue: (prop?: string | string[]) => {
+        const key = Array.isArray(prop) ? prop.join(".") : prop
+        return key ? model[key] : undefined
+      },
+      setModelValue: (prop: string | string[], value: unknown) => {
+        const key = Array.isArray(prop) ? prop.join(".") : prop
+        if (key) model[key] = value
+      },
+      ensureComponentDefaults: (item: FormItem) => {
+        if (!item.component) item.component = {}
+        item.component.props = item.component.props ?? {}
+        item.component.on = item.component.on ?? {}
+        item.component.style = item.component.style ?? {}
+      },
+      required: (item: FormItem) => Boolean(item.required),
+    }
+  }
+
+  it("设置默认值到 model", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    expect(model.name).toBe("默认名称")
+  })
+
+  it("model 中已有值时不覆盖", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = { name: "已有值" }
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    expect(model.name).toBe("已有值")
+  })
+
+  it("带 hook 配置时触发 formHook.bind", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = { tags: "a,b,c" }
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "tags", hook: "split", component: { is: "el-select" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    // hook 执行后应该将字符串分割为数组
+    expect(model.tags).toEqual(["a", "b", "c"])
+  })
+
+  it("required 为 true 时注入必填规则（无现有规则）", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    expect(item.rules).toBeDefined()
+    expect(Array.isArray(item.rules)).toBe(true)
+    expect((item.rules as any[])[0]._inner).toBe(true)
+  })
+
+  it("required 为 true 且已有规则数组时前置注入", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const existingRule = { min: 2, message: "最少2个字符" }
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        {
+          ...baseItemDefaults,
+          prop: "name",
+          label: "姓名",
+          required: true,
+          rules: [existingRule],
+          component: { is: "el-input" },
+        },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rules = item.rules as any[]
+    expect(rules.length).toBe(2)
+    expect(rules[0]._inner).toBe(true)
+    expect(rules[1]).toEqual(existingRule)
+  })
+
+  it("已有 _inner 规则时替换而非新增", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        {
+          ...baseItemDefaults,
+          prop: "name",
+          label: "姓名",
+          required: true,
+          rules: [{ _inner: true, required: true, message: "旧规则" } as any],
+          component: { is: "el-input" },
+        },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rules = item.rules as any[]
+    // 应该仍然只有一条规则（替换而非新增）
+    expect(rules.length).toBe(1)
+    expect(rules[0]._inner).toBe(true)
+    expect(rules[0].trigger).toEqual(["change", "blur"])
+  })
+
+  it("rules 为单个对象时转换为数组", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const singleRule = { min: 2, message: "最少2个字符" }
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        {
+          ...baseItemDefaults,
+          prop: "name",
+          label: "姓名",
+          required: true,
+          rules: singleRule as any,
+          component: { is: "el-input" },
+        },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rules = item.rules as any[]
+    expect(Array.isArray(rules)).toBe(true)
+    expect(rules.length).toBe(2)
+  })
+
+  it("必填验证器正确校验空值", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rule = (item.rules as any[])[0]
+
+    // 测试空值校验
+    const errors: Error[] = []
+    rule.validator({}, undefined, (err?: Error) => {
+      if (err) errors.push(err)
+    })
+    expect(errors.length).toBe(1)
+    expect(errors[0].message).toContain("姓名")
+
+    // 测试非空值校验
+    const errors2: Error[] = []
+    rule.validator({}, "有值", (err?: Error) => {
+      if (err) errors2.push(err)
+    })
+    expect(errors2.length).toBe(0)
+  })
+
+  it("必填验证器校验空字符串", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "code", label: "编码", required: true, component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rule = (item.rules as any[])[0]
+
+    const errors: Error[] = []
+    rule.validator({}, "", (err?: Error) => {
+      if (err) errors.push(err)
+    })
+    expect(errors.length).toBe(1)
+  })
+
+  it("必填验证器校验 null 值", async () => {
+    const { normalizeItems } = await import("../core/filters")
+    const model: Record<string, unknown> = {}
+    const helpers = createMockHelpers(model)
+    const options: FormOptions = {
+      key: 0,
+      mode: "add",
+      model: {},
+      items: [
+        { ...baseItemDefaults, prop: "value", required: true, component: { is: "el-input" } },
+      ],
+      group: {},
+      form: {},
+    }
+
+    normalizeItems({ options, model, helpers: helpers as any })
+    const item = options.items[0]
+    const rule = (item.rules as any[])[0]
+
+    const errors: Error[] = []
+    rule.validator({}, null, (err?: Error) => {
+      if (err) errors.push(err)
+    })
+    expect(errors.length).toBe(1)
+    // 无 label 时使用 propName
+    expect(errors[0].message).toContain("value")
+  })
+})

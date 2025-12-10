@@ -290,4 +290,111 @@ describe("fd-form hooks 格式化器", () => {
       expect(model.value).toBe("test")
     })
   })
+
+  describe("嵌套字段操作", () => {
+    it("设置嵌套路径字段值", () => {
+      const model = createModel<Record<string, any>>({})
+      formHook.bind({ hook: "string", model, field: "user.profile.name", value: 123 })
+      expect(model.user?.profile?.name).toBe("123")
+    })
+
+    it("submit 阶段 undefined 返回值删除嵌套字段", () => {
+      const model = createModel<Record<string, any>>({ user: { name: "test", age: 18 } })
+      formHook.submit({ hook: "empty", model, field: "user.name", value: "" })
+      expect(model.user.name).toBeUndefined()
+      expect(model.user.age).toBe(18)
+    })
+
+    it("删除不存在的嵌套路径不报错", () => {
+      const model = createModel<Record<string, any>>({ data: {} })
+      expect(() => {
+        formHook.submit({ hook: "empty", model, field: "data.nested.deep.field", value: "" })
+      }).not.toThrow()
+    })
+  })
+
+  describe("registerFormHook 自定义钩子", () => {
+    it("注册并使用自定义格式化钩子", async () => {
+      const { registerFormHook } = await import("../core/hooks")
+
+      // 注册自定义钩子：将值转为大写
+      registerFormHook("uppercase", (value) => {
+        if (typeof value === "string") return value.toUpperCase()
+        return value
+      })
+
+      const model = createModel({ name: "hello" })
+      formHook.bind({ hook: "uppercase" as any, model, field: "name", value: model.name })
+      expect(model.name).toBe("HELLO")
+    })
+
+    it("自定义钩子可访问上下文", async () => {
+      const { registerFormHook } = await import("../core/hooks")
+
+      registerFormHook("contextTest", (value, ctx) => {
+        if (ctx.method === "bind") return `bind:${value}`
+        return `submit:${value}`
+      })
+
+      const model = createModel<Record<string, any>>({ field: "test" })
+      formHook.bind({ hook: "contextTest" as any, model, field: "field", value: model.field })
+      expect(model.field).toBe("bind:test")
+
+      formHook.submit({ hook: "contextTest" as any, model, field: "field", value: model.field })
+      expect(model.field).toBe("submit:bind:test")
+    })
+  })
+
+  describe("hook 对象配置", () => {
+    it("对象配置只执行对应阶段的钩子", () => {
+      const model = createModel({ value: "test" })
+      // bind 阶段，submit 配置不执行
+      formHook.bind({
+        hook: { bind: "string", submit: "number" },
+        model,
+        field: "value",
+        value: 123,
+      })
+      expect(model.value).toBe("123")
+    })
+
+    it("对象配置阶段为数组时依次执行", () => {
+      const model = createModel({ tags: "a,b,c" })
+      formHook.bind({
+        hook: { bind: ["split"], submit: ["join"] },
+        model,
+        field: "tags",
+        value: model.tags,
+      })
+      expect(model.tags).toEqual(["a", "b", "c"])
+    })
+
+    it("对象配置阶段未定义时不执行", () => {
+      const model = createModel({ value: "original" })
+      formHook.bind({
+        hook: { submit: "number" }, // 无 bind 配置
+        model,
+        field: "value",
+        value: model.value,
+      })
+      // 值应保持不变（因为 bind 阶段无配置）
+      expect(model.value).toBe("original")
+    })
+  })
+
+  describe("field 为空的边缘情况", () => {
+    it("field 为 undefined 时不更新 model", () => {
+      const model = createModel({ existing: "value" })
+      formHook.bind({ hook: "string", model, field: undefined as any, value: 123 })
+      // model 应保持不变
+      expect(model.existing).toBe("value")
+      expect(Object.keys(model)).toEqual(["existing"])
+    })
+
+    it("field 为空字符串时仍执行但不更新", () => {
+      const model = createModel({ test: "value" })
+      formHook.bind({ hook: "string", model, field: "", value: 123 })
+      expect(model.test).toBe("value")
+    })
+  })
 })

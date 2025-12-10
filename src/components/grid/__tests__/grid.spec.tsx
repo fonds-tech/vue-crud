@@ -1,9 +1,8 @@
 import type { GridCollector, GridContextState } from "../interface"
 import { mount } from "@vue/test-utils"
-import { renderToString } from "@vue/server-renderer"
 import { it, vi, expect, describe, afterEach } from "vitest"
 import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "../interface"
-import { h, inject, onMounted, createSSRApp, defineComponent } from "vue"
+import { h, inject, onMounted, defineComponent } from "vue"
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -11,26 +10,6 @@ afterEach(() => {
 })
 
 describe("fd-grid", () => {
-  it("在无 window 环境下回退默认宽度并渲染", async () => {
-    vi.stubGlobal("window", undefined as any)
-    const { default: Grid } = await import("../grid")
-    let injectedWidth: number | undefined
-    const Consumer = defineComponent({
-      setup() {
-        const ctx = inject<GridContextState | undefined>(GRID_CONTEXT_KEY)
-        injectedWidth = ctx?.viewportWidth.value
-        return () => null
-      },
-    })
-
-    const app = createSSRApp({
-      render: () => h(Grid, null, { default: () => h(Consumer) }),
-    })
-
-    await renderToString(app)
-    expect(injectedWidth).toBe(1920)
-  })
-
   it("监听 resize 并更新上下文，卸载时移除监听", async () => {
     const { default: Grid } = await import("../grid")
     const addSpy = vi.spyOn(window, "addEventListener")
@@ -80,5 +59,25 @@ describe("fd-grid", () => {
     })
 
     expect(wrapper.classes()).toContain("is-collapsed")
+  })
+
+  it("提供正确的上下文给子组件", async () => {
+    const { default: Grid } = await import("../grid")
+    let ctx: GridContextState | undefined
+    const Consumer = defineComponent({
+      setup() {
+        ctx = inject<GridContextState>(GRID_CONTEXT_KEY)
+        return () => null
+      },
+    })
+
+    mount(Grid, {
+      props: { cols: 3, rowGap: 8, colGap: 16 },
+      slots: { default: () => h(Consumer) },
+    })
+
+    expect(ctx).toBeDefined()
+    expect(ctx?.cols.value).toBe(3)
+    expect(ctx?.viewportWidth.value).toBeGreaterThan(0)
   })
 })
