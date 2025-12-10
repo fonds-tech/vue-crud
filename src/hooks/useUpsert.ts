@@ -11,8 +11,7 @@ export function useUpsert<T extends FormRecord = FormRecord>(options?: UpsertUse
   watch(
     () => upsert.value,
     (instance) => {
-      if (!instance)
-        return
+      if (!instance) return
       if (options) {
         instance.use(options)
       }

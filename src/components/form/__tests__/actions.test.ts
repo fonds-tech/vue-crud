@@ -71,7 +71,10 @@ describe("fd-form actions", () => {
 
   describe("setOptions/getOptions", () => {
     it("设置和获取选项数据", () => {
-      const options = [{ label: "A", value: "a" }, { label: "B", value: "b" }]
+      const options = [
+        { label: "A", value: "a" },
+        { label: "B", value: "b" },
+      ]
       actions.setOptions("tags", options)
       expect(actions.getOptions("tags")).toEqual(options)
     })

@@ -41,11 +41,7 @@ const ElDropdownStub = defineComponent({
   inheritAttrs: false,
   emits: ["command"],
   setup(_, { slots }) {
-    return () =>
-      h("div", { class: "el-dropdown-stub" }, [
-        slots.default?.(),
-        h("div", { class: "el-dropdown-menu" }, slots.dropdown?.()),
-      ])
+    return () => h("div", { class: "el-dropdown-stub" }, [slots.default?.(), h("div", { class: "el-dropdown-menu" }, slots.dropdown?.())])
   },
 })
 
@@ -80,8 +76,7 @@ const ElPopoverStub = defineComponent({
   name: "ElPopoverStub",
   inheritAttrs: false,
   setup(_, { slots }) {
-    return () =>
-      h("div", { class: "el-popover-stub" }, [slots.reference?.(), slots.default?.(), slots.content?.()])
+    return () => h("div", { class: "el-popover-stub" }, [slots.reference?.(), slots.default?.(), slots.content?.()])
   },
 })
 
@@ -172,9 +167,7 @@ const ElTableStub = defineComponent({
         .filter(([key]) => key !== "default")
         .map(([, slot]) => slot?.({ row: props.data?.[0] ?? {}, column: {}, $index: 0 }))
         .filter(Boolean) as VNodeChild[]
-      const onRowContextmenu = (attrs as Record<string, unknown>).onRowContextmenu as
-        | ((row: TableRecord, column: Record<string, unknown>, event: MouseEvent) => void)
-        | undefined
+      const onRowContextmenu = (attrs as Record<string, unknown>).onRowContextmenu as ((row: TableRecord, column: Record<string, unknown>, event: MouseEvent) => void) | undefined
       const rows = (props.data ?? []).map((row: TableRecord) =>
         h(
           "div",
@@ -291,8 +284,7 @@ function createMittStub() {
       handlers[event].push(handler)
     }),
     off: vi.fn((event: string, handler?: (payload?: unknown) => void) => {
-      if (!handlers[event])
-        return
+      if (!handlers[event]) return
       if (!handler) {
         handlers[event] = []
         return
@@ -347,13 +339,9 @@ describe("fd-table", () => {
     const wrapper = mountTable()
     const table = getExpose(wrapper)
     table.use({
-      columns: [
-        { prop: "name", label: "姓名" },
-      ],
+      columns: [{ prop: "name", label: "姓名" }],
     } as TableUseOptions)
-    table.setData([
-      { id: 1, name: "张三" },
-    ])
+    table.setData([{ id: 1, name: "张三" }])
     await nextTick()
     expect(table.data[0].name).toBe("张三")
   })

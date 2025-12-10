@@ -2,19 +2,9 @@
   <fd-crud ref="crud">
     <fd-table ref="table">
       <template #toolbar>
-        <el-button
-          type="primary"
-          :disabled="!selection.length"
-          @click="handleBatchDelete"
-        >
-          批量删除 ({{ selection.length }})
-        </el-button>
-        <el-button @click="toggleAll">
-          切换全选
-        </el-button>
-        <span v-if="selection.length" class="selection-text">
-          选中: {{ selection.map(item => item.id).join(", ") }}
-        </span>
+        <el-button type="primary" :disabled="!selection.length" @click="handleBatchDelete"> 批量删除 ({{ selection.length }}) </el-button>
+        <el-button @click="toggleAll"> 切换全选 </el-button>
+        <span v-if="selection.length" class="selection-text"> 选中: {{ selection.map((item) => item.id).join(", ") }} </span>
       </template>
     </fd-table>
   </fd-crud>
@@ -28,9 +18,12 @@ import { ElMessage, ElMessageBox } from "element-plus"
 
 defineOptions({ name: "selection-table" })
 
-const crud = useCrud({
-  service: new TableMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new TableMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   table: { border: true, rowKey: "id" },

@@ -5,18 +5,11 @@
       <h3 class="demo-title">1. 远程搜索 (API + Debounce)</h3>
       <p class="demo-desc">输入关键词触发搜索，默认 300ms 防抖。尝试输入 "user"。</p>
       <div class="demo-control">
-        <fd-select
-          v-model="remoteValue"
-          :api="fetchUserList"
-          search-field="keyword"
-          placeholder="输入关键词搜索用户"
-          style="width: 100%"
-          clearable
-        />
+        <fd-select v-model="remoteValue" :api="fetchUserList" search-field="keyword" placeholder="输入关键词搜索用户" style="width: 100%" clearable />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
-        <span>{{ remoteValue || '-' }}</span>
+        <span>{{ remoteValue || "-" }}</span>
       </div>
     </div>
 
@@ -31,20 +24,14 @@
             <el-radio-button label="sales">销售部</el-radio-button>
           </el-radio-group>
 
-          <fd-select
-            v-model="deptUserValue"
-            :api="fetchUserByDept"
-            :params="deptParams"
-            placeholder="搜索该部门员工"
-            style="width: 220px"
-          />
+          <fd-select v-model="deptUserValue" :api="fetchUserByDept" :params="deptParams" placeholder="搜索该部门员工" style="width: 220px" />
         </div>
       </div>
       <div class="demo-result">
         <span class="result-label">选中部门:</span>
         <el-tag size="small" type="info">{{ currentDept }}</el-tag>
         <span class="result-label" style="margin-left: 12px">选中员工:</span>
-        <span>{{ deptUserValue || '-' }}</span>
+        <span>{{ deptUserValue || "-" }}</span>
       </div>
     </div>
   </div>
@@ -54,7 +41,11 @@
 import FdSelect from "@/components/select"
 import { ref, computed } from "vue"
 
-interface UserOption { label: string, value: string, dept: string }
+interface UserOption {
+  label: string
+  value: string
+  dept: string
+}
 
 // --- 模拟数据 ---
 const ALL_USERS: UserOption[] = [
@@ -74,9 +65,7 @@ function fetchUserList(params: Record<string, any>): Promise<UserOption[]> {
   return new Promise<UserOption[]>((resolve) => {
     setTimeout(() => {
       const keyword = (params.keyword || "").toLowerCase()
-      const results = ALL_USERS.filter(u =>
-        u.label.toLowerCase().includes(keyword),
-      )
+      const results = ALL_USERS.filter(u => u.label.toLowerCase().includes(keyword))
       resolve(results)
     }, 500) // 模拟网络延迟
   })
@@ -96,9 +85,7 @@ function fetchUserByDept(params: Record<string, any>): Promise<UserOption[]> {
     setTimeout(() => {
       const { keyword, dept } = params
       const k = (keyword || "").toLowerCase()
-      const results = ALL_USERS.filter(u =>
-        u.dept === dept && u.label.toLowerCase().includes(k),
-      )
+      const results = ALL_USERS.filter(u => u.dept === dept && u.label.toLowerCase().includes(k))
       resolve(results)
     }, 300)
   })

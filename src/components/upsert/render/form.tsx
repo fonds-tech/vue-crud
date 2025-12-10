@@ -22,8 +22,7 @@ interface RenderFormContext {
  * FormRef 类型守卫
  */
 function isFormRef(value: unknown): value is FormRef<FormRecord> {
-  if (!value || typeof value !== "object")
-    return false
+  if (!value || typeof value !== "object") return false
   return "submit" in value && "use" in value
 }
 
@@ -46,8 +45,7 @@ export function renderForm(context: RenderFormContext): VNode {
     handleFormSlots(),
   )
 
-  if (!loadingDirective)
-    return formVNode
+  if (!loadingDirective) return formVNode
 
   return withDirectives(formVNode, [[loadingDirective, state.loading.value]])
 }

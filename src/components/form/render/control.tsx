@@ -17,13 +17,17 @@ export function renderControl(ctx: FormRenderContext, item: FormItem) {
     const listeners = helpers.normalizeListeners(helpers.onListeners(item.component))
     const childSlots = renderComponentSlotMap(ctx, helpers.slotsOf(item.component), { item, model: ctx.model })
 
-    return h(resolved, {
-      ...helpers.formatProps.value(item),
-      "ref": helpers.bindComponentRef(item.component),
-      "modelValue": helpers.getModelValue(item.prop),
-      "style": helpers.styleOf(item.component),
-      "onUpdate:modelValue": (val: unknown) => helpers.setModelValue(item.prop, val),
-      ...listeners,
-    }, childSlots)
+    return h(
+      resolved,
+      {
+        ...helpers.formatProps.value(item),
+        "ref": helpers.bindComponentRef(item.component),
+        "modelValue": helpers.getModelValue(item.prop),
+        "style": helpers.styleOf(item.component),
+        "onUpdate:modelValue": (val: unknown) => helpers.setModelValue(item.prop, val),
+        ...listeners,
+      },
+      childSlots,
+    )
   }
 }

@@ -138,9 +138,7 @@ describe("dict utils", () => {
     })
 
     it("应该处理只有部分字段的字典项", () => {
-      const minimalDict: DictItem[] = [
-        { value: 1, label: "最小项" },
-      ]
+      const minimalDict: DictItem[] = [{ value: 1, label: "最小项" }]
 
       expect(match(minimalDict, 1)).toEqual({ value: 1, label: "最小项" })
       expect(has(minimalDict, 1)).toBe(true)

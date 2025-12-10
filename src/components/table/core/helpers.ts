@@ -126,7 +126,7 @@ export function getComponentProps<T extends TableRecord>(component: TableCompone
   if (!component) return {}
   const value = component.props
   // props 支持按行计算，便于不同数据行传入不同配置
-  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, unknown>)(scope) : value ?? {}
+  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, unknown>)(scope) : (value ?? {})
 }
 
 /**
@@ -156,7 +156,7 @@ export function getComponentEvents<T extends TableRecord>(component: TableCompon
   if (!component) return {}
   const value = component.on
   // 事件配置函数可根据当前行绑定不同处理器（如携带行 id）
-  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, (...args: unknown[]) => unknown>)(scope) : value ?? {}
+  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, (...args: unknown[]) => unknown>)(scope) : (value ?? {})
 }
 
 /**
@@ -171,7 +171,7 @@ export function getComponentSlots<T extends TableRecord>(component: TableCompone
   if (!component) return {}
   const value = component.slots
   // 返回值可为静态对象或作用域函数，保持与组件插槽结构一致
-  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, VNodeChild>)(scope) : (value as Record<string, VNodeChild>) ?? {}
+  return isFunction(value) ? (value as (scope?: TableScope<T>) => Record<string, VNodeChild>)(scope) : ((value as Record<string, VNodeChild>) ?? {})
 }
 
 /**
@@ -184,7 +184,7 @@ export function getComponentSlots<T extends TableRecord>(component: TableCompone
 export function getColumnSlots<T extends TableRecord>(column: TableColumn<T>) {
   const value = column.slots
   // slots 允许懒执行函数形式，表头渲染时可动态生成 header/custom 插槽
-  return typeof value === "function" ? value() : value ?? {}
+  return typeof value === "function" ? value() : (value ?? {})
 }
 
 /**

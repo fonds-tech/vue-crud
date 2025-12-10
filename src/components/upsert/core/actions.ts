@@ -29,8 +29,7 @@ export function useUpsertActions<T extends FormRecord = FormRecord>(context: Act
    * 确保存在默认动作（含 steps 模式的 prev/next）。
    */
   function ensureActions() {
-    if (options.actions.length > 0)
-      return
+    if (options.actions.length > 0) return
     if (options.group?.type === "steps") {
       options.actions = [
         { type: "cancel", text: crud.dict?.label?.close ?? "取消" },
@@ -55,11 +54,9 @@ export function useUpsertActions<T extends FormRecord = FormRecord>(context: Act
    */
   function resolveActionText(action: UpsertAction<T>) {
     const text = action.text
-    if (isFunction(text))
-      return text(formModel.value)
-    if (text)
-      return text
-    return action.type === "cancel" ? crud.dict?.label?.close ?? "取消" : crud.dict?.label?.confirm ?? "确定"
+    if (isFunction(text)) return text(formModel.value)
+    if (text) return text
+    return action.type === "cancel" ? (crud.dict?.label?.close ?? "取消") : (crud.dict?.label?.confirm ?? "确定")
   }
 
   /**
@@ -70,8 +67,7 @@ export function useUpsertActions<T extends FormRecord = FormRecord>(context: Act
    */
   function isActionVisible(action: UpsertAction<T>) {
     const maybeHidden = action.hidden
-    if (isFunction(maybeHidden))
-      return !maybeHidden(formModel.value)
+    if (isFunction(maybeHidden)) return !maybeHidden(formModel.value)
     return !maybeHidden
   }
 

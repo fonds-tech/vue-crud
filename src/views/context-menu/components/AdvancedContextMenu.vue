@@ -2,48 +2,26 @@
   <div class="context-card">
     <div class="card-header">
       <div>
-        <p class="card-eyebrow">
-          Component Mode
-        </p>
+        <p class="card-eyebrow">Component Mode</p>
         <h3>受控 + 插槽自定义</h3>
       </div>
-      <el-tag type="success" effect="light">
-        fd-context-menu
-      </el-tag>
+      <el-tag type="success" effect="light"> fd-context-menu </el-tag>
     </div>
 
-    <p class="card-desc">
-      当需要完全自定义内容时，可在模板中放置 <code>&lt;fd-context-menu&gt;</code> 并通过状态控制显隐。
-      点击下方按钮体验：
-    </p>
+    <p class="card-desc">当需要完全自定义内容时，可在模板中放置 <code>&lt;fd-context-menu&gt;</code> 并通过状态控制显隐。 点击下方按钮体验：</p>
 
     <el-space>
-      <el-button type="primary" @click="openMenu($event)">
-        自定义菜单
-      </el-button>
-      <el-button @click="openMenu($event, true)">
-        默认样式菜单
-      </el-button>
+      <el-button type="primary" @click="openMenu($event)"> 自定义菜单 </el-button>
+      <el-button @click="openMenu($event, true)"> 默认样式菜单 </el-button>
     </el-space>
 
-    <fd-context-menu
-      v-if="state.event"
-      :show="state.show"
-      :event="state.event"
-      :options="state.options"
-    >
+    <fd-context-menu v-if="state.event" :show="state.show" :event="state.event" :options="state.options">
       <div class="custom-menu">
         <h4>快速动作</h4>
-        <div class="menu-item primary" @click="copyLink">
-          复制链接
-        </div>
-        <div class="menu-item danger" @click="removeItem">
-          删除
-        </div>
+        <div class="menu-item primary" @click="copyLink">复制链接</div>
+        <div class="menu-item danger" @click="removeItem">删除</div>
         <el-divider />
-        <p class="custom-menu__tip">
-          你可以在这里渲染任何内容，例如表单或统计信息。
-        </p>
+        <p class="custom-menu__tip">你可以在这里渲染任何内容，例如表单或统计信息。</p>
       </div>
     </fd-context-menu>
   </div>

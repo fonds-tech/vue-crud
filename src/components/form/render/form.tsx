@@ -15,25 +15,21 @@ export function renderForm(ctx: FormRenderContext) {
   const stepGroupName = showSteps ? activeStepName.value : undefined
   const stepItems = showSteps ? helpers.itemsOfStep(stepGroupName) : options.items
 
-  const inner = showTabs || showSteps
-    ? (
-        <ElSpace direction="vertical" fill size={24}>
-          {showSteps && renderSteps(ctx)}
-          {showTabs && renderTabs(ctx)}
-          {!showTabs && renderGrid(ctx, stepItems, stepGroupName)}
-        </ElSpace>
-      )
-    : renderGrid(ctx, stepItems, stepGroupName)
+  const inner
+    = showTabs || showSteps
+      ? (
+          <ElSpace direction="vertical" fill size={24}>
+            {showSteps && renderSteps(ctx)}
+            {showTabs && renderTabs(ctx)}
+            {!showTabs && renderGrid(ctx, stepItems, stepGroupName)}
+          </ElSpace>
+        )
+      : (
+          renderGrid(ctx, stepItems, stepGroupName)
+        )
 
   return (
-    <ElForm
-      ref={formRef}
-      key={options.key}
-      class="fd-form"
-      model={model}
-      {...options.form}
-      {...attrs}
-    >
+    <ElForm ref={formRef} key={options.key} class="fd-form" model={model} {...options.form} {...attrs}>
       {inner}
     </ElForm>
   )

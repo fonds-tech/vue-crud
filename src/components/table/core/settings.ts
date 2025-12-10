@@ -138,9 +138,7 @@ export function writeCache(state: TableState) {
       .filter(item => item.sort)
       .sort((a, b) => a.order - b.order)
       .map(item => item.id)
-    const columns = Object.fromEntries(
-      state.columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]),
-    )
+    const columns = Object.fromEntries(state.columnSettings.value.map(item => [item.id, { show: item.show, pinned: item.pinned, fixed: item.fixed }]))
     const cacheData: ColumnCacheData = { version, order, columns }
     localStorage.setItem(state.cacheKey.value, JSON.stringify(cacheData))
   }
@@ -164,18 +162,9 @@ export function rebuildColumnSettings(state: TableState, useCache = true) {
     const isNonSortableType = column.type === "action" || column.type === "selection"
     const sort = !isNonSortableType && (column.sort ?? true) && !pinned
     const rawFixed = cache?.columns?.[id]?.fixed ?? column.fixed
-    const normalizedFixed: ColumnSetting["fixed"] = rawFixed === "left" || rawFixed === "right"
-      ? rawFixed
-      : rawFixed === true
-        ? "left"
-        : undefined
-    const fixed = normalizedFixed
-      ?? (column.type === "action"
-        ? "right"
-        : column.type === "selection"
-          ? "left"
-          : undefined)
-    const baseOrder = sort ? orderMap.get(id) ?? index : index
+    const normalizedFixed: ColumnSetting["fixed"] = rawFixed === "left" || rawFixed === "right" ? rawFixed : rawFixed === true ? "left" : undefined
+    const fixed = normalizedFixed ?? (column.type === "action" ? "right" : column.type === "selection" ? "left" : undefined)
+    const baseOrder = sort ? (orderMap.get(id) ?? index) : index
     const label = column.label || (column.type === "selection" ? "选择" : column.prop) || id
     return {
       id,

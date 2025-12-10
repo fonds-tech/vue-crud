@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-detail 详情示例"
-    description="展示两列布局、分组、插槽与自定义组件渲染"
-    :components="componentCatalog"
-  />
+  <layout title="fd-detail 详情示例" description="展示两列布局、分组、插槽与自定义组件渲染" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-select 下拉选择"
-    description="基于 Element Plus Select 封装，内置远程搜索、参数联动、自动防抖与数据回填机制"
-    :components="componentCatalog"
-  />
+  <layout title="fd-select 下拉选择" description="基于 Element Plus Select 封装，内置远程搜索、参数联动、自动防抖与数据回填机制" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

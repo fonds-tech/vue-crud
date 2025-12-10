@@ -44,24 +44,14 @@ export function renderHeader(ctx: DialogRenderContext): VNode {
     <>
       <div class="fd-dialog__title">{ctx.title}</div>
       <div class="fd-dialog__actions">
-        <div
-          class="fd-dialog__action"
-          role="button"
-          aria-label={ctx.fullscreenLabel}
-          title={ctx.fullscreenLabel}
-          onClick={ctx.onToggleFullscreen}
-        >
+        <div class="fd-dialog__action" role="button" aria-label={ctx.fullscreenLabel} title={ctx.fullscreenLabel} onClick={ctx.onToggleFullscreen}>
           <ElIcon>{h(ctx.fullscreenIcon)}</ElIcon>
         </div>
         {ctx.showClose && (
-          <div
-            class="fd-dialog__action"
-            role="button"
-            aria-label="关闭弹窗"
-            title="关闭弹窗"
-            onClick={ctx.onClose}
-          >
-            <ElIcon><IconTablerX /></ElIcon>
+          <div class="fd-dialog__action" role="button" aria-label="关闭弹窗" title="关闭弹窗" onClick={ctx.onClose}>
+            <ElIcon>
+              <IconTablerX />
+            </ElIcon>
           </div>
         )}
       </div>

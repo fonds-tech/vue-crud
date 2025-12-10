@@ -3,19 +3,11 @@
     <!-- 外部控制区 -->
     <el-card header="外部控制 (External Control)">
       <el-button-group>
-        <el-button type="primary" @click="handleExternalSearch">
-          外部触发搜索
-        </el-button>
-        <el-button type="warning" @click="handleExternalReset">
-          外部触发重置
-        </el-button>
-        <el-button @click="handleToggleCollapse">
-          切换折叠状态
-        </el-button>
+        <el-button type="primary" @click="handleExternalSearch"> 外部触发搜索 </el-button>
+        <el-button type="warning" @click="handleExternalReset"> 外部触发重置 </el-button>
+        <el-button @click="handleToggleCollapse"> 切换折叠状态 </el-button>
       </el-button-group>
-      <p class="control-tip">
-        通过 ref 获取组件实例，调用暴露的 search/reset/collapse 方法
-      </p>
+      <p class="control-tip">通过 ref 获取组件实例，调用暴露的 search/reset/collapse 方法</p>
     </el-card>
 
     <!-- 核心演示区 -->
@@ -25,15 +17,9 @@
           <!-- 1. 表单项插槽：自定义复杂交互控件 -->
           <template #custom-region="{ model }">
             <el-radio-group v-model="model.region" size="default">
-              <el-radio-button value="cn">
-                中国
-              </el-radio-button>
-              <el-radio-button value="us">
-                美国
-              </el-radio-button>
-              <el-radio-button value="jp">
-                日本
-              </el-radio-button>
+              <el-radio-button value="cn"> 中国 </el-radio-button>
+              <el-radio-button value="us"> 美国 </el-radio-button>
+              <el-radio-button value="jp"> 日本 </el-radio-button>
             </el-radio-group>
           </template>
 
@@ -60,10 +46,7 @@ import { Share, Download } from "@element-plus/icons-vue"
 import { SearchMockService } from "../mockService"
 import { useCrud, useSearch } from "@/hooks"
 
-const crudRef = useCrud(
-  { service: new SearchMockService() },
-  crud => crud.refresh(),
-)
+const crudRef = useCrud({ service: new SearchMockService() }, crud => crud.refresh())
 
 const options: SearchOptions = {
   grid: { cols: 3 },

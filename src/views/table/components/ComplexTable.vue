@@ -20,9 +20,12 @@ import { useCrud, useTable } from "@/hooks"
 
 defineOptions({ name: "complex-table" })
 
-const crud = useCrud({
-  service: new TableMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new TableMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   table: {
@@ -36,12 +39,17 @@ const table = useTable({
     { prop: "amount", label: "金额", width: 150, sortable: "custom", component: { slot: "amount" } },
     { prop: "progress", label: "进度", width: 200, component: { slot: "progress" } },
     { prop: "department", label: "部门", width: 120 },
-    { prop: "role", label: "角色", width: 120, dict: [
-      { value: 0, label: "Developer", type: "default" },
-      { value: 1, label: "Designer", type: "success" },
-      { value: 2, label: "Manager", type: "warning" },
-      { value: 3, label: "Tester", type: "info" },
-    ] },
+    {
+      prop: "role",
+      label: "角色",
+      width: 120,
+      dict: [
+        { value: 0, label: "Developer", type: "default" },
+        { value: 1, label: "Designer", type: "success" },
+        { value: 2, label: "Manager", type: "warning" },
+        { value: 3, label: "Tester", type: "info" },
+      ],
+    },
     { prop: "phone", label: "手机号", width: 150 },
     { prop: "email", label: "邮箱", width: 200 },
     { prop: "address", label: "地址", minWidth: 300 },

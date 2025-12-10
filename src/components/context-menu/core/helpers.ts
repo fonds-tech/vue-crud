@@ -42,12 +42,7 @@ export function removeHoverHighlight(hoverTarget: Ref<HTMLElement | null>, hover
  * @param hoverTarget 高亮目标元素的 ref 对象
  * @param hoverClassName 高亮类名的 ref 对象
  */
-export function markTarget(
-  event: MouseEvent,
-  hoverOptions: ContextMenuOptions["hover"] | undefined,
-  hoverTarget: Ref<HTMLElement | null>,
-  hoverClassName: Ref<string>,
-) {
+export function markTarget(event: MouseEvent, hoverOptions: ContextMenuOptions["hover"] | undefined, hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>) {
   removeHoverHighlight(hoverTarget, hoverClassName)
   if (!hoverOptions) return
 

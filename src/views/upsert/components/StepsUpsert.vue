@@ -14,7 +14,7 @@ import { useCrud, useTable, useUpsert } from "@/hooks"
 defineOptions({ name: "steps-upsert-demo" })
 
 const STEP_SEQUENCE = ["base", "extra"] as const
-type StepKey = typeof STEP_SEQUENCE[number]
+type StepKey = (typeof STEP_SEQUENCE)[number]
 type StepModel = { __step: StepKey } & Record<string, any>
 const stepIndex = ref(0)
 
@@ -24,9 +24,12 @@ const priorityDict: TableDict[] = [
   { label: "Low", value: "Low", type: "info" },
 ]
 
-const crud = useCrud({
-  service: new UpsertMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new UpsertMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   columns: [
@@ -118,10 +121,8 @@ const upsert = useUpsert<StepModel>({
         props: () => ({ type: "primary" }),
         on: () => ({
           click: () => {
-            if (stepIndex.value === STEP_SEQUENCE.length - 1)
-              upsert.value?.submit()
-            else
-              setStep(stepIndex.value + 1)
+            if (stepIndex.value === STEP_SEQUENCE.length - 1) upsert.value?.submit()
+            else setStep(stepIndex.value + 1)
           },
         }),
         slots: () => ({ default: () => (stepIndex.value === STEP_SEQUENCE.length - 1 ? "提交" : "下一步") }),
@@ -131,7 +132,13 @@ const upsert = useUpsert<StepModel>({
   items: [
     { prop: "__step", label: "步骤", hidden: true },
     { prop: "avatar", label: "头像", component: { is: "el-input", props: { placeholder: "请输入头像地址" } }, hidden: (model: StepModel) => model.__step !== "base" },
-    { prop: "name", label: "姓名", component: { is: "el-input", props: { placeholder: "请输入姓名" } }, rules: [{ required: true, message: "必填" }], hidden: (model: StepModel) => model.__step !== "base" },
+    {
+      prop: "name",
+      label: "姓名",
+      component: { is: "el-input", props: { placeholder: "请输入姓名" } },
+      rules: [{ required: true, message: "必填" }],
+      hidden: (model: StepModel) => model.__step !== "base",
+    },
     { prop: "account", label: "账号", component: { is: "el-input", props: { placeholder: "请输入账号" } }, hidden: (model: StepModel) => model.__step !== "base" },
     {
       prop: "priority",

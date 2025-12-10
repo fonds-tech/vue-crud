@@ -46,8 +46,7 @@ export default defineComponent<GridItemProps>({
     })
 
     const visible = computed(() => {
-      if (!grid)
-        return true
+      if (!grid) return true
       return grid.displayIndexList.value.includes(index)
     })
 
@@ -69,8 +68,7 @@ export default defineComponent<GridItemProps>({
         gridColumn: `span ${data.span}`,
         ...offsetStyle.value,
       }
-      if (!visible.value || data.span === 0)
-        style.display = "none"
+      if (!visible.value || data.span === 0) style.display = "none"
       return style
     })
 
@@ -81,31 +79,24 @@ export default defineComponent<GridItemProps>({
 
     const finalStyle = computed(() => {
       const extraStyle = (attrs as Record<string, any>).style as CSSProperties | undefined
-      if (!extraStyle)
-        return baseStyle.value
+      if (!extraStyle) return baseStyle.value
       return [baseStyle.value, extraStyle]
     })
 
     const overflow = computed(() => grid?.overflow.value ?? false)
 
     watchEffect(() => {
-      if (!collector || index === -1)
-        return
+      if (!collector || index === -1) return
       collector.collectItemData(index, itemData.value)
     })
 
     onBeforeUnmount(() => {
-      if (!collector || index === -1)
-        return
+      if (!collector || index === -1) return
       collector.removeItemData(index)
     })
 
     return () => (
-      <div
-        class={className.value}
-        style={finalStyle.value}
-        {...passThroughAttrs.value}
-      >
+      <div class={className.value} style={finalStyle.value} {...passThroughAttrs.value}>
         {slots.default?.({ overflow: overflow.value })}
       </div>
     )

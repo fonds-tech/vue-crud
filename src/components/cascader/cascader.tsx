@@ -22,8 +22,7 @@ export default defineComponent({
 
     // options 优先级：优先使用远程获取结果，若远程为空则回退静态 props.options
     const options = computed<CascaderOption[]>(() => {
-      if (remoteOptionList.value.length > 0)
-        return remoteOptionList.value
+      if (remoteOptionList.value.length > 0) return remoteOptionList.value
       return props.options || []
     })
 
@@ -31,8 +30,7 @@ export default defineComponent({
       () => props.api,
       () => {
         remoteOptionList.value = []
-        if (props.immediate && isFunction(props.api))
-          void refresh()
+        if (props.immediate && isFunction(props.api)) void refresh()
       },
       { immediate: true },
     )
@@ -40,8 +38,7 @@ export default defineComponent({
     watch(
       () => props.params,
       (next, prev) => {
-        if (!isEqual(next, prev))
-          void refresh()
+        if (!isEqual(next, prev)) void refresh()
       },
       { deep: true },
     )

@@ -13,9 +13,12 @@ defineOptions({
   name: "basic-detail-demo",
 })
 
-const crudRef = useCrud({
-  service: new DetailMockService(),
-}, crud => crud.refresh())
+const crudRef = useCrud(
+  {
+    service: new DetailMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const tableRef = useTable({
   columns: [
@@ -83,9 +86,7 @@ const tableRef = useTable({
       label: "操作",
       width: 100,
       fixed: "right",
-      actions: [
-        { text: "详情", type: "detail" },
-      ],
+      actions: [{ text: "详情", type: "detail" }],
     },
   ],
 })

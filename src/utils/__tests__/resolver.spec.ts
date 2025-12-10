@@ -34,7 +34,7 @@ describe("resolver", () => {
         user: { name: string, age: number }
         isAdmin: boolean
       }
-      const fn = (ctx: Context) => ctx.isAdmin ? ctx.user.name : "Guest"
+      const fn = (ctx: Context) => (ctx.isAdmin ? ctx.user.name : "Guest")
 
       expect(resolve(fn, { user: { name: "Alice", age: 30 }, isAdmin: true })).toBe("Alice")
       expect(resolve(fn, { user: { name: "Bob", age: 25 }, isAdmin: false })).toBe("Guest")

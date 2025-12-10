@@ -161,9 +161,7 @@ describe("render/item", () => {
   describe("renderFormItem", () => {
     it("渲染表单项包含 GridItem 和 el-form-item", () => {
       const ctx = createRenderContext()
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }]
       const item = ctx.options.items[0]
 
       const TestWrapper = defineComponent({
@@ -181,9 +179,7 @@ describe("render/item", () => {
 
     it("hidden 项不可见", () => {
       const ctx = createRenderContext()
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "name", label: "名称", hidden: true, component: { is: "el-input" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", hidden: true, component: { is: "el-input" } }]
       const item = ctx.options.items[0]
 
       const TestWrapper = defineComponent({
@@ -423,9 +419,7 @@ describe("render/form", () => {
   describe("renderForm", () => {
     it("渲染基础表单", () => {
       const ctx = createRenderContext()
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }]
 
       const TestWrapper = defineComponent({
         setup() {
@@ -449,9 +443,7 @@ describe("render/form", () => {
           { name: "step2", title: "步骤2" },
         ],
       }
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "name", label: "名称", group: "step1", component: { is: "el-input" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", group: "step1", component: { is: "el-input" } }]
 
       const TestWrapper = defineComponent({
         setup() {
@@ -476,9 +468,7 @@ describe("render/form", () => {
         ],
       }
       ctx.activeGroupName.value = "tab1"
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "name", label: "名称", group: "tab1", component: { is: "el-input" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", group: "tab1", component: { is: "el-input" } }]
 
       const TestWrapper = defineComponent({
         setup() {

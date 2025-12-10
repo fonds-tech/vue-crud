@@ -63,6 +63,23 @@ describe("fd-crud helper logic", () => {
     expect(res).toEqual({ page: 1, name: "foo" })
   })
 
+  it("paramsReplace 在参数缺失时保持键值不变", () => {
+    const dict: any = { pagination: { page: "p" }, search: {}, sort: {} }
+    const res = paramsReplace(dict, { size: 20 })
+    expect(res).toEqual({ size: 20 })
+  })
+
+  it("paramsReplace 支持默认字典为空并恢复下划线键", () => {
+    const res = paramsReplace(undefined as any, { _token: "abc", page: 2 })
+    expect(res).toEqual({ token: "abc", page: 2 })
+  })
+
+  it("paramsReplace 映射字段与源字段相同时不转换", () => {
+    const dict: any = { pagination: { page: "page" }, search: { keyword: "keyword" }, sort: {} }
+    const res = paramsReplace(dict, { page: 1, keyword: "k" })
+    expect(res).toEqual({ page: 1, keyword: "k" })
+  })
+
   it("set(service) 透传 _permission 并保持原型", () => {
     const { crud, config } = createCrud()
     const helper = createHelper({ crud, config, mitt: crud.mitt as any })
@@ -80,6 +97,15 @@ describe("fd-crud helper logic", () => {
     expect(crud.permission.list).toBe(true)
     expect(Object.getPrototypeOf(crud.service)).toBe(ServiceClass.prototype)
     expect((crud.service as any).ping()).toBe("pong")
+  })
+
+  it("set(service) _permission 为空时跳过权限写入", () => {
+    const { crud, config } = createCrud()
+    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
+
+    helper.set("service", { _permission: undefined })
+
+    expect(crud.permission.list).toBeUndefined()
   })
 
   it("set(permission) 函数形式", () => {
@@ -108,6 +134,15 @@ describe("fd-crud helper logic", () => {
     helper.set("params", { customKey: "value" })
 
     expect(crud.params.customKey).toBe("value")
+  })
+
+  it("set 默认分支在未知字段时不合并", () => {
+    const { crud, config } = createCrud()
+    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
+
+    helper.set("unknown", { shouldNotExist: true })
+
+    expect((crud as any).unknown).toBeUndefined()
   })
 
   it("set 空值时返回 false", () => {
@@ -216,5 +251,14 @@ describe("fd-crud helper logic", () => {
     expect(crud.params.page).toBe(1)
     expect(crud.params.size).toBe(100)
     expect(crud.params.keyword).toBe("test")
+  })
+
+  it("rowDelete 占位符可直接调用", async () => {
+    const { crud, config } = createCrud()
+    const helper = createHelper({ crud, config, mitt: crud.mitt as any })
+
+    const res = await helper.rowDelete()
+
+    expect(res).toBeUndefined()
   })
 })

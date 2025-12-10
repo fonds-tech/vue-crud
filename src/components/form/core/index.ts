@@ -83,8 +83,7 @@ export function useFormCore(): FormCore {
   watch(
     activeGroupName,
     (name) => {
-      if (options.group?.type === "tabs")
-        helpers.markGroupLoaded(name)
+      if (options.group?.type === "tabs") helpers.markGroupLoaded(name)
     },
     { immediate: true },
   )
@@ -92,8 +91,7 @@ export function useFormCore(): FormCore {
   watch(
     step,
     () => {
-      if (options.group?.type === "steps")
-        helpers.markGroupLoaded(helpers.activeStepName.value)
+      if (options.group?.type === "steps") helpers.markGroupLoaded(helpers.activeStepName.value)
     },
     { immediate: true },
   )
@@ -116,8 +114,7 @@ export function useFormCore(): FormCore {
 
   function next() {
     methods.validate((isValid) => {
-      if (!isValid)
-        return
+      if (!isValid) return
       const values = clone(model)
       const proceed = () => {
         const total = options.group?.children?.length || 0

@@ -20,9 +20,7 @@ describe("table settings", () => {
   describe("cache", () => {
     it("writeCache 写入缓存", () => {
       const state = createTableState({ name: "test-write" }, {}, {})
-      ;(state.columnSettings as any).value = [
-        { id: "col1", label: "Col1", show: false, order: 0, sort: true, pinned: false },
-      ]
+      ;(state.columnSettings as any).value = [{ id: "col1", label: "Col1", show: false, order: 0, sort: true, pinned: false }]
 
       writeCache(state)
 

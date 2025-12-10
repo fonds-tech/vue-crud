@@ -1,30 +1,15 @@
 <template>
   <div class="dialog-example">
     <el-space wrap>
-      <el-button type="primary" :icon="List" @click="dialogVisible = true">
-        发布日志
-      </el-button>
-      <el-button text type="primary" @click="shuffleLogs">
-        刷新日志
-      </el-button>
+      <el-button type="primary" :icon="List" @click="dialogVisible = true"> 发布日志 </el-button>
+      <el-button text type="primary" @click="shuffleLogs"> 刷新日志 </el-button>
     </el-space>
     <span class="operation-tip">点击查看长列表内容的滚动效果</span>
 
-    <fd-dialog
-      v-model="dialogVisible"
-      title="发布日志"
-      width="640"
-      height="28vh"
-      top="10vh"
-    >
+    <fd-dialog v-model="dialogVisible" title="发布日志" width="640" height="28vh" top="10vh">
       <div class="scroll-dialog__body">
         <el-timeline>
-          <el-timeline-item
-            v-for="item in logs"
-            :key="item.id"
-            :timestamp="item.time"
-            :type="item.type"
-          >
+          <el-timeline-item v-for="item in logs" :key="item.id" :timestamp="item.time" :type="item.type">
             <div class="timeline-item">
               <strong>{{ item.title }}</strong>
               <p>{{ item.desc }}</p>

@@ -13,31 +13,22 @@ export const responsiveBreakpoints = {
 const breakpointOrder = ["xxl", "xl", "lg", "md", "sm", "xs"] as const
 
 /** 按视口宽度解析响应式数值，支持数值或断点对象 */
-export function resolveResponsiveValue(
-  value: number | ResponsiveValue | undefined,
-  viewportWidth?: number,
-  fallback = 0,
-): number {
-  if (typeof value === "number" && !Number.isNaN(value))
-    return value
+export function resolveResponsiveValue(value: number | ResponsiveValue | undefined, viewportWidth?: number, fallback = 0): number {
+  if (typeof value === "number" && !Number.isNaN(value)) return value
 
   if (value && typeof value === "object") {
-    const width = typeof viewportWidth === "number" && !Number.isNaN(viewportWidth)
-      ? viewportWidth
-      : Number.POSITIVE_INFINITY
+    const width = typeof viewportWidth === "number" && !Number.isNaN(viewportWidth) ? viewportWidth : Number.POSITIVE_INFINITY
 
     for (const key of breakpointOrder) {
       const minWidth = responsiveBreakpoints[key]
       const candidate = (value as ResponsiveValue)[key]
-      if (candidate !== undefined && width >= minWidth)
-        return candidate as number
+      if (candidate !== undefined && width >= minWidth) return candidate as number
     }
 
     // 未匹配到合适断点时，取最靠前的已配置值作为兜底
     for (const key of [...breakpointOrder].reverse()) {
       const candidate = (value as ResponsiveValue)[key]
-      if (candidate !== undefined)
-        return candidate as number
+      if (candidate !== undefined) return candidate as number
     }
   }
 
@@ -66,12 +57,7 @@ export function resolveItemData(cols: number, data: GridItemData): GridItemData 
 }
 
 /** 计算折叠状态下需要展示的子项索引 */
-export function calculateDisplayInfo(params: {
-  cols: number
-  collapsed: boolean
-  collapsedRows: number
-  items: GridItemData[]
-}) {
+export function calculateDisplayInfo(params: { cols: number, collapsed: boolean, collapsedRows: number, items: GridItemData[] }) {
   const cols = Math.max(1, params.cols)
   const collapsedRows = Math.max(1, params.collapsedRows)
   const items = params.items.map(item => resolveItemData(cols, item))
@@ -98,10 +84,8 @@ export function calculateDisplayInfo(params: {
   // 再按顺序填充非后缀元素，直到容量耗尽
   for (let i = 0; i < items.length; i++) {
     const item = items[i]
-    if (item.suffix)
-      continue
-    if (used + item.span > capacity)
-      break
+    if (item.suffix) continue
+    if (used + item.span > capacity) break
     used += item.span
     displayIndexList.push(i)
   }

@@ -7,18 +7,19 @@ describe("detail actions", () => {
   const mockData = { name: "测试", value: 100 }
   const mockOnClose = vi.fn()
 
-  const createCtx = (actions: DetailAction[] = []): RenderCtx<typeof mockData> => ({
-    data: { value: mockData },
-    options: {
-      actions,
-      dialog: { title: "详情" },
-    } as any,
-    onClose: mockOnClose,
-    userSlots: {},
-    groups: [],
-    loading: { value: false },
-    cache: { value: {} },
-  } as unknown as RenderCtx<typeof mockData>)
+  const createCtx = (actions: DetailAction[] = []): RenderCtx<typeof mockData> =>
+    ({
+      data: { value: mockData },
+      options: {
+        actions,
+        dialog: { title: "详情" },
+      } as any,
+      onClose: mockOnClose,
+      userSlots: {},
+      groups: [],
+      loading: { value: false },
+      cache: { value: {} },
+    }) as unknown as RenderCtx<typeof mockData>
 
   beforeEach(() => {
     mockOnClose.mockClear()
@@ -81,9 +82,7 @@ describe("detail actions", () => {
     })
 
     it("应该解析动态文本", () => {
-      const ctx = createCtx([
-        { type: "ok", text: data => `提交(${data.value})` },
-      ])
+      const ctx = createCtx([{ type: "ok", text: data => `提交(${data.value})` }])
       const result = renderActions(ctx)
 
       expect(result).toBeDefined()

@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-grid 栅格示例"
-    description="展示栅格列数、间距、响应式与折叠能力"
-    :components="componentCatalog"
-  />
+  <layout title="fd-grid 栅格示例" description="展示栅格列数、间距、响应式与折叠能力" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

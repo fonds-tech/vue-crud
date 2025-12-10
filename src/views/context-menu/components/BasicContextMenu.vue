@@ -2,20 +2,13 @@
   <div class="context-card">
     <div class="card-header">
       <div>
-        <p class="card-eyebrow">
-          Right Click Demo
-        </p>
+        <p class="card-eyebrow">Right Click Demo</p>
         <h3>基础右键菜单</h3>
       </div>
-      <el-tag type="primary" effect="light">
-        ContextMenu.open
-      </el-tag>
+      <el-tag type="primary" effect="light"> ContextMenu.open </el-tag>
     </div>
 
-    <p class="card-desc">
-      在任意区域触发右键事件后调用 <code>ContextMenu.open(event, options)</code> 即可渲染菜单。
-      下面的面板内置 hover 高亮和多级菜单示例。
-    </p>
+    <p class="card-desc">在任意区域触发右键事件后调用 <code>ContextMenu.open(event, options)</code> 即可渲染菜单。 下面的面板内置 hover 高亮和多级菜单示例。</p>
 
     <div class="interactive-area" @contextmenu.prevent="handleContextMenu">
       <p>在此区域点击右键打开菜单</p>
@@ -45,10 +38,7 @@ const menuActions: ContextMenuItem[] = [
       { label: "下线", disabled: true },
       {
         label: "子级菜单",
-        children: [
-          { label: "移动到其他组" },
-          { label: "归档" },
-        ],
+        children: [{ label: "移动到其他组" }, { label: "归档" }],
       },
     ],
   },

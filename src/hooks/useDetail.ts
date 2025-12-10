@@ -10,8 +10,7 @@ export function useDetail(options?: DetailUseOptions, callback?: (detail: Detail
   watch(
     () => detail.value,
     (val) => {
-      if (!val)
-        return
+      if (!val) return
       if (options) {
         val.use(options)
       }

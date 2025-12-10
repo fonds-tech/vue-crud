@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-dialog 弹窗示例"
-    description="展示基础弹窗、全屏切换与滚动内容"
-    :components="componentCatalog"
-  />
+  <layout title="fd-dialog 弹窗示例" description="展示基础弹窗、全屏切换与滚动内容" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

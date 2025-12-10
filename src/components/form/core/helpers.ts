@@ -39,8 +39,7 @@ export function createHelpers({
 }) {
   function propKey(prop?: FormItemProp, fallback?: string | number) {
     const path = toPathArray(prop)
-    if (path?.length)
-      return path.join(".")
+    if (path?.length) return path.join(".")
     return String(fallback ?? "")
   }
 
@@ -48,8 +47,7 @@ export function createHelpers({
   const setValue = (prop: FormItemProp, value: unknown) => setModelValue(model, prop, value)
 
   function isComponentConfig(component?: FormComponentSlot): component is FormComponentSlot & Record<string, unknown> {
-    if (!component || typeof component !== "object")
-      return false
+    if (!component || typeof component !== "object") return false
     return "is" in component || "slot" in component || "props" in component || "options" in component || "on" in component || "style" in component
   }
 
@@ -58,8 +56,7 @@ export function createHelpers({
   }
 
   function resolveProp<TValue>(target: unknown, prop: string): TValue | undefined {
-    if (!target || typeof target !== "object")
-      return undefined
+    if (!target || typeof target !== "object") return undefined
     const value = (target as Record<string, unknown>)[prop]
     if (isFunction(value)) {
       return value(model) as TValue | undefined
@@ -68,27 +65,23 @@ export function createHelpers({
   }
 
   function is(com?: FormComponentSlot) {
-    if (!com)
-      return undefined
+    if (!com) return undefined
 
     const resolved = isComponentConfig(com) ? resolveProp<string | VueComponent | (() => unknown)>(com, "is") : com
-    if (!resolved)
-      return undefined
+    if (!resolved) return undefined
 
-    if (isVNode(resolved))
-      return wrapVNode(resolved)
+    if (isVNode(resolved)) return wrapVNode(resolved)
 
-    if (typeof resolved === "function" || (typeof resolved === "object" && resolved))
-      return markRaw(resolved as VueComponent)
+    if (typeof resolved === "function" || (typeof resolved === "object" && resolved)) return markRaw(resolved as VueComponent)
 
     return resolved as string | VueComponent
   }
 
-  const onListeners = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, (...args: unknown[]) => void>>(com, "on") ?? {} : {})
+  const onListeners = (com?: FormComponentSlot) => (isComponentConfig(com) ? (resolveProp<Record<string, (...args: unknown[]) => void>>(com, "on") ?? {}) : {})
 
   const slotNameOf = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<string | undefined>(com, "slot") : undefined)
 
-  const componentBaseProps = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<Record<string, unknown>>(com, "props") ?? {} : {})
+  const componentBaseProps = (com?: FormComponentSlot) => (isComponentConfig(com) ? (resolveProp<Record<string, unknown>>(com, "props") ?? {}) : {})
 
   const styleOf = (com?: FormComponentSlot) => (isComponentConfig(com) ? resolveProp<CSSProperties | undefined>(com, "style") : undefined)
 
@@ -99,28 +92,23 @@ export function createHelpers({
   }
 
   function slotsOf(target?: FormItem | FormComponentSlot) {
-    if (!target)
-      return {}
-    if (!hasSlotsProp(target))
-      return {}
+    if (!target) return {}
+    if (!hasSlotsProp(target)) return {}
     return resolveProp<Record<string, FormComponentSlot>>(target, "slots") ?? {}
   }
 
   function markGroupLoaded(name?: string | number) {
-    if (name === undefined)
-      return
+    if (name === undefined) return
     loadedGroups.value.add(name)
   }
 
   function isGroupLoaded(name?: string | number) {
-    if (name === undefined)
-      return true
+    if (name === undefined) return true
     return loadedGroups.value.has(name)
   }
 
   const activeStepName = computed<string | number | undefined>(() => {
-    if (options.group?.type !== "steps" || !options.group.children?.length)
-      return undefined
+    if (options.group?.type !== "steps" || !options.group.children?.length) return undefined
     const idx = Math.max(0, step.value - 1)
     return options.group.children[idx]?.name ?? idx + 1
   })
@@ -137,21 +125,17 @@ export function createHelpers({
   }
 
   function itemsOfGroup(groupName: string | number) {
-    if (options.group?.type !== "tabs" || !options.group.children?.length)
-      return []
+    if (options.group?.type !== "tabs" || !options.group.children?.length) return []
     return filterGroupItems(options.items, filterContext.value, groupName)
       .map(item => applyFilters(item, filterContext.value, { groupName }))
       .filter((item): item is FormItem => item !== null)
   }
 
   function itemsOfStep(groupName?: string | number) {
-    if (options.group?.type !== "steps" || !options.group.children?.length)
-      return options.items
+    if (options.group?.type !== "steps" || !options.group.children?.length) return options.items
     const filtered = filterStepItems(options.items, filterContext.value, groupName)
     const target = groupName ?? filterContext.value.activeStepName
-    return filtered
-      .map(item => applyFilters(item, filterContext.value, { groupName: target }))
-      .filter((item): item is FormItem => item !== null)
+    return filtered.map(item => applyFilters(item, filterContext.value, { groupName: target })).filter((item): item is FormItem => item !== null)
   }
 
   function showInGroup(item: FormItem, groupName: string | number) {
@@ -161,8 +145,7 @@ export function createHelpers({
   const extra = (item: FormItem) => (resolveProp<boolean>(item, "hidden") ? "" : resolveProp<string>(item, "extra"))
 
   function required(item: FormItem) {
-    if (resolveProp<boolean>(item, "hidden"))
-      return false
+    if (resolveProp<boolean>(item, "hidden")) return false
     const flag = resolveProp<boolean | undefined>(item, "required")
     return typeof flag === "boolean" ? flag : undefined
   }
@@ -170,14 +153,11 @@ export function createHelpers({
   const disabled = (item: FormItem) => Boolean(resolveProp(item, "disabled"))
 
   function rules(item: FormItem) {
-    if (resolveProp<boolean>(item, "hidden"))
-      return []
+    if (resolveProp<boolean>(item, "hidden")) return []
     const fieldRules = resolveProp<FormItemRuleWithMeta | FormItemRuleWithMeta[]>(item, "rules")
-    if (!fieldRules)
-      return []
+    if (!fieldRules) return []
     if (!required(item)) {
-      if (Array.isArray(fieldRules))
-        return fieldRules.filter(rule => !rule._inner)
+      if (Array.isArray(fieldRules)) return fieldRules.filter(rule => !rule._inner)
       return fieldRules._inner ? [] : fieldRules
     }
     return fieldRules
@@ -266,8 +246,7 @@ export function createHelpers({
   }
 
   function useRef(el: unknown, com?: FormComponentSlot) {
-    if (!isComponentConfig(com))
-      return
+    if (!isComponentConfig(com)) return
     const refHandler = com.ref
     if (isFunction(refHandler)) {
       refHandler(el)
@@ -299,8 +278,7 @@ export function createHelpers({
    * 调用方应确保事件名已使用 `onXxx` 格式。
    */
   function normalizeListeners(listeners?: Record<string, (...args: unknown[]) => void>) {
-    if (!listeners)
-      return {}
+    if (!listeners) return {}
     const result: Record<string, (...args: unknown[]) => void> = {}
     Object.entries(listeners).forEach(([key, handler]) => {
       if (handler) {
@@ -316,12 +294,10 @@ export function createHelpers({
     const rawOptions = isComponentConfig(item.component) ? item.component.options : undefined
 
     if (isFunction(rawOptions)) {
-      if (!state.loading && !state.pending)
-        syncOptions(optionState, key, rawOptions(model))
+      if (!state.loading && !state.pending) syncOptions(optionState, key, rawOptions(model))
     }
     else if (rawOptions !== undefined) {
-      if (state.value !== rawOptions)
-        syncOptions(optionState, key, rawOptions as MaybePromise<any[]>)
+      if (state.value !== rawOptions) syncOptions(optionState, key, rawOptions as MaybePromise<any[]>)
     }
 
     const stateRef = optionState[key]

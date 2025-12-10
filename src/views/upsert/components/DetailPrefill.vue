@@ -18,9 +18,12 @@ const priorityDict: TableDict[] = [
   { label: "Low", value: "Low", type: "info" },
 ]
 
-const crud = useCrud({
-  service: new UpsertMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new UpsertMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   columns: [
@@ -64,7 +67,15 @@ const table = useTable({
         slots: { default: () => "点击访问" },
       },
     },
-    { prop: "status", label: "状态", width: 80, dict: [{ label: "启用", value: 1, type: "success" }, { label: "禁用", value: 0, type: "danger" }] },
+    {
+      prop: "status",
+      label: "状态",
+      width: 80,
+      dict: [
+        { label: "启用", value: 1, type: "success" },
+        { label: "禁用", value: 0, type: "danger" },
+      ],
+    },
     { prop: "createTime", label: "创建时间", minWidth: 160 },
     { prop: "remark", label: "备注", minWidth: 200 },
     { type: "action", label: "操作", width: 100, actions: [{ text: "编辑", type: "update" }] },
@@ -92,7 +103,7 @@ const upsert = useUpsert({
   onDetail: async (row, ctx) => {
     // 自定义详情预取：调用 service.detail，然后补充备注，账号设为只读
     const service = crud.value?.service as UpsertMockService
-    const detail = await service.detail({ id: row.id }) as Record<string, any>
+    const detail = (await service.detail({ id: row.id })) as Record<string, any>
     ctx.done({
       ...detail,
       remark: `【详情预填】${detail.remark ?? ""}`,

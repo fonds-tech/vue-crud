@@ -107,10 +107,7 @@ describe("fd-crud service logic", () => {
 
     expect(res).toEqual({ list: [{ id: 1 }, { id: 2 }], pagination: { total: 2 } })
     expect(crud.mitt.emit).toHaveBeenCalledWith("crud.refresh", expect.anything())
-    expect(crud.mitt.emit).toHaveBeenCalledWith(
-      "table.refresh",
-      expect.objectContaining({ count: 2, pageSize: undefined, list: expect.any(Array) }),
-    )
+    expect(crud.mitt.emit).toHaveBeenCalledWith("table.refresh", expect.objectContaining({ count: 2, pageSize: undefined, list: expect.any(Array) }))
     expect(crud.loading).toBe(false)
   })
 

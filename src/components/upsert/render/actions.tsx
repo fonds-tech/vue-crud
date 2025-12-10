@@ -38,15 +38,12 @@ interface RenderActionsContext<T extends FormRecord = FormRecord> {
 /**
  * 渲染底部操作按钮
  */
-export function renderActions<T extends FormRecord = FormRecord>(
-  context: RenderActionsContext<T>,
-) {
+export function renderActions<T extends FormRecord = FormRecord>(context: RenderActionsContext<T>) {
   const { options, state, service, actionHelpers, componentHelper, exposeSlots } = context
   const { resolveActionText, isActionVisible } = actionHelpers
 
   return options.actions.map((action, index) => {
-    if (!isActionVisible(action))
-      return null
+    if (!isActionVisible(action)) return null
 
     if (action.type === "cancel") {
       return (
@@ -125,8 +122,6 @@ export function renderActions<T extends FormRecord = FormRecord>(
 /**
  * 渲染底部区域
  */
-export function renderFooter<T extends FormRecord = FormRecord>(
-  context: RenderActionsContext<T>,
-) {
+export function renderFooter<T extends FormRecord = FormRecord>(context: RenderActionsContext<T>) {
   return <div class="fd-upsert__footer">{renderActions(context)}</div>
 }

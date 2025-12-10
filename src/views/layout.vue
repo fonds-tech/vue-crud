@@ -28,9 +28,7 @@
         <div class="layout__info-text">
           <h3 class="layout__preview-title">
             {{ activeComponent.title }}
-            <span v-if="activeComponent.componentName" class="layout__component-name">
-              - {{ activeComponent.componentName }}
-            </span>
+            <span v-if="activeComponent.componentName" class="layout__component-name"> - {{ activeComponent.componentName }} </span>
           </h3>
           <p class="layout__preview-description">
             {{ activeComponent.description }}

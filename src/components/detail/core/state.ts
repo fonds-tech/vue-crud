@@ -79,8 +79,7 @@ export function createDetailState<D extends DetailData = DetailData>(crud: CrudC
 
   function use(useOptions: DetailUseOptions<D>) {
     mergeWith(options, useOptions as any, (_objValue, srcValue) => {
-      if (Array.isArray(srcValue))
-        return srcValue
+      if (Array.isArray(srcValue)) return srcValue
       return undefined
     })
     ensureActions()

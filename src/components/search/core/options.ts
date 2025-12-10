@@ -23,10 +23,7 @@ export function createDefaultOptions<T extends FormRecord = FormRecord>(): Inter
       },
     },
     action: {
-      items: clone([
-        { type: "search" },
-        { type: "reset" },
-      ]) as SearchAction<T>[],
+      items: clone([{ type: "search" }, { type: "reset" }]) as SearchAction<T>[],
       grid: {
         cols: 2,
         colGap: 12,
@@ -41,10 +38,7 @@ export function createDefaultOptions<T extends FormRecord = FormRecord>(): Inter
  * @param options 当前配置
  * @param useOptions 新配置
  */
-export function mergeSearchOptions<T extends FormRecord = FormRecord>(
-  options: InternalOptions<T>,
-  useOptions: SearchOptions<T>,
-) {
+export function mergeSearchOptions<T extends FormRecord = FormRecord>(options: InternalOptions<T>, useOptions: SearchOptions<T>) {
   const { action, onSearch, onReset, ...formOptions } = useOptions
 
   // 合并动作配置
@@ -53,9 +47,7 @@ export function mergeSearchOptions<T extends FormRecord = FormRecord>(
   }
 
   if (action?.grid) {
-    options.action.grid = options.action.grid
-      ? merge({}, options.action.grid, action.grid)
-      : clone(action.grid)
+    options.action.grid = options.action.grid ? merge({}, options.action.grid, action.grid) : clone(action.grid)
   }
 
   // 设置钩子

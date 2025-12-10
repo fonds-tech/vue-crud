@@ -5,16 +5,11 @@
       <h3 class="demo-title">1. 基础用法 (Click Trigger)</h3>
       <p class="demo-desc">默认点击展开子菜单。</p>
       <div class="demo-control">
-        <fd-cascader
-          v-model="value1"
-          :options="options"
-          placeholder="请选择地区"
-          style="width: 100%"
-        />
+        <fd-cascader v-model="value1" :options="options" placeholder="请选择地区" style="width: 100%" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
-        <span>{{ value1 || '-' }}</span>
+        <span>{{ value1 || "-" }}</span>
       </div>
     </div>
 
@@ -23,17 +18,11 @@
       <h3 class="demo-title">2. 悬停展开 (Hover Trigger)</h3>
       <p class="demo-desc">鼠标悬停即可展开子菜单。</p>
       <div class="demo-control">
-        <fd-cascader
-          v-model="value2"
-          :options="options"
-          :props="{ expandTrigger: 'hover' }"
-          placeholder="请选择地区"
-          style="width: 100%"
-        />
+        <fd-cascader v-model="value2" :options="options" :props="{ expandTrigger: 'hover' }" placeholder="请选择地区" style="width: 100%" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
-        <span>{{ value2 || '-' }}</span>
+        <span>{{ value2 || "-" }}</span>
       </div>
     </div>
 
@@ -64,17 +53,11 @@
       <h3 class="demo-title">4. 可搜索 (Filterable)</h3>
       <p class="demo-desc">开启 filterable 属性，支持关键词搜索。</p>
       <div class="demo-control">
-        <fd-cascader
-          v-model="value4"
-          :options="options"
-          filterable
-          placeholder="试试搜索 '杭州'"
-          style="width: 100%"
-        />
+        <fd-cascader v-model="value4" :options="options" filterable placeholder="试试搜索 '杭州'" style="width: 100%" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
-        <span>{{ value4 || '-' }}</span>
+        <span>{{ value4 || "-" }}</span>
       </div>
     </div>
   </div>
@@ -118,9 +101,7 @@ const options = [
       {
         value: "nanjing",
         label: "南京",
-        children: [
-          { value: "zhonghuamen", label: "中华门" },
-        ],
+        children: [{ value: "zhonghuamen", label: "中华门" }],
       },
     ],
   },

@@ -138,11 +138,7 @@ const advancedOptions: SearchOptions = {
       component: {
         is: "el-radio-group",
         slots: {
-          default: () => [
-            h("el-radio", { label: "all" }, () => "全部"),
-            h("el-radio", { label: "pending" }, () => "待审批"),
-            h("el-radio", { label: "passed" }, () => "已通过"),
-          ],
+          default: () => [h("el-radio", { label: "all" }, () => "全部"), h("el-radio", { label: "pending" }, () => "待审批"), h("el-radio", { label: "passed" }, () => "已通过")],
         },
       },
     },

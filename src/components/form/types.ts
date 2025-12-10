@@ -2,15 +2,7 @@ import type { Arrayable } from "element-plus/es/utils"
 import type { FormHelpers } from "./core"
 import type { GridProps, GridItemProps } from "../grid"
 import type { Ref, VNode, VNodeChild, ComputedRef, CSSProperties, Component as VueComponent } from "vue"
-import type {
-  FormProps,
-  FormInstance,
-  FormItemProp,
-  FormItemRule,
-  FormItemProps,
-  FormValidateCallback,
-  FormValidationResult,
-} from "element-plus"
+import type { FormProps, FormInstance, FormItemProp, FormItemRule, FormItemProps, FormValidateCallback, FormValidationResult } from "element-plus"
 
 export type { FormInstance }
 
@@ -111,17 +103,7 @@ export type FormModel = FormRecord
  * - `json`: JSON 字符串与对象之间的转换 (bind: parse, submit: stringify)
  * - `empty`: 空字符串/空数组转换为 undefined (submit)
  */
-export type FormHookKey
-  = | "number"
-    | "string"
-    | "split"
-    | "join"
-    | "boolean"
-    | "booleanNumber"
-    | "datetimeRange"
-    | "splitJoin"
-    | "json"
-    | "empty"
+export type FormHookKey = "number" | "string" | "split" | "join" | "boolean" | "booleanNumber" | "datetimeRange" | "splitJoin" | "json" | "empty"
 
 /**
  * 自定义表单钩子函数类型
@@ -148,7 +130,7 @@ export type FormHook
   = | FormHookPipe
     | FormHookPipe[]
     | {
-      /** 绑定阶段：数据源 -> 表单模型 */
+    /** 绑定阶段：数据源 -> 表单模型 */
       bind?: FormHookPipe | FormHookPipe[]
       /** 提交阶段：表单模型 -> 提交数据 */
       submit?: FormHookPipe | FormHookPipe[]
@@ -186,12 +168,7 @@ export interface FormRenderContext {
  * 表单组件插槽内容类型
  * @description 支持多种形式的组件渲染内容
  */
-export type FormComponentSlot<T extends FormRecord = FormRecord>
-  = | string
-    | VueComponent
-    | VNode
-    | FormComponent<T>
-    | (() => VNodeChild)
+export type FormComponentSlot<T extends FormRecord = FormRecord> = string | VueComponent | VNode | FormComponent<T> | (() => VNodeChild)
 
 /**
  * 表单内部组件详细配置
@@ -576,9 +553,7 @@ export interface FormMethods<T extends FormRecord = FormRecord> {
    * @param callback 提交完成的回调，包含处理后的数据和可能的错误
    * @returns Promise 包含 values 和 errors
    */
-  submit: (
-    callback?: (model: T, errors: Record<string, any> | undefined) => void,
-  ) => Promise<{ values: T, errors: Record<string, any> | undefined }>
+  submit: (callback?: (model: T, errors: Record<string, any> | undefined) => void) => Promise<{ values: T, errors: Record<string, any> | undefined }>
 }
 
 /**

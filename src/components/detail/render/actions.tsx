@@ -8,8 +8,7 @@ import { slotNameOf, renderComponentSlot } from "../core/helpers"
 /** 判断显隐，支持布尔与函数隐藏条件。 */
 function isVisible<D extends DetailData>(target: { hidden?: ((data: D) => boolean) | boolean }, data: D) {
   const hidden = target?.hidden
-  if (typeof hidden === "function")
-    return !hidden(data)
+  if (typeof hidden === "function") return !hidden(data)
   return !hidden
 }
 
@@ -18,9 +17,7 @@ function resolveActionText<D extends DetailData>(action: DetailAction<D>, option
 }
 
 export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<D>) {
-  const baseActions = ctx.options.actions.length
-    ? ctx.options.actions
-    : []
+  const baseActions = ctx.options.actions.length ? ctx.options.actions : []
   const hasOk = baseActions.some(action => action.type === "ok")
   const actions = hasOk ? baseActions : [...baseActions, { type: "ok", text: "确认" } as DetailAction<D>]
 
@@ -28,8 +25,7 @@ export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<
     "div",
     { class: "fd-detail__footer" },
     actions.map((action, index) => {
-      if (!isVisible(action, ctx.data.value))
-        return null
+      if (!isVisible(action, ctx.data.value)) return null
       if (action.type === "ok") {
         return h(
           ElButton,
@@ -43,11 +39,7 @@ export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<
       }
       const slotName = slotNameOf(action.component, ctx.data.value)
       if (slotName && ctx.userSlots[slotName]) {
-        return h(
-          "template",
-          { key: index },
-          ctx.userSlots[slotName]?.({ index, data: ctx.data.value }),
-        )
+        return h("template", { key: index }, ctx.userSlots[slotName]?.({ index, data: ctx.data.value }))
       }
       const comp = renderComponentSlot(action.component, ctx.data.value, { index, data: ctx.data.value }, ctx.userSlots)
       return comp ? h("template", { key: index }, comp) : null

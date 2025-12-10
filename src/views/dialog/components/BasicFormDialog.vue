@@ -1,27 +1,14 @@
 <template>
   <div class="dialog-example">
-    <el-button type="primary" :icon="Plus" @click="openDialog">
-      新建用户
-    </el-button>
+    <el-button type="primary" :icon="Plus" @click="openDialog"> 新建用户 </el-button>
     <span class="operation-tip">点击新建用户演示表单校验与提交流程</span>
 
-    <fd-dialog
-      v-model="dialogVisible"
-      title="新建内部用户"
-      width="720"
-      height="60vh"
-      destroy-on-close
-      @closed="handleDialogClosed"
-    >
+    <fd-dialog v-model="dialogVisible" title="新建内部用户" width="720" height="60vh" destroy-on-close @closed="handleDialogClosed">
       <fd-form ref="formRef" class="dialog-example__form" />
 
       <template #footer>
-        <el-button :disabled="saving" @click="dialogVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" :loading="saving" @click="handleSubmit">
-          提交
-        </el-button>
+        <el-button :disabled="saving" @click="dialogVisible = false"> 取消 </el-button>
+        <el-button type="primary" :loading="saving" @click="handleSubmit"> 提交 </el-button>
       </template>
     </fd-dialog>
   </div>
@@ -100,8 +87,7 @@ function handleDialogClosed() {
 }
 
 async function handleSubmit() {
-  if (!formRef.value)
-    return
+  if (!formRef.value) return
   try {
     saving.value = true
     const payload = await formRef.value.submit()

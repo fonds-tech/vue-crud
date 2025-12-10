@@ -82,8 +82,7 @@ const isPromiseLike = <T>(value: unknown): value is Promise<T> => Boolean(value 
  * 确保选项状态存在
  */
 export function ensureOptionState(optionState: Record<string, FormAsyncOptionsState>, key: string) {
-  if (!optionState[key])
-    optionState[key] = { loading: false }
+  if (!optionState[key]) optionState[key] = { loading: false }
   return optionState[key]!
 }
 
@@ -94,8 +93,7 @@ export function syncOptions(optionState: Record<string, FormAsyncOptionsState>, 
   const state = ensureOptionState(optionState, key)
 
   if (isPromiseLike(value)) {
-    if (state.pending === value && state.loading)
-      return state
+    if (state.pending === value && state.loading) return state
 
     const requestId = (state.requestId ?? 0) + 1
     state.pending = value

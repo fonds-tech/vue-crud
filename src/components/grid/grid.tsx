@@ -43,7 +43,11 @@ export default defineComponent<GridProps>({
     const rowGap = computed(() => Math.max(0, resolveResponsiveValue(props.rowGap, viewportWidth.value, 0)))
 
     const itemDataMap = reactive(new Map<number, GridItemData>())
-    const itemList = computed(() => Array.from(itemDataMap.entries()).sort((a, b) => a[0] - b[0]).map(([, data]) => data))
+    const itemList = computed(() =>
+      Array.from(itemDataMap.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([, data]) => data),
+    )
     const displayInfo = computed(() =>
       calculateDisplayInfo({
         cols: cols.value,
@@ -95,27 +99,20 @@ export default defineComponent<GridProps>({
 
     // 方法
     const handleResize = () => {
-      if (typeof window !== "undefined")
-        viewportWidth.value = window.innerWidth
+      if (typeof window !== "undefined") viewportWidth.value = window.innerWidth
     }
 
     // 生命周期
     onMounted(() => {
-      if (typeof window !== "undefined")
-        window.addEventListener("resize", handleResize)
+      if (typeof window !== "undefined") window.addEventListener("resize", handleResize)
     })
 
     onBeforeUnmount(() => {
-      if (typeof window !== "undefined")
-        window.removeEventListener("resize", handleResize)
+      if (typeof window !== "undefined") window.removeEventListener("resize", handleResize)
     })
 
     return () => (
-      <div
-        class={className.value}
-        style={[baseStyle.value, attrs.style as CSSProperties]}
-        {...passThroughAttrs.value}
-      >
+      <div class={className.value} style={[baseStyle.value, attrs.style as CSSProperties]} {...passThroughAttrs.value}>
         {slots.default?.()}
       </div>
     )

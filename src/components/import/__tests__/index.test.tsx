@@ -21,10 +21,16 @@ vi.mock("../../../hooks", () => ({
     crud: {
       getPermission: mockGetPermission,
       service: {
-        get import() { return mockServiceOverride.value !== undefined ? mockServiceOverride.value : mockImport },
+        get import() {
+          return mockServiceOverride.value !== undefined ? mockServiceOverride.value : mockImport
+        },
       },
-      get selection() { return mockSelection.value },
-      get dict() { return mockDict.value },
+      get selection() {
+        return mockSelection.value
+      },
+      get dict() {
+        return mockDict.value
+      },
       refresh: mockRefresh,
     },
   }),
@@ -414,9 +420,12 @@ describe("fd-import", () => {
   // Loading 状态测试
   it("导入过程中显示 loading 状态", async () => {
     let resolveImport: (value: any) => void
-    mockImport.mockImplementationOnce(() => new Promise((resolve) => {
-      resolveImport = resolve
-    }))
+    mockImport.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveImport = resolve
+        }),
+    )
 
     const wrapper = mount(FdImport, {
       global: {
@@ -540,9 +549,7 @@ describe("fd-import", () => {
     mockImport.mockResolvedValueOnce({
       success: true,
       count: 9,
-      errors: [
-        { message: "未知行错误" },
-      ],
+      errors: [{ message: "未知行错误" }],
     })
 
     const wrapper = mount(FdImport, {

@@ -55,9 +55,7 @@ describe("fd-form core", () => {
       const core = useFormCore()
       core.use({
         model: { name: "Tom" },
-        items: [
-          { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } },
-        ],
+        items: [{ ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }],
       })
 
       expect(core.model.name).toBe("Tom")
@@ -155,9 +153,7 @@ describe("fd-form core", () => {
         onSubmit,
         group: {
           type: "steps",
-          children: [
-            { name: "step1", title: "步骤1" },
-          ],
+          children: [{ name: "step1", title: "步骤1" }],
         },
       })
 

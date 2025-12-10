@@ -9,8 +9,7 @@ export function useCrud(options?: Partial<CrudOptions>, callback?: (app: CrudRef
   watch(
     () => crud.value,
     (val) => {
-      if (!val)
-        return
+      if (!val) return
       if (options && typeof val.use === "function") {
         val.use(options)
       }

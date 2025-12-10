@@ -11,11 +11,7 @@ import { renderSlotOrComponent } from "./slots"
  */
 export function renderItemSlots(ctx: FormRenderContext, item: FormItem) {
   const slotMap = ctx.helpers.slotsOf(item)
-  return Object.entries(slotMap).map(([name, com]) => (
-    <span key={name}>
-      {renderSlotOrComponent(ctx, com, { model: ctx.model, item })}
-    </span>
-  ))
+  return Object.entries(slotMap).map(([name, com]) => <span key={name}>{renderSlotOrComponent(ctx, com, { model: ctx.model, item })}</span>)
 }
 
 /**
@@ -35,9 +31,7 @@ export function renderFormItem(ctx: FormRenderContext, item: FormItem, index: nu
   const extraContent = helpers.extra(item)
 
   const mainSlotName = helpers.slotNameOf(item.component)
-  const mainContent = mainSlotName && slots[mainSlotName]
-    ? slots[mainSlotName]!({ model, item })
-    : renderControl(ctx, item)
+  const mainContent = mainSlotName && slots[mainSlotName] ? slots[mainSlotName]!({ model, item }) : renderControl(ctx, item)
 
   return (
     <GridItem key={key} v-show={visible} span={helpers.resolveSpan(item)} offset={helpers.resolveOffset(item)}>

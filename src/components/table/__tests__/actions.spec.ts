@@ -33,10 +33,12 @@ describe("buildContextMenuItems", () => {
   })
 
   it("从 action 列提取内置操作", () => {
-    const columns = [{
-      type: "action",
-      actions: [{ type: "detail" }, { type: "update" }, { type: "delete" }],
-    }] as any
+    const columns = [
+      {
+        type: "action",
+        actions: [{ type: "detail" }, { type: "update" }, { type: "delete" }],
+      },
+    ] as any
     const items = buildContextMenuItems(scope, columns, crud, refresh)
 
     // 刷新 always at top
@@ -44,10 +46,12 @@ describe("buildContextMenuItems", () => {
   })
 
   it("action 文本缺省时应回退到 crud 字典并触发执行", () => {
-    const columns = [{
-      type: "action",
-      actions: [{ type: "detail" }],
-    }] as any
+    const columns = [
+      {
+        type: "action",
+        actions: [{ type: "detail" }],
+      },
+    ] as any
     const items = buildContextMenuItems(scope, columns, crud, refresh)
     expect(items[1].label).toBe("Detail")
     items[1].action()
@@ -55,14 +59,16 @@ describe("buildContextMenuItems", () => {
   })
 
   it("处理 action 的 hidden 属性", () => {
-    const columns = [{
-      type: "action",
-      actions: [
-        { type: "detail", text: "Show", hidden: false },
-        { type: "update", text: "Hide", hidden: true },
-        { type: "delete", text: "FnHide", hidden: () => true },
-      ],
-    }] as any
+    const columns = [
+      {
+        type: "action",
+        actions: [
+          { type: "detail", text: "Show", hidden: false },
+          { type: "update", text: "Hide", hidden: true },
+          { type: "delete", text: "FnHide", hidden: () => true },
+        ],
+      },
+    ] as any
     const items = buildContextMenuItems(scope, columns, crud, refresh)
 
     const labels = items.map(i => i.label)

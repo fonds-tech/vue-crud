@@ -31,17 +31,13 @@
 
         <!-- Suffix Item -->
         <!-- 使用 style="grid-column-end: -1" 强制使操作区靠右对齐 -->
-        <fd-grid-item suffix style="grid-column-end: -1;">
+        <fd-grid-item suffix style="grid-column-end: -1">
           <div class="form-item">
             <!-- 占位 Label，确保按钮组与输入框垂直对齐 -->
-            <span class="label" style="opacity: 0; user-select: none;">Placeholder</span>
+            <span class="label" style="opacity: 0; user-select: none">Placeholder</span>
             <div class="action-area">
-              <el-button type="primary" :icon="Search">
-                搜索
-              </el-button>
-              <el-button :icon="Refresh">
-                重置
-              </el-button>
+              <el-button type="primary" :icon="Search"> 搜索 </el-button>
+              <el-button :icon="Refresh"> 重置 </el-button>
               <el-button link type="primary" class="collapse-btn" @click="collapsed = !collapsed">
                 {{ collapsed ? "展开" : "收起" }}
                 <el-icon class="el-icon--right">

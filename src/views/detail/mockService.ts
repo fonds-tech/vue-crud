@@ -61,10 +61,7 @@ export class DetailMockService {
         // 模拟搜索
         if (params.keyword) {
           const kw = params.keyword.toLowerCase()
-          list = list.filter((item: any) =>
-            item.name.toLowerCase().includes(kw)
-            || item.account.toLowerCase().includes(kw),
-          )
+          list = list.filter((item: any) => item.name.toLowerCase().includes(kw) || item.account.toLowerCase().includes(kw))
         }
 
         // 模拟状态过滤

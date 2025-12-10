@@ -32,18 +32,15 @@ export default defineComponent<ComponentProps>({
 
       // 复制非特殊 Props
       Object.entries(props as ComponentProps).forEach(([key, value]) => {
-        if (key === "option" || key === "labelKey" || key === "valueKey")
-          return
+        if (key === "option" || key === "labelKey" || key === "valueKey") return
         merged[key] = value
       })
 
       const option = props.option
       // 如果提供了 option 对象，尝试自动提取 label 和 value
       if (option) {
-        if (merged.label === undefined && props.labelKey)
-          merged.label = option[props.labelKey]
-        if (merged.value === undefined && props.valueKey)
-          merged.value = option[props.valueKey]
+        if (merged.label === undefined && props.labelKey) merged.label = option[props.labelKey]
+        if (merged.value === undefined && props.valueKey) merged.value = option[props.valueKey]
       }
 
       return { ...merged, class: optionClass.value }
@@ -57,14 +54,11 @@ export default defineComponent<ComponentProps>({
       const slotMap: Record<string, any> = {}
 
       Object.entries(slots).forEach(([name, slot]) => {
-        if (!slot)
-          return
+        if (!slot) return
         slotMap[name] = (scope: any) => slot(scope)
       })
 
-      return (
-        <ElOption class="fd-option" {...optionProps.value} v-slots={slotMap} />
-      )
+      return <ElOption class="fd-option" {...optionProps.value} v-slots={slotMap} />
     }
   },
 })

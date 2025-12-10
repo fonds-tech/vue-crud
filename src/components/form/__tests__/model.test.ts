@@ -77,7 +77,7 @@ describe("fd-form model 路径操作", () => {
     it("设置嵌套属性（自动创建中间对象）", () => {
       const model = reactive<Record<string, unknown>>({})
       setModelValue(model, "user.info.name", "Alice")
-      expect((model.user as Record<string, unknown>)).toBeDefined()
+      expect(model.user as Record<string, unknown>).toBeDefined()
       expect(((model.user as Record<string, unknown>).info as Record<string, unknown>).name).toBe("Alice")
     })
 

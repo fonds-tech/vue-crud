@@ -19,6 +19,7 @@ interface ServiceParams<D extends DetailData = DetailData> {
 /** 创建详情与刷新流程，含并发防脏落地。 */
 export function createDetailService<D extends DetailData = DetailData>(ctx: ServiceParams<D>) {
   const refreshToken = { value: 0 }
+  const defaultErrorMessage = "详情查询失败"
 
   function getDetailApiName() {
     return ctx.crud.dict?.api?.detail ?? "detail"
@@ -29,26 +30,22 @@ export function createDetailService<D extends DetailData = DetailData>(ctx: Serv
     const service = ctx.crud.service?.[apiName]
     if (!isFunction(service)) {
       const error = new Error(`未在 CRUD service 中找到 ${apiName} 方法`)
-      if (token === refreshToken.value)
-        ctx.loading.value = false
+      if (token === refreshToken.value) ctx.loading.value = false
       ElMessage.error(error.message)
       return Promise.reject(error)
     }
     ctx.paramsCache.value = clone(query)
     return service(query)
       .then((res: Record<string, any>) => {
-        if (token === refreshToken.value)
-          done(res ?? {})
+        if (token === refreshToken.value) done(res ?? {})
         return res
       })
       .catch((err: any) => {
-        if (token === refreshToken.value)
-          ElMessage.error(err?.message ?? "详情查询失败")
+        if (token === refreshToken.value) ElMessage.error(defaultErrorMessage)
         throw err
       })
       .finally(() => {
-        if (token === refreshToken.value)
-          ctx.loading.value = false
+        if (token === refreshToken.value) ctx.loading.value = false
       })
   }
 
@@ -60,8 +57,7 @@ export function createDetailService<D extends DetailData = DetailData>(ctx: Serv
       ctx.loading.value = false
     }
     const finalizeIfIdle = () => {
-      if (!requested && currentToken === refreshToken.value)
-        ctx.loading.value = false
+      if (!requested && currentToken === refreshToken.value) ctx.loading.value = false
     }
     const next = (query: Record<string, any>) => {
       requested = true
@@ -75,15 +71,13 @@ export function createDetailService<D extends DetailData = DetailData>(ctx: Serv
         const result = ctx.options.onDetail(params as D, { done, next, close: () => close() })
         return Promise.resolve(result)
           .catch((error: any) => {
-            if (currentToken === refreshToken.value)
-              ElMessage.error(error?.message ?? "详情查询失败")
+            if (currentToken === refreshToken.value) ElMessage.error(defaultErrorMessage)
             throw error
           })
           .finally(finalizeIfIdle)
       }
       catch (error: any) {
-        if (currentToken === refreshToken.value)
-          ElMessage.error(error?.message ?? "详情查询失败")
+        if (currentToken === refreshToken.value) ElMessage.error(defaultErrorMessage)
         finalizeIfIdle()
         return Promise.reject(error)
       }

@@ -25,14 +25,9 @@ import { isFunction } from "@fonds/utils"
  * resolve(undefined, {}) // => undefined
  * ```
  */
-export function resolve<T, C = unknown>(
-  value: MaybeFn<T, C> | undefined,
-  context: C,
-): T | undefined {
-  if (value === undefined)
-    return undefined
-  if (isFunction(value))
-    return (value as (context: C) => T)(context)
+export function resolve<T, C = unknown>(value: MaybeFn<T, C> | undefined, context: C): T | undefined {
+  if (value === undefined) return undefined
+  if (isFunction(value)) return (value as (context: C) => T)(context)
   return value as T
 }
 
@@ -61,15 +56,9 @@ export function resolve<T, C = unknown>(
  * resolveProp<string>(config, "notExist", {}) // => undefined
  * ```
  */
-export function resolveProp<T, C = unknown>(
-  target: Record<string, unknown> | undefined,
-  key: string,
-  context: C,
-): T | undefined {
-  if (!target || typeof target !== "object")
-    return undefined
+export function resolveProp<T, C = unknown>(target: Record<string, unknown> | undefined, key: string, context: C): T | undefined {
+  if (!target || typeof target !== "object") return undefined
   const value = target[key]
-  if (isFunction(value))
-    return value(context) as T
+  if (isFunction(value)) return value(context) as T
   return value as T | undefined
 }

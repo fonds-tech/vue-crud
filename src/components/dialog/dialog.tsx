@@ -94,15 +94,15 @@ export default defineComponent({
     /** 是否为自适应高度模式 */
     const isAutoHeight = computed(() => (props as DialogProps).height === "auto")
     /** 固定高度（非自适应模式下使用） */
-    const scrollbarHeight = computed(() => isAutoHeight.value ? undefined : parseSizeValue((props as DialogProps).height, "60vh"))
+    const scrollbarHeight = computed(() => (isAutoHeight.value ? undefined : parseSizeValue((props as DialogProps).height, "60vh")))
     /** 最大高度（自适应模式下使用） */
-    const scrollbarMaxHeight = computed(() => isAutoHeight.value ? parseSizeValue((props as DialogProps).maxHeight, "60vh") : undefined)
+    const scrollbarMaxHeight = computed(() => (isAutoHeight.value ? parseSizeValue((props as DialogProps).maxHeight, "60vh") : undefined))
 
     // ========== 计算属性：全屏与关闭按钮 ==========
     /** 全屏按钮提示文本 */
-    const fullscreenLabel = computed(() => fullscreenActive.value ? "退出全屏" : "全屏")
+    const fullscreenLabel = computed(() => (fullscreenActive.value ? "退出全屏" : "全屏"))
     /** 全屏按钮图标组件 */
-    const fullscreenIcon = computed(() => fullscreenActive.value ? IconTablerMinimize : IconTablerMaximize)
+    const fullscreenIcon = computed(() => (fullscreenActive.value ? IconTablerMinimize : IconTablerMaximize))
     /** 是否显示关闭按钮 */
     const showClose = computed(() => props.showClose !== false)
 
@@ -153,8 +153,14 @@ export default defineComponent({
     }
 
     // ========== 侦听器 ==========
-    watch(() => props.modelValue, val => dialogVisible.value = Boolean(val))
-    watch(() => props.fullscreen, val => fullscreenActive.value = Boolean(val))
+    watch(
+      () => props.modelValue,
+      val => (dialogVisible.value = Boolean(val)),
+    )
+    watch(
+      () => props.fullscreen,
+      val => (fullscreenActive.value = Boolean(val)),
+    )
 
     expose({ open, close, fullscreen, dialogVisible, fullscreenActive })
 

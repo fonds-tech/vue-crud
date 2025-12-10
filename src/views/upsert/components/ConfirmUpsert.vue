@@ -19,9 +19,12 @@ const priorityDict: TableDict[] = [
   { label: "Low", value: "Low", type: "info" },
 ]
 
-const crud = useCrud({
-  service: new UpsertMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new UpsertMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   columns: [
@@ -65,7 +68,15 @@ const table = useTable({
         slots: { default: () => "点击访问" },
       },
     },
-    { prop: "status", label: "状态", width: 80, dict: [{ label: "启用", value: 1, type: "success" }, { label: "禁用", value: 0, type: "danger" }] },
+    {
+      prop: "status",
+      label: "状态",
+      width: 80,
+      dict: [
+        { label: "启用", value: 1, type: "success" },
+        { label: "禁用", value: 0, type: "danger" },
+      ],
+    },
     { prop: "createTime", label: "创建时间", minWidth: 160 },
     { prop: "remark", label: "备注", minWidth: 200 },
     { type: "action", label: "操作", width: 100, actions: [{ text: "编辑", type: "update" }] },

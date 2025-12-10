@@ -35,8 +35,19 @@ export class SearchMockService {
     })
   }
 
-  add() { return Promise.resolve() }
-  update() { return Promise.resolve() }
-  delete() { return Promise.resolve() }
-  info() { return Promise.resolve() }
+  add() {
+    return Promise.resolve()
+  }
+
+  update() {
+    return Promise.resolve()
+  }
+
+  delete() {
+    return Promise.resolve()
+  }
+
+  info() {
+    return Promise.resolve()
+  }
 }

@@ -17,8 +17,7 @@ interface RenderCtx<D extends DetailData = DetailData> {
 /** 判断显隐，支持布尔与函数隐藏条件。 */
 function isVisible<D extends DetailData>(target: { hidden?: DetailMaybeFn<boolean, D> }, data: D) {
   const hidden = target?.hidden
-  if (typeof hidden === "function")
-    return !hidden(data)
+  if (typeof hidden === "function") return !hidden(data)
   return !hidden
 }
 
@@ -30,11 +29,9 @@ function resolveLabel<D extends DetailData>(item: DetailItem<D>, data: D) {
 /** 获取字段值，兼容默认值。 */
 function getFieldValue<D extends DetailData>(item: DetailItem<D>, data: D) {
   const prop = (item as DetailItem & { field?: string }).prop ?? (item as { field?: string }).field
-  if (!prop)
-    return resolve(item.value, data)
+  if (!prop) return resolve(item.value, data)
   const current = (data ?? {})[prop as any]
-  if (current === undefined || current === null)
-    return resolve(item.value, data)
+  if (current === undefined || current === null) return resolve(item.value, data)
   return current
 }
 
@@ -44,42 +41,32 @@ function resolveDict<D extends DetailData>(item: DetailItem<D>, data: D) {
 
 function getDictMatch<D extends DetailData>(item: DetailItem<D>, data: D) {
   const dict = resolveDict(item, data)
-  if (!dict)
-    return undefined
+  if (!dict) return undefined
   const value = getFieldValue(item, data)
   return dict.find(d => d.value === value)
 }
 
 function tagType(match?: ReturnType<typeof getDictMatch>) {
   const type = match?.type
-  if (!type || type === "default")
-    return undefined
+  if (!type || type === "default") return undefined
   return type
 }
 
 function formatValue<D extends DetailData>(item: DetailItem<D>, data: D) {
   const value = getFieldValue(item, data)
-  if (typeof item.formatter === "function")
-    return item.formatter(value, data)
+  if (typeof item.formatter === "function") return item.formatter(value, data)
   return value ?? ""
 }
 
 function renderItemContent<D extends DetailData>(item: DetailItem<D>, data: D, userSlots: Record<string, ((props: any) => any) | undefined>, index: number) {
   const slotMap = slotsOf(item, data)
   const slotEntries = Object.entries(slotMap).map(([slotName, slotComponent]) => {
-    const content = renderComponentSlot(
-      slotComponent,
-      data,
-      { index, data, value: getFieldValue(item, data) },
-      userSlots,
-    )
+    const content = renderComponentSlot(slotComponent, data, { index, data, value: getFieldValue(item, data) }, userSlots)
     return content ? h("template", { key: slotName }, content) : null
   })
 
   const directSlotName = slotNameOf(item.component, data)
-  const directSlot = directSlotName && userSlots[directSlotName]
-    ? userSlots[directSlotName]?.({ index, data, value: getFieldValue(item, data) })
-    : null
+  const directSlot = directSlotName && userSlots[directSlotName] ? userSlots[directSlotName]?.({ index, data, value: getFieldValue(item, data) }) : null
 
   const directComponent = renderComponentSlot(item.component, data, { index, data, value: getFieldValue(item, data) }, userSlots)
 
@@ -146,12 +133,13 @@ export function renderDetailContent<D extends DetailData = DetailData>(ctx: Rend
                   {
                     default: () => renderItemContent(item, ctx.data.value, ctx.userSlots, itemIndex),
                     label: ctx.userSlots.label
-                      ? () => ctx.userSlots.label?.({
-                          index: itemIndex,
-                          data: ctx.data.value,
-                          value: getFieldValue(item, ctx.data.value),
-                          item,
-                        })
+                      ? () =>
+                          ctx.userSlots.label?.({
+                            index: itemIndex,
+                            data: ctx.data.value,
+                            value: getFieldValue(item, ctx.data.value),
+                            item,
+                          })
                       : undefined,
                   },
                 ),
@@ -163,9 +151,7 @@ export function renderDetailContent<D extends DetailData = DetailData>(ctx: Rend
 
   // 使用 withDirectives 正确应用 v-loading 指令
   if (loadingDirective) {
-    return withDirectives(spaceVNode, [
-      [loadingDirective, ctx.loading.value],
-    ])
+    return withDirectives(spaceVNode, [[loadingDirective, ctx.loading.value]])
   }
   return spaceVNode
 }

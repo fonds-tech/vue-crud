@@ -62,12 +62,7 @@ describe("createUpsertState", () => {
       const state = createUpsertState({ style: {} })
 
       state.useUpsert({
-        items: [
-          { label: "名称", prop: "name" },
-          null as any,
-          undefined as any,
-          { label: "年龄", prop: "age" },
-        ],
+        items: [{ label: "名称", prop: "name" }, null as any, undefined as any, { label: "年龄", prop: "age" }],
       })
 
       expect(state.options.items).toHaveLength(2)
@@ -79,11 +74,7 @@ describe("createUpsertState", () => {
       const state = createUpsertState({ style: {} })
 
       state.useUpsert({
-        actions: [
-          { type: "cancel" },
-          null as any,
-          { type: "ok" },
-        ],
+        actions: [{ type: "cancel" }, null as any, { type: "ok" }],
       })
 
       expect(state.options.actions).toHaveLength(2)

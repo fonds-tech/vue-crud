@@ -126,10 +126,7 @@ describe("createTableMethods", () => {
   it("expandAll 收起所有行", () => {
     state.tableRows.value = [{ id: 1 }, { id: 2 }] as any
     methods.expandAll(false)
-    expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalledWith(
-      state.tableRows.value[0],
-      false,
-    )
+    expect(state.tableRef.value?.toggleRowExpansion).toHaveBeenCalledWith(state.tableRows.value[0], false)
   })
 
   it("setTable 设置表格属性", () => {

@@ -157,8 +157,7 @@ function createMittStub() {
       handlers[event].push(handler)
     }),
     off: vi.fn((event: string, handler?: MittHandler) => {
-      if (!handlers[event])
-        return
+      if (!handlers[event]) return
       if (!handler) {
         handlers[event] = []
         return
@@ -210,9 +209,7 @@ describe("fd-detail", () => {
     const { wrapper } = mountDetail()
     const exposed = getExpose(wrapper)
     exposed.use({
-      items: [
-        { prop: "name", label: "姓名" },
-      ],
+      items: [{ prop: "name", label: "姓名" }],
     })
     exposed.setData({ name: "张三" })
     await nextTick()
@@ -257,6 +254,53 @@ describe("fd-detail", () => {
       exposed.setData({ name: "测试数据" })
       exposed.clearData()
       expect(exposed.data).toEqual({})
+    })
+
+    it("可见性变化触发 beforeOpen/beforeClose 钩子与事件", async () => {
+      const onBeforeOpen = vi.fn()
+      const onBeforeClose = vi.fn()
+      const { wrapper } = mountDetail({
+        crudOverrides: {
+          service: { detail: vi.fn().mockResolvedValue({ id: 1 }) },
+        },
+      })
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [{ prop: "id", label: "编号" }],
+        onBeforeOpen,
+        onBeforeClose,
+      })
+
+      await exposed.detail({ id: 1 })
+      await nextTick()
+      expect(onBeforeOpen).toHaveBeenCalled()
+      expect(wrapper.emitted("beforeOpen")).toBeTruthy()
+
+      exposed.close()
+      await nextTick()
+      expect(onBeforeClose).toHaveBeenCalled()
+      expect(wrapper.emitted("beforeClose")?.[0][0]).toEqual({ id: 1 })
+    })
+
+    it("watch visible 关闭时进入 beforeClose 分支", async () => {
+      const onBeforeClose = vi.fn()
+      const { wrapper } = mountDetail({
+        crudOverrides: { service: { detail: vi.fn().mockResolvedValue({ id: 1 }) } },
+      })
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [{ prop: "id", label: "编号" }],
+        onBeforeClose,
+      })
+
+      await exposed.detail({ id: 1 })
+      await nextTick()
+      expect(wrapper.find(".fd-dialog-stub").attributes("data-visible")).toBe("true")
+
+      wrapper.findComponent(FdDialogStub).vm.$emit("update:modelValue", false)
+      await nextTick()
+
+      expect(onBeforeClose).toHaveBeenCalledWith({ id: 1 })
     })
 
     it("use 合并配置时数组会被替换", async () => {
@@ -413,6 +457,35 @@ describe("fd-detail", () => {
       expect(detailFn).not.toHaveBeenCalled()
     })
 
+    it("crud.proxy 事件携带空数据不触发", async () => {
+      const detailFn = vi.fn()
+      const { mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      mitt.handlers["crud.proxy"]?.[0]?.({ name: "detail", data: [null as any] })
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("detail 事件参数非对象直接忽略", async () => {
+      const detailFn = vi.fn()
+      const { mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      mitt.handlers.detail?.[0]?.("invalid-payload" as any)
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("crud.proxy 非对象 payload 被忽略", async () => {
+      const detailFn = vi.fn()
+      const { mitt } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      mitt.handlers["crud.proxy"]?.[0]?.("invalid-payload" as any)
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
+    it("内部 handleDetailEvent 会忽略空数据", async () => {
+      const detailFn = vi.fn()
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper) as any
+      exposed.__test__handleDetailEvent?.(null)
+      expect(detailFn).not.toHaveBeenCalled()
+    })
+
     it("组件卸载时移除事件监听", async () => {
       const { wrapper, mitt } = mountDetail()
       expect(mitt.on).toHaveBeenCalledWith("detail", expect.any(Function))
@@ -476,6 +549,19 @@ describe("fd-detail", () => {
       dialogStub.vm.$emit("close")
       await nextTick()
       expect(onClose).toHaveBeenCalledWith(expect.objectContaining({ name: "快照数据" }))
+    })
+
+    it("弹窗 closed 后清理数据缓存", async () => {
+      const detailFn = vi.fn().mockResolvedValue({ name: "待清理" })
+      const { wrapper } = mountDetail({ crudOverrides: { service: { detail: detailFn } } })
+      const exposed = getExpose(wrapper)
+      await exposed.detail({ id: "9" })
+      await nextTick()
+      expect(exposed.data).toEqual({ name: "待清理" })
+      const dialogStub = wrapper.findComponent(FdDialogStub)
+      dialogStub.vm.$emit("closed")
+      await nextTick()
+      expect(exposed.data).toEqual({})
     })
   })
 
@@ -557,9 +643,7 @@ describe("fd-detail", () => {
       // value 属性仅在 prop 对应的值为 undefined/null 时作为 fallback
       // 当 prop 有值时，显示 prop 对应的值
       exposed.use({
-        items: [
-          { prop: "custom", label: "自定义", value: "固定值" },
-        ],
+        items: [{ prop: "custom", label: "自定义", value: "固定值" }],
       })
       // 当 prop 对应的值为 undefined 时，使用 value 作为 fallback
       exposed.setData({ other: "其他值" })
@@ -588,13 +672,78 @@ describe("fd-detail", () => {
       expect(descriptions.length).toBeGreaterThanOrEqual(2)
     })
 
+    it("无 items 时不渲染描述列表", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({ items: [] })
+      exposed.setData({})
+      await nextTick()
+      expect(wrapper.findAll(".el-descriptions-stub")).toHaveLength(0)
+    })
+
+    it("分组描述使用分组配置覆盖标题和列数", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        groups: [{ name: "info", title: (data: any) => `标题-${data.name}`, descriptions: { column: 1 } }],
+        items: [{ prop: "name", label: "姓名", group: "info" }],
+      })
+      exposed.setData({ name: "李雷" })
+      await nextTick()
+      const description = wrapper.find(".el-descriptions-stub")
+      expect(description.attributes("data-title")).toBe("标题-李雷")
+      expect(description.attributes("column")).toBe("1")
+    })
+
+    it("无分组名称时回退到默认分组并使用 descriptions.title", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        descriptions: { title: "默认标题" },
+        groups: [{ title: "未命名分组" }],
+        items: [{ prop: "name", label: "姓名" }],
+      })
+      exposed.setData({ name: "默认分组" })
+      await nextTick()
+      const descriptions = wrapper.findAll(".el-descriptions-stub")
+      expect(descriptions).toHaveLength(1)
+      expect(descriptions[0].attributes("data-title")).toBe("默认标题")
+    })
+
+    it("空分组会被过滤，不渲染空 Descriptions", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        groups: [{ name: "empty", title: "空分组" }],
+        items: [
+          { prop: "name", label: "姓名" }, // 未指定分组，走 fallback
+        ],
+      })
+      exposed.setData({ name: "张三" })
+      await nextTick()
+      const descriptions = wrapper.findAll(".el-descriptions-stub")
+      expect(descriptions).toHaveLength(1)
+      expect(descriptions[0].attributes("data-title")).toBe("") // 空分组被过滤，fallback 没有 title
+    })
+
+    it("描述列数为空时回退到默认值", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        descriptions: { column: undefined as any },
+        items: [{ prop: "name", label: "姓名" }],
+      })
+      exposed.setData({ name: "列数测试" })
+      await nextTick()
+      const description = wrapper.find(".el-descriptions-stub")
+      expect(description.attributes("column")).toBe("2")
+    })
+
     it("span 属性控制列宽", async () => {
       const { wrapper } = mountDetail()
       const exposed = getExpose(wrapper)
       exposed.use({
-        items: [
-          { prop: "name", label: "姓名", span: 2 },
-        ],
+        items: [{ prop: "name", label: "姓名", span: 2 }],
       })
       exposed.setData({ name: "张三" })
       await nextTick()
@@ -636,9 +785,7 @@ describe("fd-detail", () => {
       const { wrapper } = mountDetail()
       const exposed = getExpose(wrapper)
       exposed.use({
-        actions: [
-          { type: "ok", text: "关闭详情" },
-        ],
+        actions: [{ type: "ok", text: "关闭详情" }],
       })
       await nextTick()
       const button = wrapper.find(".el-button-stub")
@@ -657,6 +804,27 @@ describe("fd-detail", () => {
       const dialog = wrapper.find(".fd-dialog-stub")
       expect(dialog.classes()).toContain("fd-detail")
       expect(dialog.classes()).toContain("custom-detail")
+    })
+
+    it("对话框透传非 class 属性", async () => {
+      const { wrapper } = mountDetail({
+        mounting: {
+          attrs: { "class": "extra-class", "data-size": "large", "aria-label": "detail-dialog" },
+        },
+      })
+      await nextTick()
+      const dialog = wrapper.find(".fd-dialog-stub")
+      expect(dialog.attributes("data-size")).toBe("large")
+      expect(dialog.attributes("aria-label")).toBe("detail-dialog")
+      expect(dialog.classes()).toEqual(expect.arrayContaining(["fd-detail", "extra-class"]))
+    })
+
+    it("onUpdate:modelValue 为 true 时不触发 close", async () => {
+      const { wrapper } = mountDetail()
+      const dialogStub = wrapper.findComponent(FdDialogStub)
+      dialogStub.vm.$emit("update:modelValue", true)
+      await nextTick()
+      expect(wrapper.emitted("close")).toBeUndefined()
     })
 
     it("attrs 透传", async () => {
@@ -679,6 +847,63 @@ describe("fd-detail", () => {
       await nextTick()
       // dialog 配置会传递给 FdDialog
       expect(wrapper.find(".fd-dialog-stub").exists()).toBe(true)
+    })
+  })
+
+  describe("分组与描述配置", () => {
+    it("getCurrentInstance 缺失时 fallback 名称匹配元数据标题", async () => {
+      vi.resetModules()
+      vi.doMock("vue", async () => {
+        const actual = await vi.importActual<typeof import("vue")>("vue")
+        return { ...actual, getCurrentInstance: () => undefined }
+      })
+      const DetailWithMock = (await import("../index?mock=fallback")).default as any
+
+      const crud = createCrudStub()
+      const mitt = createMittStub()
+      coreStore.crud = crud
+      coreStore.mitt = mitt
+
+      const mountOptions: MountingOptions<any> = {
+        global: {
+          directives: { loading: () => {} },
+          stubs: {
+            "fd-dialog": FdDialogStub,
+            "el-descriptions": ElDescriptionsStub,
+            "el-descriptions-item": ElDescriptionsItemStub,
+            "el-space": ElSpaceStub,
+            "el-button": ElButtonStub,
+            "ElButton": ElButtonStub,
+            "el-tag": ElTagStub,
+          },
+        },
+      }
+
+      const wrapper = mount(DetailWithMock, mountOptions as any)
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        items: [{ prop: "name", label: "姓名" }],
+        groups: [{ name: "fd-detail", title: "无实例标题" }],
+      })
+      exposed.setData({ name: "零号" })
+      await nextTick()
+      expect(wrapper.find(".el-descriptions-stub").attributes("data-title")).toBe("无实例标题")
+
+      vi.doUnmock("vue")
+      vi.resetModules()
+    })
+
+    it("descriptions.column 为空时回退为 2", async () => {
+      const { wrapper } = mountDetail()
+      const exposed = getExpose(wrapper)
+      exposed.use({
+        descriptions: { column: null as any },
+        items: [{ prop: "name", label: "姓名", group: "main" }],
+        groups: [{ name: "main", title: "主分组" }],
+      })
+      exposed.setData({ name: "张三" })
+      await nextTick()
+      expect(wrapper.find(".el-descriptions-stub").attributes().column).toBe("2")
     })
   })
 

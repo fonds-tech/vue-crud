@@ -1,11 +1,7 @@
 <template>
   <section class="demo-card">
-    <h4 class="demo-card__title">
-      基础新增按钮
-    </h4>
-    <p class="demo-card__desc">
-      依赖 crud 权限，点击触发 rowAdd。
-    </p>
+    <h4 class="demo-card__title">基础新增按钮</h4>
+    <p class="demo-card__desc">依赖 crud 权限，点击触发 rowAdd。</p>
 
     <fd-crud ref="crudRef">
       <fd-add-button />

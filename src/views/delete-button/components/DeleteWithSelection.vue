@@ -1,18 +1,12 @@
 <template>
   <section class="demo-card">
-    <h4 class="demo-card__title">
-      删除按钮 + 选中校验
-    </h4>
-    <p class="demo-card__desc">
-      当未选择行时禁用；点击调用 rowDelete。
-    </p>
+    <h4 class="demo-card__title">删除按钮 + 选中校验</h4>
+    <p class="demo-card__desc">当未选择行时禁用；点击调用 rowDelete。</p>
 
     <fd-crud ref="crudRef">
       <el-space>
         <fd-delete-button />
-        <el-button size="small" @click="toggleSelect">
-          切换选中状态
-        </el-button>
+        <el-button size="small" @click="toggleSelect"> 切换选中状态 </el-button>
       </el-space>
     </fd-crud>
   </section>
@@ -40,8 +34,7 @@ const crudRef = useCrud({
 
 function toggleSelect() {
   const crud = crudRef.value
-  if (!crud)
-    return
+  if (!crud) return
   crud.selection = crud.selection.length ? [] : [mockRow]
 }
 </script>

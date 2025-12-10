@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-upsert 新增/编辑示例"
-    description="展示 fd-upsert 的打开、提交与模式切换"
-    :components="componentCatalog"
-  />
+  <layout title="fd-upsert 新增/编辑示例" description="展示 fd-upsert 的打开、提交与模式切换" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

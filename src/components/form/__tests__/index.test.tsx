@@ -64,32 +64,38 @@ const elementStubs = {
   "el-icon": createSimpleStub("span"),
 }
 
-const BasicInput = markRaw(defineComponent({
-  name: "BasicInput",
-  props: { modelValue: { type: [String, Number], default: "" } },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    return () => h("input", {
-      value: props.modelValue as string | number,
-      onInput: (event: Event) => {
-        const value = (event.target as HTMLInputElement).value
-        emit("update:modelValue", value)
-      },
-    })
-  },
-}))
+const BasicInput = markRaw(
+  defineComponent({
+    name: "BasicInput",
+    props: { modelValue: { type: [String, Number], default: "" } },
+    emits: ["update:modelValue"],
+    setup(props, { emit }) {
+      return () =>
+        h("input", {
+          value: props.modelValue as string | number,
+          onInput: (event: Event) => {
+            const value = (event.target as HTMLInputElement).value
+            emit("update:modelValue", value)
+          },
+        })
+    },
+  }),
+)
 
-const FlexibleInput = markRaw(defineComponent({
-  name: "FlexibleInput",
-  props: { modelValue: { type: null, default: undefined } },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    return () => h("input", {
-      value: props.modelValue as string,
-      onInput: (event: Event) => emit("update:modelValue", (event.target as HTMLInputElement).value),
-    })
-  },
-}))
+const FlexibleInput = markRaw(
+  defineComponent({
+    name: "FlexibleInput",
+    props: { modelValue: { type: null, default: undefined } },
+    emits: ["update:modelValue"],
+    setup(props, { emit }) {
+      return () =>
+        h("input", {
+          value: props.modelValue as string,
+          onInput: (event: Event) => emit("update:modelValue", (event.target as HTMLInputElement).value),
+        })
+    },
+  }),
+)
 
 function mountForm() {
   return mount(FdForm, {
@@ -189,9 +195,10 @@ describe("fd-form", () => {
 
     form.setProps("price", { placeholder: "请输入金额" }) // 动态设置组件 props
     const priceItem = form.items.find(item => item.prop === "price") // 查找 price 表单项
-    const priceProps = typeof priceItem?.component?.props === "function"
-      ? priceItem.component.props(form.model) // 如果 props 是函数，则执行获取结果
-      : priceItem?.component?.props // 否则直接获取 props
+    const priceProps
+      = typeof priceItem?.component?.props === "function"
+        ? priceItem.component.props(form.model) // 如果 props 是函数，则执行获取结果
+        : priceItem?.component?.props // 否则直接获取 props
     expect(priceProps?.placeholder).toBe("请输入金额") // 验证 props 设置成功
   })
 

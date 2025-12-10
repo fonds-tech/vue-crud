@@ -10,8 +10,7 @@ export function useTable(options?: TableUseOptions, callback?: (table: TableExpo
   watch(
     () => table.value,
     (val) => {
-      if (!val)
-        return
+      if (!val) return
       if (options) {
         val.use(options)
       }

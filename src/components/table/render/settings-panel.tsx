@@ -57,78 +57,82 @@ export function ColumnSettingsPanel(props: ColumnSettingsPanelProps): VNode {
             }),
             h(ElButton, { link: true, type: "primary", onClick: () => props.resetColumns() }, () => "重置"),
           ]),
-          h(
-            ElScrollbar,
-            { class: "fd-table__column-scroll" },
-            () =>
-              h(
-                Draggable,
-                {
-                  "modelValue": state.columnSettings.value,
-                  "item-key": "id",
-                  "animation": 180,
-                  "ghost-class": "fd-table__drag-ghost",
-                  "chosen-class": "fd-table__drag-chosen",
-                  "move": (evt: DragMoveEvent) => props.onDragMove(evt),
-                  "onUpdate:modelValue": (val: ColumnSetting[]) => {
-                    state.columnSettings.value = val
-                  },
-                  "onEnd": () => props.onDragEnd(),
+          h(ElScrollbar, { class: "fd-table__column-scroll" }, () =>
+            h(
+              Draggable,
+              {
+                "modelValue": state.columnSettings.value,
+                "item-key": "id",
+                "animation": 180,
+                "ghost-class": "fd-table__drag-ghost",
+                "chosen-class": "fd-table__drag-chosen",
+                "move": (evt: DragMoveEvent) => props.onDragMove(evt),
+                "onUpdate:modelValue": (val: ColumnSetting[]) => {
+                  state.columnSettings.value = val
                 },
-                {
-                  item: ({ element }: { element: ColumnSetting }) =>
-                    h("div", { class: "fd-table__column-wrapper" }, [
-                      h(
-                        "div",
-                        {
-                          class: [
-                            "fd-table__column-item",
-                            {
-                              "is-locked": element.pinned,
-                              "is-disabled": !element.sort,
-                            },
-                          ],
-                        },
-                        [
-                          h("span", { "class": ["fd-table__drag", { "is-disabled": !element.sort }], "aria-hidden": "true" }, "⋮⋮"),
-                          h(ElCheckbox, {
-                            modelValue: element.show,
-                            onChange: (val: unknown) => props.onColumnShowChange(element.id, Boolean(val)),
-                          }),
-                          h("span", { class: "fd-table__column-label" }, element.label),
-                          h("div", { class: "fd-table__fixed-actions" }, [
-                            h(
-                              ElButton,
-                              {
-                                link: true,
-                                size: "small",
-                                class: { "is-active": element.fixed === "left" },
-                                onClick: () => props.toggleFixed(element.id, "left"),
-                              },
-                              () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-left" }, element.fixed === "left" ? "L" : "↢"),
-                            ),
-                            h(
-                              ElButton,
-                              {
-                                link: true,
-                                size: "small",
-                                class: { "is-active": element.fixed === "right" },
-                                onClick: () => props.toggleFixed(element.id, "right"),
-                              },
-                              () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-right" }, element.fixed === "right" ? "R" : "↣"),
-                            ),
-                          ]),
+                "onEnd": () => props.onDragEnd(),
+              },
+              {
+                item: ({ element }: { element: ColumnSetting }) =>
+                  h("div", { class: "fd-table__column-wrapper" }, [
+                    h(
+                      "div",
+                      {
+                        class: [
+                          "fd-table__column-item",
+                          {
+                            "is-locked": element.pinned,
+                            "is-disabled": !element.sort,
+                          },
                         ],
-                      ),
-                    ]),
-                },
-              ),
-          ),
+                      },
+                      [
+                        h("span", { "class": ["fd-table__drag", { "is-disabled": !element.sort }], "aria-hidden": "true" }, "⋮⋮"),
+                        h(ElCheckbox, {
+                          modelValue: element.show,
+                          onChange: (val: unknown) => props.onColumnShowChange(element.id, Boolean(val)),
+                        }),
+                        h("span", { class: "fd-table__column-label" }, element.label),
+                        h("div", { class: "fd-table__fixed-actions" }, [
+                          h(
+                            ElButton,
+                            {
+                              link: true,
+                              size: "small",
+                              class: { "is-active": element.fixed === "left" },
+                              onClick: () => props.toggleFixed(element.id, "left"),
+                            },
+                            () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-left" }, element.fixed === "left" ? "L" : "↢"),
+                          ),
+                          h(
+                            ElButton,
+                            {
+                              link: true,
+                              size: "small",
+                              class: { "is-active": element.fixed === "right" },
+                              onClick: () => props.toggleFixed(element.id, "right"),
+                            },
+                            () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-right" }, element.fixed === "right" ? "R" : "↣"),
+                          ),
+                        ]),
+                      ],
+                    ),
+                  ]),
+              },
+            )),
           h("div", { class: "fd-table__column-footer" }, [
-            h(ElButton, { type: "primary", class: "fd-table__column-save", onClick: () => {
-              props.saveColumns()
-              ElMessage.success("保存成功")
-            } }, () => "保存"),
+            h(
+              ElButton,
+              {
+                type: "primary",
+                class: "fd-table__column-save",
+                onClick: () => {
+                  props.saveColumns()
+                  ElMessage.success("保存成功")
+                },
+              },
+              () => "保存",
+            ),
           ]),
         ]),
     },

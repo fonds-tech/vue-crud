@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-cascader 级联选择"
-    description="基于 Element Plus Cascader 封装，支持静态数据、API 全量加载与 Lazy 异步加载子节点。"
-    :components="componentCatalog"
-  />
+  <layout title="fd-cascader 级联选择" description="基于 Element Plus Cascader 封装，支持静态数据、API 全量加载与 Lazy 异步加载子节点。" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

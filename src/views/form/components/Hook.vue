@@ -3,15 +3,9 @@
     <el-card class="variant-card">
       <fd-form ref="formRef" />
       <div class="action-row">
-        <el-button type="primary" @click="handleSubmit">
-          提交
-        </el-button>
-        <el-button @click="handleReset">
-          重置
-        </el-button>
-        <el-button type="warning" plain @click="handleRebind">
-          绑定
-        </el-button>
+        <el-button type="primary" @click="handleSubmit"> 提交 </el-button>
+        <el-button @click="handleReset"> 重置 </el-button>
+        <el-button type="warning" plain @click="handleRebind"> 绑定 </el-button>
       </div>
     </el-card>
 
@@ -183,12 +177,15 @@ function diffChanges(current: Record<string, any>, target: Record<string, any>) 
 }
 
 function handleSubmit() {
-  formRef.value?.submit().then(({ values }) => {
-    submitPayload.value = clone(values)
-    console.log("HookForm Submit (after hooks):", values)
-  }).catch((err) => {
-    console.error("HookForm Submit Error:", err)
-  })
+  formRef.value
+    ?.submit()
+    .then(({ values }) => {
+      submitPayload.value = clone(values)
+      console.log("HookForm Submit (after hooks):", values)
+    })
+    .catch((err) => {
+      console.error("HookForm Submit Error:", err)
+    })
 }
 
 function handleReset() {

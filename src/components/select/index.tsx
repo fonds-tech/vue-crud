@@ -47,11 +47,9 @@ export default defineComponent<ComponentProps>({
     // 统一对外的可用选项：远程 > props.options > attrs.options
     // 优先级逻辑：如果是远程搜索，优先使用远程返回的数据；否则回退到 props 或 attrs 传入的静态选项
     const availableOptions = computed<OptionRecord[]>(() => {
-      if (remoteOptionList.value.length > 0)
-        return remoteOptionList.value
+      if (remoteOptionList.value.length > 0) return remoteOptionList.value
       const fallback = props.options
-      if (Array.isArray(fallback))
-        return fallback as OptionRecord[]
+      if (Array.isArray(fallback)) return fallback as OptionRecord[]
       const external = (attrs as Record<string, unknown>).options
       return Array.isArray(external) ? (external as OptionRecord[]) : []
     })
@@ -64,8 +62,7 @@ export default defineComponent<ComponentProps>({
       () => props.api,
       () => {
         remoteOptionList.value = []
-        if (props.api)
-          void refresh()
+        if (props.api) void refresh()
       },
       { immediate: true },
     )
@@ -74,15 +71,14 @@ export default defineComponent<ComponentProps>({
     watch(
       () => props.params,
       (next, prev) => {
-        if (!isEqual(next, prev))
-          void refresh()
+        if (!isEqual(next, prev)) void refresh()
       },
       { deep: true },
     )
 
     // 合并基础参数与额外条件，最终输入远程服务
     function resolveParams(extra: Record<string, any> = {}) {
-      const base = typeof props.params === "function" ? props.params(extra) : props.params ?? {}
+      const base = typeof props.params === "function" ? props.params(extra) : (props.params ?? {})
       return merge({}, clone(base), extra)
     }
 
@@ -105,13 +101,11 @@ export default defineComponent<ComponentProps>({
           const url = new URL(props.api, window.location.origin)
           Object.keys(payload).forEach((key) => {
             const val = payload[key]
-            if (val !== undefined && val !== null)
-              url.searchParams.append(key, String(val))
+            if (val !== undefined && val !== null) url.searchParams.append(key, String(val))
           })
 
           const response = await fetch(url.toString(), { method: "GET", headers: { Accept: "application/json" } })
-          if (!response.ok)
-            throw new Error(`Request failed: ${response.status}`)
+          if (!response.ok) throw new Error(`Request failed: ${response.status}`)
 
           const json = await response.json()
           result = Array.isArray(json) ? json : []
@@ -130,14 +124,12 @@ export default defineComponent<ComponentProps>({
 
     // 聚焦时刷新（仅当已有搜索词）
     function handleFocus() {
-      if (currentSearchTerm.value)
-        void refresh({ [SEARCH_FIELD]: currentSearchTerm.value })
+      if (currentSearchTerm.value) void refresh({ [SEARCH_FIELD]: currentSearchTerm.value })
     }
 
     // 失焦时刷新（仅当已有搜索词）
     function handleBlur() {
-      if (currentSearchTerm.value)
-        void refresh({ [SEARCH_FIELD]: currentSearchTerm.value })
+      if (currentSearchTerm.value) void refresh({ [SEARCH_FIELD]: currentSearchTerm.value })
     }
 
     // 处理值变更，查找并回传完整的 Option 对象
@@ -165,19 +157,16 @@ export default defineComponent<ComponentProps>({
     // 处理搜索输入，触发防抖刷新（仅 trailing）
     function handleFilterInput(value: string) {
       currentSearchTerm.value = value
-      if (searchTimer)
-        clearTimeout(searchTimer)
+      if (searchTimer) clearTimeout(searchTimer)
       if (value && props.api) {
         searchTimer = setTimeout(() => void refresh({ [SEARCH_FIELD]: value }), DEBOUNCE_MS)
       }
-      if (value)
-        emit("search", value)
+      if (value) emit("search", value)
     }
 
     // 解析选项特定字段值
     function resolveOptionField(option: OptionRecord, key: string | undefined) {
-      if (!option || !key)
-        return undefined
+      if (!option || !key) return undefined
       return option[key]
     }
 
@@ -189,12 +178,7 @@ export default defineComponent<ComponentProps>({
 
     // 过滤掉自定义属性，只保留透传给 el-select 的属性
     const forwardedProps = computed(() => {
-      const {
-        api,
-        params,
-        labelKey,
-        ...rest
-      } = props as ComponentProps
+      const { api, params, labelKey, ...rest } = props as ComponentProps
       return rest
     })
 
@@ -231,22 +215,16 @@ export default defineComponent<ComponentProps>({
       const slotMap: Record<string, any> = {
         default: (scope: any) => {
           const payload = { ...scope, options: availableOptions.value, refresh, loading: optionLoading.value }
-          if (slots.default)
-            return slots.default(payload)
+          if (slots.default) return slots.default(payload)
           return availableOptions.value.map((item, index) => (
-            <ElOption
-              key={resolveOptionKey(item, index)}
-              label={resolveOptionField(item, labelKey.value)}
-              value={resolveOptionField(item, valueKey.value)}
-            />
+            <ElOption key={resolveOptionKey(item, index)} label={resolveOptionField(item, labelKey.value)} value={resolveOptionField(item, valueKey.value)} />
           ))
         },
       }
 
       namedSlotKeys.value.forEach((name) => {
         const slot = slots[name]
-        if (!slot)
-          return
+        if (!slot) return
         slotMap[name] = (scope: any) => slot({ ...scope, options: availableOptions.value, refresh, loading: optionLoading.value })
       })
 

@@ -28,13 +28,7 @@ export default defineComponent({
       const children = slots.default?.()
 
       return (
-        <ElButton
-          {...props}
-          {...attrs}
-          type={buttonType.value}
-          size={buttonSize.value}
-          onClick={handleClick}
-        >
+        <ElButton {...props} {...attrs} type={buttonType.value} size={buttonSize.value} onClick={handleClick}>
           {children && children.length > 0 ? children : fallbackLabel.value}
         </ElButton>
       )

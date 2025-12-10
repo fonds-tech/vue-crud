@@ -2,21 +2,13 @@
   <div class="demo-grid">
     <div class="demo-item">
       <h3 class="demo-title">1. 动态加载 (Lazy Load)</h3>
-      <p class="demo-desc">
-        通过配置 <code>lazy: true</code> 和 <code>lazyLoad</code> 函数，实现子节点的按需异步加载。
-      </p>
+      <p class="demo-desc">通过配置 <code>lazy: true</code> 和 <code>lazyLoad</code> 函数，实现子节点的按需异步加载。</p>
       <div class="demo-control">
-        <fd-cascader
-          v-model="value"
-          :props="props"
-          placeholder="请选择 (动态加载)"
-          style="width: 100%"
-          clearable
-        />
+        <fd-cascader v-model="value" :props="props" placeholder="请选择 (动态加载)" style="width: 100%" clearable />
       </div>
       <div class="demo-result">
         <span class="result-label">选中路径:</span>
-        <span>{{ value || '-' }}</span>
+        <span>{{ value || "-" }}</span>
       </div>
     </div>
   </div>

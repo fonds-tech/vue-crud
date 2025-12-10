@@ -10,11 +10,7 @@ import { h, resolveDynamicComponent } from "vue"
  * @param key 属性 key
  * @param model 表单模型
  */
-export function resolveComponent(
-  action: SearchAction,
-  key: keyof NonNullable<SearchAction["component"]>,
-  model: FormRecord,
-) {
+export function resolveComponent(action: SearchAction, key: keyof NonNullable<SearchAction["component"]>, model: FormRecord) {
   const component = action.component
   if (!component) return undefined
   const value = component[key]

@@ -4,7 +4,7 @@
     <div class="demo-item">
       <h3 class="demo-title">1. 模拟 API 方法 (Function Mode)</h3>
       <p class="demo-desc">
-        使用本地函数模拟后端接口，演示 <code>params</code> 参数传递与自动重新请求。<br>
+        使用本地函数模拟后端接口，演示 <code>params</code> 参数传递与自动重新请求。<br />
         尝试切换<b>用户角色</b>，列表将自动刷新。
       </p>
 
@@ -19,22 +19,13 @@
         </div>
 
         <div class="control-row" style="margin-top: 12px">
-          <fd-select
-            v-model="value1"
-            :api="mockUserApi"
-            :params="queryParams"
-            label-key="name"
-            value-key="id"
-            placeholder="请选择用户"
-            style="width: 100%"
-            clearable
-          />
+          <fd-select v-model="value1" :api="mockUserApi" :params="queryParams" label-key="name" value-key="id" placeholder="请选择用户" style="width: 100%" clearable />
         </div>
       </div>
 
       <div class="demo-result">
         <span class="result-label">当前选中:</span>
-        <span>{{ value1 || '-' }}</span>
+        <span>{{ value1 || "-" }}</span>
         <span class="result-label" style="margin-left: 16px">请求参数:</span>
         <span>{{ JSON.stringify(queryParams) }}</span>
       </div>
@@ -43,27 +34,11 @@
     <!-- 示例 2: 模拟复杂数据结构 -->
     <div class="demo-item">
       <h3 class="demo-title">2. 复杂数据处理</h3>
-      <p class="demo-desc">
-        模拟带延迟的搜索接口，并在模拟数据中包含额外信息（如头像、部门）。
-      </p>
+      <p class="demo-desc">模拟带延迟的搜索接口，并在模拟数据中包含额外信息（如头像、部门）。</p>
       <div class="demo-control">
-        <fd-select
-          v-model="value2"
-          :api="mockUserApi"
-          :params="{ role: 'all' }"
-          label-key="name"
-          value-key="id"
-          placeholder="搜索用户 (支持防抖)"
-          style="width: 100%"
-        >
+        <fd-select v-model="value2" :api="mockUserApi" :params="{ role: 'all' }" label-key="name" value-key="id" placeholder="搜索用户 (支持防抖)" style="width: 100%">
           <template #default="{ options }">
-            <fd-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              style="height: 56px"
-            >
+            <fd-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id" style="height: 56px">
               <div class="user-option">
                 <span class="user-avatar">{{ item.name[0] }}</span>
                 <div class="user-info">
@@ -82,7 +57,7 @@
       </div>
       <div class="demo-result">
         <span class="result-label">选中ID:</span>
-        <span>{{ value2 || '-' }}</span>
+        <span>{{ value2 || "-" }}</span>
       </div>
     </div>
   </div>

@@ -14,13 +14,15 @@ function createMockOptions(): UpsertOptions<FormRecord> {
       labelPosition: "right" as const,
     },
     model: { name: "默认值" },
-    items: [{
-      label: "名称",
-      prop: "name",
-      component: { is: "el-input" },
-      labelPosition: "right",
-      showMessage: true,
-    }],
+    items: [
+      {
+        label: "名称",
+        prop: "name",
+        component: { is: "el-input" },
+        labelPosition: "right",
+        showMessage: true,
+      },
+    ],
     group: {},
     grid: { cols: 2, rowGap: 10, colGap: 12 },
     actions: [],
@@ -148,10 +150,12 @@ describe("createFormBuilder", () => {
 
       await builder.applyForm({ id: 1 })
 
-      expect(mockFormRef.use).toHaveBeenCalledWith(expect.objectContaining({
-        mode: "add",
-        model: expect.objectContaining({ id: 1, name: "默认值" }),
-      }))
+      expect(mockFormRef.use).toHaveBeenCalledWith(
+        expect.objectContaining({
+          mode: "add",
+          model: expect.objectContaining({ id: 1, name: "默认值" }),
+        }),
+      )
     })
 
     it("设置表单模式", async () => {
@@ -173,10 +177,12 @@ describe("createFormBuilder", () => {
 
       await builder.applyForm({ extra: "数据" })
 
-      expect(mockFormRef.bindFields).toHaveBeenCalledWith(expect.objectContaining({
-        name: "默认值",
-        extra: "数据",
-      }))
+      expect(mockFormRef.bindFields).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "默认值",
+          extra: "数据",
+        }),
+      )
     })
 
     it("formRef 不存在时不报错", async () => {

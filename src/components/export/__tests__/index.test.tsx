@@ -22,10 +22,16 @@ vi.mock("../../../hooks", () => ({
     crud: {
       getPermission: mockGetPermission,
       service: {
-        get export() { return mockServiceOverride.value !== undefined ? mockServiceOverride.value : mockExport },
+        get export() {
+          return mockServiceOverride.value !== undefined ? mockServiceOverride.value : mockExport
+        },
       },
-      get selection() { return mockSelection.value },
-      get dict() { return mockDict.value },
+      get selection() {
+        return mockSelection.value
+      },
+      get dict() {
+        return mockDict.value
+      },
     },
     mitt: {
       emit: mockEmit,
@@ -101,9 +107,11 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      ids: "1,2",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ids: "1,2",
+      }),
+    )
   })
 
   it("优雅处理导出错误", async () => {
@@ -169,10 +177,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      customParam: "value",
-      extra: 123,
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customParam: "value",
+        extra: 123,
+      }),
+    )
   })
 
   // 插槽相关测试
@@ -242,10 +252,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      ids: "",
-      id: "",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ids: "",
+        id: "",
+      }),
+    )
   })
 
   it("正确处理 null 选中项", async () => {
@@ -260,10 +272,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      ids: "",
-      id: "",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ids: "",
+        id: "",
+      }),
+    )
   })
 
   it("使用自定义 primaryKey", async () => {
@@ -280,10 +294,12 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      ids: "a1,b2",
-      id: "a1,b2",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ids: "a1,b2",
+        id: "a1,b2",
+      }),
+    )
   })
 
   it("未设置 dict.primaryId 时使用默认值", async () => {
@@ -300,9 +316,11 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      ids: "x1,y2",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ids: "x1,y2",
+      }),
+    )
   })
 
   // Expose 方法测试
@@ -316,18 +334,23 @@ describe("fd-export", () => {
     const vm = wrapper.vm as any
     const result = await vm.export({ directParam: "test" })
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      directParam: "test",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        directParam: "test",
+      }),
+    )
     expect(result).toEqual({ url: "http://example.com/file.xlsx" })
   })
 
   // Loading 状态测试
   it("导出过程中显示 loading 状态", async () => {
     let resolveExport: (value: any) => void
-    mockExport.mockImplementationOnce(() => new Promise((resolve) => {
-      resolveExport = resolve
-    }))
+    mockExport.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveExport = resolve
+        }),
+    )
 
     const wrapper = mount(FdExport, {
       global: {
@@ -367,12 +390,14 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      searchField: "searchValue",
-      page: 1,
-      extraParam: "extra",
-      ids: "1,2",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        searchField: "searchValue",
+        page: 1,
+        extraParam: "extra",
+        ids: "1,2",
+      }),
+    )
   })
 
   // props.params 覆盖搜索参数测试
@@ -395,8 +420,10 @@ describe("fd-export", () => {
     await wrapper.find(".fd-export__trigger").trigger("click")
     await new Promise(process.nextTick)
 
-    expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
-      field: "fromProps",
-    }))
+    expect(mockExport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        field: "fromProps",
+      }),
+    )
   })
 })

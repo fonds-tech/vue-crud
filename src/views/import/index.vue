@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-import 导入示例"
-    description="展示上传、模板下载与确认流程"
-    :components="componentCatalog"
-  />
+  <layout title="fd-import 导入示例" description="展示上传、模板下载与确认流程" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

@@ -19,9 +19,12 @@ const priorityDict: TableDict[] = [
   { label: "Low", value: "Low", type: "info" },
 ]
 
-const crud = useCrud({
-  service: new UpsertMockService(),
-}, crud => crud.refresh())
+const crud = useCrud(
+  {
+    service: new UpsertMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   columns: [
@@ -85,9 +88,7 @@ const table = useTable({
       type: "action",
       label: "操作",
       width: 100,
-      actions: [
-        { text: "编辑", type: "update" },
-      ],
+      actions: [{ text: "编辑", type: "update" }],
     },
   ],
 })
@@ -106,11 +107,14 @@ const upsert = useUpsert({
         is: "el-select",
         props: { placeholder: "请选择优先级" },
         slots: {
-          default: () => priorityDict.map(item => h("el-option", {
-            key: item.value,
-            label: item.label,
-            value: item.value,
-          })),
+          default: () =>
+            priorityDict.map(item =>
+              h("el-option", {
+                key: item.value,
+                label: item.label,
+                value: item.value,
+              }),
+            ),
         },
       },
     },

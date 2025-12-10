@@ -47,8 +47,7 @@ export function renderList(
                 }
               }}
               onKeydown={(event) => {
-                if (item.disabled)
-                  return
+                if (item.disabled) return
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault()
                   toggleItem(item, id)

@@ -175,10 +175,7 @@ describe("fd-form methods", () => {
       ctx.model.name = "Tom" as any
       const callback = vi.fn()
       await methods.submit(callback)
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "Tom" }),
-        undefined,
-      )
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ name: "Tom" }), undefined)
     })
 
     it("校验通过时调用 onSubmit", async () => {
@@ -186,16 +183,11 @@ describe("fd-form methods", () => {
       ctx.options.onSubmit = onSubmit
       ctx.model.name = "Tom" as any
       await methods.submit()
-      expect(onSubmit).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "Tom" }),
-        undefined,
-      )
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ name: "Tom" }), undefined)
     })
 
     it("提交时执行 hook 处理", async () => {
-      ctx.options.items = [
-        { ...baseItemDefaults, prop: "tags", label: "标签", hook: "join", component: { is: "el-select" } },
-      ]
+      ctx.options.items = [{ ...baseItemDefaults, prop: "tags", label: "标签", hook: "join", component: { is: "el-select" } }]
       ctx.model.tags = ["a", "b"] as any
       const result = await methods.submit()
       expect(result.values.tags).toBe("a,b")
@@ -232,9 +224,7 @@ describe("normalizeErrors", () => {
 
   beforeEach(() => {
     ctx = createMethodsContext()
-    ctx.options.items = [
-      { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } },
-    ]
+    ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }]
     methods = useMethods(ctx as any)
   })
 
@@ -310,9 +300,7 @@ describe("normalizeErrors", () => {
 describe("useFormApi", () => {
   it("组合 actions 与 methods", () => {
     const ctx = createMethodsContext()
-    ctx.options.items = [
-      { ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } },
-    ]
+    ctx.options.items = [{ ...baseItemDefaults, prop: "name", label: "名称", component: { is: "el-input" } }]
     const api = useFormApi(ctx as any)
 
     expect(api.actions).toBeDefined()

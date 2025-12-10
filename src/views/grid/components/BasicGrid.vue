@@ -3,9 +3,7 @@
     <div class="control-panel">
       <div class="panel-header">
         <span class="title">基础配置</span>
-        <el-tag size="small" effect="plain">
-          Cols: {{ cols }}
-        </el-tag>
+        <el-tag size="small" effect="plain"> Cols: {{ cols }} </el-tag>
       </div>
       <div class="control-item">
         <span class="label">列数设置</span>

@@ -2,12 +2,7 @@ import type { Ref } from "vue"
 import type { SearchLifecycleParams } from "../interface"
 import { ref } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
-import {
-  handleResize,
-  registerEvents,
-  unregisterEvents,
-  useSearchLifecycle,
-} from "../core/lifecycle"
+import { handleResize, registerEvents, unregisterEvents, useSearchLifecycle } from "../core/lifecycle"
 
 describe("lifecycle", () => {
   let params: SearchLifecycleParams

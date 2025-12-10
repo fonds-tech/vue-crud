@@ -3,18 +3,10 @@
     <el-card class="variant-card">
       <fd-form ref="formRef" />
       <div class="action-row">
-        <el-button type="primary" @click="handleSubmit">
-          提交配置
-        </el-button>
-        <el-button @click="handleReset">
-          重置
-        </el-button>
-        <el-button text type="primary" @click="loadEnterprise">
-          加载企业模板
-        </el-button>
-        <el-button text type="primary" @click="loadPersonal">
-          加载个人模板
-        </el-button>
+        <el-button type="primary" @click="handleSubmit"> 提交配置 </el-button>
+        <el-button @click="handleReset"> 重置 </el-button>
+        <el-button text type="primary" @click="loadEnterprise"> 加载企业模板 </el-button>
+        <el-button text type="primary" @click="loadPersonal"> 加载个人模板 </el-button>
       </div>
     </el-card>
 
@@ -231,50 +223,62 @@ const formRef = useForm<CustomerFormModel>({
 })
 const formModel = computed(() => formRef.value?.model ?? ({} as CustomerFormModel))
 
-watch(() => formModel.value.region, (region) => {
-  if (!formRef.value)
-    return
-  const nextOptions = cityOptionsMap[region as keyof typeof cityOptionsMap] ?? []
-  formRef.value.setOptions("city", [...nextOptions] as any[])
-  if (!nextOptions.find(item => item.value === formModel.value.city)) {
-    formRef.value.setField("city", "")
-  }
-}, { immediate: true })
+watch(
+  () => formModel.value.region,
+  (region) => {
+    if (!formRef.value) return
+    const nextOptions = cityOptionsMap[region as keyof typeof cityOptionsMap] ?? []
+    formRef.value.setOptions("city", [...nextOptions] as any[])
+    if (!nextOptions.find(item => item.value === formModel.value.city)) {
+      formRef.value.setField("city", "")
+    }
+  },
+  { immediate: true },
+)
 
-watch(() => formModel.value.customerType, (type) => {
-  if (!formRef.value)
-    return
-  const nextManagers = managerOptions[(type as "enterprise" | "personal") ?? "enterprise"]
-  formRef.value.setOptions("accountManager", [...nextManagers] as any[])
-  formRef.value.setRequired("accountManager", true)
-  formRef.value.clearValidate("accountManager")
-  if (!nextManagers.find(item => item.value === formModel.value.accountManager)) {
-    formRef.value.setField("accountManager", "")
-  }
-}, { immediate: true })
+watch(
+  () => formModel.value.customerType,
+  (type) => {
+    if (!formRef.value) return
+    const nextManagers = managerOptions[(type as "enterprise" | "personal") ?? "enterprise"]
+    formRef.value.setOptions("accountManager", [...nextManagers] as any[])
+    formRef.value.setRequired("accountManager", true)
+    formRef.value.clearValidate("accountManager")
+    if (!nextManagers.find(item => item.value === formModel.value.accountManager)) {
+      formRef.value.setField("accountManager", "")
+    }
+  },
+  { immediate: true },
+)
 
 const invoiceProps = ["invoiceTitle", "taxId", "invoiceEmail"] as const
 
-watch(() => formModel.value.needInvoice, (need) => {
-  if (!formRef.value)
-    return
-  const targets = invoiceProps as readonly string[]
-  if (need) {
-    formRef.value.showItem(targets as any)
-    invoiceProps.forEach(prop => formRef.value?.setRequired(prop, true))
-  }
-  else {
-    formRef.value.hideItem(targets as any)
-    invoiceProps.forEach(prop => formRef.value?.setRequired(prop, false))
-  }
-}, { immediate: true })
+watch(
+  () => formModel.value.needInvoice,
+  (need) => {
+    if (!formRef.value) return
+    const targets = invoiceProps as readonly string[]
+    if (need) {
+      formRef.value.showItem(targets as any)
+      invoiceProps.forEach(prop => formRef.value?.setRequired(prop, true))
+    }
+    else {
+      formRef.value.hideItem(targets as any)
+      invoiceProps.forEach(prop => formRef.value?.setRequired(prop, false))
+    }
+  },
+  { immediate: true },
+)
 
 function handleSubmit() {
-  formRef.value?.submit().then((res) => {
-    console.log("DynamicForm Submit:", res)
-  }).catch((err) => {
-    console.error("DynamicForm Submit Error:", err)
-  })
+  formRef.value
+    ?.submit()
+    .then((res) => {
+      console.log("DynamicForm Submit:", res)
+    })
+    .catch((err) => {
+      console.error("DynamicForm Submit Error:", err)
+    })
 }
 
 function handleReset() {

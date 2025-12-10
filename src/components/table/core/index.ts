@@ -94,7 +94,7 @@ export function useTableCore(options: TableCoreOptions): TableCore {
     rowDelete: crud.rowDelete,
     dict: {
       // label 是一个 Record<string, string | undefined>，需要类型断言以匹配 CrudBridge.dict.label
-      label: crud.dict?.label && typeof crud.dict.label === "object" ? crud.dict.label as Record<string, string | undefined> : undefined,
+      label: crud.dict?.label && typeof crud.dict.label === "object" ? (crud.dict.label as Record<string, string | undefined>) : undefined,
       primaryId: crud.dict?.primaryId,
     },
   }

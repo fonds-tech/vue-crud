@@ -1,13 +1,7 @@
 import type { ContextMenuItem, ContextMenuOptions } from "../types"
 import { useRefs } from "@/hooks"
 import { ref, watch, nextTick, reactive, onBeforeUnmount } from "vue"
-import {
-  markTarget,
-  positionMenu,
-  normalizeList,
-  registerOutsideClose,
-  removeHoverHighlight,
-} from "./helpers"
+import { markTarget, positionMenu, normalizeList, registerOutsideClose, removeHoverHighlight } from "./helpers"
 
 /**
  * Context Menu 核心逻辑组合式函数
@@ -19,11 +13,7 @@ import {
  * @param props.options 菜单配置选项
  * @returns 包含组件状态和方法的对象
  */
-export function useContextMenuCore(props: {
-  show: boolean
-  event?: MouseEvent
-  options?: ContextMenuOptions
-}) {
+export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, options?: ContextMenuOptions }) {
   const { refs, setRefs } = useRefs<HTMLDivElement>()
   const list = ref<ContextMenuItem[]>(normalizeList(props.options?.list))
   const ids = ref<Set<string>>(new Set())
@@ -58,8 +48,7 @@ export function useContextMenuCore(props: {
    * @param options 配置选项
    */
   function open(event: MouseEvent, options: ContextMenuOptions = {}) {
-    if (!event)
-      return { close }
+    if (!event) return { close }
 
     event.preventDefault?.()
     event.stopPropagation?.()
@@ -102,8 +91,7 @@ export function useContextMenuCore(props: {
   function close(immediate = false) {
     _removeHoverHighlight()
     cleanup()
-    if (!visible.value)
-      return
+    if (!visible.value) return
 
     // 清理之前的定时器
     if (closeTimer) {
@@ -126,8 +114,7 @@ export function useContextMenuCore(props: {
    */
   function toggleItem(item: ContextMenuItem, id: string) {
     ids.value = new Set([id])
-    if (item.disabled)
-      return
+    if (item.disabled) return
 
     if (item.callback) {
       item.callback(() => close())
@@ -155,8 +142,7 @@ export function useContextMenuCore(props: {
   watch(
     () => props.options?.class,
     (cls) => {
-      if (cls)
-        extraClass.value = cls
+      if (cls) extraClass.value = cls
     },
   )
 
@@ -167,7 +153,7 @@ export function useContextMenuCore(props: {
       if (show && props.event) {
         open(props.event, props.options)
       }
-      else if (!show) {
+      if (!show) {
         close(true)
       }
     },

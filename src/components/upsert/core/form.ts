@@ -19,9 +19,7 @@ export interface FormBuilderContext {
  * @param context 表单构建上下文
  * @returns 表单构建器对象
  */
-export function createFormBuilder(
-  context: FormBuilderContext,
-) {
+export function createFormBuilder(context: FormBuilderContext) {
   const { options, mode, formRef } = context
 
   /**

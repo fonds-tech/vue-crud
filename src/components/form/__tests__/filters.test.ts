@@ -237,9 +237,7 @@ describe("fd-form filters", () => {
         form: {},
       }
       const ctx = createFilterContext({ options })
-      const items: FormItem[] = [
-        { ...baseItemDefaults, prop: "a", component: { is: "el-input" } },
-      ]
+      const items: FormItem[] = [{ ...baseItemDefaults, prop: "a", component: { is: "el-input" } }]
       const result = filterStepItems(items, ctx)
       expect(result.map(i => i.prop)).toEqual(["a"])
     })

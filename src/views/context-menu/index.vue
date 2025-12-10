@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-context-menu 右键菜单示例"
-    description="展示基础右键菜单与多级自定义项"
-    :components="componentCatalog"
-  />
+  <layout title="fd-context-menu 右键菜单示例" description="展示基础右键菜单与多级自定义项" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

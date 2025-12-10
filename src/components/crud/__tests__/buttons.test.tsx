@@ -6,7 +6,10 @@ import { h, nextTick } from "vue"
 import { it, vi, expect, describe, afterEach, beforeEach } from "vitest"
 
 // 模拟 crud 上下文
-const mockSelection = [{ id: 1, name: "项目1" }, { id: 2, name: "项目2" }]
+const mockSelection = [
+  { id: 1, name: "项目1" },
+  { id: 2, name: "项目2" },
+]
 const mockRowDelete = vi.fn()
 const mockRowAdd = vi.fn()
 const mockRefresh = vi.fn()
@@ -73,10 +76,7 @@ describe("deleteButton 集成测试", () => {
     await nextTick()
 
     expect(mockRowDelete).toHaveBeenCalledTimes(1)
-    expect(mockRowDelete).toHaveBeenCalledWith(
-      { id: 1, name: "项目1" },
-      { id: 2, name: "项目2" },
-    )
+    expect(mockRowDelete).toHaveBeenCalledWith({ id: 1, name: "项目1" }, { id: 2, name: "项目2" })
   })
 
   it("使用 crud.dict 中的标签", () => {

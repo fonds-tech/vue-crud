@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-form 表单示例"
-    description="展示 fd-form 的多种布局与模式"
-    :components="componentCatalog"
-  />
+  <layout title="fd-form 表单示例" description="展示 fd-form 的多种布局与模式" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

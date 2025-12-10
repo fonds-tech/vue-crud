@@ -3,46 +3,20 @@
     <el-card class="basic-form__card">
       <fd-form ref="form" />
       <div class="basic-form__actions">
-        <el-button type="primary" @click="handleSubmit">
-          提交表单
-        </el-button>
-        <el-button @click="handleReset">
-          重置表单
-        </el-button>
+        <el-button type="primary" @click="handleSubmit"> 提交表单 </el-button>
+        <el-button @click="handleReset"> 重置表单 </el-button>
         <el-divider direction="vertical" />
-        <el-button @click="handleValidate">
-          校验表单
-        </el-button>
-        <el-button @click="handleSetName">
-          设置姓名
-        </el-button>
-        <el-button @click="handleGetName">
-          读取姓名
-        </el-button>
-        <el-button @click="handleToggleRequired">
-          切换年龄必填
-        </el-button>
-        <el-button @click="handleUpdateConfig">
-          更新配置
-        </el-button>
-        <el-button @click="handleBatchFill">
-          批量填充
-        </el-button>
-        <el-button @click="handleSetOptions">
-          设置选项
-        </el-button>
-        <el-button @click="handleToggleDisabled">
-          切换禁用
-        </el-button>
-        <el-button @click="handleToggleVisible">
-          显隐生日
-        </el-button>
-        <el-button @click="handleClearValidate">
-          清除姓名校验
-        </el-button>
-        <el-button @click="handleValidateField">
-          校验年龄
-        </el-button>
+        <el-button @click="handleValidate"> 校验表单 </el-button>
+        <el-button @click="handleSetName"> 设置姓名 </el-button>
+        <el-button @click="handleGetName"> 读取姓名 </el-button>
+        <el-button @click="handleToggleRequired"> 切换年龄必填 </el-button>
+        <el-button @click="handleUpdateConfig"> 更新配置 </el-button>
+        <el-button @click="handleBatchFill"> 批量填充 </el-button>
+        <el-button @click="handleSetOptions"> 设置选项 </el-button>
+        <el-button @click="handleToggleDisabled"> 切换禁用 </el-button>
+        <el-button @click="handleToggleVisible"> 显隐生日 </el-button>
+        <el-button @click="handleClearValidate"> 清除姓名校验 </el-button>
+        <el-button @click="handleValidateField"> 校验年龄 </el-button>
       </div>
     </el-card>
 
@@ -133,8 +107,7 @@ const form = useForm({
 
 // #region 基础操作
 async function handleSubmit() {
-  if (!form.value)
-    return
+  if (!form.value) return
   try {
     const res = await form.value.submit()
     const hasErrors = res.errors && Object.keys(res.errors).length > 0
@@ -162,8 +135,7 @@ function handleReset() {
 // #region 演示操作
 function handleValidate() {
   form.value?.validate((valid) => {
-    if (valid)
-      ElMessage.success("校验通过")
+    if (valid) ElMessage.success("校验通过")
     else ElMessage.warning("校验不通过")
   })
 }
@@ -238,8 +210,7 @@ function handleClearValidate() {
 
 function handleValidateField() {
   form.value?.validateField("age", (valid) => {
-    if (valid)
-      ElMessage.success("年龄校验通过")
+    if (valid) ElMessage.success("年龄校验通过")
     else ElMessage.error("年龄校验失败")
   })
 }

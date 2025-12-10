@@ -1,19 +1,10 @@
 <template>
   <section class="demo-card">
-    <h4 class="demo-card__title">
-      基础导入
-    </h4>
-    <p class="demo-card__desc">
-      展示上传入口与模板下载按钮，使用模拟接口。
-    </p>
+    <h4 class="demo-card__title">基础导入</h4>
+    <p class="demo-card__desc">展示上传入口与模板下载按钮，使用模拟接口。</p>
 
     <fd-crud ref="crudRef">
-      <fd-import
-        title="导入数据"
-        :upload="handleUpload"
-        :confirm="handleConfirm"
-        :template="mockTemplate"
-      />
+      <fd-import title="导入数据" :upload="handleUpload" :confirm="handleConfirm" :template="mockTemplate" />
     </fd-crud>
   </section>
 </template>

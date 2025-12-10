@@ -5,23 +5,8 @@ import FdDialog from "../dialog"
 import { clone } from "@fonds/utils"
 import { useCore, useConfig } from "@/hooks"
 import { renderForm, renderFooter } from "./render"
-import {
-  useUpsertActions,
-  createFormBuilder,
-  createUpsertState,
-  useComponentHelper,
-  createUpsertService,
-} from "./core"
-import {
-  h,
-  watch,
-  computed,
-  useAttrs,
-  useSlots,
-  defineComponent,
-  onBeforeUnmount,
-  resolveDirective,
-} from "vue"
+import { h, watch, computed, useAttrs, useSlots, defineComponent, onBeforeUnmount, resolveDirective } from "vue"
+import { useUpsertActions, createFormBuilder, createUpsertState, useComponentHelper, createUpsertService } from "./core"
 import "./style.scss"
 
 export default defineComponent({
@@ -74,16 +59,13 @@ export default defineComponent({
     const dialogNativeAttrs = computed(() => {
       const result: Record<string, unknown> = {}
       Object.keys(attrs).forEach((key) => {
-        if (key === "class")
-          return
+        if (key === "class") return
         result[key] = attrs[key]
       })
       return result
     })
 
-    const defaultTitle = computed(() =>
-      state.mode.value === "add" ? crud.dict?.label?.add ?? "新增" : crud.dict?.label?.update ?? "编辑",
-    )
+    const defaultTitle = computed(() => (state.mode.value === "add" ? (crud.dict?.label?.add ?? "新增") : (crud.dict?.label?.update ?? "编辑")))
 
     const dialogClass = computed(() => {
       const extra = attrs.class

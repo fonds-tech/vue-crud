@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-add-button 新增按钮示例"
-    description="依赖 CRUD 权限的新增触发"
-    :components="componentCatalog"
-  />
+  <layout title="fd-add-button 新增按钮示例" description="依赖 CRUD 权限的新增触发" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

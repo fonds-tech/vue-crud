@@ -3,7 +3,7 @@
     <div class="demo-item">
       <h3 class="demo-title">1. API 获取全量数据</h3>
       <p class="demo-desc">
-        通过 <code>api</code> 属性传入一个返回 Promise 的函数，组件挂载时自动获取全量层级数据。<br>
+        通过 <code>api</code> 属性传入一个返回 Promise 的函数，组件挂载时自动获取全量层级数据。<br />
         适用于数据量较小、层级固定的场景。
       </p>
       <div class="demo-control">
@@ -15,19 +15,12 @@
         </div>
 
         <div class="control-row" style="margin-top: 12px">
-          <fd-cascader
-            v-model="value"
-            :api="mockFetchApi"
-            :params="queryParams"
-            placeholder="请选择城市"
-            style="width: 100%"
-            clearable
-          />
+          <fd-cascader v-model="value" :api="mockFetchApi" :params="queryParams" placeholder="请选择城市" style="width: 100%" clearable />
         </div>
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
-        <span>{{ value || '-' }}</span>
+        <span>{{ value || "-" }}</span>
         <span class="result-label" style="margin-left: 16px">API 参数:</span>
         <span>{{ JSON.stringify(queryParams) }}</span>
       </div>

@@ -7,12 +7,8 @@
         </el-tag>
       </template>
       <template #actionSlots="{ row }">
-        <el-link type="primary" @click="handleView(row)">
-          查看
-        </el-link>
-        <el-link type="warning" @click="handleEdit(row)">
-          编辑
-        </el-link>
+        <el-link type="primary" @click="handleView(row)"> 查看 </el-link>
+        <el-link type="warning" @click="handleEdit(row)"> 编辑 </el-link>
       </template>
     </fd-table>
   </fd-crud>
@@ -28,19 +24,18 @@ defineOptions({
   name: "action-table",
 })
 
-const crudRef = useCrud({
-  service: new TableMockService(),
-}, crud => crud.refresh())
+const crudRef = useCrud(
+  {
+    service: new TableMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const actionColumn: TableColumn = {
   type: "action",
   label: "操作",
   width: 200,
-  actions: _scope =>
-    [
-      { text: "内置详情", type: "detail" } as TableAction,
-      { text: "自定义", component: { slot: "actionSlots" } },
-    ],
+  actions: _scope => [{ text: "内置详情", type: "detail" } as TableAction, { text: "自定义", component: { slot: "actionSlots" } }],
 }
 
 const columns: TableColumn[] = [
@@ -50,12 +45,10 @@ const columns: TableColumn[] = [
   actionColumn,
 ]
 
-const tableRef = useTable(
-  {
-    table: { border: true, size: "small", rowKey: "id" },
-    columns,
-  },
-)
+const tableRef = useTable({
+  table: { border: true, size: "small", rowKey: "id" },
+  columns,
+})
 
 function handleView(row: any) {
   ElMessage.info(`查看：${row.name}`)

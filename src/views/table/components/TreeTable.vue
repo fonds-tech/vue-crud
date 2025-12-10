@@ -12,11 +12,14 @@ defineOptions({ name: "tree-table" })
 
 const service = new TableMockService()
 
-const crud = useCrud({
-  service: {
-    page: service.treePage,
+const crud = useCrud(
+  {
+    service: {
+      page: service.treePage,
+    },
   },
-}, crud => crud.refresh())
+  crud => crud.refresh(),
+)
 
 const table = useTable({
   table: {

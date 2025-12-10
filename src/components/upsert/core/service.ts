@@ -200,7 +200,7 @@ export function createUpsertService(context: UpsertServiceContext) {
       ElMessage.success(crud.dict?.label?.saveSuccess ?? "保存成功")
     }
     const next = (data: Record<string, unknown>) => {
-      const apiName = state.mode.value === "add" ? crud.dict?.api?.add ?? "add" : crud.dict?.api?.update ?? "update"
+      const apiName = state.mode.value === "add" ? (crud.dict?.api?.add ?? "add") : (crud.dict?.api?.update ?? "update")
       const service = crud.service?.[apiName]
       if (typeof service !== "function") {
         const error = new Error(`未在 CRUD service 中找到 ${apiName} 方法`)
@@ -235,7 +235,7 @@ export function createUpsertService(context: UpsertServiceContext) {
   function handleProxyEvent(payload: unknown) {
     if (!payload || typeof payload !== "object") return
     const name = "name" in payload && typeof (payload as { name?: unknown }).name === "string" ? (payload as { name?: string }).name : undefined
-    const data = "data" in payload && Array.isArray((payload as { data?: unknown }).data) ? (payload as { data?: Array<Record<string, unknown>> }).data ?? [] : []
+    const data = "data" in payload && Array.isArray((payload as { data?: unknown }).data) ? ((payload as { data?: Array<Record<string, unknown>> }).data ?? []) : []
     switch (name) {
       case "add":
         add(data[0] ?? {})

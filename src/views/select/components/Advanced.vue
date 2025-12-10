@@ -5,19 +5,9 @@
       <h3 class="demo-title">1. 自定义选项模板 (Slots)</h3>
       <p class="demo-desc">使用默认插槽自定义下拉列表的 Option 内容。</p>
       <div class="demo-control">
-        <fd-select
-          v-model="valueSlot"
-          :options="users"
-          placeholder="请选择"
-          style="width: 100%"
-        >
+        <fd-select v-model="valueSlot" :options="users" placeholder="请选择" style="width: 100%">
           <template #default="{ options }">
-            <fd-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+            <fd-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
               <div class="custom-option">
                 <span class="option-label">{{ item.label }}</span>
                 <span class="option-desc">{{ item.desc }}</span>
@@ -33,16 +23,10 @@
       <h3 class="demo-title">2. 获取选中项完整对象</h3>
       <p class="demo-desc">监听 change 事件，第二个参数即为选中项原始数据。</p>
       <div class="demo-control">
-        <fd-select
-          v-model="valueEvent"
-          :options="users"
-          placeholder="请选择一项"
-          style="width: 100%"
-          @change="handleChange"
-        />
+        <fd-select v-model="valueEvent" :options="users" placeholder="请选择一项" style="width: 100%" @change="handleChange" />
       </div>
       <div class="demo-result">
-        {{ selectedObject ? JSON.stringify(selectedObject, null, 2) : '// 暂无选择数据' }}
+        {{ selectedObject ? JSON.stringify(selectedObject, null, 2) : "// 暂无选择数据" }}
       </div>
     </div>
 
@@ -53,17 +37,9 @@
       <div class="demo-control">
         <div class="flex-row" style="margin-bottom: 12px">
           <el-button size="small" @click="refreshList">点击刷新</el-button>
-          <span style="font-size: 12px; color: var(--el-text-color-secondary)">
-            Updated: {{ lastRefreshTime }}
-          </span>
+          <span style="font-size: 12px; color: var(--el-text-color-secondary)"> Updated: {{ lastRefreshTime }} </span>
         </div>
-        <fd-select
-          ref="selectRef"
-          v-model="valueManual"
-          :api="fetchTimeApi"
-          placeholder="列表由 API 生成"
-          style="width: 100%"
-        />
+        <fd-select ref="selectRef" v-model="valueManual" :api="fetchTimeApi" placeholder="列表由 API 生成" style="width: 100%" />
       </div>
     </div>
   </div>

@@ -10,11 +10,7 @@ import { renderSlotOrComponent, renderComponentSlotMap } from "./slots"
  * @param groupName 分组名称（可选）
  */
 export function renderGrid(ctx: FormRenderContext, items: FormItem[], groupName?: string | number) {
-  return (
-    <Grid {...ctx.options.grid}>
-      {items.map((item, index) => renderFormItem(ctx, item, index, groupName))}
-    </Grid>
-  )
+  return <Grid {...ctx.options.grid}>{items.map((item, index) => renderFormItem(ctx, item, index, groupName))}</Grid>
 }
 
 /**
@@ -24,27 +20,16 @@ export function renderGrid(ctx: FormRenderContext, items: FormItem[], groupName?
  */
 export function renderSteps(ctx: FormRenderContext) {
   const { options, step, helpers } = ctx
-  if (!(options.group?.type === "steps" && options.group.children?.length))
-    return null
+  if (!(options.group?.type === "steps" && options.group.children?.length)) return null
 
   const stepSlots = renderComponentSlotMap(ctx, helpers.slotsOf(options.group.component))
 
   return (
-    <el-steps
-      active={step.value}
-      {...helpers.componentProps(options.group.component)}
-      style={helpers.styleOf(options.group.component)}
-      v-slots={stepSlots}
-    >
+    <el-steps active={step.value} {...helpers.componentProps(options.group.component)} style={helpers.styleOf(options.group.component)} v-slots={stepSlots}>
       {options.group.children.map((child, index) => {
         const childSlots = renderComponentSlotMap(ctx, helpers.slotsOf(child.component), { step: index, model: ctx.model })
         return (
-          <el-step
-            key={child.name ?? index}
-            title={child.title}
-            {...helpers.componentProps(child.component)}
-            v-slots={childSlots}
-          >
+          <el-step key={child.name ?? index} title={child.title} {...helpers.componentProps(child.component)} v-slots={childSlots}>
             {renderSlotOrComponent(ctx, child.component, { step: index, model: ctx.model })}
           </el-step>
         )
@@ -55,20 +40,14 @@ export function renderSteps(ctx: FormRenderContext) {
 
 export function renderTabs(ctx: FormRenderContext) {
   const { options, activeGroupName, helpers } = ctx
-  if (!(options.group?.type === "tabs" && options.group.children?.length))
-    return null
+  if (!(options.group?.type === "tabs" && options.group.children?.length)) return null
 
   const tabSlots = renderComponentSlotMap(ctx, helpers.slotsOf(options.group.component), { model: ctx.model })
   const lazy = options.group.lazy ?? true
   const keepAlive = options.group.keepAlive ?? true
 
   return (
-    <el-tabs
-      v-model={activeGroupName.value}
-      {...helpers.componentProps(options.group.component)}
-      style={helpers.styleOf(options.group.component)}
-      v-slots={tabSlots}
-    >
+    <el-tabs v-model={activeGroupName.value} {...helpers.componentProps(options.group.component)} style={helpers.styleOf(options.group.component)} v-slots={tabSlots}>
       {options.group.children.map((child, index) => {
         const childSlots = renderComponentSlotMap(ctx, helpers.slotsOf(child.component), { model: ctx.model, name: child.name })
         const groupName = child.name ?? index
@@ -77,13 +56,7 @@ export function renderTabs(ctx: FormRenderContext) {
         const shouldRenderContent = !lazy || isActive || (keepAlive && loaded)
 
         return (
-          <el-tab-pane
-            key={groupName}
-            label={child.title}
-            name={groupName}
-            {...helpers.componentProps(child.component)}
-            v-slots={childSlots}
-          >
+          <el-tab-pane key={groupName} label={child.title} name={groupName} {...helpers.componentProps(child.component)} v-slots={childSlots}>
             {renderSlotOrComponent(ctx, child.component, { model: ctx.model, scope: { name: child.name } })}
             {shouldRenderContent ? renderGrid(ctx, helpers.itemsOfGroup(groupName), groupName) : null}
           </el-tab-pane>

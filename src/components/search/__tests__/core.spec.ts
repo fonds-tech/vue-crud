@@ -78,11 +78,13 @@ describe("useSearchCore", () => {
 
     await search({ status: 1 })
 
-    expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-      keyword: "Vue",
-      status: 1,
-      page: 1,
-    }))
+    expect(mockCrud.setParams).toHaveBeenCalledWith(
+      expect.objectContaining({
+        keyword: "Vue",
+        status: 1,
+        page: 1,
+      }),
+    )
     expect(mockCrud.refresh).toHaveBeenCalled()
   })
 
@@ -129,13 +131,17 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        keyword: "test",
-        page: 1,
-      }))
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.not.objectContaining({
-        empty: undefined,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: "test",
+          page: 1,
+        }),
+      )
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          empty: undefined,
+        }),
+      )
     })
 
     it("过滤空字符串", async () => {
@@ -148,9 +154,11 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.not.objectContaining({
-        emptyStr: "",
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          emptyStr: "",
+        }),
+      )
     })
 
     it("过滤只包含空格的字符串", async () => {
@@ -163,9 +171,11 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.not.objectContaining({
-        spaces: "   ",
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          spaces: "   ",
+        }),
+      )
     })
 
     it("保留数字 0", async () => {
@@ -178,9 +188,11 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        count: 0,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          count: 0,
+        }),
+      )
     })
 
     it("保留布尔值 false", async () => {
@@ -193,9 +205,11 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        enabled: false,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          enabled: false,
+        }),
+      )
     })
   })
 
@@ -217,10 +231,7 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(onSearch).toHaveBeenCalledWith(
-        { keyword: "Vue" },
-        expect.objectContaining({ next: expect.any(Function) }),
-      )
+      expect(onSearch).toHaveBeenCalledWith({ keyword: "Vue" }, expect.objectContaining({ next: expect.any(Function) }))
       expect(mockCrud.refresh).toHaveBeenCalled()
     })
 
@@ -239,11 +250,13 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        keyword: "Vue",
-        customField: "custom",
-        page: 1,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: "Vue",
+          customField: "custom",
+          page: 1,
+        }),
+      )
       expect(mockCrud.refresh).toHaveBeenCalled()
     })
 
@@ -285,10 +298,7 @@ describe("useSearchCore", () => {
 
       await reset()
 
-      expect(onReset).toHaveBeenCalledWith(
-        {},
-        expect.objectContaining({ next: expect.any(Function) }),
-      )
+      expect(onReset).toHaveBeenCalledWith({}, expect.objectContaining({ next: expect.any(Function) }))
       expect(mockCrud.refresh).toHaveBeenCalled()
     })
 
@@ -308,10 +318,12 @@ describe("useSearchCore", () => {
 
       await reset({ extra: 1 })
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        resetField: "reset",
-        page: 1,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          resetField: "reset",
+          page: 1,
+        }),
+      )
       expect(mockCrud.refresh).toHaveBeenCalled()
     })
 
@@ -396,10 +408,12 @@ describe("useSearchCore", () => {
 
       await search()
 
-      expect(mockCrud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-        size: 50,
-        page: 1,
-      }))
+      expect(mockCrud.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({
+          size: 50,
+          page: 1,
+        }),
+      )
     })
   })
 })

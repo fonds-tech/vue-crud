@@ -35,12 +35,7 @@ const COLUMN_MIN_WIDTH = 120
  * @param crud - CRUD 桥接实例
  * @returns 代表表格列的 VNode 数组
  */
-export function renderColumns(
-  columns: TableColumn<TableRecord>[],
-  renderHelpers: RenderHelpers<TableRecord>,
-  slots: Slots,
-  crud: CrudBridge,
-) {
+export function renderColumns(columns: TableColumn<TableRecord>[], renderHelpers: RenderHelpers<TableRecord>, slots: Slots, crud: CrudBridge) {
   return columns.map((column, index) => {
     // 为列生成稳定 id 以配合虚拟 DOM diff，同时仅透传 Element Plus 接受的列属性
     const columnProps: Record<string, unknown> = { id: column.__id ?? column.prop ?? `col_${index}`, ...omitColumnProps(column) }
@@ -104,33 +99,22 @@ export function renderColumns(
                     // 将配置化的 slot 映射为 VNode 插槽函数，并剔除未定义的槽避免无效渲染
                     Object.entries(componentSlots)
                       .filter(([, value]) => value !== undefined)
-                      .map(([slotKey, value]) => [
-                        slotKey,
-                        () => value,
-                      ]),
+                      .map(([slotKey, value]) => [slotKey, () => value]),
                   ),
                 )
               : null
           }
-          return h(
-            ElSpace,
-            { size: 4, alignment: "center" },
-            () => [
-              h("span", null, column.label),
-              column.help
-                ? h(
-                    ElTooltip,
-                    { content: column.help, placement: "top" },
-                    () =>
-                      h(
-                        "span",
-                        { class: "fd-table__help" },
-                        h(ElIcon, null, () => h(QuestionFilled)),
-                      ),
-                  )
-                : null,
-            ],
-          )
+          return h(ElSpace, { size: 4, alignment: "center" }, () => [
+            h("span", null, column.label),
+            column.help
+              ? h(ElTooltip, { content: column.help, placement: "top" }, () =>
+                  h(
+                    "span",
+                    { class: "fd-table__help" },
+                    h(ElIcon, null, () => h(QuestionFilled)),
+                  ))
+              : null,
+          ])
         },
         default: (scope: TableScope<TableRecord>) => {
           if (renderHelpers.hasDict(column, scope)) {
@@ -168,10 +152,7 @@ export function renderColumns(
               Object.fromEntries(
                 Object.entries(componentSlots)
                   .filter(([, value]) => value !== undefined)
-                  .map(([slotKey, value]) => [
-                    slotKey,
-                    () => value,
-                  ]),
+                  .map(([slotKey, value]) => [slotKey, () => value]),
               ),
             )
           }

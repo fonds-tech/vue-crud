@@ -25,7 +25,7 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
   const options = reactive<InternalOptions>(createDefaultOptions())
 
   const formModel = computed<FormRecord>(() => formRef.value?.model ?? (options.form.model as FormRecord) ?? {})
-  const resolvedActions = computed(() => (options.action.items.length ? options.action.items : [{ type: "search" }, { type: "reset" }] as SearchAction[]))
+  const resolvedActions = computed(() => (options.action.items.length ? options.action.items : ([{ type: "search" }, { type: "reset" }] as SearchAction[])))
 
   const actionGridProps = computed(() => {
     const grid = options.action.grid ?? {}
@@ -37,7 +37,7 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
     return { cols, colGap, rowGap, collapsed: collapsedState, collapsedRows }
   })
 
-  const collapseLabel = computed(() => (collapsed.value ? crud.dict?.label?.expand ?? "展开" : crud.dict?.label?.collapse ?? "折叠"))
+  const collapseLabel = computed(() => (collapsed.value ? (crud.dict?.label?.expand ?? "展开") : (crud.dict?.label?.collapse ?? "折叠")))
 
   const formSlots = computed(() => {
     const vSlots: Record<string, any> = {}
@@ -61,8 +61,7 @@ export function useSearchCore(setupSlots: Slots): SearchCore {
     return { span: col.span, offset: col.offset }
   }
 
-  const getActionSlot = (action: SearchAction): string | undefined =>
-    resolve(action.slot, formModel.value) ?? resolveComponent(action, "slot", formModel.value)
+  const getActionSlot = (action: SearchAction): string | undefined => resolve(action.slot, formModel.value) ?? resolveComponent(action, "slot", formModel.value)
 
   const getComponentIs = (action: SearchAction) => resolveComponent(action, "is", formModel.value)
   const getComponentProps = (action: SearchAction) => resolveComponent(action, "props", formModel.value) ?? {}

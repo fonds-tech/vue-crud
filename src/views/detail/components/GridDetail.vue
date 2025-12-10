@@ -49,9 +49,12 @@ const columns: TableColumn[] = [
   },
 ]
 
-const crudRef = useCrud({
-  service: new DetailMockService(),
-}, crud => crud.refresh())
+const crudRef = useCrud(
+  {
+    service: new DetailMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const tableRef = useTable({
   columns,

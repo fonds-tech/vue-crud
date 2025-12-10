@@ -61,8 +61,7 @@ function createMittStub() {
       handlers[event].push(handler)
     }),
     off: vi.fn((event: string, handler?: (payload?: any) => void) => {
-      if (!handlers[event])
-        return
+      if (!handlers[event]) return
       if (!handler) {
         handlers[event] = []
       }
@@ -115,11 +114,7 @@ const ElRowStub = defineComponent({
   setup(_, { slots, attrs }) {
     return () => {
       const { class: className, ...rest } = attrs as Record<string, any>
-      return h(
-        "div",
-        { ...rest, class: ["el-row-stub", className].filter(Boolean).join(" ") },
-        slots.default?.(),
-      )
+      return h("div", { ...rest, class: ["el-row-stub", className].filter(Boolean).join(" ") }, slots.default?.())
     }
   },
 })
@@ -130,11 +125,7 @@ const ElColStub = defineComponent({
   setup(_, { slots, attrs }) {
     return () => {
       const { class: className, ...rest } = attrs as Record<string, any>
-      return h(
-        "div",
-        { ...rest, class: ["el-col-stub", className].filter(Boolean).join(" ") },
-        slots.default?.(),
-      )
+      return h("div", { ...rest, class: ["el-col-stub", className].filter(Boolean).join(" ") }, slots.default?.())
     }
   },
 })
@@ -145,11 +136,7 @@ const FdGridStub = defineComponent({
   setup(_, { slots, attrs }) {
     return () => {
       const { class: className, ...rest } = attrs as Record<string, any>
-      return h(
-        "div",
-        { ...rest, class: ["fd-grid-stub", className].filter(Boolean).join(" ") },
-        slots.default?.(),
-      )
+      return h("div", { ...rest, class: ["fd-grid-stub", className].filter(Boolean).join(" ") }, slots.default?.())
     }
   },
 })
@@ -160,11 +147,7 @@ const FdGridItemStub = defineComponent({
   setup(_, { slots, attrs }) {
     return () => {
       const { class: className, ...rest } = attrs as Record<string, any>
-      return h(
-        "div",
-        { ...rest, class: ["fd-grid-item-stub", className].filter(Boolean).join(" ") },
-        slots.default?.(),
-      )
+      return h("div", { ...rest, class: ["fd-grid-item-stub", className].filter(Boolean).join(" ") }, slots.default?.())
     }
   },
 })
@@ -176,11 +159,7 @@ const FdFormStub = defineComponent({
     expose(formExpose)
     return () => {
       const { class: className, ...rest } = attrs as Record<string, any>
-      return h(
-        "form",
-        { ...rest, class: ["fd-form-stub", className].filter(Boolean).join(" ") },
-        slots.default?.(),
-      )
+      return h("form", { ...rest, class: ["fd-form-stub", className].filter(Boolean).join(" ") }, slots.default?.())
     }
   },
 })
@@ -232,21 +211,19 @@ describe("fd-search", () => {
     await nextTick()
     const options: Parameters<SearchExpose["use"]>[0] = {
       model: { keyword: "" },
-      items: [
-        { prop: "keyword", label: "关键字", component: { is: "el-input" } },
-      ],
+      items: [{ prop: "keyword", label: "关键字", component: { is: "el-input" } }],
       action: {
         items: [{ type: "search", text: "查询" }],
       },
     }
     search.use(options)
     expect(formExpose.use).toHaveBeenCalledTimes(1)
-    expect(formExpose.use).toHaveBeenCalledWith(expect.objectContaining({
-      model: expect.objectContaining({ keyword: "" }),
-      items: expect.arrayContaining([
-        expect.objectContaining({ prop: "keyword" }),
-      ]),
-    }))
+    expect(formExpose.use).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: expect.objectContaining({ keyword: "" }),
+        items: expect.arrayContaining([expect.objectContaining({ prop: "keyword" })]),
+      }),
+    )
   })
 
   it("action 配置支持 grid 布局", async () => {
@@ -281,16 +258,20 @@ describe("fd-search", () => {
     formExpose.model.keyword = "Vue3"
     coreStore.crud.refresh = vi.fn(async () => "ok")
     const result = await search.search({ status: true })
-    expect(coreStore.crud.setParams).toHaveBeenCalledWith(expect.objectContaining({
-      keyword: "Vue3",
-      status: true,
-      page: 1,
-      size: 20,
-    }))
-    expect(coreStore.crud.refresh).toHaveBeenCalledWith(expect.objectContaining({
-      keyword: "Vue3",
-      status: true,
-    }))
+    expect(coreStore.crud.setParams).toHaveBeenCalledWith(
+      expect.objectContaining({
+        keyword: "Vue3",
+        status: true,
+        page: 1,
+        size: 20,
+      }),
+    )
+    expect(coreStore.crud.refresh).toHaveBeenCalledWith(
+      expect.objectContaining({
+        keyword: "Vue3",
+        status: true,
+      }),
+    )
     expect(result).toBe("ok")
   })
 

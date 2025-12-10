@@ -46,16 +46,12 @@ export function TableToolbar(props: ToolbarProps) {
     props.slots.toolbar?.(),
     props.toolsEnabled
       ? h("div", { class: "fd-table__tools" }, [
-          h(
-            ElTooltip,
-            { content: "刷新", placement: "top" },
-            () =>
-              h(
-                "div",
-                { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onRefresh() },
-                h(ElIcon, null, () => h(RefreshIcon)),
-              ),
-          ),
+          h(ElTooltip, { content: "刷新", placement: "top" }, () =>
+            h(
+              "div",
+              { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onRefresh() },
+              h(ElIcon, null, () => h(RefreshIcon)),
+            )),
           h(
             ElDropdown,
             { trigger: "click", onCommand: (size: TableSize) => props.onSizeChange(size) },
@@ -64,47 +60,35 @@ export function TableToolbar(props: ToolbarProps) {
                 h(
                   "span",
                   { class: "fd-table__tool-trigger" },
-                  h(
-                    ElTooltip,
-                    { content: "尺寸", placement: "top" },
-                    () =>
-                      h(
-                        "div",
-                        { class: "fd-table__tool-btn", role: "button", tabindex: 0 },
-                        h(ElIcon, null, () => h(Operation)),
-                      ),
-                  ),
+                  h(ElTooltip, { content: "尺寸", placement: "top" }, () =>
+                    h(
+                      "div",
+                      { class: "fd-table__tool-btn", role: "button", tabindex: 0 },
+                      h(ElIcon, null, () => h(Operation)),
+                    )),
                 ),
               dropdown: () =>
-                h(
-                  ElDropdownMenu,
-                  null,
-                  () =>
-                    props.sizeOptions.map(size =>
-                      h(
-                        ElDropdownItem,
-                        {
-                          key: size.value,
-                          command: size.value,
-                          class: { "is-active": size.value === props.currentSize },
-                        },
-                        () => size.label,
-                      ),
+                h(ElDropdownMenu, null, () =>
+                  props.sizeOptions.map(size =>
+                    h(
+                      ElDropdownItem,
+                      {
+                        key: size.value,
+                        command: size.value,
+                        class: { "is-active": size.value === props.currentSize },
+                      },
+                      () => size.label,
                     ),
-                ),
+                  )),
             },
           ),
           props.columnSettings,
-          h(
-            ElTooltip,
-            { content: "全屏", placement: "top" },
-            () =>
-              h(
-                "div",
-                { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onToggleFullscreen() },
-                h(ElIcon, null, () => h(FullScreen)),
-              ),
-          ),
+          h(ElTooltip, { content: "全屏", placement: "top" }, () =>
+            h(
+              "div",
+              { class: "fd-table__tool-btn", role: "button", tabindex: 0, onClick: () => props.onToggleFullscreen() },
+              h(ElIcon, null, () => h(FullScreen)),
+            )),
         ])
       : null,
   ])

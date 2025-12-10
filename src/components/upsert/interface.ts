@@ -1,18 +1,7 @@
 import type { GridProps } from "../grid"
 import type { dialogProps } from "element-plus"
 import type { ExtractPropTypes } from "vue"
-import type {
-  FormRef,
-  FormItem,
-  FormGroup,
-  FormRecord,
-  DeepPartial,
-  FormActions,
-  FormMaybeFn,
-  FormMethods,
-  FormUseOptions,
-  FormComponentSlot,
-} from "../form/types"
+import type { FormRef, FormItem, FormGroup, FormRecord, DeepPartial, FormActions, FormMaybeFn, FormMethods, FormUseOptions, FormComponentSlot } from "../form/types"
 
 /**
  * 排除 modelValue 的原生 Dialog 属性

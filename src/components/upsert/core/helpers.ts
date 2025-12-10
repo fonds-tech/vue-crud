@@ -20,13 +20,8 @@ function isComponentConfig(component?: FormComponentSlot): component is Record<s
   return Boolean(isRecord(component) && "is" in component)
 }
 
-function resolveComponentProp<T>(
-  component: FormComponentSlot | undefined,
-  prop: string,
-  formModel: ComputedRef<FormRecord>,
-): T | undefined {
-  if (!isRecord(component))
-    return undefined
+function resolveComponentProp<T>(component: FormComponentSlot | undefined, prop: string, formModel: ComputedRef<FormRecord>): T | undefined {
+  if (!isRecord(component)) return undefined
   return resolveProp<T>(component, prop, formModel.value)
 }
 
@@ -61,8 +56,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 插槽名称 或 undefined
    */
   function slotNameOf(component?: FormComponentSlot) {
-    if (!isComponentConfig(component))
-      return undefined
+    if (!isComponentConfig(component)) return undefined
     return resolveComponentProp<string | undefined>(component, "slot", formModel)
   }
 
@@ -73,12 +67,9 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 组件对象/字符串 或 undefined
    */
   function componentOf(component?: FormComponentSlot) {
-    if (!component)
-      return undefined
-    if (typeof component === "string" || typeof component === "function")
-      return component
-    if (isComponentConfig(component))
-      return resolveComponentProp(component, "is", formModel)
+    if (!component) return undefined
+    if (typeof component === "string" || typeof component === "function") return component
+    if (isComponentConfig(component)) return resolveComponentProp(component, "is", formModel)
     return undefined
   }
 
@@ -89,8 +80,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 组件 props 对象
    */
   function componentProps(component?: FormComponentSlot) {
-    if (!component || !isComponentConfig(component))
-      return {}
+    if (!component || !isComponentConfig(component)) return {}
     return resolveComponentProp<Record<string, unknown>>(component, "props", formModel) ?? {}
   }
 
@@ -101,8 +91,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 样式对象
    */
   function componentStyle(component?: FormComponentSlot) {
-    if (!component || !isComponentConfig(component))
-      return undefined
+    if (!component || !isComponentConfig(component)) return undefined
     return resolveComponentProp(component, "style", formModel)
   }
 
@@ -113,8 +102,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 事件对象
    */
   function componentEvents(component?: FormComponentSlot) {
-    if (!component || !isComponentConfig(component))
-      return {}
+    if (!component || !isComponentConfig(component)) return {}
     return resolveComponentProp<Record<string, unknown>>(component, "on", formModel) ?? {}
   }
 
@@ -125,8 +113,7 @@ export function useComponentHelper<T extends FormRecord = FormRecord>(context: C
    * @returns 内部插槽对象
    */
   function componentSlots(component?: FormComponentSlot) {
-    if (!component || !isComponentConfig(component))
-      return {}
+    if (!component || !isComponentConfig(component)) return {}
     return resolveComponentProp<Record<string, FormComponentSlot>>(component, "slots", formModel) ?? {}
   }
 

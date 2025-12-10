@@ -1,12 +1,6 @@
 import type { Arrayable } from "element-plus/es/utils"
 import type { FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
-import type {
-  FormItem,
-  FormRecord,
-  FormMethods,
-  FormOptions,
-  FormActionContext,
-} from "../types"
+import type { FormItem, FormRecord, FormMethods, FormOptions, FormActionContext } from "../types"
 import formHook from "./hooks"
 import { useAction } from "./actions"
 import { propToString } from "./model"
@@ -17,8 +11,7 @@ import { clone, isDef, isFunction } from "@fonds/utils"
  */
 export function useMethods<T extends FormRecord = FormRecord>({ options, form, model }: { options: FormOptions<T>, form: FormActionContext<T>["form"], model: T }): FormMethods<T> {
   const ensureFieldsArray = (field?: Arrayable<FormItemProp>): string[] | undefined => {
-    if (!field)
-      return undefined
+    if (!field) return undefined
     const flatten = Array.isArray(field) ? field : [field]
     return flatten.flatMap(item => (Array.isArray(item) ? item : [item]))
   }
@@ -114,8 +107,7 @@ export function useMethods<T extends FormRecord = FormRecord>({ options, form, m
 }
 
 function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<string, any> | undefined, values: T) {
-  if (!errors)
-    return errors
+  if (!errors) return errors
 
   const result: Record<string, any> = {}
   Object.keys(errors).forEach((field) => {
@@ -125,17 +117,11 @@ function normalizeErrors<T extends FormRecord = FormRecord>(errors: Record<strin
     const isEmpty = value === undefined || value === null || value === ""
 
     const isRequiredError = (err: any) =>
-      err?.required === true
-      || err?.type === "required"
-      || err?._inner === true
-      || (typeof err?.message === "string" && err.message.includes("必填"))
+      err?.required === true || err?.type === "required" || err?._inner === true || (typeof err?.message === "string" && err.message.includes("必填"))
 
-    const filtered = Array.isArray(fieldErrors)
-      ? fieldErrors.filter(err => !(isRequiredError(err) && !isEmpty))
-      : fieldErrors
+    const filtered = Array.isArray(fieldErrors) ? fieldErrors.filter(err => !(isRequiredError(err) && !isEmpty)) : fieldErrors
 
-    if (Array.isArray(filtered) && filtered.length > 0)
-      result[field] = filtered
+    if (Array.isArray(filtered) && filtered.length > 0) result[field] = filtered
   })
 
   return Object.keys(result).length ? result : undefined

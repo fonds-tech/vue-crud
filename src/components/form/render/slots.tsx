@@ -3,8 +3,7 @@ import type { FormComponentSlot, FormRenderContext } from "../types"
 import { h, resolveDynamicComponent } from "vue"
 
 function resolveComponent(type: string | VueComponent | undefined) {
-  if (!type)
-    return undefined
+  if (!type) return undefined
   if (typeof type === "string") {
     const dyn = resolveDynamicComponent(type)
     return dyn as VueComponent | undefined
@@ -19,11 +18,7 @@ function resolveComponent(type: string | VueComponent | undefined) {
  * @param slotProps 透传给插槽/组件的属性
  * @returns 渲染结果 VNode 或 null
  */
-export function renderSlotOrComponent(
-  ctx: FormRenderContext,
-  com?: FormComponentSlot,
-  slotProps: Record<string, unknown> = {},
-) {
+export function renderSlotOrComponent(ctx: FormRenderContext, com?: FormComponentSlot, slotProps: Record<string, unknown> = {}) {
   const { helpers, slots, model } = ctx
 
   const name = helpers.slotNameOf(com)
@@ -32,22 +27,24 @@ export function renderSlotOrComponent(
   }
 
   const componentType = helpers.is(com)
-  if (!componentType)
-    return null
+  if (!componentType) return null
 
   const resolved = resolveComponent(componentType)
-  if (!resolved)
-    return null
+  if (!resolved) return null
 
   const listeners = helpers.normalizeListeners(helpers.onListeners(com))
   const childSlots = renderComponentSlotMap(ctx, helpers.slotsOf(com), slotProps)
 
-  return h(resolved, {
-    ...helpers.componentProps(com),
-    ref: helpers.bindComponentRef(com),
-    style: helpers.styleOf(com),
-    ...listeners,
-  }, childSlots)
+  return h(
+    resolved,
+    {
+      ...helpers.componentProps(com),
+      ref: helpers.bindComponentRef(com),
+      style: helpers.styleOf(com),
+      ...listeners,
+    },
+    childSlots,
+  )
 }
 
 /**
@@ -57,14 +54,7 @@ export function renderSlotOrComponent(
  * @param slotProps 透传给子插槽的上下文属性
  * @returns 标准化的 slots 对象
  */
-export function renderComponentSlotMap(
-  ctx: FormRenderContext,
-  slotMap: Record<string, FormComponentSlot>,
-  slotProps: Record<string, unknown> = {},
-) {
-  const entries = Object.entries(slotMap).map(([name, value]) => [
-    name,
-    () => renderSlotOrComponent(ctx, value, slotProps),
-  ] as const)
+export function renderComponentSlotMap(ctx: FormRenderContext, slotMap: Record<string, FormComponentSlot>, slotProps: Record<string, unknown> = {}) {
+  const entries = Object.entries(slotMap).map(([name, value]) => [name, () => renderSlotOrComponent(ctx, value, slotProps)] as const)
   return Object.fromEntries(entries)
 }

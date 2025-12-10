@@ -3,11 +3,7 @@
     <div class="control-panel">
       <div class="control-group">
         <span class="label">默认折叠</span>
-        <el-switch
-          v-model="collapsed"
-          active-text="开启"
-          inactive-text="关闭"
-        />
+        <el-switch v-model="collapsed" active-text="开启" inactive-text="关闭" />
       </div>
       <div class="divider"></div>
       <div class="control-group">
@@ -15,27 +11,15 @@
         <el-input-number v-model="collapsedRows" :min="1" :max="5" size="small" style="width: 100px" />
       </div>
       <div class="breakpoint-hint">
-        <el-tag size="small" effect="plain">
-          xs: 1列
-        </el-tag>
-        <el-tag size="small" effect="plain">
-          sm: 2列
-        </el-tag>
-        <el-tag size="small" effect="plain">
-          md: 4列
-        </el-tag>
+        <el-tag size="small" effect="plain"> xs: 1列 </el-tag>
+        <el-tag size="small" effect="plain"> sm: 2列 </el-tag>
+        <el-tag size="small" effect="plain"> md: 4列 </el-tag>
       </div>
     </div>
 
     <div class="grid-stage">
       <!-- 使用 4 列布局在 md 尺寸 -->
-      <fd-grid
-        :cols="{ xs: 1, sm: 2, md: 4 }"
-        :row-gap="16"
-        :col-gap="16"
-        :collapsed="collapsed"
-        :collapsed-rows="collapsedRows"
-      >
+      <fd-grid :cols="{ xs: 1, sm: 2, md: 4 }" :row-gap="16" :col-gap="16" :collapsed="collapsed" :collapsed-rows="collapsedRows">
         <fd-grid-item v-for="member in members" :key="member.id">
           <div class="member-card">
             <div class="avatar-wrapper" :style="{ backgroundColor: member.color }">
@@ -56,24 +40,13 @@
 
       <!-- 独立的操作区 (Footer) -->
       <div class="grid-footer-action">
-        <el-button
-          v-if="collapsed"
-          type="primary"
-          plain
-          class="expand-btn"
-          @click="collapsed = false"
-        >
+        <el-button v-if="collapsed" type="primary" plain class="expand-btn" @click="collapsed = false">
           查看全部 ({{ members.length }})
           <el-icon class="el-icon--right">
             <arrow-down />
           </el-icon>
         </el-button>
-        <el-button
-          v-else
-          link
-          type="info"
-          @click="collapsed = true"
-        >
+        <el-button v-else link type="info" @click="collapsed = true">
           收起列表
           <el-icon class="el-icon--right">
             <arrow-up />

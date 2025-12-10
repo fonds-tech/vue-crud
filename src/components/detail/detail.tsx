@@ -5,16 +5,7 @@ import { useCore } from "@/hooks"
 import { resolve } from "@/utils"
 import { renderActions, renderDetailContent } from "./render"
 import { createDetailState, createDetailService } from "./core"
-import {
-  h,
-  watch,
-  computed,
-  useAttrs,
-  useSlots,
-  defineComponent,
-  onBeforeUnmount,
-  getCurrentInstance,
-} from "vue"
+import { h, watch, computed, useAttrs, useSlots, defineComponent, onBeforeUnmount, getCurrentInstance } from "vue"
 import "./style.scss"
 
 export default defineComponent({
@@ -32,8 +23,7 @@ export default defineComponent({
     const dialogNativeAttrs = computed(() => {
       const result: Record<string, unknown> = {}
       Object.keys(attrs).forEach((key) => {
-        if (key === "class")
-          return
+        if (key === "class") return
         result[key] = attrs[key]
       })
       return result
@@ -67,12 +57,8 @@ export default defineComponent({
     watch(
       () => state.visible.value,
       (current, previous) => {
-        if (current && !previous) {
-          handleBeforeOpen()
-        }
-        else if (!current && previous) {
-          handleBeforeClose()
-        }
+        if (current && !previous) handleBeforeOpen()
+        if (!current && previous) handleBeforeClose()
       },
     )
 
@@ -104,25 +90,20 @@ export default defineComponent({
     }
 
     function handleDetailEvent(row: any) {
-      if (!row)
-        return
+      if (!row) return
       service.detail(row)
     }
 
     function detailHandler(row: unknown) {
-      if (row && typeof row === "object")
-        handleDetailEvent(row as Record<string, any>)
+      if (row && typeof row === "object") handleDetailEvent(row as Record<string, any>)
     }
 
     function proxyHandler(payload: unknown) {
-      if (!payload || typeof payload !== "object")
-        return
+      if (!payload || typeof payload !== "object") return
       const proxyPayload = payload as { name?: string, data?: Record<string, any>[] }
-      if (proxyPayload.name !== "detail")
-        return
+      if (proxyPayload.name !== "detail") return
       const row = proxyPayload.data?.[0]
-      if (row)
-        handleDetailEvent(row)
+      if (row) handleDetailEvent(row)
     }
 
     mitt?.on?.("detail", detailHandler)
@@ -144,6 +125,7 @@ export default defineComponent({
       setData: state.setData,
       getData: state.getData,
       clearData: state.clearData,
+      __test__handleDetailEvent: handleDetailEvent,
     })
 
     return () =>
@@ -155,8 +137,7 @@ export default defineComponent({
           "modelValue": state.visible.value,
           "onUpdate:modelValue": (value: boolean) => {
             state.visible.value = value
-            if (!value)
-              handleClose()
+            if (!value) handleClose()
           },
           "onOpen": handleOpen,
           "onClose": handleClose,
@@ -198,8 +179,7 @@ export default defineComponent({
 })
 
 function buildGroups<D extends DetailData = DetailData>(options: DetailOptions<D>, uid?: number, data: D = {} as D) {
-  if (!options.items.length)
-    return []
+  if (!options.items.length) return []
   const fallbackName = uid ?? "fd-detail"
   const map = new Map<string | number, DetailItem<D>[]>()
   map.set(fallbackName, [])

@@ -4,21 +4,11 @@
       <fd-form ref="form" />
 
       <div class="action-row">
-        <el-button :disabled="isFirstStep" @click="handlePrev">
-          上一步
-        </el-button>
-        <el-button v-if="!isLastStep" type="primary" @click="handleNext">
-          下一步
-        </el-button>
-        <el-button v-else type="success" @click="handleSubmit">
-          完成提交
-        </el-button>
-        <el-button type="warning" plain @click="handleStepReset">
-          重置当前
-        </el-button>
-        <el-button @click="handleReset">
-          重置全部
-        </el-button>
+        <el-button :disabled="isFirstStep" @click="handlePrev"> 上一步 </el-button>
+        <el-button v-if="!isLastStep" type="primary" @click="handleNext"> 下一步 </el-button>
+        <el-button v-else type="success" @click="handleSubmit"> 完成提交 </el-button>
+        <el-button type="warning" plain @click="handleStepReset"> 重置当前 </el-button>
+        <el-button @click="handleReset"> 重置全部 </el-button>
       </div>
     </el-card>
 
@@ -55,7 +45,7 @@ interface StepsFormModel {
 }
 
 const STEP_SEQUENCE = ["profile", "project", "confirm"] as const
-type StepKey = typeof STEP_SEQUENCE[number]
+type StepKey = (typeof STEP_SEQUENCE)[number]
 
 const STEP_FIELDS: Record<StepKey, string[]> = {
   profile: ["applicant", "department", "email"],
@@ -213,17 +203,20 @@ const form = useForm<StepsFormModel>(
   },
 )
 
-const formModel = computed<StepsFormModel>(() => form.value?.model ?? {
-  applicant: "",
-  department: "",
-  email: "",
-  budget: 0,
-  timeline: [],
-  reviewer: "",
-  remark: "",
-  agree: false,
-  __step: STEP_SEQUENCE[0],
-})
+const formModel = computed<StepsFormModel>(
+  () =>
+    form.value?.model ?? {
+      applicant: "",
+      department: "",
+      email: "",
+      budget: 0,
+      timeline: [],
+      reviewer: "",
+      remark: "",
+      agree: false,
+      __step: STEP_SEQUENCE[0],
+    },
+)
 const currentStep = computed(() => stepMeta[activeStepIndex.value] ?? stepMeta[0])
 const isFirstStep = computed(() => activeStepIndex.value === 0)
 const isLastStep = computed(() => activeStepIndex.value === STEP_SEQUENCE.length - 1)
@@ -241,18 +234,20 @@ function handleNext() {
 }
 
 function handlePrev() {
-  if (isFirstStep.value)
-    return
+  if (isFirstStep.value) return
   syncStep(activeStepIndex.value - 1)
   form.value?.prev()
 }
 
 function handleSubmit() {
-  form.value?.submit().then((res) => {
-    console.log("Steps Submit:", res)
-  }).catch((err) => {
-    console.error("Steps Submit Error:", err)
-  })
+  form.value
+    ?.submit()
+    .then((res) => {
+      console.log("Steps Submit:", res)
+    })
+    .catch((err) => {
+      console.error("Steps Submit Error:", err)
+    })
 }
 
 function handleReset() {

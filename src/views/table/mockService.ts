@@ -35,9 +35,7 @@ const TREE_DATA = [
         name: "运营中心",
         leader: "COO",
         count: 300,
-        children: [
-          { id: 121, name: "市场部", leader: "Marketing Lead", count: 100 },
-        ],
+        children: [{ id: 121, name: "市场部", leader: "Marketing Lead", count: 100 }],
       },
     ],
   },
@@ -46,9 +44,7 @@ const TREE_DATA = [
     name: "分公司",
     leader: "VP",
     count: 500,
-    children: [
-      { id: 21, name: "销售部", leader: "Sales Lead", count: 200 },
-    ],
+    children: [{ id: 21, name: "销售部", leader: "Sales Lead", count: 200 }],
   },
 ]
 
@@ -58,11 +54,7 @@ export class TableMockService {
       setTimeout(() => {
         let list = [...MOCK_DATA]
         if (params.keyword) {
-          list = list.filter(item =>
-            item.name.includes(params.keyword)
-            || item.account.includes(params.keyword)
-            || item.address.includes(params.keyword),
-          )
+          list = list.filter(item => item.name.includes(params.keyword) || item.account.includes(params.keyword) || item.address.includes(params.keyword))
         }
         if (params.status !== undefined && params.status !== "") {
           list = list.filter(item => item.status === Number(params.status))
@@ -115,8 +107,19 @@ export class TableMockService {
     })
   }
 
-  add() { return Promise.resolve() }
-  update() { return Promise.resolve() }
-  delete() { return Promise.resolve() }
-  info() { return Promise.resolve() }
+  add() {
+    return Promise.resolve()
+  }
+
+  update() {
+    return Promise.resolve()
+  }
+
+  delete() {
+    return Promise.resolve()
+  }
+
+  info() {
+    return Promise.resolve()
+  }
 }

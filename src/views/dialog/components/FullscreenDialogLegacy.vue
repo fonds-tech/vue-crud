@@ -2,46 +2,21 @@
   <div class="dialog-example">
     <div class="trigger-area">
       <el-space wrap>
-        <el-button plain :icon="Cpu" @click="openByApi">
-          打开巡检报告
-        </el-button>
-        <el-button plain @click="toggleFullscreen">
-          切换全屏
-        </el-button>
-        <el-button plain @click="closeByApi">
-          关闭弹窗
-        </el-button>
+        <el-button plain :icon="Cpu" @click="openByApi"> 打开巡检报告 </el-button>
+        <el-button plain @click="toggleFullscreen"> 切换全屏 </el-button>
+        <el-button plain @click="closeByApi"> 关闭弹窗 </el-button>
       </el-space>
       <span class="operation-tip">演示通过 API 控制弹窗状态</span>
     </div>
 
-    <el-alert
-      type="info"
-      :closable="false"
-      show-icon
-      :title="`当前状态：${visibleState}`"
-      class="dialog-example__alert"
-    />
+    <el-alert type="info" :closable="false" show-icon :title="`当前状态：${visibleState}`" class="dialog-example__alert" />
 
-    <fd-dialog
-      ref="dialogRef"
-      v-model="dialogVisible"
-      title="系统巡检报告"
-      width="860"
-      destroy-on-close
-      :fullscreen="presetFullscreen"
-      :show-close="false"
-      @close="handleClose"
-    >
+    <fd-dialog ref="dialogRef" v-model="dialogVisible" title="系统巡检报告" width="860" destroy-on-close :fullscreen="presetFullscreen" :show-close="false" @close="handleClose">
       <div class="fullscreen-dialog__body">
         <div class="fullscreen-dialog__panel">
-          <p class="panel-eyebrow">
-            运行概览
-          </p>
+          <p class="panel-eyebrow">运行概览</p>
           <h4>集群状态良好</h4>
-          <p class="panel-desc">
-            已完成近 30 天巡检，关键服务 0 异常。
-          </p>
+          <p class="panel-desc">已完成近 30 天巡检，关键服务 0 异常。</p>
 
           <div class="panel-metrics">
             <div class="panel-metric">
@@ -62,25 +37,15 @@
         <el-divider />
 
         <el-descriptions :column="2" size="large" border>
-          <el-descriptions-item label="最近巡检时间">
-            2024-06-18 09:30
-          </el-descriptions-item>
-          <el-descriptions-item label="负责人">
-            高文
-          </el-descriptions-item>
-          <el-descriptions-item label="剩余风险">
-            0 个 (Critical)
-          </el-descriptions-item>
-          <el-descriptions-item label="平均响应">
-            312 ms
-          </el-descriptions-item>
+          <el-descriptions-item label="最近巡检时间"> 2024-06-18 09:30 </el-descriptions-item>
+          <el-descriptions-item label="负责人"> 高文 </el-descriptions-item>
+          <el-descriptions-item label="剩余风险"> 0 个 (Critical) </el-descriptions-item>
+          <el-descriptions-item label="平均响应"> 312 ms </el-descriptions-item>
         </el-descriptions>
       </div>
 
       <template #footer>
-        <el-button @click="closeByApi()">
-          关闭
-        </el-button>
+        <el-button @click="closeByApi()"> 关闭 </el-button>
         <el-button type="primary" text @click="presetFullscreen = !presetFullscreen">
           {{ presetFullscreen ? "取消全屏" : "默认全屏" }}
         </el-button>

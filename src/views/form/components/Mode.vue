@@ -1,29 +1,16 @@
 <template>
   <div class="form-variant">
     <el-card class="variant-card">
-      <el-alert
-        :type="modeLabel === 'add' ? 'info' : 'warning'"
-        show-icon
-        :closable="false"
-        class="mode-alert"
-      >
+      <el-alert :type="modeLabel === 'add' ? 'info' : 'warning'" show-icon :closable="false" class="mode-alert">
         当前模式：{{ modeLabel === "add" ? "新增" : "编辑" }} ｜ 使用 setMode + bindFields 演示同表单复用
       </el-alert>
 
       <fd-form ref="form" />
       <div class="action-row">
-        <el-button type="primary" @click="handleSubmit">
-          保存
-        </el-button>
-        <el-button @click="handleReset">
-          重置
-        </el-button>
-        <el-button text type="primary" @click="loadAddMode">
-          切换新增场景
-        </el-button>
-        <el-button text type="primary" @click="loadUpdateMode">
-          切换编辑场景
-        </el-button>
+        <el-button type="primary" @click="handleSubmit"> 保存 </el-button>
+        <el-button @click="handleReset"> 重置 </el-button>
+        <el-button text type="primary" @click="loadAddMode"> 切换新增场景 </el-button>
+        <el-button text type="primary" @click="loadUpdateMode"> 切换编辑场景 </el-button>
       </div>
     </el-card>
 
@@ -191,31 +178,31 @@ function syncMode(formInstance: FormRef<ProjectPayload>, mode: "add" | "update")
 }
 
 function handleSubmit() {
-  form.value?.submit().then((res) => {
-    console.log("ModeForm Submit:", res)
-  }).catch((err) => {
-    console.error("ModeForm Submit Error:", err)
-  })
+  form.value
+    ?.submit()
+    .then((res) => {
+      console.log("ModeForm Submit:", res)
+    })
+    .catch((err) => {
+      console.error("ModeForm Submit Error:", err)
+    })
 }
 
 function handleReset() {
-  if (!form.value)
-    return
+  if (!form.value) return
   form.value.resetFields()
   syncMode(form.value, "add")
 }
 
 function loadAddMode() {
-  if (!form.value)
-    return
+  if (!form.value) return
   form.value.setMode("add")
   form.value.bindFields({ ...draftRecord })
   syncMode(form.value, "add")
 }
 
 function loadUpdateMode() {
-  if (!form.value)
-    return
+  if (!form.value) return
   form.value.setMode("update")
   form.value.bindFields({ ...reviewRecord })
   syncMode(form.value, "update")

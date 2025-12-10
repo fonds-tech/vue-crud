@@ -13,9 +13,7 @@ export function paramsReplace(dict: CrudRef["dict"], params: CrudParams): CrudPa
   const { pagination = {}, search = {}, sort = {} } = dict || {}
 
   const a: Record<string, any> = { ...params }
-  const originalUnderscoreKeys = new Set(
-    Object.keys(params).filter(key => typeof key === "string" && key.startsWith("_")),
-  )
+  const originalUnderscoreKeys = new Set(Object.keys(params).filter(key => typeof key === "string" && key.startsWith("_")))
   const b: Record<string, any> = { ...pagination, ...search, ...sort }
 
   for (const i in b) {
@@ -145,7 +143,9 @@ export function createHelper({ config, crud, mitt }: HelperOptions) {
     rowAdd,
     rowEdit,
     rowAppend,
-    rowDelete: async (..._selection: any[]) => { /* 由 service.ts 覆盖 */ },
+    rowDelete: async (..._selection: any[]) => {
+      /* 由 service.ts 覆盖 */
+    },
     rowClose,
     getPermission,
     paramsReplace: (params: CrudParams) => paramsReplace(crud.dict, params),

@@ -112,11 +112,7 @@ describe("通用 hooks", () => {
   })
 
   describe("父子实例注入类 hooks", () => {
-    function mountWithParent(
-      name: string,
-      hook: (options?: any, cb?: (inst: any) => void) => { value: any },
-      options: any,
-    ) {
+    function mountWithParent(name: string, hook: (options?: any, cb?: (inst: any) => void) => { value: any }, options: any) {
       const callback = vi.fn()
       const childInstance = ref<any>()
       const Parent = defineComponent({

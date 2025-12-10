@@ -28,8 +28,7 @@ export function applyFilters(item: FormItem, ctx: FilterRuntimeContext, options:
   for (const [name, filter] of registry) {
     try {
       const next = filter(current, ctx, options)
-      if (next === null)
-        return null
+      if (next === null) return null
       current = next ?? current
     }
     catch (error) {
@@ -118,8 +117,7 @@ export function filterStepItems(items: FormItem[], ctx: FilterRuntimeContext, gr
 
 // 默认规则：可见性（含 Tabs/Steps 分组）
 registerFilter("visibility", (item, ctx, options) => {
-  if (options?.groupName !== undefined)
-    return shouldShowInGroup(item, ctx, options.groupName) ? item : null
+  if (options?.groupName !== undefined) return shouldShowInGroup(item, ctx, options.groupName) ? item : null
   return shouldShowItem(item, ctx) ? item : null
 })
 
@@ -163,19 +161,15 @@ export function normalizeItems({ options, model, helpers }: NormalizeContext) {
         trigger: ["change", "blur"],
         validator: (_rule, value, callback) => {
           const isEmpty = value === undefined || value === null || value === ""
-          if (isEmpty)
-            callback(new Error(`${item.label ?? propName}为必填项`))
-          else
-            callback()
+          if (isEmpty) callback(new Error(`${item.label ?? propName}为必填项`))
+          else callback()
         },
       }
       if (isNoEmpty(item.rules)) {
         const ruleList: InternalRule[] = (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as InternalRule[]
         const index = ruleList.findIndex(r => r._inner === true)
-        if (index > -1)
-          ruleList[index] = rule
-        else
-          ruleList.unshift(rule)
+        if (index > -1) ruleList[index] = rule
+        else ruleList.unshift(rule)
         item.rules = ruleList
       }
       else {

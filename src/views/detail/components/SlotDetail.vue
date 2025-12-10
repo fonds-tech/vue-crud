@@ -15,12 +15,8 @@
       </template>
       <template #footer>
         <div class="slot-footer">
-          <el-button @click="close">
-            取消
-          </el-button>
-          <el-button type="primary" @click="close">
-            知道了
-          </el-button>
+          <el-button @click="close"> 取消 </el-button>
+          <el-button type="primary" @click="close"> 知道了 </el-button>
         </div>
       </template>
     </fd-detail>
@@ -79,9 +75,12 @@ const columns: TableColumn[] = [
   },
 ]
 
-const crudRef = useCrud({
-  service: new DetailMockService(),
-}, crud => crud.refresh())
+const crudRef = useCrud(
+  {
+    service: new DetailMockService(),
+  },
+  crud => crud.refresh(),
+)
 
 const tableRef = useTable({
   columns,

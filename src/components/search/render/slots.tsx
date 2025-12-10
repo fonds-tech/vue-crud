@@ -9,11 +9,7 @@ import { h, resolveDynamicComponent } from "vue"
  * @param action 动作配置
  * @param slots 组件插槽
  */
-export function renderActionSlots(
-  engine: SearchCore,
-  action: SearchAction,
-  slots: Slots,
-): VNodeChild | null {
+export function renderActionSlots(engine: SearchCore, action: SearchAction, slots: Slots): VNodeChild | null {
   const slotName = engine.getActionSlot(action)
   if (slotName && slots[slotName]) {
     return slots[slotName]?.({ model: engine.formModel.value, action })
@@ -26,10 +22,7 @@ export function renderActionSlots(
  * @param engine 搜索引擎
  * @param action 动作配置
  */
-export function renderCustomSlots(
-  engine: SearchCore,
-  action: SearchAction,
-): Record<string, () => VNodeChild> | undefined {
+export function renderCustomSlots(engine: SearchCore, action: SearchAction): Record<string, () => VNodeChild> | undefined {
   const componentSlots = engine.getComponentSlots(action)
   const entries = Object.entries(componentSlots)
   if (!entries.length) return undefined
@@ -52,10 +45,7 @@ export function renderCustomSlots(
  * @param engine 搜索引擎
  * @param action 动作配置
  */
-export function renderComponent(
-  engine: SearchCore,
-  action: SearchAction,
-): VNodeChild | null {
+export function renderComponent(engine: SearchCore, action: SearchAction): VNodeChild | null {
   const componentIs = engine.getComponentIs(action)
   if (!componentIs) return null
 

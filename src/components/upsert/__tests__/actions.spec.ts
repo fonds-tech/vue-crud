@@ -47,10 +47,7 @@ describe("useUpsertActions", () => {
 
   it("解析函数型文本与隐藏", () => {
     const options = createOptions()
-    options.actions = [
-      { type: "ok", text: model => model.label as string },
-      { type: "cancel", hidden: () => true } as UpsertAction,
-    ]
+    options.actions = [{ type: "ok", text: model => model.label as string }, { type: "cancel", hidden: () => true } as UpsertAction]
     const helper = useUpsertActions({
       options,
       crud: { dict: { label: { close: "取消", confirm: "确定" } } } as any,

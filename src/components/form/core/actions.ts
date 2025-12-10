@@ -1,14 +1,5 @@
 import type { FormItemProp } from "element-plus"
-import type {
-  FormItem,
-  FormMode,
-  FormRecord,
-  FormActions,
-  FormMaybeFn,
-  MaybePromise,
-  FormActionContext,
-  FormItemRuleWithMeta,
-} from "../types"
+import type { FormItem, FormMode, FormRecord, FormActions, FormMaybeFn, MaybePromise, FormActionContext, FormItemRuleWithMeta } from "../types"
 import formHook from "./hooks"
 import { dataset } from "../../../utils/dataset"
 import { toArray } from "../../../utils/object"
@@ -23,8 +14,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * @returns 表单项配置对象或 undefined
    */
   function findItem(prop?: FormItemProp): FormItem<T> | undefined {
-    if (prop === undefined || prop === null)
-      return undefined
+    if (prop === undefined || prop === null) return undefined
     const propKey = propToString(prop)
     return options.items.find(item => propToString(item.prop) === propKey)
   }
@@ -36,8 +26,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    */
   function resolveOptionSource(prop: FormItemProp): MaybePromise<any[]> | undefined {
     const optionValue = findItem(prop)?.component?.options as FormMaybeFn<MaybePromise<any[]>, T> | undefined
-    if (!optionValue)
-      return undefined
+    if (!optionValue) return undefined
     return isFunction(optionValue) ? optionValue(model) : optionValue
   }
 
@@ -50,15 +39,18 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    * @param target.path 直接修改的深层路径 (dataset 模式)
    * @param value 要设置的新值
    */
-  function set({
-    prop,
-    key,
-    path,
-  }: {
-    prop?: FormItemProp
-    key?: "options" | "props" | "hidden" | "style"
-    path?: string
-  }, value?: any) {
+  function set(
+    {
+      prop,
+      key,
+      path,
+    }: {
+      prop?: FormItemProp
+      key?: "options" | "props" | "hidden" | "style"
+      path?: string
+    },
+    value?: any,
+  ) {
     // 如果指定了深层路径，直接修改 dataset (通常用于全局配置或非表单项的深层属性)
     if (path) {
       dataset(options as unknown as Record<string, unknown>, path, value)
@@ -185,12 +177,10 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
     // 执行 bind 阶段钩子，确保重新绑定时类型/结构与组件期望一致
     // 例如：后端返回逗号分隔字符串 "1,2"，bind hook 将其转为数组 ["1", "2"] 供 CheckboxGroup 使用
     options.items.forEach((item) => {
-      if (!item.hook || !item.prop)
-        return
+      if (!item.hook || !item.prop) return
       const propKey = propToString(item.prop)
       const currentValue = getModelValue(model, item.prop)
-      if (!isDef(currentValue))
-        return
+      if (!isDef(currentValue)) return
       formHook.bind({
         hook: item.hook,
         model,
@@ -234,8 +224,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    */
   function getOptions(prop: FormItemProp) {
     const optionValue = resolveOptionSource(prop)
-    if (optionValue === undefined)
-      return ensureOptionState(optionState, propToString(prop)).value
+    if (optionValue === undefined) return ensureOptionState(optionState, propToString(prop)).value
     const state = syncOptions(optionState, propToString(prop), optionValue)
     return state.value
   }
@@ -254,8 +243,7 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    */
   async function reloadOptions(prop: FormItemProp) {
     const optionValue = resolveOptionSource(prop)
-    if (optionValue === undefined)
-      return ensureOptionState(optionState, propToString(prop)).value
+    if (optionValue === undefined) return ensureOptionState(optionState, propToString(prop)).value
     const state = syncOptions(optionState, propToString(prop), optionValue)
     try {
       const data = await Promise.resolve(optionValue)
@@ -328,25 +316,20 @@ export function useAction<T extends FormRecord = FormRecord>({ options, model, f
    */
   function setRequired(prop: FormItemProp, required: boolean) {
     const item = findItem(prop)
-    if (!item)
-      return
+    if (!item) return
 
     item.required = required
     const label = item.label || propToString(prop)
     // 标记 _inner: true 以便后续识别和替换
     const rule: FormItemRuleWithMeta = { required, message: `${label}为必填项`, _inner: true }
 
-    const ruleList: FormItemRuleWithMeta[] = isNoEmpty(item.rules)
-      ? (Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as FormItemRuleWithMeta[]
-      : []
+    const ruleList: FormItemRuleWithMeta[] = isNoEmpty(item.rules) ? ((Array.isArray(item.rules) ? item.rules : [item.rules]).filter(Boolean) as FormItemRuleWithMeta[]) : []
 
     const innerIndex = ruleList.findIndex(r => r._inner === true)
 
     if (required) {
-      if (innerIndex > -1)
-        ruleList[innerIndex] = rule
-      else
-        ruleList.unshift(rule)
+      if (innerIndex > -1) ruleList[innerIndex] = rule
+      else ruleList.unshift(rule)
     }
     else if (innerIndex > -1) {
       // 如果取消必填，移除内部规则

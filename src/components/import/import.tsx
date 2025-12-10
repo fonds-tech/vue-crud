@@ -210,24 +210,22 @@ export default defineComponent({
       )
 
       // 渲染模板下载按钮
-      const templateButton = props.templateUrl && slots.template?.() !== undefined
-        ? slots.template?.()
-        : props.templateUrl
+      const templateButton
+        = props.templateUrl && slots.template?.() !== undefined
           ? (
-              <ElButton type="info" onClick={downloadTemplate}>
-                下载模板
-              </ElButton>
+              slots.template?.()
             )
-          : null
+          : props.templateUrl
+            ? (
+                <ElButton type="info" onClick={downloadTemplate}>
+                  下载模板
+                </ElButton>
+              )
+            : null
 
       return (
         <div class="fd-import">
-          <ElUpload
-            class="fd-import__upload"
-            accept={props.accept}
-            showFileList={false}
-            beforeUpload={beforeUpload}
-          >
+          <ElUpload class="fd-import__upload" accept={props.accept} showFileList={false} beforeUpload={beforeUpload}>
             {uploadButton}
           </ElUpload>
           {templateButton && <div class="fd-import__template">{templateButton}</div>}

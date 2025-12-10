@@ -68,4 +68,20 @@ describe("createDetailState", () => {
     expect(state.data.value).toEqual({})
     expect(state.paramsCache.value).toEqual({})
   })
+
+  it("setData 支持传入 null/undefined 并回退为空对象", () => {
+    const state = createDetailState(mockCrud)
+    state.setData(undefined as any)
+    expect(state.data.value).toEqual({})
+    state.setData(null as any)
+    expect(state.data.value).toEqual({})
+  })
+
+  it("无 dict 时回退默认文案并保留已有 actions", () => {
+    const state = createDetailState({} as any)
+    state.options.actions = [{ type: "ok", text: "已有" } as any]
+    state.ensureActions()
+    expect(state.options.dialog.title).toBe("详情")
+    expect(state.options.actions[0].text).toBe("已有")
+  })
 })

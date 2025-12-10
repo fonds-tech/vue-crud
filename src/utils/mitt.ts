@@ -7,10 +7,7 @@
 // 事件处理函数类型，可以接受一个事件参数且不返回任何值
 export type Handler<T> = (event: T) => void
 // 通配符事件处理函数类型，可以接受事件类型和事件参数，不返回任何值
-export type WildcardHandler<T> = (
-  type: keyof T,
-  event: T[keyof T],
-) => void
+export type WildcardHandler<T> = (type: keyof T, event: T[keyof T]) => void
 
 // 特定事件类型处理函数列表
 export type HandlerList<T> = Array<Handler<T>>
@@ -18,10 +15,7 @@ export type HandlerList<T> = Array<Handler<T>>
 export type WildCardHandlerList<T> = Array<WildcardHandler<T>>
 
 // 事件处理函数映射表类型，将事件名称或通配符映射到对应的处理函数列表
-export type EventHandlerMap<Events extends Record<PropertyKey, unknown>> = Map<
-  keyof Events | "*",
-  HandlerList<Events[keyof Events]> | WildCardHandlerList<Events>
->
+export type EventHandlerMap<Events extends Record<PropertyKey, unknown>> = Map<keyof Events | "*", HandlerList<Events[keyof Events]> | WildCardHandlerList<Events>>
 
 /**
  * Mitt 类是一个类型安全的事件发射器。
@@ -98,7 +92,7 @@ export class Mitt<Events extends Record<PropertyKey, unknown> = Record<string, u
     let handlers = this.events.get(type)
     if (handlers) {
       // 调用特定事件类型的处理函数
-      (handlers as HandlerList<Events[Key]>)
+      ;(handlers as HandlerList<Events[Key]>)
         .slice() // 使用slice创建副本，防止在迭代过程中修改数组
         .forEach((handler) => {
           handler(evt!)
@@ -108,7 +102,7 @@ export class Mitt<Events extends Record<PropertyKey, unknown> = Record<string, u
     // 调用通配符事件处理函数
     handlers = this.events.get("*")
     if (handlers) {
-      (handlers as WildCardHandlerList<Events>)
+      ;(handlers as WildCardHandlerList<Events>)
         .slice() // 使用slice创建副本
         .forEach((handler) => {
           handler(type, evt!)

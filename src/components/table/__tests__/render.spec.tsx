@@ -121,11 +121,9 @@ describe("table render layer", () => {
     renderHelpers.getComponentIs.mockImplementation(component => (component as any)?.is)
 
     const nodes = toVNodeArray(renderActionButtons(baseScope, [{ hidden: true } as any], {}, renderHelpers as any, crudBridge as any))
-    expect(nodes[0]).toBeNull()
+    expect(nodes.length).toBe(0)
 
-    const builtins = toVNodeArray(
-      renderActionButtons(baseScope, [{ type: "delete" } as any], {}, renderHelpers as any, crudBridge as any),
-    )
+    const builtins = toVNodeArray(renderActionButtons(baseScope, [{ type: "delete" } as any], {}, renderHelpers as any, crudBridge as any))
     builtins[0]?.props?.onClick?.()
     expect(crudBridge.rowDelete).toHaveBeenCalledWith(baseScope.row)
 
@@ -137,15 +135,7 @@ describe("table render layer", () => {
     renderHelpers.getComponentEvents.mockReturnValueOnce({ onClick: vi.fn() })
     renderHelpers.getComponentSlots.mockReturnValueOnce({ default: "content", extra: undefined })
 
-    const dynamic = toVNodeArray(
-      renderActionButtons(
-        baseScope,
-        [{ component: { is: "button" } } as any],
-        {},
-        renderHelpers as any,
-        crudBridge as any,
-      ),
-    )
+    const dynamic = toVNodeArray(renderActionButtons(baseScope, [{ component: { is: "button" } } as any], {}, renderHelpers as any, crudBridge as any))
     expect(dynamic[0]?.type).toBe("button")
     expect(renderHelpers.getComponentSlots).toHaveBeenCalled()
   })

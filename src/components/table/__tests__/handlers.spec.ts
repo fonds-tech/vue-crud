@@ -231,9 +231,7 @@ describe("createTableHandlers", () => {
       const event = new MouseEvent("contextmenu")
 
       state.tableRows.value = [row]
-      state.tableOptions.columns = [
-        { type: "action", actions: [{ type: "delete" }] },
-      ]
+      state.tableOptions.columns = [{ type: "action", actions: [{ type: "delete" }] }]
 
       handlers.onCellContextmenu(row, column, event)
 

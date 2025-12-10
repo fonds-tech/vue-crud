@@ -37,37 +37,58 @@ const ElPaginationStub = defineComponent({
 
 const ElButtonStub = defineComponent({
   name: "ElButtonStub",
-  setup: (_, { slots }) => () => h("button", { class: "el-button-stub" }, slots.default?.()),
+  setup:
+    (_, { slots }) =>
+      () =>
+        h("button", { class: "el-button-stub" }, slots.default?.()),
 })
 
 const ElTooltipStub = defineComponent({
   name: "ElTooltipStub",
-  setup: (_, { slots }) => () => slots.default?.(),
+  setup:
+    (_, { slots }) =>
+      () =>
+        slots.default?.(),
 })
 
 const ElDropdownStub = defineComponent({
   name: "ElDropdownStub",
-  setup: (_, { slots }) => () => h("div", { class: "el-dropdown-stub" }, slots.default?.()),
+  setup:
+    (_, { slots }) =>
+      () =>
+        h("div", { class: "el-dropdown-stub" }, slots.default?.()),
 })
 
 const ElIconStub = defineComponent({
   name: "ElIconStub",
-  setup: (_, { slots }) => () => h("span", { class: "el-icon-stub" }, slots.default?.()),
+  setup:
+    (_, { slots }) =>
+      () =>
+        h("span", { class: "el-icon-stub" }, slots.default?.()),
 })
 
 const ElLinkStub = defineComponent({
   name: "ElLinkStub",
-  setup: (_, { slots, attrs }) => () => h("a", { class: "el-link-stub", ...attrs }, slots.default?.()),
+  setup:
+    (_, { slots, attrs }) =>
+      () =>
+        h("a", { class: "el-link-stub", ...attrs }, slots.default?.()),
 })
 
 const ElTagStub = defineComponent({
   name: "ElTagStub",
-  setup: (_, { slots }) => () => h("span", { class: "el-tag-stub" }, slots.default?.()),
+  setup:
+    (_, { slots }) =>
+      () =>
+        h("span", { class: "el-tag-stub" }, slots.default?.()),
 })
 
 const ElSpaceStub = defineComponent({
   name: "ElSpaceStub",
-  setup: (_, { slots }) => () => h("div", { class: "el-space-stub" }, slots.default?.()),
+  setup:
+    (_, { slots }) =>
+      () =>
+        h("div", { class: "el-space-stub" }, slots.default?.()),
 })
 
 type TableMountOptions = ComponentMountingOptions<typeof Table>

@@ -3,21 +3,14 @@ import type { SearchCore, SearchAction } from "../interface"
 import { renderAction, renderActions } from "../render/action"
 import { h, ref, computed, defineComponent } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
-import {
-  renderComponent,
-  renderActionSlots,
-  renderCustomSlots,
-} from "../render/slots"
+import { renderComponent, renderActionSlots, renderCustomSlots } from "../render/slots"
 
 // 创建模拟的 SearchCore
 function createMockEngine(overrides: Partial<SearchCore> = {}): SearchCore {
   const formModel = ref<Record<string, any>>({})
   const loading = ref(false)
   const collapsed = ref(false)
-  const resolvedActions = ref<SearchAction[]>([
-    { type: "search" },
-    { type: "reset" },
-  ])
+  const resolvedActions = ref<SearchAction[]>([{ type: "search" }, { type: "reset" }])
   const actionGridProps = ref({ cols: 24, colGap: 12, rowGap: 12, collapsed: false, collapsedRows: 1 })
   const collapseLabel = ref("折叠")
   const formSlots = ref<Record<string, any>>({})
@@ -85,8 +78,8 @@ describe("renderActionSlots", () => {
 
   it("当插槽存在时正确渲染", () => {
     const slotContent = "Slot Content"
-    engine.getActionSlot = vi.fn(() => "customSlot");
-    (slots as any).customSlot = vi.fn(() => slotContent)
+    engine.getActionSlot = vi.fn(() => "customSlot")
+    ;(slots as any).customSlot = vi.fn(() => slotContent)
 
     const result = renderActionSlots(engine, action, slots)
 
@@ -98,10 +91,10 @@ describe("renderActionSlots", () => {
   })
 
   it("传递正确的作用域数据到插槽", () => {
-    const model = { keyword: "test" };
-    (engine as any)._formModel.value = model
-    engine.getActionSlot = vi.fn(() => "testSlot");
-    (slots as any).testSlot = vi.fn()
+    const model = { keyword: "test" }
+    ;(engine as any)._formModel.value = model
+    engine.getActionSlot = vi.fn(() => "testSlot")
+    ;(slots as any).testSlot = vi.fn()
 
     renderActionSlots(engine, action, slots)
 
@@ -395,8 +388,8 @@ describe("renderAction", () => {
 
   it("渲染自定义组件动作（带插槽）", () => {
     const action: SearchAction = { slot: "customAction" }
-    const slotFn = vi.fn(() => "Custom Action");
-    (slots as any).customAction = slotFn
+    const slotFn = vi.fn(() => "Custom Action")
+    ;(slots as any).customAction = slotFn
     engine.getActionSlot = vi.fn(() => "customAction")
 
     const result = renderAction(engine, action, 0, slots)
@@ -433,10 +426,7 @@ describe("renderActions", () => {
   })
 
   it("渲染默认动作列表", () => {
-    (engine as any)._resolvedActions.value = [
-      { type: "search" },
-      { type: "reset" },
-    ] as SearchAction[]
+    ;(engine as any)._resolvedActions.value = [{ type: "search" }, { type: "reset" }] as SearchAction[]
 
     const result = renderActions(engine, slots)
 
@@ -444,11 +434,7 @@ describe("renderActions", () => {
   })
 
   it("渲染自定义动作列表", () => {
-    (engine as any)._resolvedActions.value = [
-      { type: "search" },
-      { type: "reset" },
-      { type: "collapse" },
-    ] as SearchAction[]
+    ;(engine as any)._resolvedActions.value = [{ type: "search" }, { type: "reset" }, { type: "collapse" }] as SearchAction[]
 
     const result = renderActions(engine, slots)
 
@@ -456,7 +442,7 @@ describe("renderActions", () => {
   })
 
   it("渲染空动作列表", () => {
-    (engine as any)._resolvedActions.value = []
+    ;(engine as any)._resolvedActions.value = []
 
     const result = renderActions(engine, slots)
 
@@ -464,11 +450,7 @@ describe("renderActions", () => {
   })
 
   it("每个动作都有唯一的 key", () => {
-    (engine as any)._resolvedActions.value = [
-      { type: "search" },
-      { type: "reset" },
-      { type: "collapse" },
-    ] as SearchAction[]
+    ;(engine as any)._resolvedActions.value = [{ type: "search" }, { type: "reset" }, { type: "collapse" }] as SearchAction[]
 
     const result = renderActions(engine, slots)
 

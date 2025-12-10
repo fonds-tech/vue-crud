@@ -62,8 +62,7 @@ export interface UpsertState {
  * @returns 规范化后的位置 或 undefined
  */
 function normalizeLabelPosition(position?: unknown) {
-  if (position === "left" || position === "right" || position === "top")
-    return position
+  if (position === "left" || position === "right" || position === "top") return position
   return undefined
 }
 
@@ -73,9 +72,7 @@ function normalizeLabelPosition(position?: unknown) {
  * @param style 全局样式配置
  * @returns 默认的 UpsertOptions 对象
  */
-function createDefaultOptions(
-  style: UpsertStateContext["style"],
-): UpsertOptions<FormRecord> {
+function createDefaultOptions(style: UpsertStateContext["style"]): UpsertOptions<FormRecord> {
   return {
     key: 0,
     mode: "add",
@@ -107,9 +104,7 @@ function createDefaultOptions(
  * @param context 初始上下文，包含样式等
  * @returns Upsert 状态对象
  */
-export function createUpsertState(
-  context: UpsertStateContext,
-): UpsertState {
+export function createUpsertState(context: UpsertStateContext): UpsertState {
   const options = reactive<UpsertOptions<FormRecord>>(createDefaultOptions(context.style))
   const visible = ref(false)
   const loading = ref(false)
@@ -130,8 +125,7 @@ export function createUpsertState(
    * @param items 新的表单项数组
    */
   function assignItems(items: Array<FormItem<FormRecord>> | undefined) {
-    if (!items)
-      return
+    if (!items) return
     const filtered = items.filter((item): item is FormItem<FormRecord> => Boolean(item))
     options.items.splice(0, options.items.length, ...filtered)
   }
@@ -142,8 +136,7 @@ export function createUpsertState(
    * @param actions 新的动作数组
    */
   function assignActions(actions: Array<UpsertAction<FormRecord>> | undefined) {
-    if (!actions)
-      return
+    if (!actions) return
     const filtered = actions.filter((action): action is UpsertAction<FormRecord> => Boolean(action))
     options.actions.splice(0, options.actions.length, ...filtered)
   }
@@ -181,15 +174,9 @@ export function createUpsertState(
     }
 
     const normalizedActions = Array.isArray(actions)
-      ? actions
-          .filter((action): action is UpsertAction<FormRecord> => Boolean(action))
-          .map(action => merge({}, action))
+      ? actions.filter((action): action is UpsertAction<FormRecord> => Boolean(action)).map(action => merge({}, action))
       : undefined
-    const normalizedItems = Array.isArray(items)
-      ? items
-          .filter((item): item is FormItem<FormRecord> => Boolean(item))
-          .map(item => merge({}, item))
-      : undefined
+    const normalizedItems = Array.isArray(items) ? items.filter((item): item is FormItem<FormRecord> => Boolean(item)).map(item => merge({}, item)) : undefined
 
     assignActions(normalizedActions)
     assignItems(normalizedItems)

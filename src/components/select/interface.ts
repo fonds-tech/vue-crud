@@ -21,10 +21,11 @@ export interface CustomProps {
   labelKey?: string
 }
 
-export type FdSelectProps = Omit<Partial<ElSelectProps>, "modelValue"> & CustomProps & {
-  modelValue?: ElSelectProps["modelValue"]
-  options?: OptionRecord[]
-}
+export type FdSelectProps = Omit<Partial<ElSelectProps>, "modelValue">
+  & CustomProps & {
+    modelValue?: ElSelectProps["modelValue"]
+    options?: OptionRecord[]
+  }
 
 export const fdSelectPropOptions = {
   api: { type: [Function, String] as PropType<ApiHandler | string> },

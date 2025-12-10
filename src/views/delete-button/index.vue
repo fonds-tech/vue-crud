@@ -1,9 +1,5 @@
 <template>
-  <layout
-    title="fd-delete-button 删除按钮示例"
-    description="校验选中态的删除触发"
-    :components="componentCatalog"
-  />
+  <layout title="fd-delete-button 删除按钮示例" description="校验选中态的删除触发" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

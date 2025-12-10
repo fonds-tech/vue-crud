@@ -10,8 +10,7 @@ export function useForm<T extends FormModel = FormModel>(options?: FormUseOption
   watch(
     () => form.value,
     (val) => {
-      if (!val)
-        return
+      if (!val) return
       if (options) {
         val.use(options)
       }

@@ -3,12 +3,8 @@
     <el-card class="variant-card">
       <fd-form ref="form" />
       <div class="action-row">
-        <el-button type="primary" @click="handleSubmit">
-          提交
-        </el-button>
-        <el-button @click="handleReset">
-          重置
-        </el-button>
+        <el-button type="primary" @click="handleSubmit"> 提交 </el-button>
+        <el-button @click="handleReset"> 重置 </el-button>
       </div>
     </el-card>
 
@@ -18,9 +14,7 @@
           <h3>Tabs 分段信息</h3>
           <span class="step-desc">折叠 + 分组并行示例</span>
         </div>
-        <el-tag effect="light" round>
-          Tabs 分组演示
-        </el-tag>
+        <el-tag effect="light" round> Tabs 分组演示 </el-tag>
       </div>
       <pre>{{ formModel }}</pre>
     </el-card>
@@ -246,11 +240,14 @@ const form = useForm<TabsFormModel>({
 const formModel = computed(() => form.value?.model ?? {})
 
 function handleSubmit() {
-  form.value?.submit().then((res) => {
-    console.log("TabsForm Submit:", res)
-  }).catch((err) => {
-    console.error("TabsForm Submit Error:", err)
-  })
+  form.value
+    ?.submit()
+    .then((res) => {
+      console.log("TabsForm Submit:", res)
+    })
+    .catch((err) => {
+      console.error("TabsForm Submit Error:", err)
+    })
 }
 
 function handleReset() {

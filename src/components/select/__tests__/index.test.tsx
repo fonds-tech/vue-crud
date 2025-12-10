@@ -40,14 +40,10 @@ const ElSelectStub = defineComponent({
   },
   setup(_, { slots, attrs }) {
     return () =>
-      h(
-        "div",
-        { "class": ["el-select-stub", attrs.class], "data-attrs": attrs, ...attrs },
-        [
-          slots.prefix?.({ loading: false, options: baseOptions }),
-          slots.default?.({ loading: false, options: baseOptions, refresh: () => {} }),
-        ],
-      )
+      h("div", { "class": ["el-select-stub", attrs.class], "data-attrs": attrs, ...attrs }, [
+        slots.prefix?.({ loading: false, options: baseOptions }),
+        slots.default?.({ loading: false, options: baseOptions, refresh: () => {} }),
+      ])
   },
 })
 

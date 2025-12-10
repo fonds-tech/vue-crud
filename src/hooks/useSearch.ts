@@ -13,8 +13,7 @@ export function useSearch(options?: SearchOptions, callback?: (search: SearchExp
   watch(
     () => search.value,
     (val) => {
-      if (!val)
-        return
+      if (!val) return
       if (options) {
         val.use(options)
       }

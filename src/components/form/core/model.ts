@@ -6,10 +6,8 @@ import type { FormItemProp } from "element-plus"
  * @param prop 字段标识
  */
 export function toPathArray(prop?: FormItemProp): string[] | undefined {
-  if (prop === undefined || prop === null)
-    return undefined
-  if (Array.isArray(prop))
-    return prop.map(String)
+  if (prop === undefined || prop === null) return undefined
+  if (Array.isArray(prop)) return prop.map(String)
   const path = String(prop).split(".").filter(Boolean)
   return path.length ? path : undefined
 }
@@ -27,12 +25,10 @@ export function propToString(prop?: FormItemProp): string {
  */
 export function getModelValue<T extends FormRecord = FormRecord>(model: T, prop?: FormItemProp) {
   const path = toPathArray(prop)
-  if (!path?.length)
-    return model
+  if (!path?.length) return model
   let cursor: unknown = model
   for (const segment of path) {
-    if (cursor == null || typeof cursor !== "object")
-      return undefined
+    if (cursor == null || typeof cursor !== "object") return undefined
     cursor = (cursor as Record<string, unknown>)[segment]
   }
   return cursor
@@ -43,8 +39,7 @@ export function getModelValue<T extends FormRecord = FormRecord>(model: T, prop?
  */
 export function setModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormItemProp, value: unknown) {
   const path = toPathArray(prop)
-  if (!path?.length)
-    return
+  if (!path?.length) return
   let cursor: Record<string, unknown> = model
   for (let i = 0; i < path.length; i++) {
     const key = path[i]!
@@ -62,16 +57,14 @@ export function setModelValue<T extends FormRecord = FormRecord>(model: T, prop:
  */
 export function deleteModelValue<T extends FormRecord = FormRecord>(model: T, prop: FormItemProp) {
   const path = toPathArray(prop)
-  if (!path?.length)
-    return
+  if (!path?.length) return
 
   let cursor: Record<string, unknown> = model
 
   // 遍历到目标字段的父级
   for (let i = 0; i < path.length - 1; i++) {
     const next = cursor[path[i]!]
-    if (!next || typeof next !== "object")
-      return
+    if (!next || typeof next !== "object") return
     cursor = next as Record<string, unknown>
   }
 

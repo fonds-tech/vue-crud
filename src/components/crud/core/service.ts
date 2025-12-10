@@ -53,7 +53,7 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
 
       // 下一步：支持缺省分页服务的兜底，避免 Loading 卡死
       function next(nextParams: Record<string, any>): Promise<any> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
           const hasService = Boolean(service)
           const shouldWarn = hasService && (crud.permission?.page ?? true)
 
@@ -68,6 +68,9 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
           pageService(nextParams)
             .then((res: any) => {
               if (rd !== refreshRd.value) {
+                done()
+                success(res)
+                resolve(res)
                 return
               }
 
@@ -84,7 +87,6 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
             .catch((err: any) => {
               ElMessage.error(err.message)
               error(err)
-              reject(err)
             })
             .finally(done)
         })
@@ -100,9 +102,7 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
     })
   }
 
-  const api: { refresh: typeof refresh, rowDelete?: typeof rowDelete } = {
-    refresh,
-  }
+  const api = { refresh } as { refresh: typeof refresh, rowDelete: typeof rowDelete }
 
   // 删除请求
   function rowDelete(...selection: any[]) {
@@ -141,19 +141,22 @@ export function createService({ config, crud, mitt, paramsReplace }: ServiceOpti
 
               instance.confirmButtonLoading = false
             }
+            else {
+              resolve(null)
+            }
 
             done()
           },
-        }).catch(() => null)
+        }).catch(() => resolve(null))
       })
     }
 
     // 删除钩子
     if (config?.onDelete) {
-      config.onDelete(selection, { next })
+      return config.onDelete(selection, { next })
     }
     else {
-      next(params)
+      return next(params)
     }
   }
 
