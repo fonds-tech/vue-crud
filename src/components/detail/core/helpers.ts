@@ -1,4 +1,5 @@
-import type { DetailData, DetailSlots, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
+import type { DetailData, DetailItem, DetailGroup, DetailSlots, DetailOptions, DetailComponent, DetailDescriptions, DetailComponentSlot } from "../interface"
+import { merge } from "lodash-es"
 import { resolve } from "@/utils"
 import { isFunction } from "@fonds/utils"
 import { h, markRaw } from "vue"
@@ -97,4 +98,41 @@ export function renderComponentSlot<D extends DetailData>(
     )
   }
   return null
+}
+
+export function buildGroups<D extends DetailData = DetailData>(options: DetailOptions<D>, uid?: number, data: D = {} as D) {
+  if (!options.items.length) return []
+  const fallbackName = uid ?? "fd-detail"
+  const map = new Map<string | number, DetailItem<D>[]>()
+  map.set(fallbackName, [])
+  options.groups.forEach((group) => {
+    if (group.name !== undefined) {
+      map.set(group.name, [])
+    }
+  })
+  options.items.forEach((item) => {
+    const groupName = resolve(item.group, data)
+    if (groupName !== undefined && map.has(groupName)) {
+      map.get(groupName)!.push(item)
+    }
+    else {
+      map.get(fallbackName)!.push(item)
+    }
+  })
+  return Array.from(map.entries())
+    .map(([name, items]) => {
+      const meta = options.groups.find(group => group.name === name)
+      const descriptions = merge({}, options.descriptions, meta?.descriptions) as DetailDescriptions
+      const normalizedDescriptions = {
+        ...descriptions,
+        column: descriptions.column ?? 2,
+      }
+      return {
+        name,
+        items,
+        title: meta ? resolve(meta.title, data) : descriptions.title,
+        descriptions: normalizedDescriptions,
+      } as DetailGroup<D> & { items: DetailItem<D>[], descriptions: DetailDescriptions }
+    })
+    .filter(group => group.items.length > 0)
 }

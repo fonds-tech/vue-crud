@@ -1,11 +1,8 @@
-import type { DetailData, DetailItem, DetailGroup, DetailOptions, DetailDescriptions } from "./interface"
-import FdDialog from "../dialog"
-import { merge } from "lodash-es"
+import Dialog from "../dialog"
 import { useCore } from "@/hooks"
-import { resolve } from "@/utils"
 import { renderActions, renderDetailContent } from "./render"
-import { createDetailState, createDetailService } from "./core"
-import { h, watch, computed, useAttrs, useSlots, defineComponent, onBeforeUnmount, getCurrentInstance } from "vue"
+import { buildGroups, createDetailState, createDetailService } from "./core"
+import { watch, computed, useAttrs, useSlots, defineComponent, onBeforeUnmount, getCurrentInstance } from "vue"
 import "./style.scss"
 
 export default defineComponent({
@@ -114,6 +111,38 @@ export default defineComponent({
       mitt?.off?.("crud.proxy", proxyHandler)
     })
 
+    function renderContent() {
+      const fallback = renderDetailContent({
+        options: state.options,
+        groups: groups.value,
+        data: state.data,
+        loading: state.loading,
+        cache: state.cache,
+        userSlots,
+        onClose: service.close,
+      })
+      const slotRendered = userSlots.default?.({
+        data: state.data.value,
+        loading: state.loading.value,
+        visible: state.visible.value,
+        refresh: service.refresh,
+        setData: state.setData,
+      })
+      return slotRendered ?? fallback
+    }
+
+    function renderFooter() {
+      return renderActions({
+        options: state.options,
+        groups: [],
+        data: state.data,
+        loading: state.loading,
+        cache: state.cache,
+        userSlots,
+        onClose: service.close,
+      })
+    }
+
     expose({
       get data() {
         return state.data.value
@@ -128,89 +157,24 @@ export default defineComponent({
       __test__handleDetailEvent: handleDetailEvent,
     })
 
-    return () =>
-      h(
-        FdDialog,
-        {
-          ...dialogBindings.value,
-          "class": dialogClass.value,
-          "modelValue": state.visible.value,
-          "onUpdate:modelValue": (value: boolean) => {
-            state.visible.value = value
-            if (!value) handleClose()
-          },
-          "onOpen": handleOpen,
-          "onClose": handleClose,
-          "onClosed": handleClosed,
-        },
-        {
-          default: () => {
-            const fallback = renderDetailContent({
-              options: state.options,
-              groups: groups.value,
-              data: state.data,
-              loading: state.loading,
-              cache: state.cache,
-              userSlots,
-              onClose: service.close,
-            })
-            const slotRendered = userSlots.default?.({
-              data: state.data.value,
-              loading: state.loading.value,
-              visible: state.visible.value,
-              refresh: service.refresh,
-              setData: state.setData,
-            })
-            return slotRendered ?? fallback
-          },
-          footer: () =>
-            renderActions({
-              options: state.options,
-              groups: [],
-              data: state.data,
-              loading: state.loading,
-              cache: state.cache,
-              userSlots,
-              onClose: service.close,
-            }),
-        },
-      )
+    return () => (
+      <Dialog
+        {...dialogBindings.value}
+        class={dialogClass.value}
+        modelValue={state.visible.value}
+        onUpdate:modelValue={(value: boolean) => {
+          state.visible.value = value
+          if (!value) handleClose()
+        }}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        onClosed={handleClosed}
+      >
+        {{
+          default: renderContent,
+          footer: renderFooter,
+        }}
+      </Dialog>
+    )
   },
 })
-
-function buildGroups<D extends DetailData = DetailData>(options: DetailOptions<D>, uid?: number, data: D = {} as D) {
-  if (!options.items.length) return []
-  const fallbackName = uid ?? "fd-detail"
-  const map = new Map<string | number, DetailItem<D>[]>()
-  map.set(fallbackName, [])
-  options.groups.forEach((group) => {
-    if (group.name !== undefined) {
-      map.set(group.name, [])
-    }
-  })
-  options.items.forEach((item) => {
-    const groupName = resolve(item.group, data)
-    if (groupName !== undefined && map.has(groupName)) {
-      map.get(groupName)!.push(item)
-    }
-    else {
-      map.get(fallbackName)!.push(item)
-    }
-  })
-  return Array.from(map.entries())
-    .map(([name, items]) => {
-      const meta = options.groups.find(group => group.name === name)
-      const descriptions = merge({}, options.descriptions, meta?.descriptions) as DetailDescriptions
-      const normalizedDescriptions = {
-        ...descriptions,
-        column: descriptions.column ?? 2,
-      }
-      return {
-        name,
-        items,
-        title: meta ? resolve(meta.title, data) : descriptions.title,
-        descriptions: normalizedDescriptions,
-      } as DetailGroup<D> & { items: DetailItem<D>[], descriptions: DetailDescriptions }
-    })
-    .filter(group => group.items.length > 0)
-}
