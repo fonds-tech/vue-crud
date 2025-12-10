@@ -4,13 +4,13 @@ import { merge } from "@fonds/utils"
 import { inject, reactive } from "vue"
 
 interface ContextOptions {
-  id: string | number | undefined
+  name: string | number | undefined
   dict: Dict
   permission: Permission
   mitt: Mitt
 }
 
-export function createCrudContext({ id, dict, permission, mitt }: ContextOptions) {
+export function createCrudContext({ name, dict, permission, mitt }: ContextOptions) {
   // 规范化字典与权限，填充必需字段避免类型缺失
   const apiDefaults: Dict["api"] = {
     add: "",
@@ -64,7 +64,7 @@ export function createCrudContext({ id, dict, permission, mitt }: ContextOptions
 
   // 使用 CrudRefInit 初始化，后续通过 merge 注入方法
   const crudInit: CrudRefInit = {
-    id,
+    id: name,
     loading: false,
     selection: [],
     params: { page: 1, size: 20 },

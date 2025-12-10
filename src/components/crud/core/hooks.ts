@@ -5,12 +5,12 @@ import { createHelper } from "./helper"
 import { createService } from "./service"
 import { createCrudContext } from "./context"
 
-export function useCrudCore(options: { id?: string | number }) {
+export function useCrudCore(options: { name?: string | number }) {
   const mitt = new Mitt()
   const { dict, permission } = useConfig()
 
   const { crud, config, useCrudOptions } = createCrudContext({
-    id: options.id,
+    name: options.name,
     dict,
     permission,
     mitt,

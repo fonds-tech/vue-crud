@@ -14,7 +14,7 @@ export default defineComponent({
     const ins = getCurrentInstance()
 
     const { crud, mitt } = useCrudCore({
-      id: props.name || ins?.uid,
+      name: props.name || ins?.uid,
     })
 
     provide("crud", crud)
