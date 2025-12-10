@@ -85,6 +85,10 @@ function renderColumnItem(element: ColumnSetting, props: ColumnSettingsPanelProp
  */
 function renderDraggableList(props: ColumnSettingsPanelProps): VNode {
   const { state } = props
+  // 默认 no-op 函数，防止 move/onEnd 未传入时报错
+  const safeOnDragMove = props.onDragMove ?? (() => true)
+  const safeOnDragEnd = props.onDragEnd ?? (() => {})
+
   // 注意：vuedraggable 的类型定义不完全支持 JSX，因此使用 h 函数
   return (
     <ElScrollbar class="fd-table__column-scroll">
@@ -96,11 +100,11 @@ function renderDraggableList(props: ColumnSettingsPanelProps): VNode {
           "animation": 180,
           "ghost-class": "fd-table__drag-ghost",
           "chosen-class": "fd-table__drag-chosen",
-          "move": (evt: DragMoveEvent) => props.onDragMove(evt),
+          "move": (evt: DragMoveEvent) => safeOnDragMove(evt),
           "onUpdate:modelValue": (val: ColumnSetting[]) => {
             state.columnSettings.value = val
           },
-          "onEnd": () => props.onDragEnd(),
+          "onEnd": () => safeOnDragEnd(),
         },
         {
           item: ({ element }: { element: ColumnSetting }) => renderColumnItem(element, props),

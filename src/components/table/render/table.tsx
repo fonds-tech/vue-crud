@@ -44,19 +44,24 @@ export interface RenderTableParams {
 }
 
 /**
- * 渲染完整的表格组件
- * @param params - 渲染参数
- * @returns 表格的 VNode
+ * 事件处理器接口
  */
-export function renderTable(params: RenderTableParams): VNode {
-  const { engine, slots } = params
-  const { state, handlers, methods, renderHelpers, crudBridge, isLoading, sizeOptions, emitColumnsChange, emit } = engine
+interface EventHandlers {
+  onSelectionChange: (rows: TableRecord[]) => void
+  onCellContextmenu: (row: TableRecord, column: any, event: MouseEvent) => void
+}
 
-  // 将用户自定义插槽按名称透传给子列，确保动态 slot 解析时可用
-  const extraSlots = Object.fromEntries(state.namedExtraSlots.value.map(slotName => [slotName, (scope: TableScope<TableRecord>) => slots[slotName]?.(scope) ?? null]))
-
-  // 动态生成 ElTable 事件监听器
-  const eventListeners = elTableEventNames.reduce<Record<string, (...args: unknown[]) => void>>(
+/**
+ * 构建 ElTable 事件监听器（纯函数）
+ * @param handlers - 内部事件处理器
+ * @param emit - 事件发射函数
+ * @returns 事件监听器对象
+ */
+function buildEventListeners(
+  handlers: EventHandlers,
+  emit: (event: string, ...args: unknown[]) => void,
+): Record<string, (...args: unknown[]) => void> {
+  return elTableEventNames.reduce<Record<string, (...args: unknown[]) => void>>(
     (acc, event) => {
       // 将 kebab-case 事件名转换为 camelCase (例如 selection-change -> selectionChange)
       const camelEvent = String(event).replace(/-([a-z])/g, (_: string, letter: string) => letter.toUpperCase())
@@ -69,19 +74,11 @@ export function renderTable(params: RenderTableParams): VNode {
           emit(event, ...args)
         }
       }
-      else if (event === "row-contextmenu" || (event === "cell-contextmenu" && !state.tableOptions.table.rowKey)) {
-        // 优先使用 row-contextmenu 或 cell-contextmenu (如果未设置 rowKey)
-        // 注意：这里我们主要内部使用 cell-contextmenu，ElTable 的 contextmenu 事件冒泡行为需注意
-        // 但 handlers.onCellContextmenu 实际上是绑在 onRowContextmenu 上的（见原代码）
-        // 保持原逻辑：onRowContextmenu 使用 handlers.onCellContextmenu
-        if (event === "row-contextmenu") {
-          acc[propName] = (...args: unknown[]) => {
-            handlers.onCellContextmenu(args[0] as TableRecord, args[1] as any, args[2] as MouseEvent)
-            emit(event, ...args)
-          }
-        }
-        else {
-          acc[propName] = (...args: unknown[]) => emit(event, ...args)
+      else if (event === "row-contextmenu" || event === "cell-contextmenu") {
+        // 统一行为：无论是否有 rowKey，都执行内部上下文菜单处理器
+        acc[propName] = (...args: unknown[]) => {
+          handlers.onCellContextmenu(args[0] as TableRecord, args[1] as any, args[2] as MouseEvent)
+          emit(event, ...args)
         }
       }
       else {
@@ -91,6 +88,22 @@ export function renderTable(params: RenderTableParams): VNode {
     },
     {} as Record<string, (...args: unknown[]) => void>,
   )
+}
+
+/**
+ * 渲染完整的表格组件
+ * @param params - 渲染参数
+ * @returns 表格的 VNode
+ */
+export function renderTable(params: RenderTableParams): VNode {
+  const { engine, slots } = params
+  const { state, handlers, methods, renderHelpers, crudBridge, isLoading, sizeOptions, emitColumnsChange, emit } = engine
+
+  // 将用户自定义插槽按名称透传给子列，确保动态 slot 解析时可用
+  const extraSlots = Object.fromEntries(state.namedExtraSlots.value.map(slotName => [slotName, (scope: TableScope<TableRecord>) => slots[slotName]?.(scope) ?? null]))
+
+  // 使用纯函数生成事件监听器
+  const eventListeners = buildEventListeners(handlers, emit)
 
   // Element Plus Loading 指令需要 withDirectives 包装，保持类型安全
   const loadingDirective: Directive = (ElLoading as { directive?: Directive }).directive ?? (ElLoading as unknown as Directive)
