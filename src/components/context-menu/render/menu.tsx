@@ -2,7 +2,14 @@ import type { Ref } from "vue"
 import type { ContextMenuItem } from "../types"
 
 /**
- * 渲染菜单项列表（递归）
+ * 递归渲染菜单项列表
+ * @param items 菜单项列表
+ * @param parentId 父级 ID
+ * @param level 当前层级，用于控制缩进和样式
+ * @param ids 激活的菜单项 ID 集合
+ * @param toggleItem 切换菜单项状态的回调函数
+ * @param close 关闭菜单的回调函数
+ * @returns JSX 元素
  */
 export function renderList(
   items: ContextMenuItem[],

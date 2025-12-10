@@ -1,4 +1,4 @@
-export * from "../components/context-menu/interface"
+export * from "../components/context-menu/types"
 export * from "../components/crud/interface"
 export * from "../components/detail/interface"
 export * from "../components/form/types"

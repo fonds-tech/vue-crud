@@ -5,24 +5,25 @@ import { useContextMenuCore } from "./core"
 import { h, render, defineComponent } from "vue"
 import "./style.scss"
 
+/**
+ * 右键菜单组件
+ * 支持嵌套菜单、图标、禁用、快捷键等功能
+ */
 export const ContextMenu = defineComponent({
   name: "fd-context-menu",
   props: {
+    /** 是否显示菜单 */
     show: Boolean,
+    /** 触发菜单的鼠标事件 */
     event: { type: Object as PropType<MouseEvent>, default: undefined },
+    /** 菜单选项配置 */
     options: { type: Object as PropType<ContextMenuOptions>, default: () => ({}) },
   },
   setup(props, { slots, expose }) {
-    // 使用核心逻辑钩子
     const { setRefs, list, ids, style, visible, animationClass, extraClass, open, close, toggleItem } = useContextMenuCore(props)
 
-    // 暴露给父组件的实例属性和方法
-    expose({
-      open,
-      close,
-    })
+    expose({ open, close })
 
-    // 返回渲染函数
     return () => {
       if (!visible.value) return null
 
@@ -45,9 +46,15 @@ export const ContextMenu = defineComponent({
 })
 
 /**
- * 工具方法：动态创建并打开 Context Menu
+ * 工具对象：包含命令式调用方法
  */
 export const contextMenu = {
+  /**
+   * 动态创建并打开 Context Menu
+   * @param event 触发菜单的鼠标事件
+   * @param options 菜单配置选项
+   * @returns 包含关闭方法的对象
+   */
   open(event: MouseEvent, options: ContextMenuOptions = {}) {
     const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
     const host = doc.createElement("div")

@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import type { ContextMenuItem } from "@/components/context-menu/types"
 import { ElMessage } from "element-plus"
-import { ContextMenu } from "@/components/context-menu"
+import { contextMenu } from "@/components/context-menu"
 
 const menuActions: ContextMenuItem[] = [
   {
@@ -55,7 +55,7 @@ const menuActions: ContextMenuItem[] = [
 ]
 
 function handleContextMenu(event: MouseEvent) {
-  ContextMenu.open(event, {
+  contextMenu.open(event, {
     list: menuActions,
     hover: {
       target: "interactive-area",

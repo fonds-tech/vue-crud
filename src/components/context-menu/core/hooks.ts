@@ -11,6 +11,13 @@ import {
 
 /**
  * Context Menu 核心逻辑组合式函数
+ * 管理菜单的状态、事件处理、定位和生命周期
+ *
+ * @param props 组件的 props
+ * @param props.show 控制菜单显示状态
+ * @param props.event 触发菜单的鼠标事件
+ * @param props.options 菜单配置选项
+ * @returns 包含组件状态和方法的对象
  */
 export function useContextMenuCore(props: {
   show: boolean
@@ -31,14 +38,25 @@ export function useContextMenuCore(props: {
   // 定时器引用，用于清理
   let closeTimer: ReturnType<typeof setTimeout> | null = null
 
+  /**
+   * 执行所有清理函数
+   */
   function cleanup() {
     cleanupFns.splice(0).forEach(fn => fn())
   }
 
+  /**
+   * 移除高亮样式
+   */
   function _removeHoverHighlight() {
     removeHoverHighlight(hoverTarget, hoverClassName)
   }
 
+  /**
+   * 打开菜单
+   * @param event 触发事件
+   * @param options 配置选项
+   */
   function open(event: MouseEvent, options: ContextMenuOptions = {}) {
     if (!event)
       return { close }
@@ -72,6 +90,10 @@ export function useContextMenuCore(props: {
     return { close }
   }
 
+  /**
+   * 关闭菜单
+   * @param immediate 是否立即关闭（无动画）
+   */
   function close(immediate = false) {
     _removeHoverHighlight()
     cleanup()
@@ -92,6 +114,11 @@ export function useContextMenuCore(props: {
     }, delay)
   }
 
+  /**
+   * 切换菜单项的展开/收起状态，或执行点击回调
+   * @param item 菜单项数据
+   * @param id 菜单项唯一标识
+   */
   function toggleItem(item: ContextMenuItem, id: string) {
     ids.value = new Set([id])
     if (item.disabled)
@@ -153,19 +180,27 @@ export function useContextMenuCore(props: {
   })
 
   return {
-    // 引用
+    /** 元素引用集合 */
     refs,
+    /** 设置元素引用的方法 */
     setRefs,
-    // 状态
+    /** 菜单项列表 */
     list,
+    /** 当前激活的菜单项 ID 集合 */
     ids,
+    /** 菜单容器样式（位置） */
     style,
+    /** 菜单是否可见 */
     visible,
+    /** 动画类名 */
     animationClass,
+    /** 额外类名 */
     extraClass,
-    // 方法
+    /** 打开菜单方法 */
     open,
+    /** 关闭菜单方法 */
     close,
+    /** 切换菜单项方法 */
     toggleItem,
   }
 }

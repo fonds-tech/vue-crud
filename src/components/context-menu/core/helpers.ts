@@ -1,9 +1,12 @@
+import type { Ref } from "vue"
 import type { ContextMenuItem, ContextMenuOptions } from "../types"
 import { nextTick } from "vue"
 import { cloneDeep } from "lodash-es"
 
 /**
  * 规范化菜单项列表，确保每个项都有 showChildren 属性
+ * @param list 原始菜单项列表
+ * @returns 规范化后的菜单项列表
  */
 export function normalizeList(list?: ContextMenuItem[]): ContextMenuItem[] {
   const data = cloneDeep(list ?? [])
@@ -21,11 +24,11 @@ export function normalizeList(list?: ContextMenuItem[]): ContextMenuItem[] {
 
 /**
  * 移除目标元素的悬浮高亮
+ * @param hoverTarget 高亮目标元素的 ref 对象
+ *
+ * @param hoverClassName 高亮类名的 ref 对象
  */
-export function removeHoverHighlight(
-  hoverTarget: { value: HTMLElement | null },
-  hoverClassName: { value: string },
-) {
+export function removeHoverHighlight(hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>) {
   if (hoverTarget.value) {
     hoverTarget.value.classList?.remove(hoverClassName.value)
     hoverTarget.value = null
@@ -33,17 +36,20 @@ export function removeHoverHighlight(
 }
 
 /**
- * 标记触发菜单的目标元素
+ * 标记触发菜单的目标元素，添加高亮样式
+ * @param event 鼠标事件
+ * @param hoverOptions 悬浮配置选项
+ * @param hoverTarget 高亮目标元素的 ref 对象
+ * @param hoverClassName 高亮类名的 ref 对象
  */
 export function markTarget(
   event: MouseEvent,
   hoverOptions: ContextMenuOptions["hover"] | undefined,
-  hoverTarget: { value: HTMLElement | null },
-  hoverClassName: { value: string },
+  hoverTarget: Ref<HTMLElement | null>,
+  hoverClassName: Ref<string>,
 ) {
   removeHoverHighlight(hoverTarget, hoverClassName)
-  if (!hoverOptions)
-    return
+  if (!hoverOptions) return
 
   const config = hoverOptions === true ? {} : hoverOptions
   const className = config.className ?? "fd-context-menu__target"
@@ -65,16 +71,16 @@ export function markTarget(
 }
 
 /**
- * 定位菜单到合适的位置
+ * 计算并设置菜单的显示位置，确保不超出可视区域
+ * @param event 鼠标事件，用于获取点击坐标
+ * @param menuElement 菜单 DOM 元素
+ * @param style 样式对象引用，用于更新 top/left
+ * @param style.top 顶部位置
+ * @param style.left 左侧位置
  */
-export async function positionMenu(
-  event: MouseEvent,
-  menuElement: HTMLElement | null | undefined,
-  style: { top: string, left: string },
-) {
+export async function positionMenu(event: MouseEvent, menuElement: HTMLElement | null | undefined, style: { top: string, left: string }) {
   await nextTick()
-  if (!menuElement)
-    return
+  if (!menuElement) return
 
   const doc = (event.target as HTMLElement | null)?.ownerDocument ?? document
   const html = doc.documentElement
@@ -98,18 +104,16 @@ export async function positionMenu(
 }
 
 /**
- * 注册外部点击关闭事件
+ * 注册点击外部关闭菜单的事件监听
+ * @param doc Document 对象
+ * @param menuElement 菜单 DOM 元素
+ * @param close 关闭回调函数
+ * @param cleanupFns 清理函数数组
  */
-export function registerOutsideClose(
-  doc: Document,
-  menuElement: HTMLElement | null | undefined,
-  close: () => void,
-  cleanupFns: Array<() => void>,
-) {
+export function registerOutsideClose(doc: Document, menuElement: HTMLElement | null | undefined, close: () => void, cleanupFns: Array<() => void>) {
   const handler = (event: MouseEvent) => {
     const target = event.target as Node | null
-    if (!menuElement || menuElement === target || menuElement.contains(target))
-      return
+    if (!menuElement || menuElement === target || menuElement.contains(target)) return
     close()
   }
   doc.addEventListener("mousedown", handler)
