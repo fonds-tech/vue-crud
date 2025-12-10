@@ -1,25 +1,10 @@
-import type { VNode, PropType, ExtractPropTypes } from "vue"
+import type { VNode } from "vue"
 import { useCore } from "@/hooks"
 import { isFunction } from "@fonds/utils"
+import { exportProps } from "./export"
 import { downloadFile } from "@/utils/file"
 import { ElButton, ElMessage } from "element-plus"
 import { ref, watch, defineComponent } from "vue"
-
-/**
- * 导出按钮组件 Props 定义
- */
-const exportProps = {
-  /**
-   * 额外的导出参数
-   * @description 会与搜索表单参数合并
-   */
-  params: {
-    type: Object as PropType<Record<string, any>>,
-    default: () => ({}),
-  },
-} as const
-
-export type ExportProps = ExtractPropTypes<typeof exportProps>
 
 /**
  * fd-export 导出按钮组件

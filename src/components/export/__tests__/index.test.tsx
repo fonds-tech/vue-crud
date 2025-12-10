@@ -1,4 +1,4 @@
-import FdExport from "../export"
+import FdExport from "../export.tsx"
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
 import { h, nextTick } from "vue"

@@ -1,5 +1,7 @@
 import { useSearchCore } from "../core/index"
+import { ref, nextTick, reactive } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
+import { handleResize, registerEvents, unregisterEvents } from "../core/lifecycle"
 
 // Mock hooks
 const mockCrud = {
@@ -414,6 +416,118 @@ describe("useSearchCore", () => {
           page: 1,
         }),
       )
+    })
+  })
+
+  it("actionGridProps 和 getActionItemProps 支持响应式配置", () => {
+    const { actionGridProps, viewportWidth, getActionItemProps, use } = useSearchCore({})
+
+    use({
+      action: {
+        grid: {
+          cols: { xs: 1, xl: 4 },
+          colGap: { xs: 4, xl: 16 },
+          rowGap: { xs: 6, xl: 18 },
+          collapsed: true,
+          collapsedRows: 3,
+        },
+      },
+    })
+
+    viewportWidth.value = 500
+    expect(actionGridProps.value).toMatchObject({
+      cols: 1,
+      colGap: 4,
+      rowGap: 6,
+      collapsed: true,
+      collapsedRows: 3,
+    })
+
+    viewportWidth.value = 1400
+    const action = { col: { span: { xs: 1, xl: 2 }, offset: { xs: 0, xl: 1 } } }
+    expect(actionGridProps.value.cols).toBe(4)
+    expect(getActionItemProps(action as any)).toMatchObject({ span: 2, offset: 1 })
+  })
+
+  it("解析动作插槽与组件配置", () => {
+    const { formRef, getActionSlot, getComponentIs, getComponentProps, getComponentEvents, getComponentStyle, getComponentSlots } = useSearchCore({})
+
+    const click = vi.fn()
+    formRef.value = { model: { role: "admin" } } as any
+
+    const action = {
+      slot: (model: any) => `${model.role}-slot`,
+      component: {
+        is: (model: any) => `el-${model.role}`,
+        props: (model: any) => ({ type: model.role }),
+        on: () => ({ click }),
+        style: (model: any) => ({ color: model.role }),
+        slots: (model: any) => ({ default: () => `hi-${model.role}` }),
+      },
+    }
+
+    expect(getActionSlot(action as any)).toBe("admin-slot")
+    expect(getComponentIs(action as any)).toBe("el-admin")
+    expect(getComponentProps(action as any)).toMatchObject({ type: "admin" })
+
+    const events = getComponentEvents(action as any)
+    events.click?.()
+    expect(click).toHaveBeenCalled()
+
+    expect(getComponentStyle(action as any)).toMatchObject({ color: "admin" })
+    expect(getComponentSlots(action as any).default?.()).toBe("hi-admin")
+  })
+
+  it("formSlots 包装插槽并透传作用域", () => {
+    const slot = vi.fn()
+    const { formSlots } = useSearchCore({ keyword: slot } as any)
+
+    formSlots.value.keyword?.({ foo: 1 })
+    expect(slot).toHaveBeenCalledWith({ foo: 1 })
+  })
+
+  it("formModel 更新时触发 search.model 事件", async () => {
+    const model = reactive({ keyword: "a" })
+    const { formRef } = useSearchCore({})
+
+    formRef.value = { model } as any
+    model.keyword = "b"
+    await nextTick()
+
+    expect(mockMitt.emit).toHaveBeenCalledWith("search.model", expect.objectContaining({ keyword: "b" }))
+  })
+
+  describe("生命周期工具函数", () => {
+    it("registerEvents 与 unregisterEvents 正确绑定解绑", () => {
+      const mitt = { on: vi.fn(), off: vi.fn(), emit: vi.fn() }
+      const params = {
+        mitt,
+        viewportWidth: ref(0),
+        searchHandler: vi.fn(),
+        resetHandler: vi.fn(),
+        getModelHandler: vi.fn(),
+      }
+
+      registerEvents(params as any)
+      expect(mitt.on).toHaveBeenCalledWith("search.search", params.searchHandler)
+      expect(mitt.on).toHaveBeenCalledWith("search.reset", params.resetHandler)
+      expect(mitt.on).toHaveBeenCalledWith("search.get.model", params.getModelHandler)
+
+      unregisterEvents(params as any)
+      expect(mitt.off).toHaveBeenCalledWith("search.search", params.searchHandler)
+      expect(mitt.off).toHaveBeenCalledWith("search.reset", params.resetHandler)
+      expect(mitt.off).toHaveBeenCalledWith("search.get.model", params.getModelHandler)
+    })
+
+    it("handleResize 根据窗口尺寸更新 viewportWidth", () => {
+      const viewportWidth = ref(0)
+      const origin = window.innerWidth
+
+      Object.defineProperty(window, "innerWidth", { value: 1280, configurable: true })
+      handleResize(viewportWidth)
+
+      expect(viewportWidth.value).toBe(1280)
+      Object.defineProperty(window, "innerWidth", { value: origin, configurable: true })
     })
   })
 })

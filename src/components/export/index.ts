@@ -1,9 +1,6 @@
-/**
- * fd-export 导出组件统一导出入口
- */
-import FdExport from "./export"
+import Export from "./export.tsx"
 
-export { FdExport }
-export type { ExportProps } from "./export"
-export type { ExportInstance } from "./interface"
-export default FdExport
+export * from "./interface"
+
+export { Export }
+export default Export
