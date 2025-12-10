@@ -1,4 +1,4 @@
-import type { FormRecord } from "../types"
+import type { FormRecord } from "../interface"
 import formHook from "../core/hooks"
 import { reactive } from "vue"
 import { it, expect, describe } from "vitest"

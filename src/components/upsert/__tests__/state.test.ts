@@ -1,4 +1,4 @@
-import type { FormRef, FormRecord } from "../../form/types"
+import type { FormRef, FormRecord } from "../../form/interface"
 import { createUpsertState } from "../core/state"
 import { it, expect, describe } from "vitest"
 

@@ -12,15 +12,15 @@ import Search from "./search"
 import Select from "./select"
 import Upsert from "./upsert"
 import Cascader from "./cascader"
-import GridItem from "./grid-item"
 import AddButton from "./add-button"
 import ContextMenu from "./context-menu"
 import DeleteButton from "./delete-button"
+import { FdGridItem } from "./grid-item"
 
 export const components: Record<string, Component> = {
   Crud,
   Grid,
-  GridItem,
+  GridItem: FdGridItem,
   AddButton,
   DeleteButton,
   Dialog,

@@ -1,7 +1,8 @@
 /**
  * @file FdGridItem 栅格子项
  */
-import GridItem from "./grid-item"
 import "../grid/style.scss"
 
-export default GridItem
+export { default as FdGridItem } from "./grid-item"
+export type { FdGridItemProps } from "./interface"
+export { fdGridItemProps } from "./props"

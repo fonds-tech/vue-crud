@@ -1,5 +1,5 @@
 import type { TableDict } from "../table/interface"
-import type { DeepPartial } from "../form/types"
+import type { DeepPartial } from "../form/interface"
 import type { dialogProps } from "element-plus"
 import type { DescriptionProps } from "element-plus/es/components/descriptions/src/description"
 import type { VNodeChild, CSSProperties, ExtractPropTypes, Component as VueComponent } from "vue"

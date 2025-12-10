@@ -1,4 +1,4 @@
-import type { FormRecord, FormOptions, FormActionContext, FormAsyncOptionsState } from "../types"
+import type { FormRecord, FormOptions, FormActionContext, FormAsyncOptionsState } from "../interface"
 import { useAction } from "../core/actions"
 import { ref, reactive } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"

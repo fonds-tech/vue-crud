@@ -1,4 +1,4 @@
-import type { FormItem, FormRecord, FormOptions, FormAsyncOptionsState } from "../types"
+import type { FormItem, FormRecord, FormOptions, FormAsyncOptionsState } from "../interface"
 import { createHelpers } from "../core"
 import { it, vi, expect, describe } from "vitest"
 import { h, ref, computed, reactive, defineComponent } from "vue"

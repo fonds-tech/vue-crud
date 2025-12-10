@@ -1,4 +1,4 @@
-import type { FormItem, FormOptions, FilterRuntimeContext } from "../types"
+import type { FormItem, FormOptions, FilterRuntimeContext } from "../interface"
 import { it, expect, describe } from "vitest"
 import { applyFilters, registerFilter, shouldShowItem, filterStepItems, filterGroupItems, shouldShowInGroup } from "../core/filters"
 

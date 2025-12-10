@@ -1,5 +1,5 @@
 import type { FormHelpers } from "./helpers"
-import type { FilterFn, FormItem, FormRecord, FormOptions, InternalRule, FilterOptions, FilterRuntimeContext } from "../types"
+import type { FilterFn, FormItem, FormRecord, FormOptions, InternalRule, FilterOptions, FilterRuntimeContext } from "../interface"
 import formHook from "./hooks"
 import { clone, isDef, isNoEmpty } from "@fonds/utils"
 

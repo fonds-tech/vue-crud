@@ -1,6 +1,6 @@
 import type { Slots, VNodeChild } from "vue"
 import type { SearchCore, SearchAction } from "../interface"
-import FdGridItem from "../../grid-item"
+import { FdGridItem } from "../../grid-item"
 import { ElIcon, ElButton } from "element-plus"
 import { renderComponent, renderActionSlots } from "./slots"
 import { Search as IconSearch, ArrowUp as IconArrowUp, Loading as IconLoading, Refresh as IconRefresh, ArrowDown as IconArrowDown } from "@element-plus/icons-vue"

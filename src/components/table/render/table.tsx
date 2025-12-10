@@ -57,10 +57,7 @@ interface EventHandlers {
  * @param emit - 事件发射函数
  * @returns 事件监听器对象
  */
-function buildEventListeners(
-  handlers: EventHandlers,
-  emit: (event: string, ...args: unknown[]) => void,
-): Record<string, (...args: unknown[]) => void> {
+function buildEventListeners(handlers: EventHandlers, emit: (event: string, ...args: unknown[]) => void): Record<string, (...args: unknown[]) => void> {
   return elTableEventNames.reduce<Record<string, (...args: unknown[]) => void>>(
     (acc, event) => {
       // 将 kebab-case 事件名转换为 camelCase (例如 selection-change -> selectionChange)

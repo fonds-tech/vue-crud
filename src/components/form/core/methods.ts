@@ -1,6 +1,6 @@
 import type { Arrayable } from "element-plus/es/utils"
 import type { FormItemProp, FormValidateCallback, FormValidationResult } from "element-plus"
-import type { FormItem, FormRecord, FormMethods, FormOptions, FormActionContext } from "../types"
+import type { FormItem, FormRecord, FormMethods, FormOptions, FormActionContext } from "../interface"
 import formHook from "./hooks"
 import { useAction } from "./actions"
 import { propToString } from "./model"

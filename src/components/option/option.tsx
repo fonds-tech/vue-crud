@@ -51,7 +51,7 @@ export default defineComponent<FdOptionProps>({
         slotMap[name] = (scope: any) => slot(scope)
       })
 
-      return <ElOption class="fd-option" {...optionProps.value} v-slots={slotMap} />
+      return <ElOption {...optionProps.value} v-slots={slotMap} />
     }
   },
 })

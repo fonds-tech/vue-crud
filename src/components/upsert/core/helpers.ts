@@ -1,6 +1,6 @@
 import type { UpsertMode } from "../interface"
 import type { Ref, ComputedRef } from "vue"
-import type { FormRecord, FormComponentSlot } from "../../form/types"
+import type { FormRecord, FormComponentSlot } from "../../form/interface"
 import { resolveProp } from "@/utils"
 
 /**

@@ -1,4 +1,4 @@
-import type { FormRecord, FormUseOptions } from "../../form/types"
+import type { FormRecord, FormUseOptions } from "../../form/interface"
 import type { SearchAction, SearchOptions, InternalOptions } from "../interface"
 import { clone } from "@fonds/utils"
 import { merge } from "lodash-es"

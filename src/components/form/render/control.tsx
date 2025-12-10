@@ -1,5 +1,5 @@
 import type { Component } from "vue"
-import type { FormItem, FormRenderContext } from "../types"
+import type { FormItem, FormRenderContext } from "../interface"
 import { renderComponentSlotMap } from "./slots"
 import { h, resolveDynamicComponent } from "vue"
 

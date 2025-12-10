@@ -1,5 +1,5 @@
 import type { FormItemProp } from "element-plus"
-import type { FormItem, FormMode, FormRecord, FormActions, FormMaybeFn, MaybePromise, FormActionContext, FormItemRuleWithMeta } from "../types"
+import type { FormItem, FormMode, FormRecord, FormActions, FormMaybeFn, MaybePromise, FormActionContext, FormItemRuleWithMeta } from "../interface"
 import formHook from "./hooks"
 import { dataset } from "../../../utils/dataset"
 import { toArray } from "../../../utils/object"

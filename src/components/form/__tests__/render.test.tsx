@@ -1,4 +1,4 @@
-import type { FormItem, FormOptions, FormRenderContext, FormAsyncOptionsState } from "../types"
+import type { FormItem, FormOptions, FormRenderContext, FormAsyncOptionsState } from "../interface"
 import { mount } from "@vue/test-utils"
 import { renderForm } from "../render/form"
 import { createHelpers } from "../core"

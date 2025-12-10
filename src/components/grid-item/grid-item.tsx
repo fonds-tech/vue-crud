@@ -1,5 +1,7 @@
 import type { CSSProperties } from "vue"
-import type { GridCollector, GridItemProps, GridContextState } from "../grid/interface"
+import type { FdGridItemProps } from "./interface"
+import type { GridCollector, GridContextState } from "../grid/interface"
+import { fdGridItemProps } from "./props"
 import { GRID_CONTEXT_KEY, GRID_COLLECTOR_KEY } from "../grid/interface"
 import { resolveItemData, resolveResponsiveValue } from "../grid/utils"
 import { inject, computed, watchEffect, defineComponent, onBeforeUnmount } from "vue"
@@ -8,23 +10,10 @@ import { inject, computed, watchEffect, defineComponent, onBeforeUnmount } from 
  * FdGridItem 栅格子项
  * @description 支持响应式跨度与偏移，并能感知容器折叠状态。
  */
-export default defineComponent<GridItemProps>({
+export default defineComponent<FdGridItemProps>({
   name: "fd-grid-item",
   inheritAttrs: false,
-  props: {
-    span: {
-      type: [Number, Object],
-      default: 1,
-    },
-    offset: {
-      type: [Number, Object],
-      default: 0,
-    },
-    suffix: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  props: fdGridItemProps,
   setup(props, { slots, attrs }) {
     const grid = inject<GridContextState | undefined>(GRID_CONTEXT_KEY, undefined)
     const collector = inject<GridCollector | undefined>(GRID_COLLECTOR_KEY, undefined)

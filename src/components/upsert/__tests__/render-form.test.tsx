@@ -1,6 +1,6 @@
 import type { Directive } from "vue"
 import type { UpsertOptions } from "../interface"
-import type { FormRef, FormRecord } from "../../form/types"
+import type { FormRef, FormRecord } from "../../form/interface"
 import { h, ref } from "vue"
 import { renderForm } from "../render/form"
 import { mount, config } from "@vue/test-utils"

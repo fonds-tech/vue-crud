@@ -1,4 +1,4 @@
-import type { FormAsyncOptionsState } from "../types"
+import type { FormAsyncOptionsState } from "../interface"
 import { createHelpers } from "../core"
 import { ref, computed, reactive } from "vue"
 import { it, vi, expect, describe, afterEach, beforeEach } from "vitest"

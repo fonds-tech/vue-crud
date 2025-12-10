@@ -1,6 +1,6 @@
 import type { UpsertOptions } from "../interface"
 import type { VNode, Directive } from "vue"
-import type { FormRef, FormRecord } from "../../form/types"
+import type { FormRef, FormRecord } from "../../form/interface"
 import FdForm from "../../form/form"
 import { h, withDirectives } from "vue"
 

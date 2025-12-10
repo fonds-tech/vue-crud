@@ -1,6 +1,6 @@
 import type { SearchExpose } from "../interface"
 import type { MountingOptions } from "@vue/test-utils"
-import type { FormRef, FormRecord } from "../../form/types"
+import type { FormRef, FormRecord } from "../../form/interface"
 import Search from "../search"
 import { mount } from "@vue/test-utils"
 import { it, vi, expect, describe, beforeEach } from "vitest"

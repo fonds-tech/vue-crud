@@ -1,5 +1,5 @@
 import type { UpsertMode, UpsertOptions } from "../interface"
-import type { FormRef, FormRecord, FormInstance } from "../../form/types"
+import type { FormRef, FormRecord, FormInstance } from "../../form/interface"
 import { createFormBuilder } from "../core/form"
 import { ref, reactive, shallowRef } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"

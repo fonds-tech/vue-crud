@@ -1,5 +1,5 @@
 import type { Ref, ComputedRef } from "vue"
-import type { FormRef, FormItem, FormRecord } from "../../form/types"
+import type { FormRef, FormItem, FormRecord } from "../../form/interface"
 import type { UpsertMode, UpsertAction, UpsertOptions, UpsertUseOptions, UpsertCloseAction } from "../interface"
 import { merge } from "lodash-es"
 import { clone, isFunction } from "@fonds/utils"

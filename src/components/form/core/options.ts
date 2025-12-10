@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { FormHelpers } from "./helpers"
-import type { FormItem, FormRecord, FormOptions, MaybePromise, FormUseOptions, FormAsyncOptionsState } from "../types"
+import type { FormItem, FormRecord, FormOptions, MaybePromise, FormUseOptions, FormAsyncOptionsState } from "../interface"
 import { merge } from "lodash-es"
 
 export function createInitialOptions(): FormOptions {
