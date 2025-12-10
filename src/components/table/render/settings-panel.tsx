@@ -6,6 +6,7 @@ import type { VNode } from "vue"
 import type { ColumnSetting } from "../core/state"
 import type { DragMoveEvent, ColumnSettingsPanelProps } from "../core/settings"
 import Draggable from "vuedraggable"
+import IconTablerPinFilled from "~icons/tabler/pin-filled"
 import { h } from "vue"
 import { Setting } from "@element-plus/icons-vue"
 import { ElIcon, ElButton, ElMessage, ElPopover, ElTooltip, ElCheckbox, ElScrollbar } from "element-plus"
@@ -102,7 +103,7 @@ export function ColumnSettingsPanel(props: ColumnSettingsPanelProps): VNode {
                               class: { "is-active": element.fixed === "left" },
                               onClick: () => props.toggleFixed(element.id, "left"),
                             },
-                            () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-left" }, element.fixed === "left" ? "L" : "↢"),
+                            () => h(ElIcon, { class: "fd-table__pin-icon fd-table__icon-rotate-left" }, () => h(IconTablerPinFilled)),
                           ),
                           h(
                             ElButton,
@@ -112,7 +113,7 @@ export function ColumnSettingsPanel(props: ColumnSettingsPanelProps): VNode {
                               class: { "is-active": element.fixed === "right" },
                               onClick: () => props.toggleFixed(element.id, "right"),
                             },
-                            () => h("span", { class: "fd-table__pin-icon fd-table__icon-rotate-right" }, element.fixed === "right" ? "R" : "↣"),
+                            () => h(ElIcon, { class: "fd-table__pin-icon fd-table__icon-rotate-right" }, () => h(IconTablerPinFilled)),
                           ),
                         ]),
                       ],
