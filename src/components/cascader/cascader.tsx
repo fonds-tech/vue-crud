@@ -7,8 +7,6 @@ import { ElCascader } from "element-plus"
 import { cascaderEmits, cascaderProps } from "./cascader"
 import { ref, watch, computed, defineComponent } from "vue"
 
-type NativeCascaderProps = InstanceType<typeof ElCascader>["$props"]
-
 export default defineComponent({
   name: "fd-cascader",
   inheritAttrs: false,
@@ -23,7 +21,7 @@ export default defineComponent({
     const remoteOptionList = ref<CascaderOption[]>([])
 
     // options 优先级：优先使用远程获取结果，若远程为空则回退静态 props.options
-    const availableOptions = computed<CascaderOption[]>(() => {
+    const options = computed<CascaderOption[]>(() => {
       if (remoteOptionList.value.length > 0)
         return remoteOptionList.value
       return props.options || []
@@ -65,20 +63,17 @@ export default defineComponent({
       }
     }
 
-    expose({ refresh, options: availableOptions })
+    expose({ refresh, options })
 
-    return () => {
-      // 透传所有原生 props 和 attrs
-      const cascaderBindings: NativeCascaderProps = {
-        ...props,
-        ...attrs,
-        "class": ["fd-cascader", attrs.class].filter(Boolean),
-        "options": availableOptions.value,
-        "modelValue": modelValue.value,
-        "onUpdate:modelValue": value => (modelValue.value = value as CascaderValue),
-      }
-
-      return <ElCascader {...cascaderBindings} v-slots={slots} />
-    }
+    return () => (
+      <ElCascader
+        {...props}
+        {...attrs}
+        class={["fd-cascader", attrs.class].filter(Boolean)}
+        options={options.value}
+        onUpdate:modelValue={value => (modelValue.value = value as CascaderValue)}
+        v-slots={slots}
+      />
+    )
   },
 })
