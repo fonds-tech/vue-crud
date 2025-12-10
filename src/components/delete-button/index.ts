@@ -1,5 +1,6 @@
-import DeleteButton from "./delete-button"
+import DeleteButton from "./delete-button.tsx"
+
+export * from "./interface"
 
 export { DeleteButton }
-export type { DeleteButtonProps } from "./delete-button"
 export default DeleteButton

@@ -44,6 +44,10 @@ describe("slotNameOf", () => {
     const slot = { slot: (row: any) => row.type }
     expect(slotNameOf(slot, { type: "video" })).toBe("video")
   })
+
+  it("非组件对象返回 undefined", () => {
+    expect(slotNameOf({} as any, mockData)).toBeUndefined()
+  })
 })
 
 describe("componentOf", () => {
@@ -55,6 +59,12 @@ describe("componentOf", () => {
   it("解析组件定义", () => {
     const comp = { is: "el-input" }
     expect(componentOf(comp, {})).toBe("el-input")
+  })
+
+  it("支持直接传入组件对象并保持引用", () => {
+    const rawComp = { name: "CustomComponent" }
+    const resolved = componentOf(rawComp as any, mockData)
+    expect(resolved).toBe(rawComp)
   })
 })
 
@@ -124,6 +134,14 @@ describe("componentSlots", () => {
     const result = componentSlots(component, mockData)
     expect(result).toEqual({ test: "测试" })
   })
+
+  it("slots 解析为非对象时回退为空对象", () => {
+    const component: DetailComponent = {
+      is: "div",
+      slots: () => "invalid" as any,
+    }
+    expect(componentSlots(component, mockData)).toEqual({})
+  })
 })
 
 describe("slotsOf", () => {
@@ -147,6 +165,17 @@ describe("slotsOf", () => {
     expect(slotsOf(undefined, mockData)).toEqual({})
     expect(slotsOf({}, mockData)).toEqual({})
     expect(slotsOf({ noSlots: true } as any, mockData)).toEqual({})
+  })
+
+  it("slots 属性为空值时回退为空对象", () => {
+    expect(slotsOf({ slots: null } as any, mockData)).toEqual({})
+  })
+
+  it("slots 返回非对象时回退为空对象", () => {
+    const target = {
+      slots: () => "text-slot" as any,
+    }
+    expect(slotsOf(target as any, mockData)).toEqual({})
   })
 })
 
