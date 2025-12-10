@@ -1,4 +1,4 @@
-import FdImport from "../import"
+import FdImport from "../import.tsx"
 import ElementPlus from "element-plus"
 import { mount } from "@vue/test-utils"
 import { h, nextTick } from "vue"

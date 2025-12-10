@@ -16,33 +16,36 @@ function resolveActionText<D extends DetailData>(action: DetailAction<D>, option
   return resolve(action.text, data) ?? options.dialog.title ?? "确定"
 }
 
+/**
+ * 渲染单个操作按钮
+ */
+function renderActionItem<D extends DetailData>(action: DetailAction<D>, index: number, ctx: RenderCtx<D>): JSX.Element | null {
+  if (!isVisible(action, ctx.data.value)) return null
+
+  // 确认按钮
+  if (action.type === "ok") {
+    return (
+      <ElButton key={index} type="primary" onClick={ctx.onClose}>
+        {resolveActionText(action, ctx.options, ctx.data.value)}
+      </ElButton>
+    )
+  }
+
+  // 用户自定义插槽
+  const slotName = slotNameOf(action.component, ctx.data.value)
+  if (slotName && ctx.userSlots[slotName]) {
+    return h("template", { key: index }, ctx.userSlots[slotName]?.({ index, data: ctx.data.value }))
+  }
+
+  // 动态组件（需使用 h 函数）
+  const comp = renderComponentSlot(action.component, ctx.data.value, { index, data: ctx.data.value }, ctx.userSlots)
+  return comp ? h("template", { key: index }, comp) : null
+}
+
 export function renderActions<D extends DetailData = DetailData>(ctx: RenderCtx<D>) {
   const baseActions = ctx.options.actions.length ? ctx.options.actions : []
   const hasOk = baseActions.some(action => action.type === "ok")
   const actions = hasOk ? baseActions : [...baseActions, { type: "ok", text: "确认" } as DetailAction<D>]
 
-  return h(
-    "div",
-    { class: "fd-detail__footer" },
-    actions.map((action, index) => {
-      if (!isVisible(action, ctx.data.value)) return null
-      if (action.type === "ok") {
-        return h(
-          ElButton,
-          {
-            key: index,
-            type: "primary",
-            onClick: ctx.onClose,
-          },
-          () => resolveActionText(action, ctx.options, ctx.data.value),
-        )
-      }
-      const slotName = slotNameOf(action.component, ctx.data.value)
-      if (slotName && ctx.userSlots[slotName]) {
-        return h("template", { key: index }, ctx.userSlots[slotName]?.({ index, data: ctx.data.value }))
-      }
-      const comp = renderComponentSlot(action.component, ctx.data.value, { index, data: ctx.data.value }, ctx.userSlots)
-      return comp ? h("template", { key: index }, comp) : null
-    }),
-  )
+  return <div class="fd-detail__footer">{actions.map((action, index) => renderActionItem(action, index, ctx))}</div>
 }

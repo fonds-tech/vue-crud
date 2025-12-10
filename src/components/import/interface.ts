@@ -1,6 +1,20 @@
 import type FdImport from "./import.tsx"
 
 /**
+ * 导入组件 Props 类型
+ */
+export interface ImportProps {
+  /** 允许的文件类型 */
+  accept?: string
+  /** 额外的上传参数 */
+  params?: Record<string, any>
+  /** 模板下载地址 */
+  templateUrl?: string
+  /** 最大文件大小 (MB) */
+  maxSize?: number
+}
+
+/**
  * 导入结果接口
  * @description 后端返回的导入结果结构
  */

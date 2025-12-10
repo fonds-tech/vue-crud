@@ -1,37 +1,31 @@
-import type { PropType } from "vue"
-import type { OptionProps as ElOptionProps } from "element-plus/es/components/select/src/type"
+import type { FdOptionProps } from "./interface"
+import { fdOptionProps } from "./option"
 import { computed, defineComponent, resolveDynamicComponent } from "vue"
 
-type OptionRecord = Record<string, unknown>
-type ComponentProps = Partial<ElOptionProps> & {
-  option?: OptionRecord
-  labelKey?: string
-  valueKey?: string
-}
-
-export default defineComponent<ComponentProps>({
+/**
+ * fd-option 选项组件
+ * @description 对 el-option 的封装，支持从对象自动提取 label 和 value
+ */
+export default defineComponent<FdOptionProps>({
   name: "fd-option",
-  inheritAttrs: false, // 禁用自动继承，手动处理属性合并
-  props: {
-    option: Object as PropType<OptionRecord>,
-    labelKey: { type: String, default: "label" },
-    valueKey: { type: String, default: "value" },
-  },
+  inheritAttrs: false,
+  props: fdOptionProps,
   setup(props, { attrs, slots, expose }) {
     const optionClass = computed(() => {
       const extra = (attrs as Record<string, unknown>).class
       return extra ? ["fd-option", extra] : ["fd-option"]
     })
 
-    // 计算最终传递给 el-option 的属性
-    // 优先级：直接传入的属性 > option 对象中的属性
+    /**
+     * 计算最终传递给 el-option 的属性
+     * 优先级：直接传入的属性 > option 对象中的属性
+     */
     const optionProps = computed<Record<string, unknown>>(() => {
       const { class: _class, ...restAttrs } = attrs as Record<string, unknown>
-      // 复制透传属性（不包含 class，统一由 optionClass 处理）
       const merged: Record<string, unknown> = { ...restAttrs }
 
       // 复制非特殊 Props
-      Object.entries(props as ComponentProps).forEach(([key, value]) => {
+      Object.entries(props as FdOptionProps).forEach(([key, value]) => {
         if (key === "option" || key === "labelKey" || key === "valueKey") return
         merged[key] = value
       })
@@ -46,7 +40,6 @@ export default defineComponent<ComponentProps>({
       return { ...merged, class: optionClass.value }
     })
 
-    // 暴露计算后的属性，方便测试与外部读取
     expose({ optionProps })
 
     return () => {
