@@ -12,6 +12,7 @@
     },
     "resolveJsonModule": true,
     "types": ["vite/client", "vue/jsx"],
+    "allowImportingTsExtensions": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": false,

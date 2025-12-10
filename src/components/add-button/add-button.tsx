@@ -1,19 +1,14 @@
-import type { ExtractPropTypes } from "vue"
+import { addButtonProps } from "./add-button"
 import { useCore, useConfig } from "@/hooks"
+import { ElButton, buttonEmits } from "element-plus"
 import { computed, defineComponent } from "vue"
-import { ElButton, buttonEmits, buttonProps } from "element-plus"
-
-const addButtonProps = {
-  ...buttonProps,
-  type: { ...buttonProps.type, default: "primary" },
-} as const
 
 export default defineComponent({
   name: "fd-add-button",
   inheritAttrs: false,
   emits: buttonEmits,
   props: addButtonProps,
-  setup(props: ExtractPropTypes<typeof addButtonProps>, { slots, attrs, emit }) {
+  setup(props, { slots, attrs, emit }) {
     const { crud } = useCore()
     const { style } = useConfig()
 
@@ -46,5 +41,3 @@ export default defineComponent({
     }
   },
 })
-
-export type AddButtonProps = ExtractPropTypes<typeof addButtonProps>

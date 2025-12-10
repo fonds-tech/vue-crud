@@ -1,5 +1,6 @@
-import AddButton from "./add-button"
+import AddButton from "./add-button.tsx"
+
+export * from "./interface"
 
 export { AddButton }
-export type { AddButtonProps } from "./add-button"
 export default AddButton
