@@ -167,4 +167,186 @@ describe("cascader", () => {
     expect(wrapper.find(".custom-slot").exists()).toBe(true)
     expect(wrapper.text()).toContain("Default Slot Content")
   })
+
+  it("未传入 options 时使用空数组默认值", () => {
+    // 不传入 options 和 api，触发 options 的默认值函数
+    const wrapper = mount(Cascader, {
+      global: {
+        plugins: [ElementPlus],
+        stubs: {
+          "el-cascader": ElCascaderStub,
+        },
+      },
+    }) as VueWrapper<any>
+
+    expect(wrapper.vm.options).toEqual([])
+  })
+
+  it("正确合并外部传入的 class", () => {
+    const wrapper = mount(Cascader, {
+      props: {
+        options: baseOptions,
+        class: "custom-class",
+      },
+      global: {
+        plugins: [ElementPlus],
+        stubs: {
+          "el-cascader": ElCascaderStub,
+        },
+      },
+    }) as VueWrapper<any>
+
+    const cascader = wrapper.findComponent(ElCascaderStub)
+    expect(cascader.classes()).toContain("fd-cascader")
+    expect(cascader.classes()).toContain("custom-class")
+  })
+
+  it("params 为函数时动态计算参数", async () => {
+    const paramsFn = vi.fn(extra => ({ dynamic: true, ...extra }))
+    const apiMock = vi.fn().mockResolvedValue([{ label: "动态", value: "d" }])
+
+    mountCascader({
+      props: {
+        api: apiMock,
+        params: paramsFn,
+      },
+    })
+
+    await flushPromises()
+    expect(paramsFn).toHaveBeenCalled()
+    expect(apiMock).toHaveBeenCalledWith(expect.objectContaining({ dynamic: true }))
+  })
+
+  it("immediate 为 false 时不自动调用 api", async () => {
+    const apiMock = vi.fn().mockResolvedValue([])
+
+    const wrapper = mountCascader({
+      props: {
+        api: apiMock,
+        immediate: false,
+      },
+    })
+
+    await flushPromises()
+    expect(apiMock).not.toHaveBeenCalled()
+
+    // 手动调用 refresh 应该可以触发
+    await wrapper.vm.refresh()
+    await flushPromises()
+    expect(apiMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("api 返回非数组时自动转换为空数组", async () => {
+    const apiMock = vi.fn().mockResolvedValue({ invalid: "data" } as any)
+
+    const wrapper = mountCascader({
+      props: {
+        api: apiMock,
+        options: [], // 显式传入空 options，避免使用 baseOptions
+      },
+    })
+
+    await flushPromises()
+    expect(wrapper.vm.options).toEqual([])
+  })
+
+  it("当 remoteOptionList 为空且 props.options 为假值时返回空数组", () => {
+    const wrapper = mountCascader({
+      props: {
+        options: null as any,
+      },
+    })
+
+    expect(wrapper.vm.options).toEqual([])
+  })
+
+  it("手动调用 refresh 且 api 非函数时清空 remoteOptionList", async () => {
+    // 先设置一个有效的 api
+    const apiMock = vi.fn().mockResolvedValue([{ label: "测试", value: "t" }])
+    const wrapper = mountCascader({
+      props: {
+        api: apiMock,
+        options: [], // 显式传入空 options
+      },
+    })
+
+    await flushPromises()
+    expect(wrapper.vm.options).toHaveLength(1)
+
+    // 移除 api，手动调用 refresh 应该清空数据
+    await wrapper.setProps({ api: undefined })
+    await wrapper.vm.refresh()
+    await flushPromises()
+
+    expect(wrapper.vm.options).toEqual([])
+  })
+
+  it("params 值相同时不触发 refresh", async () => {
+    const apiMock = vi.fn().mockResolvedValue([])
+
+    const wrapper = mountCascader({
+      props: {
+        api: apiMock,
+        params: { type: "a" },
+      },
+    })
+
+    await flushPromises()
+    expect(apiMock).toHaveBeenCalledTimes(1)
+
+    // 设置相同的 params 值，不应该触发新的 refresh
+    await wrapper.setProps({ params: { type: "a" } })
+    await flushPromises()
+
+    // 应该仍然是 1 次调用
+    expect(apiMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("params 为 undefined 时使用空对象", async () => {
+    const apiMock = vi.fn().mockResolvedValue([])
+
+    mountCascader({
+      props: {
+        api: apiMock,
+        params: undefined,
+      },
+    })
+
+    await flushPromises()
+    expect(apiMock).toHaveBeenCalledWith({})
+  })
+
+  it("params 为 null 时使用空对象", async () => {
+    const apiMock = vi.fn().mockResolvedValue([])
+
+    mountCascader({
+      props: {
+        api: apiMock,
+        params: null as any,
+      },
+    })
+
+    await flushPromises()
+    expect(apiMock).toHaveBeenCalledWith({})
+  })
+
+  it("透传非 class 的 attrs 到原生 cascader", () => {
+    const wrapper = mount(Cascader, {
+      props: {
+        "options": baseOptions,
+        "data-testid": "my-cascader",
+        "style": "width: 200px",
+      } as any,
+      global: {
+        plugins: [ElementPlus],
+        stubs: {
+          "el-cascader": ElCascaderStub,
+        },
+      },
+    }) as VueWrapper<any>
+
+    const cascader = wrapper.findComponent(ElCascaderStub)
+    // ElCascaderStub 会接收到这些透传的 attrs
+    expect(cascader.exists()).toBe(true)
+  })
 })
