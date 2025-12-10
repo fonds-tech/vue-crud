@@ -273,7 +273,7 @@ describe("fd-form normalizeItems", () => {
 
   function createMockHelpers(model: Record<string, unknown> = {}) {
     return {
-      propKey: (prop?: string | string[]) => (Array.isArray(prop) ? prop.join(".") : prop ?? ""),
+      propKey: (prop?: string | string[]) => (Array.isArray(prop) ? prop.join(".") : (prop ?? "")),
       getModelValue: (prop?: string | string[]) => {
         const key = Array.isArray(prop) ? prop.join(".") : prop
         return key ? model[key] : undefined
@@ -300,9 +300,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } }],
       group: {},
       form: {},
     }
@@ -319,9 +317,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "name", value: "默认名称", component: { is: "el-input" } }],
       group: {},
       form: {},
     }
@@ -338,9 +334,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "tags", hook: "split", component: { is: "el-select" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "tags", hook: "split", component: { is: "el-select" } }],
       group: {},
       form: {},
     }
@@ -358,9 +352,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } }],
       group: {},
       form: {},
     }
@@ -472,9 +464,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "name", label: "姓名", required: true, component: { is: "el-input" } }],
       group: {},
       form: {},
     }
@@ -507,9 +497,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "code", label: "编码", required: true, component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "code", label: "编码", required: true, component: { is: "el-input" } }],
       group: {},
       form: {},
     }
@@ -533,9 +521,7 @@ describe("fd-form normalizeItems", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "value", required: true, component: { is: "el-input" } },
-      ],
+      items: [{ ...baseItemDefaults, prop: "value", required: true, component: { is: "el-input" } }],
       group: {},
       form: {},
     }

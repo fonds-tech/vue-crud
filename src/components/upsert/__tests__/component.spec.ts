@@ -227,6 +227,18 @@ describe("useComponentHelper", () => {
 
       expect(helper.componentOf(cfg as any)).toBe("el-input")
     })
+
+    it("配置对象不含 is 属性时返回 undefined", () => {
+      const helper = useComponentHelper({
+        mode: ref("add"),
+        formModel: computed(() => ({})),
+        loading: ref(false),
+      })
+      // 这是一个对象但不是组件配置（没有 is 属性）
+      const invalidCfg = { props: { label: "test" } }
+
+      expect(helper.componentOf(invalidCfg as any)).toBeUndefined()
+    })
   })
 
   describe("slotNameOf 边界情况", () => {

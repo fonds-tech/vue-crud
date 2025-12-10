@@ -383,4 +383,119 @@ describe("createUpsertService", () => {
       expect(() => service.handlePrev()).not.toThrow()
     })
   })
+
+  describe("requestDetail 错误处理", () => {
+    it("detail API 返回 null 时使用空对象处理", async () => {
+      mockCrud = createMockCrud({
+        service: {
+          detail: vi.fn().mockResolvedValue(null),
+        } as any,
+      })
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await service.update({ id: 1 })
+
+      // 验证 applyForm 被调用时使用了空对象
+      expect(mockBuilder.applyForm).toHaveBeenCalledWith({})
+    })
+
+    it("detail API 抛出带 message 的错误对象时显示该消息", async () => {
+      const { ElMessage } = await import("element-plus")
+      const customError = new Error("自定义错误消息")
+      mockCrud = createMockCrud({
+        service: {
+          detail: vi.fn().mockRejectedValue(customError),
+        } as any,
+      })
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await expect(service.update({ id: 1 })).rejects.toThrow("自定义错误消息")
+      expect(ElMessage.error).toHaveBeenCalledWith("自定义错误消息")
+    })
+
+    it("detail API 抛出不带 message 的错误时使用默认消息", async () => {
+      const { ElMessage } = await import("element-plus")
+      const plainError = { code: 500 } // 没有 message 属性的对象
+      mockCrud = createMockCrud({
+        service: {
+          detail: vi.fn().mockRejectedValue(plainError),
+        } as any,
+      })
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await expect(service.update({ id: 1 })).rejects.toEqual(plainError)
+      expect(ElMessage.error).toHaveBeenCalledWith("详情查询失败")
+    })
+
+    it("detail API 抛出带非字符串 message 的错误时使用默认消息", async () => {
+      const { ElMessage } = await import("element-plus")
+      const weirdError = { message: 123 } // message 不是字符串
+      mockCrud = createMockCrud({
+        service: {
+          detail: vi.fn().mockRejectedValue(weirdError),
+        } as any,
+      })
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await expect(service.update({ id: 1 })).rejects.toEqual(weirdError)
+      expect(ElMessage.error).toHaveBeenCalledWith("详情查询失败")
+    })
+  })
+
+  describe("submit 错误处理", () => {
+    it("api 调用失败后正确恢复 loading 状态", async () => {
+      const apiError = new Error("网络错误")
+      mockCrud = createMockCrud({
+        service: {
+          add: vi.fn().mockRejectedValue(apiError),
+        } as any,
+      })
+      mockState.formRef.value = {
+        submit: vi.fn().mockResolvedValue({ values: { name: "数据" }, errors: null }),
+      } as any
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await expect(service.submit()).rejects.toThrow("网络错误")
+      expect(mockState.loading.value).toBe(false)
+    })
+
+    it("update 模式调用 update API 失败后恢复 loading", async () => {
+      const apiError = new Error("更新失败")
+      mockCrud = createMockCrud({
+        service: {
+          update: vi.fn().mockRejectedValue(apiError),
+        } as any,
+      })
+      mockState.mode.value = "update"
+      mockState.formRef.value = {
+        submit: vi.fn().mockResolvedValue({ values: { id: 1 }, errors: null }),
+      } as any
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await expect(service.submit()).rejects.toThrow("更新失败")
+      expect(mockState.loading.value).toBe(false)
+    })
+
+    it("submit 结果无 values 时使用空对象", async () => {
+      mockState.formRef.value = {
+        submit: vi.fn().mockResolvedValue({}), // 无 values 属性
+      } as any
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await service.submit()
+
+      expect(mockCrud.service?.add).toHaveBeenCalledWith({})
+    })
+
+    it("submit 结果为 null 时使用空对象", async () => {
+      mockState.formRef.value = {
+        submit: vi.fn().mockResolvedValue(null),
+      } as any
+      const service = createUpsertService({ crud: mockCrud, state: mockState, builder: mockBuilder })
+
+      await service.submit()
+
+      expect(mockCrud.service?.add).toHaveBeenCalledWith({})
+    })
+  })
 })

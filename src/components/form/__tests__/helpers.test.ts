@@ -231,9 +231,7 @@ describe("fd-form helpers", () => {
       key: 0,
       mode: "add",
       model: {},
-      items: [
-        { ...baseItemDefaults, prop: "a", component: { is: "el-input" }, group: "g1" },
-      ],
+      items: [{ ...baseItemDefaults, prop: "a", component: { is: "el-input" }, group: "g1" }],
       group: {}, // 非 tabs 模式
       form: {},
     })
@@ -423,10 +421,7 @@ describe("fd-form helpers", () => {
       ...baseItemDefaults,
       prop: "name",
       required: false,
-      rules: [
-        { _inner: true, required: true } as any,
-        { min: 2, message: "最少2字符" },
-      ],
+      rules: [{ _inner: true, required: true } as any, { min: 2, message: "最少2字符" }],
       component: { is: "el-input" },
     }
     const rules = helpers.rules(item) as any[]
