@@ -114,9 +114,11 @@ export function renderTable(params: RenderTableParams): VNode {
     h(
       ElTable,
       {
-        ref: state.tableRef,
-        data: state.tableRows.value,
-        rowKey: state.rowKeyProp.value,
+        "ref": state.tableRef,
+        "data": state.tableRows.value,
+        "rowKey": state.rowKeyProp.value,
+        "element-loading-text": "加载中...",
+        "element-loading-background": "rgba(0, 0, 0, 0.7)",
         ...eventListeners,
         ...state.elTableProps.value,
       },
