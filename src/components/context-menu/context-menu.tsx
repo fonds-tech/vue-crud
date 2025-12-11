@@ -1,5 +1,5 @@
 import type { PropType } from "vue"
-import type { ContextMenuExpose, ContextMenuOptions } from "./types"
+import type { ContextMenuExpose, ContextMenuControl, ContextMenuOptions } from "./types"
 import { renderList } from "./render/menu"
 import { useContextMenuCore } from "./core"
 import { h, render, defineComponent } from "vue"
@@ -20,14 +20,27 @@ export const ContextMenu = defineComponent({
     options: { type: Object as PropType<ContextMenuOptions>, default: () => ({}) },
   },
   setup(props, { slots, expose }) {
-    const { setRefs, list, ids, style, visible, animationClass, extraClass, open, close, toggleItem } = useContextMenuCore(props)
+    const {
+      setRefs,
+      list,
+      ids,
+      style,
+      visible,
+      animationClass,
+      extraClass,
+      open,
+      close,
+      handleItemClick,
+    } = useContextMenuCore(props)
 
-    expose({ open, close })
+    expose({ open, close } satisfies ContextMenuExpose)
 
     return () => {
       if (!visible.value) return null
 
-      const content = slots.default ? slots.default() : renderList(list.value, "0", 1, ids, toggleItem, close)
+      const content = slots.default
+        ? slots.default()
+        : renderList(list.value, "0", 1, ids, handleItemClick, close)
 
       return (
         <div
@@ -51,12 +64,13 @@ export const ContextMenu = defineComponent({
 export const contextMenu = {
   /**
    * 动态创建并打开 Context Menu
-   * @param event 触发菜单的鼠标事件
-   * @param options 菜单配置选项
-   * @returns 包含关闭方法的对象
+   * @param event - 触发菜单的鼠标事件
+   * @param options - 菜单配置选项
+   * @returns 包含关闭方法的控制对象
    */
-  open(event: MouseEvent, options: ContextMenuOptions = {}) {
-    const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
+  open(event: MouseEvent, options: ContextMenuOptions = {}): ContextMenuControl {
+    const targetElement = event.target as HTMLElement | null
+    const doc = options.document ?? targetElement?.ownerDocument ?? document
     const host = doc.createElement("div")
     doc.body.appendChild(host)
 
@@ -70,18 +84,28 @@ export const contextMenu = {
 
     const exposed = vnode.component?.exposed as ContextMenuExpose | undefined
 
-    if (exposed) {
-      const originalClose = exposed.close
-      exposed.close = () => {
-        originalClose()
-        setTimeout(() => {
-          render(null, host)
-          host.remove()
-        }, 180)
-      }
+    const cleanup = (): void => {
+      setTimeout(() => {
+        render(null, host)
+        host.remove()
+      }, 180)
     }
 
-    return exposed ?? { close: () => render(null, host) }
+    if (exposed) {
+      const originalClose = exposed.close
+      const wrappedClose = (): void => {
+        originalClose()
+        cleanup()
+      }
+      return { close: wrappedClose }
+    }
+
+    return {
+      close: () => {
+        render(null, host)
+        host.remove()
+      },
+    }
   },
 }
 

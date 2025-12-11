@@ -1,23 +1,48 @@
-import type { ContextMenuItem, ContextMenuOptions } from "../types"
+import type { InternalMenuItem } from "./helpers"
+import type { ContextMenuControl, ContextMenuOptions } from "../types"
 import { useRefs } from "@/hooks"
 import { ref, watch, nextTick, reactive, onBeforeUnmount } from "vue"
-import { markTarget, positionMenu, normalizeList, registerOutsideClose, removeHoverHighlight } from "./helpers"
+import {
+  markTarget,
+  positionMenu,
+  normalizeList,
+  registerEscapeClose,
+  registerOutsideClose,
+  removeHoverHighlight,
+} from "./helpers"
+
+/**
+ * 菜单位置样式接口
+ */
+interface MenuPositionStyle {
+  top: string
+  left: string
+}
+
+/**
+ * Context Menu 核心 Props 接口
+ */
+interface ContextMenuCoreProps {
+  /** 控制菜单显示状态 */
+  show: boolean
+  /** 触发菜单的鼠标事件 */
+  event?: MouseEvent
+  /** 菜单配置选项 */
+  options?: ContextMenuOptions
+}
 
 /**
  * Context Menu 核心逻辑组合式函数
  * 管理菜单的状态、事件处理、定位和生命周期
  *
- * @param props 组件的 props
- * @param props.show 控制菜单显示状态
- * @param props.event 触发菜单的鼠标事件
- * @param props.options 菜单配置选项
+ * @param props - 组件的 props
  * @returns 包含组件状态和方法的对象
  */
-export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, options?: ContextMenuOptions }) {
+export function useContextMenuCore(props: ContextMenuCoreProps) {
   const { refs, setRefs } = useRefs<HTMLDivElement>()
-  const list = ref<ContextMenuItem[]>(normalizeList(props.options?.list))
+  const list = ref<InternalMenuItem[]>(normalizeList(props.options?.list))
   const ids = ref<Set<string>>(new Set())
-  const style = reactive({ top: "0px", left: "0px" })
+  const style = reactive<MenuPositionStyle>({ top: "0px", left: "0px" })
   const visible = ref(false)
   const animationClass = ref("is-enter")
   const extraClass = ref<string | undefined>(props.options?.class)
@@ -31,23 +56,24 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
   /**
    * 执行所有清理函数
    */
-  function cleanup() {
+  function cleanup(): void {
     cleanupFns.splice(0).forEach(fn => fn())
   }
 
   /**
    * 移除高亮样式
    */
-  function _removeHoverHighlight() {
+  function removeHighlight(): void {
     removeHoverHighlight(hoverTarget, hoverClassName)
   }
 
   /**
    * 打开菜单
-   * @param event 触发事件
-   * @param options 配置选项
+   * @param event - 触发事件
+   * @param options - 配置选项
+   * @returns 菜单控制对象
    */
-  function open(event: MouseEvent, options: ContextMenuOptions = {}) {
+  function open(event: MouseEvent, options: ContextMenuOptions = {}): ContextMenuControl {
     if (!event) return { close }
 
     event.preventDefault?.()
@@ -64,11 +90,12 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
     visible.value = true
     ids.value = new Set()
 
-    if (options.list?.length) {
+    if (options.list && options.list.length > 0) {
       list.value = normalizeList(options.list)
     }
 
-    const doc = options.document ?? (event.target as HTMLElement | null)?.ownerDocument ?? document
+    const targetElement = event.target as HTMLElement | null
+    const doc = options.document ?? targetElement?.ownerDocument ?? document
 
     nextTick(() => {
       if (!visible.value) return
@@ -77,6 +104,7 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
 
       cleanup()
       registerOutsideClose(doc, menuElement, close, cleanupFns)
+      registerEscapeClose(doc, close, cleanupFns)
       markTarget(event, options.hover ?? props.options?.hover, hoverTarget, hoverClassName)
       positionMenu(event, menuElement, style)
     })
@@ -86,10 +114,10 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
 
   /**
    * 关闭菜单
-   * @param immediate 是否立即关闭（无动画）
+   * @param immediate - 是否立即关闭（无动画）
    */
-  function close(immediate = false) {
-    _removeHoverHighlight()
+  function close(immediate = false): void {
+    removeHighlight()
     cleanup()
     if (!visible.value) return
 
@@ -108,27 +136,37 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
   }
 
   /**
-   * 切换菜单项的展开/收起状态，或执行点击回调
-   * @param item 菜单项数据
-   * @param id 菜单项唯一标识
+   * 切换菜单项的子菜单展开状态
+   * @param item - 菜单项
    */
-  function toggleItem(item: ContextMenuItem, id: string) {
-    ids.value = new Set([id])
-    if (item.disabled) return
+  function toggleShowChildren(item: InternalMenuItem): void {
+    item._showChildren = !item._showChildren
+  }
 
-    if (item.callback) {
-      item.callback(() => close())
-      // 如果设置了 autoClose，执行 callback 后自动关闭菜单
-      if (item.autoClose) {
-        close()
-      }
+  /**
+   * 处理菜单项点击
+   * @param item - 菜单项数据
+   * @param id - 菜单项唯一标识
+   */
+  function handleItemClick(item: InternalMenuItem, id: string): void {
+    ids.value = new Set([id])
+
+    // 禁用项或分隔线不响应点击
+    if (item.disabled || item.type === "divider") return
+
+    // 执行点击回调
+    if (item.onClick) {
+      item.onClick()
+    }
+
+    // 有子菜单时切换展开状态
+    if (item.children && item.children.length > 0) {
+      toggleShowChildren(item)
       return
     }
 
-    if (item.children?.length) {
-      item.showChildren = !item.showChildren
-    }
-    else {
+    // 默认自动关闭，除非设置了 keepOpen
+    if (!item.keepOpen) {
       close()
     }
   }
@@ -171,7 +209,7 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
       closeTimer = null
     }
     cleanup()
-    _removeHoverHighlight()
+    removeHighlight()
   })
 
   return {
@@ -195,7 +233,7 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
     open,
     /** 关闭菜单方法 */
     close,
-    /** 切换菜单项方法 */
-    toggleItem,
+    /** 处理菜单项点击 */
+    handleItemClick,
   }
 }

@@ -228,7 +228,7 @@ describe("createTableHandlers", () => {
       expect(mockOpen).not.toHaveBeenCalled()
     })
 
-    it("菜单项应包含 callback 字段", () => {
+    it("菜单项应包含 onClick 字段", () => {
       const row: TableRecord = { id: 1, name: "张三" }
       const column = { prop: "name" } as any
       const event = new MouseEvent("contextmenu")
@@ -237,8 +237,8 @@ describe("createTableHandlers", () => {
       handlers.onCellContextmenu(row, column, event)
 
       const callArgs = mockOpen.mock.calls[0]
-      expect(callArgs[1].list[0]).toHaveProperty("callback")
-      expect(typeof callArgs[1].list[0].callback).toBe("function")
+      expect(callArgs[1].list[0]).toHaveProperty("onClick")
+      expect(typeof callArgs[1].list[0].onClick).toBe("function")
     })
   })
 })

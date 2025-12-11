@@ -111,12 +111,11 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
     const rowIndex = state.tableRows.value.findIndex(item => item === row)
     const scope: TableScope<TableRecord> = { row, column, $index: rowIndex >= 0 ? rowIndex : 0 }
 
-    // 构建菜单项，将 action 转换为 callback，使用 autoClose 自动关闭菜单
+    // 构建菜单项，使用 onClick 回调（点击后默认自动关闭）
     const items = buildContextMenuItems(scope, state.tableOptions.columns, crudBridge, refresh)
     const menuList: ContextMenuItem[] = items.map(item => ({
       label: item.label,
-      callback: () => item.action(),
-      autoClose: true,
+      onClick: () => item.action(),
     }))
 
     // 使用 contextMenu 组件打开菜单

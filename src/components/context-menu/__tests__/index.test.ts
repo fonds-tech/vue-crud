@@ -110,12 +110,12 @@ describe("contextMenu", () => {
     wrapper.unmount()
   })
 
-  it("回调项可触发关闭", async () => {
+  it("回调项点击后自动关闭", async () => {
     vi.useFakeTimers()
-    const callback = vi.fn((close: () => void) => close())
+    const onClick = vi.fn()
     const wrapper = mount(ContextMenu, {
       props: {
-        options: { list: [{ label: "回调", callback }] },
+        options: { list: [{ label: "回调", onClick }] },
       },
     })
     const event = createEvent()
@@ -123,7 +123,7 @@ describe("contextMenu", () => {
     await nextTick()
 
     await wrapper.find(".fd-context-menu__item span").trigger("click")
-    expect(callback).toHaveBeenCalled()
+    expect(onClick).toHaveBeenCalled()
     vi.runAllTimers()
     await nextTick()
     expect(wrapper.find(".fd-context-menu").exists()).toBe(false)
@@ -188,11 +188,11 @@ describe("contextMenu.open", () => {
 
 describe("contextMenu 边缘情况", () => {
   it("禁用项点击无响应", async () => {
-    const callback = vi.fn()
+    const onClick = vi.fn()
     const wrapper = mount(ContextMenu, {
       props: {
         options: {
-          list: [{ label: "禁用项", disabled: true, callback }],
+          list: [{ label: "禁用项", disabled: true, onClick }],
         },
       },
     })
@@ -203,7 +203,7 @@ describe("contextMenu 边缘情况", () => {
     const item = wrapper.find(".fd-context-menu__item")
     expect(item.classes()).toContain("is-disabled")
     await item.trigger("click")
-    expect(callback).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
@@ -227,10 +227,10 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("按 Enter 键触发项目", async () => {
-    const callback = vi.fn()
+    const onClick = vi.fn()
     const wrapper = mount(ContextMenu, {
       props: {
-        options: { list: [{ label: "回调", callback }] },
+        options: { list: [{ label: "回调", onClick }] },
       },
     })
     const event = createEvent()
@@ -238,7 +238,7 @@ describe("contextMenu 边缘情况", () => {
     await nextTick()
 
     await wrapper.find(".fd-context-menu__item").trigger("keydown", { key: "Enter" })
-    expect(callback).toHaveBeenCalled()
+    expect(onClick).toHaveBeenCalled()
     wrapper.unmount()
   })
 
@@ -269,10 +269,10 @@ describe("contextMenu 边缘情况", () => {
   })
 
   it("按空格键触发项目", async () => {
-    const callback = vi.fn()
+    const onClick = vi.fn()
     const wrapper = mount(ContextMenu, {
       props: {
-        options: { list: [{ label: "回调", callback }] },
+        options: { list: [{ label: "回调", onClick }] },
       },
     })
     const event = createEvent()
@@ -280,15 +280,15 @@ describe("contextMenu 边缘情况", () => {
     await nextTick()
 
     await wrapper.find(".fd-context-menu__item").trigger("keydown", { key: " " })
-    expect(callback).toHaveBeenCalled()
+    expect(onClick).toHaveBeenCalled()
     wrapper.unmount()
   })
 
   it("禁用项按键时不会触发回调", async () => {
-    const callback = vi.fn()
+    const onClick = vi.fn()
     const wrapper = mount(ContextMenu, {
       props: {
-        options: { list: [{ label: "禁用", disabled: true, callback }] },
+        options: { list: [{ label: "禁用", disabled: true, onClick }] },
       },
     })
     const event = createEvent()
@@ -296,7 +296,7 @@ describe("contextMenu 边缘情况", () => {
     await nextTick()
 
     await wrapper.find(".fd-context-menu__item").trigger("keydown", { key: "Enter" })
-    expect(callback).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
@@ -578,12 +578,12 @@ describe("contextMenu 边缘情况", () => {
 })
 
 describe("helpers", () => {
-  it("normalizeList 会深拷贝并重置 showChildren", () => {
-    const list = [{ label: "父", showChildren: true, children: [{ label: "子", showChildren: true }] }]
-    const normalized = normalizeList(list as any)
+  it("normalizeList 会深拷贝并重置 _showChildren", () => {
+    const list = [{ label: "父", children: [{ label: "子" }] }]
+    const normalized = normalizeList(list)
     expect(normalized).not.toBe(list)
-    expect(normalized[0].showChildren).toBe(false)
-    expect(normalized[0].children?.[0].showChildren).toBe(false)
+    expect(normalized[0]._showChildren).toBe(false)
+    expect(normalized[0].children?.[0]._showChildren).toBe(false)
   })
 
   it("normalizeList 在未传值时返回空数组", () => {
@@ -776,12 +776,12 @@ describe("core", () => {
     vi.useRealTimers()
   })
 
-  it("toggleItem 针对禁用项时提前返回", async () => {
+  it("handleItemClick 针对禁用项时提前返回", async () => {
     const wrapper = mount(CoreTester, { props: { options: { list: [{ label: "禁用", disabled: true }] } } })
     const core = wrapper.vm as any
     await nextTick()
     const item = { label: "禁用", disabled: true }
-    expect(() => core.toggleItem(item, "0-0")).not.toThrow()
+    expect(() => core.handleItemClick(item, "0-0")).not.toThrow()
     wrapper.unmount()
   })
 })

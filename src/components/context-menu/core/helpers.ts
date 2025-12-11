@@ -4,31 +4,54 @@ import { nextTick } from "vue"
 import { cloneDeep } from "lodash-es"
 
 /**
- * 规范化菜单项列表，确保每个项都有 showChildren 属性
- * @param list 原始菜单项列表
- * @returns 规范化后的菜单项列表
+ * 内部使用的菜单项状态接口
+ * 扩展了 ContextMenuItem，添加了内部状态字段
  */
-export function normalizeList(list?: ContextMenuItem[]): ContextMenuItem[] {
-  const data = cloneDeep(list ?? [])
-  const traverse = (items: ContextMenuItem[]) => {
-    items.forEach((item) => {
-      item.showChildren = false
-      if (item.children?.length) {
+export interface InternalMenuItem extends ContextMenuItem {
+  /**
+   * 内部状态：是否显示子菜单
+   * 仅用于内部管理，不暴露给外部
+   */
+  _showChildren?: boolean
+
+  /**
+   * 子菜单列表（递归类型）
+   */
+  children?: InternalMenuItem[]
+}
+
+/**
+ * 规范化菜单项列表，确保每个项都有正确的内部状态
+ * @param list - 原始菜单项列表
+ * @returns 规范化后的内部菜单项列表
+ */
+export function normalizeList(list?: ContextMenuItem[]): InternalMenuItem[] {
+  if (!list || list.length === 0) return []
+
+  const data = cloneDeep(list) as InternalMenuItem[]
+
+  const traverse = (items: InternalMenuItem[]): void => {
+    for (const item of items) {
+      item._showChildren = false
+      if (item.children && item.children.length > 0) {
         traverse(item.children)
       }
-    })
+    }
   }
+
   traverse(data)
   return data
 }
 
 /**
  * 移除目标元素的悬浮高亮
- * @param hoverTarget 高亮目标元素的 ref 对象
- *
- * @param hoverClassName 高亮类名的 ref 对象
+ * @param hoverTarget - 高亮目标元素的 ref 对象
+ * @param hoverClassName - 高亮类名的 ref 对象
  */
-export function removeHoverHighlight(hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>) {
+export function removeHoverHighlight(
+  hoverTarget: Ref<HTMLElement | null>,
+  hoverClassName: Ref<string>,
+): void {
   if (hoverTarget.value) {
     hoverTarget.value.classList?.remove(hoverClassName.value)
     hoverTarget.value = null
@@ -37,12 +60,17 @@ export function removeHoverHighlight(hoverTarget: Ref<HTMLElement | null>, hover
 
 /**
  * 标记触发菜单的目标元素，添加高亮样式
- * @param event 鼠标事件
- * @param hoverOptions 悬浮配置选项
- * @param hoverTarget 高亮目标元素的 ref 对象
- * @param hoverClassName 高亮类名的 ref 对象
+ * @param event - 鼠标事件
+ * @param hoverOptions - 悬浮配置选项
+ * @param hoverTarget - 高亮目标元素的 ref 对象
+ * @param hoverClassName - 高亮类名的 ref 对象
  */
-export function markTarget(event: MouseEvent, hoverOptions: ContextMenuOptions["hover"] | undefined, hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>) {
+export function markTarget(
+  event: MouseEvent,
+  hoverOptions: ContextMenuOptions["hover"] | undefined,
+  hoverTarget: Ref<HTMLElement | null>,
+  hoverClassName: Ref<string>,
+): void {
   removeHoverHighlight(hoverTarget, hoverClassName)
   if (!hoverOptions) return
 
@@ -66,18 +94,29 @@ export function markTarget(event: MouseEvent, hoverOptions: ContextMenuOptions["
 }
 
 /**
- * 计算并设置菜单的显示位置，确保不超出可视区域
- * @param event 鼠标事件，用于获取点击坐标
- * @param menuElement 菜单 DOM 元素
- * @param style 样式对象引用，用于更新 top/left
- * @param style.top 顶部位置
- * @param style.left 左侧位置
+ * 菜单定位样式接口
  */
-export async function positionMenu(event: MouseEvent, menuElement: HTMLElement | null | undefined, style: { top: string, left: string }) {
+interface MenuPositionStyle {
+  top: string
+  left: string
+}
+
+/**
+ * 计算并设置菜单的显示位置，确保不超出可视区域
+ * @param event - 鼠标事件，用于获取点击坐标
+ * @param menuElement - 菜单 DOM 元素
+ * @param style - 样式对象引用，用于更新 top/left
+ */
+export async function positionMenu(
+  event: MouseEvent,
+  menuElement: HTMLElement | null | undefined,
+  style: MenuPositionStyle,
+): Promise<void> {
   await nextTick()
   if (!menuElement) return
 
-  const doc = (event.target as HTMLElement | null)?.ownerDocument ?? document
+  const targetElement = event.target as HTMLElement | null
+  const doc = targetElement?.ownerDocument ?? document
   const html = doc.documentElement
   const maxHeight = html.clientHeight
   const maxWidth = html.clientWidth
@@ -100,17 +139,42 @@ export async function positionMenu(event: MouseEvent, menuElement: HTMLElement |
 
 /**
  * 注册点击外部关闭菜单的事件监听
- * @param doc Document 对象
- * @param menuElement 菜单 DOM 元素
- * @param close 关闭回调函数
- * @param cleanupFns 清理函数数组
+ * @param doc - Document 对象
+ * @param menuElement - 菜单 DOM 元素
+ * @param close - 关闭回调函数
+ * @param cleanupFns - 清理函数数组
  */
-export function registerOutsideClose(doc: Document, menuElement: HTMLElement | null | undefined, close: () => void, cleanupFns: Array<() => void>) {
-  const handler = (event: MouseEvent) => {
+export function registerOutsideClose(
+  doc: Document,
+  menuElement: HTMLElement | null | undefined,
+  close: () => void,
+  cleanupFns: Array<() => void>,
+): void {
+  const handler = (event: MouseEvent): void => {
     const target = event.target as Node | null
     if (!menuElement || menuElement === target || menuElement.contains(target)) return
     close()
   }
   doc.addEventListener("mousedown", handler)
   cleanupFns.push(() => doc.removeEventListener("mousedown", handler))
+}
+
+/**
+ * 注册 ESC 键关闭菜单的事件监听
+ * @param doc - Document 对象
+ * @param close - 关闭回调函数
+ * @param cleanupFns - 清理函数数组
+ */
+export function registerEscapeClose(
+  doc: Document,
+  close: () => void,
+  cleanupFns: Array<() => void>,
+): void {
+  const handler = (event: KeyboardEvent): void => {
+    if (event.key === "Escape") {
+      close()
+    }
+  }
+  doc.addEventListener("keydown", handler)
+  cleanupFns.push(() => doc.removeEventListener("keydown", handler))
 }
