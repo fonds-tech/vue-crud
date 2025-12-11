@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { SearchLifecycleParams } from "../interface"
-import { onMounted, onBeforeUnmount } from "vue"
+import { onMounted, onBeforeUnmount, getCurrentInstance } from "vue"
 
 /**
  * 注册事件监听
@@ -37,18 +37,27 @@ export function useSearchLifecycle(params: SearchLifecycleParams) {
   const { viewportWidth } = params
 
   const resizeHandler = () => handleResize(viewportWidth)
+  const instance = getCurrentInstance()
 
-  onMounted(() => {
+  const register = () => {
     registerEvents(params)
     if (typeof window !== "undefined") {
       window.addEventListener("resize", resizeHandler)
     }
-  })
+  }
 
-  onBeforeUnmount(() => {
+  const unregister = () => {
     unregisterEvents(params)
     if (typeof window !== "undefined") {
       window.removeEventListener("resize", resizeHandler)
     }
-  })
+  }
+
+  if (!instance) {
+    register()
+    return unregister
+  }
+
+  onMounted(register)
+  onBeforeUnmount(unregister)
 }

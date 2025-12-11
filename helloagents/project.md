@@ -22,4 +22,5 @@
 
 ## 测试与流程
 - **测试:** `pnpm test` 运行全量单测并输出覆盖率
+- **Stub 约定:** 测试用 Element Plus stub 应提供根元素并声明常用 props/emit，避免 extraneous attrs/未声明事件警告；调用生命周期相关 Composable 时若无组件实例需添加安全降级
 - **提交:** 遵循 Conventional Commits，确保同时更新知识库

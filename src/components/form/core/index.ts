@@ -8,8 +8,8 @@ import { useFormApi } from "./methods"
 import { createHelpers } from "./helpers"
 import { normalizeItems } from "./filters"
 import { clone, isFunction } from "@fonds/utils"
-import { ref, useId, watch, computed, reactive } from "vue"
 import { mergeFormOptions, createInitialOptions } from "./options"
+import { ref, useId, watch, computed, reactive, getCurrentInstance } from "vue"
 
 export interface FormCore {
   id: string
@@ -36,7 +36,8 @@ export { createHelpers } from "./helpers"
  * @returns 表单引擎实例，包含状态、动作、方法及辅助工具
  */
 export function useFormCore(): FormCore {
-  const id = typeof useId === "function" ? useId() : `fd-form-${Math.random().toString(36).slice(2)}`
+  const hasInstance = !!getCurrentInstance()
+  const id = typeof useId === "function" && hasInstance ? useId() : `fd-form-${Math.random().toString(36).slice(2)}`
   const formRef = ref<FormInstance>()
 
   const options = reactive<FormOptions>(createInitialOptions())

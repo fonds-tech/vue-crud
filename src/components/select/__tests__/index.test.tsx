@@ -103,7 +103,7 @@ describe("select", () => {
   })
 
   it("api 非函数时不执行刷新", async () => {
-    const wrapper = mountSelect({ props: { api: "not-a-function", options: [] } })
+    const wrapper = mountSelect({ props: { api: null, options: [] } })
     await flushPromises()
     expect(wrapper.vm.options).toEqual([])
   })

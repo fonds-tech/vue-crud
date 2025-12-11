@@ -25,8 +25,19 @@ const ElTableStub = defineComponent({
 
 const ElTableColumnStub = defineComponent({
   name: "ElTableColumnStub",
-  setup(_, { slots }) {
-    return () => slots.default?.({ row: {}, column: {}, $index: 0 })
+  inheritAttrs: false,
+  props: {
+    prop: { type: [String, Number], default: undefined },
+    align: { type: String, default: undefined },
+    minWidth: { type: [String, Number], default: undefined },
+    id: { type: [String, Number], default: undefined },
+    label: { type: String, default: undefined },
+    fixed: { type: [String, Boolean], default: undefined },
+    width: { type: [String, Number], default: undefined },
+    type: { type: String, default: undefined },
+  },
+  setup(props, { slots, attrs }) {
+    return () => h("div", { class: "el-table-column-stub", ...attrs }, slots.default?.({ row: {}, column: props, $index: 0 }))
   },
 })
 
@@ -45,10 +56,14 @@ const ElButtonStub = defineComponent({
 
 const ElTooltipStub = defineComponent({
   name: "ElTooltipStub",
-  setup:
-    (_, { slots }) =>
-      () =>
-        slots.default?.(),
+  inheritAttrs: false,
+  props: {
+    content: { type: [String, Number], default: "" },
+    placement: { type: String, default: "top" },
+    trigger: { type: [String, Array], default: "hover" },
+  },
+  emits: ["beforeShow", "beforeHide", "show", "hide"],
+  setup: (_, { slots, attrs }) => () => h("div", { class: "el-tooltip-stub", ...attrs }, slots.default?.()),
 })
 
 const ElDropdownStub = defineComponent({
@@ -57,6 +72,18 @@ const ElDropdownStub = defineComponent({
     (_, { slots }) =>
       () =>
         h("div", { class: "el-dropdown-stub" }, slots.default?.()),
+})
+
+const ElPopoverStub = defineComponent({
+  name: "ElPopoverStub",
+  inheritAttrs: false,
+  props: {
+    content: { type: [String, Number], default: "" },
+    placement: { type: String, default: "bottom" },
+    trigger: { type: [String, Array], default: "click" },
+  },
+  emits: ["beforeShow", "beforeHide", "show", "hide"],
+  setup: (_, { slots, attrs }) => () => h("div", { class: "el-popover-stub", ...attrs }, slots.default?.()),
 })
 
 const ElIconStub = defineComponent({
@@ -144,6 +171,7 @@ function mountTable(options: TableMountOptions = {}) {
         "el-pagination": ElPaginationStub,
         "el-button": ElButtonStub,
         "el-tooltip": ElTooltipStub,
+        "el-popover": ElPopoverStub,
         "el-dropdown": ElDropdownStub,
         "el-icon": ElIconStub,
         "el-link": ElLinkStub,

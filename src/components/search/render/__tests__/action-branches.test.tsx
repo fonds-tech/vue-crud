@@ -40,7 +40,7 @@ describe("renderAction 分支补测", () => {
           stubs: {
             "fd-grid-item": { template: "<div class='fd-grid-item'><slot /></div>" },
             "el-button": { template: "<button @click=\"$emit('click')\"><slot /></button>" },
-            "el-icon": { template: "<span><slot /></slot></span>" },
+            "el-icon": { template: "<span><slot /></span>" },
           },
         },
       },
