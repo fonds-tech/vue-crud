@@ -1,12 +1,12 @@
 .fd-context-menu {
   color: var(--el-text-color-primary, #1f2937);
+  width: fit-content;
   border: 1px solid var(--el-border-color-lighter, rgba(15, 23, 42, 0.06));
   padding: 4px;
   z-index: 3000;
   position: fixed;
   font-size: 13px;
   max-width: 280px;
-  min-width: 160px;
   background: var(--el-bg-color-overlay, #ffffff);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -27,7 +27,6 @@
 
 .fd-context-menu__list {
   display: flex;
-  min-width: 140px;
   flex-direction: column;
 
   &.is-append {
