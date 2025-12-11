@@ -124,6 +124,8 @@ export function renderTable(params: RenderTableParams): VNode {
       },
       {
         default: () => renderColumns(state.visibleColumns.value, renderHelpers, slots, crudBridge),
+        // 优化：加载时不显示"暂无数据"，避免与loading遮罩同时出现
+        empty: () => (isLoading.value ? "" : slots.empty?.() ?? "暂无数据"),
         ...extraSlots,
       },
     ),
