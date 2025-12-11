@@ -4,11 +4,11 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
-import Api from "./components/Api.vue"
-import Basic from "./components/Basic.vue"
+import Api from "./components/api.vue"
+import Basic from "./components/basic.vue"
 import Layout from "../layout.vue"
-import Remote from "./components/Remote.vue"
-import Advanced from "./components/Advanced.vue"
+import Remote from "./components/remote.vue"
+import Advanced from "./components/advanced.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {

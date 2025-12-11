@@ -4,8 +4,8 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Basic from "./components/basic.vue"
 import Layout from "../layout.vue"
-import BasicAdd from "./components/BasicAdd.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -13,7 +13,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "基础新增",
     badge: "基础",
     description: "绑定 crud 权限与 rowAdd 调用。",
-    component: BasicAdd,
+    component: Basic,
     tagType: "success",
   },
 ]

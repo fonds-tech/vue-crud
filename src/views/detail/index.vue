@@ -4,12 +4,12 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Grid from "./components/grid.vue"
+import Slot from "./components/slot.vue"
+import Basic from "./components/basic.vue"
 import Layout from "../layout.vue"
-import GridDetail from "./components/GridDetail.vue"
-import SlotDetail from "./components/SlotDetail.vue"
-import BasicDetail from "./components/BasicDetail.vue"
-import DynamicDetail from "./components/DynamicDetail.vue"
-import ComponentDetail from "./components/ComponentDetail.vue"
+import Dynamic from "./components/dynamic.vue"
+import Component from "./components/component.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -17,7 +17,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "基础详情",
     badge: "Basic",
     description: "最简单的两列布局，展示常规字段与 default action。",
-    component: BasicDetail,
+    component: Basic,
     componentName: "BasicDetail",
     tagType: "success",
   },
@@ -26,7 +26,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "分组与插槽",
     badge: "Advanced",
     description: "展示如何使用 Groups 分组、Label/Value 插槽以及自定义 Footer。",
-    component: SlotDetail,
+    component: Slot,
     componentName: "SlotDetail",
     tagType: "warning",
   },
@@ -35,7 +35,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "组件渲染",
     badge: "Feature",
     description: "无需写插槽，通过 component 配置直接渲染 Element Plus 组件（如 Image, Rate）。",
-    component: ComponentDetail,
+    component: Component,
     componentName: "ComponentDetail",
     tagType: "info",
   },
@@ -44,7 +44,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "多列布局",
     badge: "Layout",
     description: "演示 column=3 与 span 属性的配合，实现灵活的栅格布局。",
-    component: GridDetail,
+    component: Grid,
     componentName: "GridDetail",
     tagType: "info",
   },
@@ -53,7 +53,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "异步与动态",
     badge: "Async",
     description: "模拟异步加载数据 (onDetail)，并根据数据动态控制字段显隐。",
-    component: DynamicDetail,
+    component: Dynamic,
     componentName: "DynamicDetail",
     tagType: "danger",
   },

@@ -4,11 +4,11 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
-import Basic from "./components/Basic.vue"
+import Basic from "./components/basic.vue"
+import Steps from "./components/steps.vue"
 import Layout from "../layout.vue"
-import StepsUpsert from "./components/StepsUpsert.vue"
-import ConfirmUpsert from "./components/ConfirmUpsert.vue"
-import DetailPrefill from "./components/DetailPrefill.vue"
+import Confirm from "./components/confirm.vue"
+import Prefill from "./components/prefill.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -24,7 +24,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "多步骤流程",
     badge: "进阶",
     description: "steps 组件引导 + 自定义上/下步按钮，提交前可分步校验。",
-    component: StepsUpsert,
+    component: Steps,
     tagType: "warning",
   },
   {
@@ -32,7 +32,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "详情预填与只读字段",
     badge: "进阶",
     description: "onDetail 自定义预填，账号字段编辑态只读，配合 setProps 控制。",
-    component: DetailPrefill,
+    component: Prefill,
     tagType: "info",
   },
   {
@@ -40,7 +40,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "二次确认提交",
     badge: "安全",
     description: "提交前弹出确认框，再调用 ctx.next 与服务端交互。",
-    component: ConfirmUpsert,
+    component: Confirm,
     tagType: "danger",
   },
 ]

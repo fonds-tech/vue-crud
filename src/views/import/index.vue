@@ -4,8 +4,8 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
+import Basic from "./components/basic.vue"
 import Layout from "../layout.vue"
-import BasicImport from "./components/BasicImport.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
@@ -13,7 +13,7 @@ const componentCatalog: ComponentMeta[] = [
     title: "基础导入",
     badge: "基础",
     description: "模拟上传 + 模板下载 + 确认回调。",
-    component: BasicImport,
+    component: Basic,
     tagType: "success",
   },
 ]

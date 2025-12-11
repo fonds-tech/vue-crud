@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import type { ComponentMeta } from "../layout.vue"
-import Basic from "./components/Basic.vue"
+import Basic from "./components/basic.vue"
 import Layout from "../layout.vue"
-import Advanced from "./components/Advanced.vue"
+import Advanced from "./components/advanced.vue"
 
 const componentCatalog: ComponentMeta[] = [
   {
