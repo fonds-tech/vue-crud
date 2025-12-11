@@ -1,4 +1,6 @@
-import FdSelect from "./select.tsx"
+import Select from "./select.tsx"
 
-export { FdSelect as default, FdSelect }
 export * from "./interface"
+
+export { Select }
+export default Select

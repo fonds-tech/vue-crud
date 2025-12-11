@@ -16,5 +16,5 @@ export default eslint(
       "vue/singleline-html-element-content-newline": "off",
     },
   },
-  { ignores: ["openspec"] },
+  { ignores: ["openspec", ".agentdocs"] },
 )

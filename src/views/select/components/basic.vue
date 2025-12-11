@@ -4,7 +4,7 @@
     <div class="demo-item">
       <h3 class="demo-title">1. 基础单选 (Static Options)</h3>
       <div class="demo-control">
-        <fd-select v-model="value1" :options="options" placeholder="请选择一项" style="width: 100%" />
+        <fd-select v-model="value1" :options="options" placeholder="请选择一项" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
@@ -16,7 +16,7 @@
     <div class="demo-item">
       <h3 class="demo-title">2. 自定义字段 (Custom Keys)</h3>
       <div class="demo-control">
-        <fd-select v-model="value2" :options="customOptions" label-key="userName" value-key="userId" placeholder="选择用户" style="width: 100%" />
+        <fd-select v-model="value2" :options="customOptions" label-key="userName" value-key="userId" placeholder="选择用户" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>
@@ -28,7 +28,7 @@
     <div class="demo-item">
       <h3 class="demo-title">3. 多选模式 (Multiple)</h3>
       <div class="demo-control">
-        <fd-select v-model="value3" :options="options" multiple collapse-tags collapse-tags-tooltip placeholder="请选择多项" style="width: 100%" />
+        <fd-select v-model="value3" :options="options" multiple collapse-tags collapse-tags-tooltip placeholder="请选择多项" />
       </div>
       <div class="demo-result">
         <span class="result-label">选中值:</span>

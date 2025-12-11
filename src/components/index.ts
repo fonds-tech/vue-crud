@@ -7,7 +7,6 @@ import Detail from "./detail"
 import Dialog from "./dialog"
 import Export from "./export"
 import Import from "./import"
-import Option from "./option"
 import Search from "./search"
 import Select from "./select"
 import Upsert from "./upsert"
@@ -26,9 +25,8 @@ export const components: Record<string, Component> = {
   Dialog,
   Form,
   Search,
-  Option,
-  Select,
   Cascader,
+  Select,
   Detail,
   Table,
   Import,

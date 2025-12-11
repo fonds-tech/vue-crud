@@ -33,26 +33,24 @@
 
     <!-- 示例 2: 模拟复杂数据结构 -->
     <div class="demo-item">
-      <h3 class="demo-title">2. 复杂数据处理</h3>
-      <p class="demo-desc">模拟带延迟的搜索接口，并在模拟数据中包含额外信息（如头像、部门）。</p>
+      <h3 class="demo-title">2. 复杂数据模板</h3>
+      <p class="demo-desc">使用静态数据 + 自定义模板展示头像、角色等额外信息。</p>
       <div class="demo-control">
-        <fd-select v-model="value2" :api="mockUserApi" :params="{ role: 'all' }" label-key="name" value-key="id" placeholder="搜索用户 (支持防抖)" style="width: 100%">
-          <template #default="{ options }">
-            <fd-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id" style="height: 56px">
-              <div class="user-option">
-                <span class="user-avatar">{{ item.name[0] }}</span>
-                <div class="user-info">
-                  <div class="user-name">
-                    {{ item.name }}
-                    <el-tag size="small" effect="plain" style="transform: scale(0.8)">
-                      {{ item.role }}
-                    </el-tag>
-                  </div>
-                  <div class="user-email">{{ item.email }}</div>
+        <fd-select v-model="value2" placeholder="选择用户" style="width: 100%">
+          <el-option v-for="item in displayUsers" :key="item.id" :label="item.name" :value="item.id" style="height: 56px">
+            <div class="user-option">
+              <span class="user-avatar">{{ item.name[0] }}</span>
+              <div class="user-info">
+                <div class="user-name">
+                  {{ item.name }}
+                  <el-tag size="small" effect="plain" style="transform: scale(0.8)">
+                    {{ item.role }}
+                  </el-tag>
                 </div>
+                <div class="user-email">{{ item.email }}</div>
               </div>
-            </fd-option>
-          </template>
+            </div>
+          </el-option>
         </fd-select>
       </div>
       <div class="demo-result">
@@ -64,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import FdOption from "@/components/option"
 import FdSelect from "@/components/select"
 import { ref, computed } from "vue"
 
@@ -77,6 +74,11 @@ const MOCK_DB = [
   { id: 104, name: "David Admin", role: "admin", email: "david@example.com" },
   { id: 105, name: "Eve User", role: "user", email: "eve@example.com" },
 ]
+const displayUsers = MOCK_DB.map(item => ({
+  ...item,
+  id: item.id ?? item.name,
+  name: item.name ?? "",
+}))
 
 // 模拟后端接口方法
 function mockUserApi(params: Record<string, any>): Promise<any[]> {

@@ -33,7 +33,7 @@ const componentCatalog: ComponentMeta[] = [
     key: "api",
     title: "API 配置",
     badge: "New",
-    description: "直接传入 API URL 字符串实现数据加载，支持自定义 Method、DataKey 与 SearchField。",
+    description: "函数式 API 远程加载示例，展示 params 透传与动态请求。",
     component: Api,
     componentName: "Api",
     tagType: "danger",

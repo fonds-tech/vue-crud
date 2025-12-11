@@ -3,17 +3,15 @@
     <!-- 示例 1: 自定义插槽 -->
     <div class="demo-item">
       <h3 class="demo-title">1. 自定义选项模板 (Slots)</h3>
-      <p class="demo-desc">使用默认插槽自定义下拉列表的 Option 内容。</p>
+      <p class="demo-desc">使用插槽自定义下拉选项的展示内容。</p>
       <div class="demo-control">
-        <fd-select v-model="valueSlot" :options="users" placeholder="请选择" style="width: 100%">
-          <template #default="{ options }">
-            <fd-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-              <div class="custom-option">
-                <span class="option-label">{{ item.label }}</span>
-                <span class="option-desc">{{ item.desc }}</span>
-              </div>
-            </fd-option>
-          </template>
+        <fd-select v-model="valueSlot" placeholder="请选择" style="width: 100%">
+          <el-option v-for="item in displayUsers" :key="item.value" :label="item.label" :value="item.value">
+            <div class="custom-option">
+              <span class="option-label">{{ item.label }}</span>
+              <span class="option-desc">{{ item.desc }}</span>
+            </div>
+          </el-option>
         </fd-select>
       </div>
     </div>
@@ -46,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import FdOption from "@/components/option"
 import FdSelect from "@/components/select"
 import { ref } from "vue"
 import { ElMessage } from "element-plus"
@@ -56,6 +53,11 @@ const users = [
   { label: "React", value: "react", desc: "用于构建用户界面的库" },
   { label: "Angular", value: "angular", desc: "现代 Web 开发平台" },
 ]
+const displayUsers = users.map(item => ({
+  label: item.label ?? "",
+  value: item.value ?? String(item.label ?? ""),
+  desc: item.desc ?? "",
+}))
 
 // --- 示例 1 ---
 const valueSlot = ref("")
