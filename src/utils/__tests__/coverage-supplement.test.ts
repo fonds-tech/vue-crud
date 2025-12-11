@@ -44,6 +44,23 @@ describe("utils Coverage Supplement", () => {
       dataset(obj, "user", { city: "Wonderland" })
       expect(obj.user).toEqual({ name: "Alice", age: 18, city: "Wonderland" })
     })
+
+    it("should handle invalid index and non-object writes", () => {
+      const obj: any = { list: [{ id: 1 }] }
+      // 非数字下标返回 {} 并终止
+      expect(dataset(obj, "list[foo].name")).toEqual({})
+      // 写入非对象时使用空对象占位
+      dataset(obj, "list[0]", 123)
+      expect(obj.list[0]).toEqual({})
+      // 合并已有对象
+      const mergeTarget = { user: { a: 1 } }
+      dataset(mergeTarget, "user", { b: 2 })
+      expect(mergeTarget.user).toEqual({ a: 1, b: 2 })
+      // 目标为原始值时也能覆盖
+      const primMerge = { user: 1 as any }
+      dataset(primMerge, "user", { name: "bob" })
+      expect(primMerge.user).toEqual({ name: "bob" })
+    })
   })
 
   describe("mitt", () => {
@@ -121,6 +138,15 @@ describe("utils Coverage Supplement", () => {
       // Config with resolved 'is' as object
       const config = { is: () => Comp }
       expect(componentIs(config, {})).toEqual(Comp)
+    })
+
+    it("component helpers return undefined for不支持类型", () => {
+      expect(componentIs(123 as any, {})).toBeUndefined()
+      expect(componentIs(undefined as any, {})).toBeUndefined()
+      expect(parse(123 as any, {}).slotName).toBeUndefined()
+      expect(parse(undefined as any, {}).slotName).toBeUndefined()
+      // slotName 对非字符串/配置对象返回 undefined
+      expect(parse({} as any, {}).slotName).toBeUndefined()
     })
   })
 

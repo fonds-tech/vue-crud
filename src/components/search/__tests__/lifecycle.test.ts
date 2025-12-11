@@ -1,6 +1,7 @@
 import type { Ref } from "vue"
 import type { SearchLifecycleParams } from "../interface"
-import { ref } from "vue"
+import { mount } from "@vue/test-utils"
+import { ref, defineComponent } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 import { handleResize, registerEvents, unregisterEvents, useSearchLifecycle } from "../core/lifecycle"
 
@@ -97,6 +98,48 @@ describe("lifecycle", () => {
       // 由于 useSearchLifecycle 使用了 onMounted/onBeforeUnmount
       // 我们只测试它不会抛出错误
       expect(() => useSearchLifecycle(params)).not.toThrow()
+    })
+
+    it("无组件实例时应立即注册并返回注销函数", () => {
+      const addSpy = vi.spyOn(window, "addEventListener")
+      const removeSpy = vi.spyOn(window, "removeEventListener")
+
+      const unregister = useSearchLifecycle(params)
+
+      expect(typeof unregister).toBe("function")
+      expect(params.mitt.on).toHaveBeenCalledTimes(3)
+      expect(addSpy).toHaveBeenCalledWith("resize", expect.any(Function))
+
+      // 调用返回的注销函数，覆盖卸载分支
+      unregister && unregister()
+      expect(params.mitt.off).toHaveBeenCalledTimes(3)
+      expect(removeSpy).toHaveBeenCalledWith("resize", expect.any(Function))
+
+      addSpy.mockRestore()
+      removeSpy.mockRestore()
+    })
+
+    it("有组件实例时在挂载/卸载阶段注册与注销", async () => {
+      const addSpy = vi.spyOn(window, "addEventListener")
+      const removeSpy = vi.spyOn(window, "removeEventListener")
+
+      const Comp = defineComponent({
+        setup() {
+          useSearchLifecycle(params)
+          return () => null
+        },
+      })
+
+      const wrapper = mount(Comp)
+      expect(params.mitt.on).toHaveBeenCalledTimes(3)
+      expect(addSpy).toHaveBeenCalledWith("resize", expect.any(Function))
+
+      await wrapper.unmount()
+      expect(params.mitt.off).toHaveBeenCalledTimes(3)
+      expect(removeSpy).toHaveBeenCalledWith("resize", expect.any(Function))
+
+      addSpy.mockRestore()
+      removeSpy.mockRestore()
     })
   })
 

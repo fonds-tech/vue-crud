@@ -104,6 +104,9 @@ describe("createTableMethods", () => {
 
     methods.toggleFullscreen()
     expect(state.isFullscreen.value).toBe(false)
+
+    methods.toggleFullscreen(false)
+    expect(state.isFullscreen.value).toBe(false)
   })
 
   it("setData 直接更新数据", () => {
@@ -164,5 +167,24 @@ describe("createTableMethods", () => {
   it("clearSorters 是 resetSorters 的别名", () => {
     methods.clearSorters()
     expect(state.tableRef.value?.clearSort).toHaveBeenCalled()
+  })
+
+  it("use 应应用分页配置", () => {
+    methods.use({
+      pagination: {
+        pageSizes: [10, 20],
+        pageSize: 20,
+        currentPage: 3,
+      },
+    } as any)
+
+    expect(state.paginationState.pageSizes).toEqual([10, 20])
+    expect(state.paginationState.pageSize).toBe(20)
+    expect(state.paginationState.currentPage).toBe(3)
+  })
+
+  it("selectAll 在未传参数时调用 toggleAllSelection", () => {
+    methods.selectAll()
+    expect(state.tableRef.value?.toggleAllSelection).toHaveBeenCalled()
   })
 })

@@ -8,7 +8,7 @@ import "./style.scss"
 export default defineComponent({
   name: "fd-detail",
   inheritAttrs: false,
-  emits: ["open", "close", "beforeOpen", "beforeClose"],
+  emits: ["open", "close", "closed", "beforeOpen", "beforeClose"],
   setup(_, { emit, expose }) {
     const attrs = useAttrs() as Record<string, unknown> & { class?: unknown }
     const userSlots = useSlots()

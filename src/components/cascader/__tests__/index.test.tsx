@@ -105,8 +105,8 @@ describe("cascader", () => {
   })
 
   it("api 非函数时不执行刷新", async () => {
-    // Pass empty options to avoid fallback
-    const wrapper = mountCascader({ props: { api: "not-a-function", options: [] } })
+    // 传入 null 作为非函数占位，避免触发 Vue runtime 警告
+    const wrapper = mountCascader({ props: { api: null as any, options: [] } })
     await flushPromises()
     expect(wrapper.vm.options).toEqual([])
   })

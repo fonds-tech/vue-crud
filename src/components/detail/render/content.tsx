@@ -1,8 +1,8 @@
 import type { DetailData, DetailItem, DetailGroup, DetailMaybeFn, DetailOptions } from "../interface"
 import { resolve } from "@/utils"
-import { h, withDirectives, resolveDirective } from "vue"
 import { slotsOf, slotNameOf, renderComponentSlot } from "../core/helpers"
 import { ElTag, ElSpace, ElDescriptions, ElDescriptionsItem } from "element-plus"
+import { h, withDirectives, resolveDirective, getCurrentInstance } from "vue"
 
 interface RenderCtx<D extends DetailData = DetailData> {
   options: DetailOptions<D>
@@ -98,7 +98,7 @@ function renderGroupSlots<D extends DetailData>(group: DetailGroup<D>, data: D, 
 }
 
 export function renderDetailContent<D extends DetailData = DetailData>(ctx: RenderCtx<D>) {
-  const loadingDirective = resolveDirective("loading")
+  const loadingDirective = getCurrentInstance() ? resolveDirective("loading") : undefined
   const spaceVNode = h(
     ElSpace,
     {

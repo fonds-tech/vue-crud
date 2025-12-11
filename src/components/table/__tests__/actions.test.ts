@@ -77,6 +77,19 @@ describe("buildContextMenuItems", () => {
     expect(labels).not.toContain("FnHide")
   })
 
+  it("无 action 列时仅刷新，action 列时刷新在首位", () => {
+    const refreshOnly = buildContextMenuItems(scope, [], crud, refresh)
+    expect(refreshOnly).toHaveLength(1)
+    refreshOnly[0].action()
+    expect(refresh).toHaveBeenCalled()
+
+    const columns = [
+      { type: "action", actions: [{ type: "detail" }] },
+    ] as any
+    const items = buildContextMenuItems(scope, columns, crud, refresh)
+    expect(items[0].label).toBe("刷新")
+  })
+
   it("getActionType 能区分 delete 类型", () => {
     expect(getActionType({ type: "delete" } as any)).toBe("danger")
     expect(getActionType({ type: "detail" } as any)).toBe("primary")

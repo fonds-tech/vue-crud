@@ -1,60 +1,48 @@
 # fd-delete-button 删除按钮
 
-`<fd-delete-button>` 基于 Element Plus `ElButton` 封装，统一 CRUD 删除操作体验：
-
-- 自动读取 `crud.dict.label.delete` 作为默认文本；
-- 绑定 `crud.selection`，在未选择数据时自动禁用；
-- 调用 `crud.getPermission("delete")` 控制显隐；
-- 点击自动执行 `crud.rowDelete(...crud.selection)`。
+`<fd-delete-button>` 基于 Element Plus `ElButton` 封装，自动读取 CRUD 权限与选中行，执行批量删除并内置安全样式。
 
 ## 基本示例
 
 ```vue
 <template>
   <fd-crud>
-    <template #toolbar-left>
-      <fd-delete-button />
-    </template>
+    <fd-table />
+    <fd-delete-button>删除选中</fd-delete-button>
   </fd-crud>
 </template>
 ```
 
-> `fd-delete-button` 默认展示在工具栏中，你也可以根据业务移动到任意插槽。
+未传插槽时默认显示 `crud.dict.label.delete`（缺省为“删除”）。
 
-## 与 useCrud 搭配
+## Props
 
-`fd-delete-button` 与 `useCrud` 共用同一份配置，包含接口地址、权限以及统一的文案：
+继承 `ElButton` 的全部 props，并调整默认值与禁用策略：
 
-```ts
-import { useCrud } from "vue-crud"
+| 名称       | 说明                                               | 类型      | 默认值     |
+| ---------- | -------------------------------------------------- | --------- | ---------- |
+| `type`     | 按钮类型                                           | `string`  | `danger`   |
+| `disabled` | 显式禁用；若未设置则根据 `crud.selection` 判空禁用 | `boolean` | `false`    |
+| 其余同     | Element Plus `ElButton`                            | -         | 跟随原组件 |
 
-const crud = useCrud(
-  {
-    dict: {
-      label: {
-        delete: "批量删除",
-      },
-      api: {
-        delete: "/api/user",
-      },
-    },
-    permission: {
-      delete: true,
-    },
-  },
-  ctx => ctx.refresh(),
-)
-```
+尺寸优先使用传入的 `size`，否则回退到 `useCrud` 的 `style.size`。
 
-## 常见问题
+## 事件
 
-- **为什么按钮是禁用状态？** `fd-delete-button` 基于 `crud.selection` 判断，需确保表格勾选事件正确回填到 selection（例如 `fd-table` 默认已接管）。
-- **如何只删除单条数据？** 可通过操作列触发 `crud.rowDelete(row)`；若仍需使用该按钮，可以在触发前手动更新 `crud.selection`。
+沿用 Element Plus `ElButton` 事件；点击时会先透出 `click` 事件，再在有选中行时调用 `crud.rowDelete(...selection)`。
 
 ## 插槽
 
-| 名称      | 说明                       | 参数 |
-| --------- | -------------------------- | ---- |
-| `default` | 按钮文本，可插入自定义内容 | -    |
+| 名称      | 说明                   |
+| --------- | ---------------------- |
+| `default` | 按钮文本，可自定义内容 |
 
-> 新增按钮请参考 `fd-add-button` 组件，更多 CRUD 能力请参阅 `fd-crud` 文档。
+## 权限与禁用策略
+
+- 无 `delete` 权限 (`crud.getPermission('delete')` 为假) 时不渲染。
+- 当表格无选中行时自动禁用，防止误触；可通过传入 `disabled` 强制禁用。
+
+## 常见问题
+
+- **删除确认文案从哪里来？** 由 `crud.dict.label.deleteConfirm` 控制，`fd-table` 的动作列与本组件共用。
+- **如何自定义删除逻辑？** 在 `useCrud` 中传入 `onDelete(selection, ctx)` 覆盖默认行为。

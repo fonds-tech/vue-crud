@@ -121,6 +121,45 @@ describe("useSearchCore", () => {
     expect(mockCrud.refresh).toHaveBeenCalled()
   })
 
+  it("use 在 falsy 输入时直接返回", () => {
+    const { use, options, collapsed } = useSearchCore({})
+
+    use(undefined as any)
+
+    expect(options.form.grid?.collapsed).toBe(false)
+    expect(collapsed.value).toBe(false)
+  })
+
+  it("search/reset/getModel handler 覆盖分支", async () => {
+    const handlers: Record<string, any> = {}
+    mockMitt.on.mockImplementation((event: string, handler: any) => {
+      handlers[event] = handler
+    })
+
+    mockCrud.params = {}
+    mockCrud.getParams.mockReturnValue({})
+
+    const engine = useSearchCore({})
+    engine.formRef.value = {
+      model: { kw: "test" },
+      submit: (cb: any) => cb({ kw: "test" }, undefined),
+      resetFields: vi.fn(),
+      bindFields: vi.fn(),
+    } as any
+
+    await engine.search()
+    await engine.reset()
+
+    const modelSpy = vi.fn()
+    await handlers["search.search"]?.({ foo: 1 })
+    await handlers["search.reset"]?.({ bar: 2 })
+    handlers["search.get.model"]?.(modelSpy)
+    handlers["search.get.model"]?.("not-fn" as any)
+
+    expect(modelSpy).toHaveBeenCalledWith(engine.formModel.value)
+    expect(mockCrud.setParams).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, kw: "test" }))
+  })
+
   // 新增测试：formatQuery 边界测试
   describe("formatQuery 边界测试", () => {
     it("过滤 undefined 值", async () => {

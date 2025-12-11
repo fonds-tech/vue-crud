@@ -32,6 +32,16 @@ describe("utils 补充覆盖", () => {
       const obj: any = { arr: "not-array" }
       expect(dataset(obj, "arr[id:1].foo")).toEqual({})
     })
+
+    it("读取或写入过程中抛异常时返回空对象", () => {
+      const obj: any = {}
+      Object.defineProperty(obj, "bad", {
+        get() {
+          throw new Error("boom")
+        },
+      })
+      expect(dataset(obj, "bad.value", 1)).toEqual({})
+    })
   })
 
   describe("mitt", () => {
@@ -133,6 +143,10 @@ describe("utils 补充覆盖", () => {
       expect(componentIs(vnode, ctx)).toBe(vnode)
       expect(componentIs(Dummy, ctx)).toBe(Dummy)
       expect(componentIs({ is: () => "custom" } as any, ctx)).toBe("custom")
+
+      const RawComp = defineComponent({ name: "RawComp", setup: () => () => h("div") })
+      const marked = componentIs({ is: RawComp } as any, ctx) as any
+      expect(marked?.name).toBe("RawComp")
     })
   })
 

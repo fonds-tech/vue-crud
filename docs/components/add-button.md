@@ -1,10 +1,6 @@
 # fd-add-button 新增按钮
 
-`<fd-add-button>` 基于 Element Plus `ElButton` 封装，用于触发 CRUD 场景中的新增操作：
-
-- 自动读取 `crud.dict.label.add` 作为默认文本；
-- 依据 `crud.getPermission('add')` 控制显隐；
-- 点击时调用 `crud.rowAdd()`，无需手动注入逻辑。
+`<fd-add-button>` 基于 Element Plus `ElButton` 封装，用于触发 CRUD 场景中的新增操作：自动读取权限、标签并调用 `crud.rowAdd()`。
 
 ## 基本示例
 
@@ -16,40 +12,35 @@
 </template>
 ```
 
-如果不传插槽文本，会默认显示 `crud.dict.label.add`。
+若未传插槽文本，默认显示 `crud.dict.label.add`（缺省为“新增”）。
 
-## 与 useCrud 搭配
+## Props
 
-```ts
-import { useCrud } from "vue-crud"
+继承 `ElButton` 的全部 props，并调整默认值：
 
-const crud = useCrud(
-  {
-    dict: {
-      label: {
-        add: "添加",
-        update: "编辑",
-        delete: "删除",
-      },
-      api: {
-        add: "/api/user",
-        delete: "/api/user",
-        page: "/api/user/page",
-        update: "/api/user",
-      },
-    },
-    permission: {
-      add: true,
-    },
-  },
-  ctx => ctx.refresh(),
-)
-```
+| 名称   | 说明                    | 类型     | 默认值     |
+| ------ | ----------------------- | -------- | ---------- |
+| `type` | 按钮类型                | `string` | `primary`  |
+| 其余同 | Element Plus `ElButton` | -        | 跟随原组件 |
+
+尺寸会优先使用传入的 `size`，否则回退到 `useCrud` 的 `style.size`。
+
+## 事件
+
+沿用 Element Plus `ElButton` 事件；点击时会先透出 `click` 事件，再调用 `crud.rowAdd()`。
 
 ## 插槽
 
-| 名称      | 说明                       | 参数 |
-| --------- | -------------------------- | ---- |
-| `default` | 按钮文本，可插入自定义内容 | -    |
+| 名称      | 说明                   |
+| --------- | ---------------------- |
+| `default` | 按钮文本，可自定义内容 |
 
-> 删除按钮请参考 `fd-delete-button` 组件，整体 CRUD 页面请参阅 `fd-crud` 文档。
+## 权限与禁用策略
+
+- 无 `add` 权限 (`crud.getPermission('add')` 为假) 时不渲染。
+- 其他禁用逻辑沿用传入的 `disabled`。
+
+## 常见问题
+
+- **想改成幽灵按钮？** 直接传入 `type="default" plain` 等原生属性即可。
+- **多语言文案？** 设置 `dict.label.add` 或传入插槽覆盖。

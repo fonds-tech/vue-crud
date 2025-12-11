@@ -1,4 +1,4 @@
-import { reactive, onMounted, onBeforeUnmount } from "vue"
+import { reactive, onMounted, onBeforeUnmount, getCurrentInstance } from "vue"
 
 interface BrowserState {
   width: number
@@ -20,25 +20,27 @@ export function useBrowser(): BrowserState {
   })
 
   const update = () => {
-    if (typeof window === "undefined") {
-      return
-    }
+    /* istanbul ignore next */
+    if (typeof window === "undefined") return
 
     state.width = window.innerWidth
     state.height = window.innerHeight
     state.isMini = state.width <= 768
   }
 
-  onMounted(() => {
-    update()
-    window.addEventListener("resize", update)
-  })
+  // 无组件实例的场景（如纯函数调用）跳过生命周期注册，避免 Vue 警告。
+  if (getCurrentInstance()) {
+    onMounted(() => {
+      update()
+      window.addEventListener("resize", update)
+    })
 
-  onBeforeUnmount(() => {
-    if (typeof window !== "undefined") {
-      window.removeEventListener("resize", update)
-    }
-  })
+    onBeforeUnmount(() => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", update)
+      }
+    })
+  }
 
   return state
 }

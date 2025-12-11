@@ -184,6 +184,33 @@ describe("contextMenu.open", () => {
     expect(hostBody.querySelector(".fd-context-menu")).toBeNull()
     vi.useRealTimers()
   })
+
+  it("无 target 且传入 document 时仍使用该 document 并可清理", async () => {
+    vi.useFakeTimers()
+    const customDoc = document.implementation.createHTMLDocument("no-target")
+    const event = createEvent(undefined)
+    const exposed = contextMenu.open(event, { document: customDoc, list: [{ label: "noop" }] })
+    await nextTick()
+    expect(customDoc.body.querySelector(".fd-context-menu")).not.toBeNull()
+    exposed.close()
+    vi.runAllTimers()
+    await nextTick()
+    expect(customDoc.body.querySelector(".fd-context-menu")).toBeNull()
+    vi.useRealTimers()
+  })
+
+  it("无 target 且无自定义 document 时回退到全局 document", async () => {
+    vi.useFakeTimers()
+    const event = createEvent(undefined)
+    const exposed = contextMenu.open(event, { list: [{ label: "global" }] })
+    await nextTick()
+    expect(document.body.querySelector(".fd-context-menu")).not.toBeNull()
+    exposed.close()
+    vi.runAllTimers()
+    await nextTick()
+    expect(document.body.querySelector(".fd-context-menu")).toBeNull()
+    vi.useRealTimers()
+  })
 })
 
 describe("contextMenu 边缘情况", () => {

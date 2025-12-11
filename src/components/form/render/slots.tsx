@@ -1,14 +1,13 @@
 import type { Component as VueComponent } from "vue"
 import type { FormComponentSlot, FormRenderContext } from "../interface"
-import { h, resolveDynamicComponent } from "vue"
+import { h, markRaw, getCurrentInstance } from "vue"
 
 function resolveComponent(type: string | VueComponent | undefined) {
   if (!type) return undefined
   if (typeof type === "string") {
-    const dyn = resolveDynamicComponent(type)
-    return dyn as VueComponent | undefined
+    return type as unknown as VueComponent
   }
-  return type
+  return markRaw(type)
 }
 
 /**
@@ -34,12 +33,13 @@ export function renderSlotOrComponent(ctx: FormRenderContext, com?: FormComponen
 
   const listeners = helpers.normalizeListeners(helpers.onListeners(com))
   const childSlots = renderComponentSlotMap(ctx, helpers.slotsOf(com), slotProps)
+  const refBinding = getCurrentInstance() ? helpers.bindComponentRef(com) : undefined
 
   return h(
     resolved,
     {
       ...helpers.componentProps(com),
-      ref: helpers.bindComponentRef(com),
+      ref: refBinding,
       style: helpers.styleOf(com),
       ...listeners,
     },

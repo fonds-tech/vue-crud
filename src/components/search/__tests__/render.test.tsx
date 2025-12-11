@@ -1,5 +1,6 @@
 import type { Slots, VNode } from "vue"
 import type { SearchCore, SearchAction } from "../interface"
+import { mount } from "@vue/test-utils"
 import { renderAction, renderActions } from "../render/action"
 import { h, ref, computed, defineComponent } from "vue"
 import { it, vi, expect, describe, beforeEach } from "vitest"
@@ -348,6 +349,36 @@ describe("renderAction", () => {
     const result = renderAction(engine, action, 0, slots)
 
     expect(result).toBeDefined()
+  })
+
+  it("search/reset/collapse 按钮点击触发对应方法", () => {
+    const searchAction: SearchAction = { type: "search" }
+    const resetAction: SearchAction = { type: "reset" }
+    const collapseAction: SearchAction = { type: "collapse" }
+
+    const wrapperSearch = mount({
+      render() {
+        return renderAction(engine, searchAction, 0, slots) as any
+      },
+    })
+    const wrapperReset = mount({
+      render() {
+        return renderAction(engine, resetAction, 1, slots) as any
+      },
+    })
+    const wrapperCollapse = mount({
+      render() {
+        return renderAction(engine, collapseAction, 2, slots) as any
+      },
+    })
+
+    wrapperSearch.findComponent({ name: "ElButton" }).vm.$emit("click")
+    wrapperReset.findComponent({ name: "ElButton" }).vm.$emit("click")
+    wrapperCollapse.findComponent({ name: "ElButton" }).vm.$emit("click")
+
+    expect(engine.search).toHaveBeenCalled()
+    expect(engine.reset).toHaveBeenCalled()
+    expect(engine.collapse).toHaveBeenCalled()
   })
 
   it("search 按钮显示 loading 状态", () => {

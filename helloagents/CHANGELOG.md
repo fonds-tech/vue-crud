@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### 变更
+- 补齐组件文档（fd-select/fd-cascader/导入导出/新增删除按钮），对齐源码的 props、权限与用法示例
+
+## [1.0.3] - 2025-12-11
+
+### 修复
+- 清理剩余 Vitest Vue 警告：table 渲染用例内联 render 执行 withDirectives，form 插槽边缘用例在组件上下文解析动态组件，cascader 非函数 api 用例避免类型告警，确保测试输出零警告
+
 ## [1.0.2] - 2025-12-11
 
 ### 修复

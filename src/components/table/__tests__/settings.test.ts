@@ -5,6 +5,7 @@ import {
   writeCache,
   saveColumns,
   toggleFixed,
+  resetColumns,
   toggleAllColumns,
   syncOrderFromList,
   onColumnShowChange,
@@ -265,6 +266,55 @@ describe("table settings", () => {
       sortColumnSettings(state)
       expect(state.columnSettings.value[0].id).toBe("b")
       expect(state.columnSettings.value[1].id).toBe("a")
+    })
+  })
+
+  describe("拖拽与固定", () => {
+    it("onDragMove 不同 fixed 或 pinned 时返回 false", () => {
+      const dragged = { sort: true, pinned: false, fixed: "left" as const }
+      const related = { sort: true, pinned: true, fixed: "right" as const }
+      expect(
+        onDragMove({
+          draggedContext: { element: dragged } as any,
+          relatedContext: { element: related } as any,
+        } as any),
+      ).toBe(false)
+    })
+
+    it("onDragMove 在相同 fixed 且可排序时返回 true", () => {
+      const dragged = { sort: true, pinned: false, fixed: undefined }
+      const related = { sort: true, pinned: false, fixed: undefined }
+      expect(
+        onDragMove({
+          draggedContext: { element: dragged } as any,
+          relatedContext: { element: related } as any,
+        } as any),
+      ).toBe(true)
+    })
+  })
+
+  describe("resetColumns 捕获缓存删除异常", () => {
+    it("removeItem 抛错时不中断", () => {
+      const original = globalThis.localStorage
+      const storageData: Record<string, string> = {}
+      const throwingStorage = {
+        setItem: (k: string, v: string) => (storageData[k] = v),
+        getItem: (k: string) => storageData[k],
+        removeItem: () => {
+          throw new Error("remove blocked")
+        },
+        clear: vi.fn(),
+      } as any
+      try {
+        globalThis.localStorage = throwingStorage
+        const state = createTableState({ name: "reset-error" }, {}, {})
+        state.cacheKey.value = "reset-error-key"
+        state.tableOptions.columns = [{ __id: "x", label: "X" }] as any
+        expect(() => resetColumns(state)).not.toThrow()
+      }
+      finally {
+        globalThis.localStorage = original
+      }
     })
   })
 })

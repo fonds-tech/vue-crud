@@ -366,8 +366,15 @@ describe("table render layer", () => {
       emit,
     } as unknown as TableCore
 
-    const vnode = renderTable({ engine, slots: {} as any })
-    const wrapper = mountVNode(vnode as any)
+    let lastVNode: any
+    const wrapper = mount(
+      defineComponent({
+        setup: () => () => {
+          lastVNode = renderTable({ engine, slots: {} as any })
+          return lastVNode as any
+        },
+      }),
+    )
     const subTreeChildren = wrapper.vm.$.subTree.children as any[] | undefined
     const tableVNode = subTreeChildren?.[2]?.children?.[0] as any
     const tableProps = tableVNode?.props
@@ -385,8 +392,9 @@ describe("table render layer", () => {
     expect(handlers.onPageChange).toHaveBeenCalledWith(2)
     expect(handlers.onPageSizeChange).toHaveBeenCalledWith(30)
 
-    expect((vnode.children as any)?.[0]?.props?.class).toContain("fd-table")
-    expect((vnode.children as any)?.[0]?.props?.class).not.toContain("is-fullscreen")
+    const rootVNode = lastVNode?.children?.[0] as any
+    expect(rootVNode?.props?.class).toContain("fd-table")
+    expect(rootVNode?.props?.class).not.toContain("is-fullscreen")
     expect(tableVNode?.children).toBeDefined()
     wrapper.unmount()
   })
@@ -446,8 +454,11 @@ describe("table render layer", () => {
     } as unknown as TableCore
 
     const slots = { extra: vi.fn().mockReturnValue("extra-slot") } as any
-    const vnode = renderTable({ engine, slots })
-    const wrapper = mountVNode(vnode as any)
+    const wrapper = mount(
+      defineComponent({
+        setup: () => () => renderTable({ engine, slots }),
+      }),
+    )
     const rootDiv = wrapper.vm.$.subTree as any
     expect(rootDiv.props?.class ?? "").toContain("is-fullscreen")
     const subTreeChildren = rootDiv.children as any[] | undefined

@@ -137,6 +137,22 @@ describe("createTableHandlers", () => {
       expect(state.tableRows.value).toEqual(list)
     })
 
+    it("非对象或空 payload 时直接返回", () => {
+      state.tableRows.value = [{ id: 999 } as any]
+      handlers.tableRefreshHandler(undefined as any)
+      handlers.tableRefreshHandler(null as any)
+      handlers.tableRefreshHandler("invalid" as any)
+      expect(state.tableRows.value).toEqual([{ id: 999 }])
+    })
+
+    it("page/pageSize 为 0 或未提供时保持原值", () => {
+      state.paginationState.currentPage = 5
+      state.paginationState.pageSize = 20
+      handlers.tableRefreshHandler({ list: [], page: 0, pageSize: 0 })
+      expect(state.paginationState.currentPage).toBe(5)
+      expect(state.paginationState.pageSize).toBe(20)
+    })
+
     it("应该更新分页信息", () => {
       handlers.tableRefreshHandler({
         list: [{ id: 1 }],
