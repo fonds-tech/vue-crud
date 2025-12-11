@@ -12,5 +12,4 @@ lib-cov
 logs
 node_modules
 temp
-openspec
 AGENTS.md
