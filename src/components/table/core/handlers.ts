@@ -1,6 +1,8 @@
 import type { CrudBridge } from "./actions"
+import type { ContextMenuItem } from "@/components/context-menu/types"
 import type { TableSize, TableState } from "./state"
 import type { TableScope, TableRecord } from "../interface"
+import { contextMenu } from "@/components/context-menu"
 import { buildContextMenuItems } from "./actions"
 
 /**
@@ -17,10 +19,6 @@ export interface TableHandlers {
   onPageSizeChange: (size: number) => void
   /** 处理右键菜单事件 */
   onCellContextmenu: (row: TableRecord, column: TableScope["column"], event: MouseEvent) => void
-  /** 处理右键菜单操作 */
-  handleContextAction: (item: { action: () => void }) => void
-  /** 关闭右键菜单 */
-  closeContextMenu: () => void
   /** 处理数据刷新事件 */
   tableRefreshHandler: (payload: unknown) => void
 }
@@ -91,13 +89,6 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
   }
 
   /**
-   * 关闭上下文菜单
-   */
-  const closeContextMenu = () => {
-    state.contextMenuState.visible = false
-  }
-
-  /**
    * 处理来自核心的数据刷新事件
    */
   const tableRefreshHandler = (payload: unknown) => {
@@ -112,24 +103,24 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
 
   /**
    * 处理单元格上的上下文菜单事件
+   * 使用 contextMenu 组件打开菜单
    */
   const onCellContextmenu = (row: TableRecord, column: TableScope["column"], event: MouseEvent) => {
-    event.preventDefault()
-    const rowIndex = state.tableRows.value.findIndex(item => item === row)
-    // 构造作用域并基于配置生成菜单项，同时记录鼠标坐标用于弹窗定位
-    const scope: TableScope<TableRecord> = { row, column, $index: rowIndex >= 0 ? rowIndex : 0 }
-    state.contextMenuState.items = buildContextMenuItems(scope, state.tableOptions.columns, crudBridge, refresh)
-    state.contextMenuState.x = event.clientX
-    state.contextMenuState.y = event.clientY
-    state.contextMenuState.visible = true
-  }
+    if (!event) return
 
-  /**
-   * 处理上下文菜单操作
-   */
-  const handleContextAction = (item: { action: () => void }) => {
-    item.action()
-    closeContextMenu()
+    const rowIndex = state.tableRows.value.findIndex(item => item === row)
+    const scope: TableScope<TableRecord> = { row, column, $index: rowIndex >= 0 ? rowIndex : 0 }
+
+    // 构建菜单项，将 action 转换为 callback，使用 autoClose 自动关闭菜单
+    const items = buildContextMenuItems(scope, state.tableOptions.columns, crudBridge, refresh)
+    const menuList: ContextMenuItem[] = items.map(item => ({
+      label: item.label,
+      callback: () => item.action(),
+      autoClose: true,
+    }))
+
+    // 使用 contextMenu 组件打开菜单
+    contextMenu.open(event, { list: menuList })
   }
 
   return {
@@ -138,8 +129,6 @@ export function createTableHandlers(context: TableHandlersContext): TableHandler
     onPageChange,
     onPageSizeChange,
     onCellContextmenu,
-    handleContextAction,
-    closeContextMenu,
     tableRefreshHandler,
   }
 }

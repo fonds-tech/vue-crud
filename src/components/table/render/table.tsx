@@ -6,7 +6,6 @@ import { TableFooter } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { renderColumns } from "./columns"
 import { ColumnSettings } from "./settings"
-import { renderContextMenu } from "./context-menu"
 import { h, withDirectives } from "vue"
 import { ElTable, ElLoading } from "element-plus"
 import { onDragEnd, onDragMove, saveColumns, toggleFixed, resetColumns, toggleAllColumns, onColumnShowChange } from "../core/settings"
@@ -71,10 +70,17 @@ function buildEventListeners(handlers: EventHandlers, emit: (event: string, ...a
           emit(event, ...args)
         }
       }
-      else if (event === "row-contextmenu" || event === "cell-contextmenu") {
-        // 统一行为：无论是否有 rowKey，都执行内部上下文菜单处理器
+      else if (event === "row-contextmenu") {
+        // row-contextmenu 事件参数：(row, column, event)
         acc[propName] = (...args: unknown[]) => {
           handlers.onCellContextmenu(args[0] as TableRecord, args[1] as any, args[2] as MouseEvent)
+          emit(event, ...args)
+        }
+      }
+      else if (event === "cell-contextmenu") {
+        // cell-contextmenu 事件参数：(row, column, cell, event) - event 在第4个位置
+        acc[propName] = (...args: unknown[]) => {
+          handlers.onCellContextmenu(args[0] as TableRecord, args[1] as any, args[3] as MouseEvent)
           emit(event, ...args)
         }
       }
@@ -162,7 +168,6 @@ export function renderTable(params: RenderTableParams): VNode {
         onPageChange: handlers.onPageChange,
         onPageSizeChange: handlers.onPageSizeChange,
       }),
-      renderContextMenu(engine),
     ],
   )
 }

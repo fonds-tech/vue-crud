@@ -19,14 +19,6 @@ export interface ColumnSetting {
 }
 
 /**
- * 表示上下文菜单项的接口
- */
-export interface ContextMenuItem {
-  label: string
-  action: () => void
-}
-
-/**
  * 表示分页状态的接口
  */
 export interface PaginationState {
@@ -61,12 +53,6 @@ export interface TableState {
   paginationEnd: ComputedRef<number>
   rowKeyProp: ComputedRef<TableOptions<TableRecord>["table"]["rowKey"]>
   shouldShowToolbar: ComputedRef<boolean>
-  contextMenuState: {
-    visible: boolean
-    x: number
-    y: number
-    items: ContextMenuItem[]
-  }
 }
 
 /**
@@ -221,14 +207,6 @@ export function createTableState(
   // 工具栏仅在传入 toolbar 插槽或开启 tools 开关时展示
   const shouldShowToolbar = computed(() => Boolean(slots.toolbar || tableOptions.table.tools))
 
-  // 右键菜单状态存储屏幕坐标与菜单项，用于 contextmenu 触发时展示
-  const contextMenuState = reactive({
-    visible: false,
-    x: 0,
-    y: 0,
-    items: [] as ContextMenuItem[],
-  })
-
   return {
     tableRows,
     selectedRows,
@@ -251,6 +229,5 @@ export function createTableState(
     paginationEnd,
     rowKeyProp,
     shouldShowToolbar,
-    contextMenuState,
   }
 }

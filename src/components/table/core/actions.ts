@@ -2,8 +2,15 @@
  * @fileoverview CRUD 操作逻辑模块
  * 包含 CrudBridge 定义和操作相关的逻辑函数
  */
-import type { ContextMenuItem } from "./state"
 import type { TableScope, TableAction, TableColumn, TableRecord } from "../interface"
+
+/**
+ * 表格右键菜单项接口（内部使用）
+ */
+export interface TableContextMenuItem {
+  label: string
+  action: () => void
+}
 
 /**
  * 定义 CRUD 操作桥接的接口
@@ -80,7 +87,7 @@ export function buildContextMenuItems(
   columns: TableColumn<TableRecord>[],
   crud: CrudBridge,
   refresh: (params?: Record<string, unknown>) => void,
-): ContextMenuItem[] {
+): TableContextMenuItem[] {
   const actionColumn = columns.find(item => item.type === "action")
   if (!actionColumn) {
     return [
@@ -93,7 +100,7 @@ export function buildContextMenuItems(
 
   const resolvedActions = resolveActions(scope, actionColumn.actions)
   const menuActions = resolvedActions.filter(action => isBuiltinAction(action) && !isHidden(action, scope))
-  const items: ContextMenuItem[] = menuActions.map(action => ({
+  const items: TableContextMenuItem[] = menuActions.map(action => ({
     label: action.text ?? crud.dict?.label?.[action.type ?? ""] ?? "操作",
     action: () => handleBuiltinAction(action, scope, crud),
   }))

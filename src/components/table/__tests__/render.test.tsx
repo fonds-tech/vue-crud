@@ -6,7 +6,6 @@ import { renderTable } from "../render/table"
 import { TableToolbar } from "../render/toolbar"
 import { renderColumns } from "../render/columns"
 import { ColumnSettings } from "../render/settings"
-import { renderContextMenu } from "../render/context-menu"
 import { h, defineComponent } from "vue"
 import { renderActionButtons } from "../render/actions"
 import { it, vi, expect, describe, beforeEach } from "vitest"
@@ -199,22 +198,6 @@ describe("table render layer", () => {
     expect(renderHelpers.formatCell).toHaveBeenCalled()
   })
 
-  it("renderContextMenu 根据可见性渲染", () => {
-    const handlers = { handleContextAction: vi.fn() }
-    const engine = {
-      state: { contextMenuState: { visible: true, x: 10, y: 20, items: [{ label: "查看", action: vi.fn() }] } },
-      handlers,
-    } as unknown as TableCore
-    const vnode = renderContextMenu(engine)
-    // 验证返回 Teleport VNode
-    expect(vnode).toBeTruthy()
-    expect(vnode.props?.to).toBe("body")
-    // 验证 children 存在（visible=true 时应有内容）
-    const children = vnode.children as any[]
-    expect(children).toBeDefined()
-    expect(children[0]).toBeTruthy() // 可见时第一个子元素是菜单 div
-  })
-
   it("tableFooter 触发分页回调", () => {
     const onPageChange = vi.fn()
     const onSizeChange = vi.fn()
@@ -359,7 +342,6 @@ describe("table render layer", () => {
         isAllChecked: { value: false },
         isIndeterminate: { value: false },
         columnSettings: { value: [{ id: "a", label: "A", show: true, sort: true }] },
-        contextMenuState: { visible: false, x: 0, y: 0, items: [] },
       },
       handlers,
       methods,
@@ -452,7 +434,6 @@ describe("table render layer", () => {
         isAllChecked: { value: false },
         isIndeterminate: { value: false },
         columnSettings: { value: [{ id: "a", label: "A", show: true, sort: true }] },
-        contextMenuState: { visible: false, x: 0, y: 0, items: [] },
       },
       handlers,
       methods,

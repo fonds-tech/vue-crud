@@ -20,6 +20,8 @@ export interface ContextMenuItem {
   showChildren?: boolean
   /** 点击回调函数，参数为关闭菜单的方法 */
   callback?: (close: () => void) => void
+  /** 是否在执行 callback 后自动关闭菜单，默认为 false */
+  autoClose?: boolean
   /** 允许任意其他属性 */
   [key: string]: any
 }

@@ -118,6 +118,10 @@ export function useContextMenuCore(props: { show: boolean, event?: MouseEvent, o
 
     if (item.callback) {
       item.callback(() => close())
+      // 如果设置了 autoClose，执行 callback 后自动关闭菜单
+      if (item.autoClose) {
+        close()
+      }
       return
     }
 

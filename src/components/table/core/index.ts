@@ -153,7 +153,6 @@ export function useTableCore(options: TableCoreOptions): TableCore {
     selectAll: (checked?: boolean) => methods.selectAll(checked),
     clearSelection: () => methods.clearSelection(),
     toggleFullscreen: (full?: boolean) => methods.toggleFullscreen(typeof full === "boolean" ? full : undefined),
-    closeContextMenu: handlers.closeContextMenu,
   }
 
   // 生命周期钩子

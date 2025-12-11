@@ -5,6 +5,14 @@ import { createTableState } from "../core/state"
 import { createTableHandlers } from "../core/handlers"
 import { it, vi, expect, describe, beforeEach } from "vitest"
 
+// Mock contextMenu 组件
+const mockOpen = vi.fn()
+vi.mock("@/components/context-menu", () => ({
+  contextMenu: {
+    open: (...args: unknown[]) => mockOpen(...args),
+  },
+}))
+
 describe("createTableHandlers", () => {
   let state: ReturnType<typeof createTableState>
   let mockCrud: TableHandlersContext["crud"]
@@ -14,6 +22,7 @@ describe("createTableHandlers", () => {
   let handlers: ReturnType<typeof createTableHandlers>
 
   beforeEach(() => {
+    vi.clearAllMocks()
     state = createTableState({}, {}, {})
     mockCrud = {
       selection: [],
@@ -118,20 +127,6 @@ describe("createTableHandlers", () => {
     })
   })
 
-  describe("closeContextMenu", () => {
-    it("应该关闭右键菜单", () => {
-      state.contextMenuState.visible = true
-      handlers.closeContextMenu()
-      expect(state.contextMenuState.visible).toBe(false)
-    })
-
-    it("已关闭时调用应该保持关闭", () => {
-      state.contextMenuState.visible = false
-      handlers.closeContextMenu()
-      expect(state.contextMenuState.visible).toBe(false)
-    })
-  })
-
   describe("tableRefreshHandler", () => {
     it("应该更新数据列表", () => {
       const list: TableRecord[] = [
@@ -190,42 +185,20 @@ describe("createTableHandlers", () => {
   })
 
   describe("onCellContextmenu", () => {
-    it("应该阻止默认行为", () => {
+    it("应该调用 contextMenu.open 打开菜单", () => {
       const row: TableRecord = { id: 1, name: "张三" }
       const column = { prop: "name" } as any
       const event = new MouseEvent("contextmenu", { clientX: 100, clientY: 200 })
-      const preventDefaultSpy = vi.spyOn(event, "preventDefault")
 
       state.tableRows.value = [row]
       handlers.onCellContextmenu(row, column, event)
 
-      expect(preventDefaultSpy).toHaveBeenCalled()
+      expect(mockOpen).toHaveBeenCalledWith(event, expect.objectContaining({
+        list: expect.any(Array),
+      }))
     })
 
-    it("应该设置菜单位置", () => {
-      const row: TableRecord = { id: 1, name: "张三" }
-      const column = { prop: "name" } as any
-      const event = new MouseEvent("contextmenu", { clientX: 150, clientY: 250 })
-
-      state.tableRows.value = [row]
-      handlers.onCellContextmenu(row, column, event)
-
-      expect(state.contextMenuState.x).toBe(150)
-      expect(state.contextMenuState.y).toBe(250)
-    })
-
-    it("应该显示菜单", () => {
-      const row: TableRecord = { id: 1, name: "张三" }
-      const column = { prop: "name" } as any
-      const event = new MouseEvent("contextmenu")
-
-      state.tableRows.value = [row]
-      handlers.onCellContextmenu(row, column, event)
-
-      expect(state.contextMenuState.visible).toBe(true)
-    })
-
-    it("应该构建菜单项", () => {
+    it("应该构建正确的菜单项列表", () => {
       const row: TableRecord = { id: 1, name: "张三" }
       const column = { prop: "name" } as any
       const event = new MouseEvent("contextmenu")
@@ -235,46 +208,37 @@ describe("createTableHandlers", () => {
 
       handlers.onCellContextmenu(row, column, event)
 
-      expect(state.contextMenuState.items.length).toBeGreaterThan(0)
-      expect(state.contextMenuState.items[0].label).toBe("刷新")
+      // 验证调用了 contextMenu.open
+      expect(mockOpen).toHaveBeenCalled()
+      const callArgs = mockOpen.mock.calls[0]
+      expect(callArgs[0]).toBe(event)
+      expect(callArgs[1]).toHaveProperty("list")
+      expect(callArgs[1].list.length).toBeGreaterThan(0)
+      expect(callArgs[1].list[0]).toHaveProperty("label", "刷新")
     })
 
-    it("行不在列表中时 $index 应为 0", () => {
-      const row: TableRecord = { id: 999, name: "不存在" }
+    it("无 event 时应该安全返回", () => {
+      const row: TableRecord = { id: 1, name: "张三" }
+      const column = { prop: "name" } as any
+
+      state.tableRows.value = [row]
+      // @ts-expect-error 测试 undefined event
+      handlers.onCellContextmenu(row, column, undefined)
+
+      expect(mockOpen).not.toHaveBeenCalled()
+    })
+
+    it("菜单项应包含 callback 字段", () => {
+      const row: TableRecord = { id: 1, name: "张三" }
       const column = { prop: "name" } as any
       const event = new MouseEvent("contextmenu")
 
-      state.tableRows.value = [{ id: 1, name: "张三" }]
+      state.tableRows.value = [row]
       handlers.onCellContextmenu(row, column, event)
 
-      // 菜单应该正常打开，$index 为 0
-      expect(state.contextMenuState.visible).toBe(true)
-    })
-  })
-
-  describe("handleContextAction", () => {
-    it("应该执行操作并关闭菜单", () => {
-      const action = vi.fn()
-      const item = { action, label: "测试操作" }
-
-      state.contextMenuState.visible = true
-      handlers.handleContextAction(item)
-
-      expect(action).toHaveBeenCalled()
-      expect(state.contextMenuState.visible).toBe(false)
-    })
-
-    it("应该按顺序执行操作", () => {
-      const callOrder: number[] = []
-      const action = () => callOrder.push(1)
-      const item = { action, label: "测试" }
-
-      state.contextMenuState.visible = true
-      handlers.handleContextAction(item)
-      callOrder.push(2)
-
-      expect(callOrder).toEqual([1, 2])
-      expect(state.contextMenuState.visible).toBe(false)
+      const callArgs = mockOpen.mock.calls[0]
+      expect(callArgs[1].list[0]).toHaveProperty("callback")
+      expect(typeof callArgs[1].list[0].callback).toBe("function")
     })
   })
 })

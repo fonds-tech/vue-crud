@@ -24,8 +24,6 @@ export interface HookHandlers {
   clearSelection: () => void
   /** 切换全屏模式的处理程序 */
   toggleFullscreen: (full?: boolean) => void
-  /** 关闭上下文菜单的处理程序 */
-  closeContextMenu: () => void
 }
 
 /**
@@ -96,9 +94,6 @@ export function registerEvents(mitt: MittLike | undefined, handlers: HookHandler
   mitt.on("table.selectAll", boundHandlers.selectAll)
   mitt.on("table.clearSelection", boundHandlers.clearSelection)
   mitt.on("table.toggleFullscreen", boundHandlers.toggleFullscreen)
-
-  // 全局监听 document click 用于关闭自定义上下文菜单
-  document.addEventListener("click", handlers.closeContextMenu)
 }
 
 /**
@@ -108,12 +103,8 @@ export function registerEvents(mitt: MittLike | undefined, handlers: HookHandler
  * @param handlers - 要移除的处理程序
  */
 export function unregisterEvents(mitt: MittLike | undefined, handlers: HookHandlers) {
-  // 卸载所有表格相关事件与全局点击监听，防止组件销毁后内存泄漏
-  if (!mitt?.off) {
-    // 即使 mitt 不存在也要移除 document 监听器
-    document.removeEventListener("click", handlers.closeContextMenu)
-    return
-  }
+  // 卸载所有表格相关事件，防止组件销毁后内存泄漏
+  if (!mitt?.off) return
 
   // 从注册表获取绑定的处理器引用，确保正确移除
   const boundHandlers = handlerRegistry.get(handlers)
@@ -126,6 +117,4 @@ export function unregisterEvents(mitt: MittLike | undefined, handlers: HookHandl
     // 清理注册表
     handlerRegistry.delete(handlers)
   }
-
-  document.removeEventListener("click", handlers.closeContextMenu)
 }
