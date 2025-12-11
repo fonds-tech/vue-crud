@@ -20,27 +20,14 @@ export const ContextMenu = defineComponent({
     options: { type: Object as PropType<ContextMenuOptions>, default: () => ({}) },
   },
   setup(props, { slots, expose }) {
-    const {
-      setRefs,
-      list,
-      ids,
-      style,
-      visible,
-      animationClass,
-      extraClass,
-      open,
-      close,
-      handleItemClick,
-    } = useContextMenuCore(props)
+    const { setRefs, list, ids, style, visible, animationClass, extraClass, open, close, handleItemClick } = useContextMenuCore(props)
 
     expose({ open, close } satisfies ContextMenuExpose)
 
     return () => {
       if (!visible.value) return null
 
-      const content = slots.default
-        ? slots.default()
-        : renderList(list.value, "0", 1, ids, handleItemClick, close)
+      const content = slots.default ? slots.default() : renderList(list.value, "0", 1, ids, handleItemClick, close)
 
       return (
         <div

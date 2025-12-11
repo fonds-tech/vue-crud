@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableDict } from "@/components/table/types"
+import type { TableDict } from "@/components/table"
 import { TableMockService } from "../mockService"
 import { useCrud, useTable } from "@/hooks"
 

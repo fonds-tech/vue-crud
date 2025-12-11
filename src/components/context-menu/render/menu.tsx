@@ -7,13 +7,7 @@ import type { InternalMenuItem } from "../core/helpers"
  * @returns JSX 元素
  */
 function renderDivider(id: string): JSX.Element {
-  return (
-    <div
-      key={id}
-      class="fd-context-menu__divider"
-      role="separator"
-    />
-  )
+  return <div key={id} class="fd-context-menu__divider" role="separator" />
 }
 
 /**
@@ -98,14 +92,7 @@ export function renderList(
               {prefixIcon && <span class={["fd-context-menu__icon", prefixIcon]}></span>}
               <span class="fd-context-menu__label">{item.label}</span>
               {suffixIcon && <span class={["fd-context-menu__icon", suffixIcon]}></span>}
-              {hasChildren && item._showChildren && item.children && renderList(
-                item.children,
-                id,
-                level + 1,
-                ids,
-                handleItemClick,
-                close,
-              )}
+              {hasChildren && item._showChildren && item.children && renderList(item.children, id, level + 1, ids, handleItemClick, close)}
             </div>
           )
         })}

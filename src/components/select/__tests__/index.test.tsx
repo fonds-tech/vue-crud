@@ -206,11 +206,7 @@ describe("select", () => {
   it("label/value 在缺少自定义字段时回退到 label/value 或空字符串", () => {
     const wrapper = mountSelect({
       props: {
-        options: [
-          { name: "姓名", id: 1 },
-          { label: "备用 label", value: "备用 value" },
-          { other: "空值回退" },
-        ],
+        options: [{ name: "姓名", id: 1 }, { label: "备用 label", value: "备用 value" }, { other: "空值回退" }],
         labelKey: "name",
         valueKey: "id",
       },

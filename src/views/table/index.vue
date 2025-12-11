@@ -1,5 +1,5 @@
 <template>
-  <layout title="fd-table 表格示例" description="展示基础表格、操作列、自定义插槽等能力" :components="componentCatalog" />
+  <layout :use-scrollbar="false" title="fd-table 表格示例" description="展示基础表格、操作列、自定义插槽等能力" :components="componentCatalog" />
 </template>
 
 <script setup lang="ts">

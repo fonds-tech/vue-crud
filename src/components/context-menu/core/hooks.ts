@@ -2,14 +2,7 @@ import type { InternalMenuItem } from "./helpers"
 import type { ContextMenuControl, ContextMenuOptions } from "../types"
 import { useRefs } from "@/hooks"
 import { ref, watch, nextTick, reactive, onBeforeUnmount } from "vue"
-import {
-  markTarget,
-  positionMenu,
-  normalizeList,
-  registerEscapeClose,
-  registerOutsideClose,
-  removeHoverHighlight,
-} from "./helpers"
+import { markTarget, positionMenu, normalizeList, registerEscapeClose, registerOutsideClose, removeHoverHighlight } from "./helpers"
 
 /**
  * 菜单位置样式接口

@@ -48,10 +48,7 @@ export function normalizeList(list?: ContextMenuItem[]): InternalMenuItem[] {
  * @param hoverTarget - 高亮目标元素的 ref 对象
  * @param hoverClassName - 高亮类名的 ref 对象
  */
-export function removeHoverHighlight(
-  hoverTarget: Ref<HTMLElement | null>,
-  hoverClassName: Ref<string>,
-): void {
+export function removeHoverHighlight(hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>): void {
   if (hoverTarget.value) {
     hoverTarget.value.classList?.remove(hoverClassName.value)
     hoverTarget.value = null
@@ -65,12 +62,7 @@ export function removeHoverHighlight(
  * @param hoverTarget - 高亮目标元素的 ref 对象
  * @param hoverClassName - 高亮类名的 ref 对象
  */
-export function markTarget(
-  event: MouseEvent,
-  hoverOptions: ContextMenuOptions["hover"] | undefined,
-  hoverTarget: Ref<HTMLElement | null>,
-  hoverClassName: Ref<string>,
-): void {
+export function markTarget(event: MouseEvent, hoverOptions: ContextMenuOptions["hover"] | undefined, hoverTarget: Ref<HTMLElement | null>, hoverClassName: Ref<string>): void {
   removeHoverHighlight(hoverTarget, hoverClassName)
   if (!hoverOptions) return
 
@@ -107,11 +99,7 @@ interface MenuPositionStyle {
  * @param menuElement - 菜单 DOM 元素
  * @param style - 样式对象引用，用于更新 top/left
  */
-export async function positionMenu(
-  event: MouseEvent,
-  menuElement: HTMLElement | null | undefined,
-  style: MenuPositionStyle,
-): Promise<void> {
+export async function positionMenu(event: MouseEvent, menuElement: HTMLElement | null | undefined, style: MenuPositionStyle): Promise<void> {
   await nextTick()
   if (!menuElement) return
 
@@ -144,12 +132,7 @@ export async function positionMenu(
  * @param close - 关闭回调函数
  * @param cleanupFns - 清理函数数组
  */
-export function registerOutsideClose(
-  doc: Document,
-  menuElement: HTMLElement | null | undefined,
-  close: () => void,
-  cleanupFns: Array<() => void>,
-): void {
+export function registerOutsideClose(doc: Document, menuElement: HTMLElement | null | undefined, close: () => void, cleanupFns: Array<() => void>): void {
   const handler = (event: MouseEvent): void => {
     const target = event.target as Node | null
     if (!menuElement || menuElement === target || menuElement.contains(target)) return
@@ -165,11 +148,7 @@ export function registerOutsideClose(
  * @param close - 关闭回调函数
  * @param cleanupFns - 清理函数数组
  */
-export function registerEscapeClose(
-  doc: Document,
-  close: () => void,
-  cleanupFns: Array<() => void>,
-): void {
+export function registerEscapeClose(doc: Document, close: () => void, cleanupFns: Array<() => void>): void {
   const handler = (event: KeyboardEvent): void => {
     if (event.key === "Escape") {
       close()

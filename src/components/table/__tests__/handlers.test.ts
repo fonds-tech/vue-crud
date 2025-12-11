@@ -193,9 +193,12 @@ describe("createTableHandlers", () => {
       state.tableRows.value = [row]
       handlers.onCellContextmenu(row, column, event)
 
-      expect(mockOpen).toHaveBeenCalledWith(event, expect.objectContaining({
-        list: expect.any(Array),
-      }))
+      expect(mockOpen).toHaveBeenCalledWith(
+        event,
+        expect.objectContaining({
+          list: expect.any(Array),
+        }),
+      )
     })
 
     it("应该构建正确的菜单项列表", () => {
