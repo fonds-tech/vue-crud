@@ -136,8 +136,8 @@ describe("useSearchCore", () => {
       handlers[event] = handler
     })
 
-    mockCrud.params = {}
-    mockCrud.getParams.mockReturnValue({})
+    ;(mockCrud as any).params = {}
+    mockCrud.getParams.mockReturnValue({} as any)
 
     const engine = useSearchCore({})
     engine.formRef.value = {

@@ -15,7 +15,7 @@ const mockEngine = {
 }
 
 vi.mock("../render", () => ({
-  renderSearch: (...args: any[]) => renderSearchSpy(...args),
+  renderSearch: (...args: any[]) => renderSearchSpy(...(args as [])),
 }))
 
 vi.mock("../core", () => ({
@@ -35,13 +35,14 @@ describe("fd-search 组件", () => {
     })
 
     expect(renderSearchSpy).toHaveBeenCalled()
-    expect(wrapper.vm.model).toEqual({ kw: "foo" })
-    expect(wrapper.vm.form).toBe("form-ref")
+    const vm = wrapper.vm as any
+    expect(vm.model).toEqual({ kw: "foo" })
+    expect(vm.form).toBe("form-ref")
 
-    wrapper.vm.use({ foo: 1 })
-    wrapper.vm.reset()
-    wrapper.vm.search()
-    wrapper.vm.collapse(true)
+    vm.use({ foo: 1 })
+    vm.reset()
+    vm.search()
+    vm.collapse(true)
 
     expect(mockEngine.use).toHaveBeenCalled()
     expect(mockEngine.reset).toHaveBeenCalled()

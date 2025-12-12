@@ -14,7 +14,7 @@ describe("utils/component 分支补测", () => {
     const vnode = h("span", "text")
     const component = { setup: () => () => h("div") }
 
-    expect(parse<string>("custom-slot", ctx).slotName).toBe("custom-slot")
+    expect(parse<string>("custom-slot", ctx as any).slotName).toBe("custom-slot")
     expect(parse(vnode, ctx).is).toBe(vnode)
     expect(parse(component as any, ctx).is).toBe(component)
 

@@ -58,6 +58,8 @@ describe("columnSettings defaults", () => {
             toggleFixed: vi.fn(),
             onColumnShowChange: vi.fn(),
             saveColumns: vi.fn(),
+            onDragMove: vi.fn(() => true),
+            onDragEnd: vi.fn(),
           }),
       }),
     )

@@ -308,7 +308,7 @@ describe("table settings", () => {
       try {
         globalThis.localStorage = throwingStorage
         const state = createTableState({ name: "reset-error" }, {}, {})
-        state.cacheKey.value = "reset-error-key"
+        ;(state.cacheKey as any).value = "reset-error-key"
         state.tableOptions.columns = [{ __id: "x", label: "X" }] as any
         expect(() => resetColumns(state)).not.toThrow()
       }
