@@ -32,7 +32,8 @@ env:
   PNPM_VERSION: '10'
 
 permissions:
-  contents: read
+  id-token: write # Required for OIDC
+  contents: write # 需要写权限以创建 Release 和上传资产
 
 jobs:
   # ==================== 代码质量检查 ====================
