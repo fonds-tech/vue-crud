@@ -25,7 +25,7 @@ env:
 
 permissions:
   id-token: write # Required for OIDC
-  contents: read
+  contents: write # 需要写权限以创建 Release 和上传资产
 
 jobs:
   # ==================== 预检查 ====================
