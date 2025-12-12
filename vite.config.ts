@@ -36,7 +36,9 @@ export default defineConfig({
       outDir: "dist/types",
     }),
   ],
-
+  server: {
+    port: 5200,
+  },
   build: {
     lib: {
       entry: resolve(__dirname, "src/entry.ts"),
