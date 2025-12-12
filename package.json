@@ -1,5 +1,5 @@
 {
-  "name": "vue-crud",
+  "name": "@fonds/vue-crud",
   "type": "module",
   "version": "1.0.5",
   "packageManager": "pnpm@10.20.0",
