@@ -5,11 +5,290 @@ on:
     tags:
       - 'v*'
 
+  # 支持手动触发
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 是否为模拟运行（不实际发布）
+        required: false
+        default: false
+        type: boolean
+
+# 并发控制：同一分支只允许一个发布流程运行
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 'lts/*'
+  PNPM_VERSION: '10'
+
 jobs:
-  release:
-    uses: sxzz/workflows/.github/workflows/release.yml@v1
-    with:
-      publish: true
+  # ==================== 预检查 ====================
+  preflight:
+    name: 🔍 预检查
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 提取版本信息
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${TAG#v}"
+          else
+            VERSION=$(node -p "require('./package.json').version")
+            TAG="v${VERSION}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 准备发布版本: ${VERSION} (标签: ${TAG})"
+
+  # ==================== 代码质量检查 ====================
+  lint:
+    name: 🔬 代码质量检查
+    runs-on: ubuntu-latest
+    needs: preflight
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 代码检查
+        run: pnpm run lint
+
+      - name: 类型检查
+        run: pnpm run typecheck
+
+  # ==================== 测试 ====================
+  test:
+    name: 🧪 测试
+    runs-on: ubuntu-latest
+    needs: preflight
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 运行测试
+        run: pnpm run test -- --run
+
+  # ==================== 构建 ====================
+  build:
+    name: 🏗️ 构建
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建库
+        run: pnpm run build
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ==================== 发布到 NPM ====================
+  publish-npm:
+    name: 📦 发布到 NPM
+    runs-on: ubuntu-latest
+    needs: [preflight, build]
+    if: ${{ !inputs.dry_run }}
+    permissions:
+      contents: read
+      id-token: write # 用于 npm provenance
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 下载构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 发布到 NPM
+        run: pnpm publish --access public --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ==================== 创建 GitHub Release ====================
+  github-release:
+    name: 🚀 创建 GitHub Release
+    runs-on: ubuntu-latest
+    needs: [preflight, publish-npm]
+    if: ${{ !inputs.dry_run }}
     permissions:
       contents: write
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整历史以生成变更日志
+
+      - name: 下载构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: 生成变更日志
+        id: changelog
+        run: |
+          # 获取上一个标签
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "📝 这是首次发布，列出所有提交"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "📝 生成自 ${PREVIOUS_TAG} 以来的变更日志"
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # 将变更日志写入文件（处理多行）
+          echo "$CHANGELOG" > changelog.md
+
+          echo "changelog_file=changelog.md" >> $GITHUB_OUTPUT
+
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.preflight.outputs.tag }}
+          name: ${{ needs.preflight.outputs.tag }}
+          body_path: changelog.md
+          draft: false
+          prerelease: ${{ contains(needs.preflight.outputs.version, '-') }}
+          files: |
+            dist/**/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ==================== 部署文档（可选） ====================
+  deploy-docs:
+    name: 📚 部署文档
+    runs-on: ubuntu-latest
+    needs: [preflight, build]
+    if: ${{ !inputs.dry_run && startsWith(github.ref, 'refs/tags/v') }}
+    permissions:
+      contents: read
+      pages: write
       id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建文档
+        run: pnpm run docs:build
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传到 Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/.vitepress/dist
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ==================== 发布通知（可选） ====================
+  notify:
+    name: 📣 发布通知
+    runs-on: ubuntu-latest
+    needs: [preflight, github-release]
+    if: ${{ always() && !inputs.dry_run }}
+    steps:
+      - name: 发布结果汇总
+        run: |
+          echo "## 📦 发布结果汇总" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 项目 | 值 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 版本 | ${{ needs.preflight.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 标签 | ${{ needs.preflight.outputs.tag }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| NPM | [vue-crud@${{ needs.preflight.outputs.version }}](https://www.npmjs.com/package/vue-crud) |" >> $GITHUB_STEP_SUMMARY
+          echo "| GitHub Release | [${{ needs.preflight.outputs.tag }}](https://github.com/${{ github.repository }}/releases/tag/${{ needs.preflight.outputs.tag }}) |" >> $GITHUB_STEP_SUMMARY
