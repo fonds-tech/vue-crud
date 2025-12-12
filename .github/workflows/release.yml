@@ -23,6 +23,10 @@ env:
   NODE_VERSION: 'lts/*'
   PNPM_VERSION: '10'
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 jobs:
   # ==================== 预检查 ====================
   preflight:
