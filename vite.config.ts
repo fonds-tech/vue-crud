@@ -34,7 +34,7 @@ export default defineConfig({
         "src/router/**",
       ],
       outDir: "dist/types",
-    }),
+    }) as any,
   ],
   server: {
     port: 5200,
@@ -48,13 +48,12 @@ export default defineConfig({
       cssFileName: "index",
     },
     rollupOptions: {
-      external: ["element-plus", "@element-plus/icons-vue", "vue"],
+      external: ["element-plus", "@element-plus/icons-vue"],
       output: {
         exports: "named",
         globals: {
           "element-plus": "ElementPlus",
           "@element-plus/icons-vue": "ElementPlusIconsVue",
-          "vue": "Vue",
         },
       },
     },
