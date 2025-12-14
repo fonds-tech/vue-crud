@@ -38,6 +38,9 @@
     "yaml",
     "scss",
     "css"
-  ]
+  ],
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 
 }

@@ -25,16 +25,16 @@ import { contextMenu } from "@/components/context-menu"
 const menuActions: ContextMenuItem[] = [
   {
     label: "查看详情",
-    callback: () => ElMessage.success("查看详情") && undefined,
+    onClick: () => ElMessage.success("查看详情"),
   },
   {
     label: "复制 ID",
-    callback: () => ElMessage.success("ID 已复制（示例）") && undefined,
+    onClick: () => ElMessage.success("ID 已复制（示例）"),
   },
   {
     label: "更多操作",
     children: [
-      { label: "导出", callback: () => ElMessage.success("导出成功（示例）") && undefined },
+      { label: "导出", onClick: () => ElMessage.success("导出成功（示例）") },
       { label: "下线", disabled: true },
       {
         label: "子级菜单",

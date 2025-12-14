@@ -44,8 +44,8 @@ function openMenu(event: MouseEvent, useList = false) {
   state.options = useList
     ? {
         list: [
-          { label: "复制链接", callback: closeMenu },
-          { label: "删除", callback: closeMenu },
+          { label: "复制链接", onClick: closeMenu },
+          { label: "删除", onClick: closeMenu },
         ],
       }
     : {
