@@ -1,13 +1,11 @@
 .fd-context-menu {
   color: var(--el-text-color-primary);
   border: 1px solid var(--el-border-color-light);
-  padding: 6px;
   z-index: 3000;
   position: fixed;
   font-size: 13px;
   max-width: 280px;
   background: var(--el-bg-color-overlay);
-  box-shadow: var(--el-box-shadow-light);
   border-radius: var(--el-border-radius-base);
   backdrop-filter: blur(12px);
   transform-origin: top left;
@@ -25,6 +23,9 @@
   gap: 2px;
   width: fit-content;
   display: flex;
+  padding: 6px;
+  box-shadow: var(--el-box-shadow-light);
+  border-radius: var(--el-border-radius-base);
   flex-direction: column;
 
   &.is-append {
